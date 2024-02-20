@@ -1,5 +1,6 @@
-import { ApiConstants } from "@/utils/constants";
-import { AuthHelper } from "@/utils/helpers/dateHelper";
+
+import { ApiConstants } from "@/utils/constants/apiConstants";
+import { AuthHelper } from "@/utils/helpers/authHelper";
 import axios from "axios";
 
 const instance = axios.create({
@@ -13,8 +14,8 @@ instance.interceptors.request.use(
   (config) => {
     const token = AuthHelper.getLocalAccessToken();
     if (token) {
-      config.headers["Authorization"] = "Bearer " + token; // for Spring Boot back-end
-      //   config.headers["x-access-token"] = token; // for Node.js Express back-end
+      config.headers["Authorization"] = "Bearer " + token; // for Spring Boot
+      //   config.headers["x-access-token"] = token; // for Node.js Express
     }
     return config;
   },

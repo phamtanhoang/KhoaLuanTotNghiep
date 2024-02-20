@@ -4,7 +4,6 @@ import com.pth.taskbackend.dto.requests.AuthenticationRequestDto;
 import com.pth.taskbackend.models.AppUserDetails;
 import com.pth.taskbackend.services.JwtTokenService;
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +21,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.pth.taskbackend.utils.Constants.*;
-import static com.pth.taskbackend.utils.Constants.Tokens.*;
+import static com.pth.taskbackend.utils.constants.PathConstants.AuthPaths.*;
+import static com.pth.taskbackend.utils.constants.TokenConstants.*;
+import static com.pth.taskbackend.utils.common.CookieCommon.createAndAddCookies;
 
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("auth")
+@RequestMapping(value = {AUTH_PATH})
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -43,7 +43,7 @@ public class AuthController {
     private long refreshTokenValidityMs;
 
 
-    @PostMapping("login")
+    @PostMapping(value = {AUTH_LOGIN_PATH})
     public ResponseEntity<Void> login(@RequestBody AuthenticationRequestDto requestDto,
                                       HttpServletRequest request,
                                       HttpServletResponse response) {
@@ -61,7 +61,10 @@ public class AuthController {
                     request,
                     response,
                     authenticatedUser.getUsername(),
-                    authenticatedUser.getRoleNames()
+                    authenticatedUser.getRoleNames(), jwtTokenService,
+                    issuedRefreshTokens,
+                    accessTokenValidityMs,
+                    refreshTokenValidityMs
             );
 
             return ResponseEntity.noContent().build();
@@ -70,7 +73,7 @@ public class AuthController {
         }
     }
 
-    @GetMapping("refresh")
+    @GetMapping(value = {AUTH_REFRESH_PATH})
     public ResponseEntity<Void> refresh(@CookieValue(value = APP_REFRESH_TOKEN) String refreshToken,
                                         HttpServletRequest request,
                                         HttpServletResponse response) {
@@ -80,47 +83,17 @@ public class AuthController {
             String username = claims.getSubject();
             List<String> rolesNames = (List<String>) claims.get(ROLES);
 
-            createAndAddCookies(request, response, username, rolesNames);
+            createAndAddCookies(
+                    request,
+                    response,
+                    username,
+                    rolesNames,
+                    jwtTokenService,
+                    issuedRefreshTokens,
+                    accessTokenValidityMs,
+                    refreshTokenValidityMs);
             return ResponseEntity.noContent().build();
         }
         throw new BadCredentialsException("Invalid refresh token");
-    }
-
-    private void createAndAddCookies(HttpServletRequest request,
-                                     HttpServletResponse response,
-                                     String username,
-                                     List<String> roleNames) {
-        String accessToken = jwtTokenService.createToken(
-                ACCESS_TOKEN_TYPE,
-                username, roleNames,
-                accessTokenValidityMs
-        );
-        String refreshToken = jwtTokenService.createToken(
-                REFRESH_TOKEN_TYPE,
-                username,
-                roleNames,
-                refreshTokenValidityMs
-        );
-
-        int secondsSpentOnProcessingRequest = 1;
-        int accessTokenExpiresInSeconds = (int) (accessTokenValidityMs / 1000) - secondsSpentOnProcessingRequest;
-        int refreshTokenExpiresInSeconds = (int) (refreshTokenValidityMs / 1000) - secondsSpentOnProcessingRequest;
-
-        issuedRefreshTokens.add(refreshToken);
-
-        // secure flag allows cookies to be transported only via https -> we turn it off on localhost
-        boolean secureFlag = !LOCALHOST.equalsIgnoreCase(request.getServerName());
-
-        response.addCookie(createCookie(APP_ACCESS_TOKEN, accessToken, secureFlag, accessTokenExpiresInSeconds));
-        response.addCookie(createCookie(APP_REFRESH_TOKEN, refreshToken, secureFlag, refreshTokenExpiresInSeconds));
-    }
-
-    public static Cookie createCookie(String cookieName, String cookieValue, boolean secure, int expiresIn) {
-        Cookie cookie = new Cookie(cookieName, cookieValue);
-        cookie.setPath(DEFAULT_PATH);
-        cookie.setHttpOnly(HTTP_ONLY);
-        cookie.setSecure(secure);
-        cookie.setMaxAge(expiresIn);
-        return cookie;
     }
 }

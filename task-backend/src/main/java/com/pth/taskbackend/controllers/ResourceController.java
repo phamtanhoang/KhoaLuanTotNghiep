@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
+import static com.pth.taskbackend.utils.constants.PathConstants.ResourcePaths.*;
+
 @RestController
-@RequestMapping("resource")
+@RequestMapping(value = {RESOURCE_PATH})
 public class ResourceController {
 
     @GetMapping

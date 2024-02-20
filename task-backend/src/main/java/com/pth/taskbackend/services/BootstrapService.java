@@ -28,14 +28,14 @@ public class BootstrapService {
             this.appRoleRepository.save(new AppRole("USER"));
         }
 
-        String email = "max@example.com";
+        String email = "test@example.com";
         if (appUserRepository.findByEmail(email).isEmpty()) {
             AppRole userRole = appRoleRepository.findByName("USER");
             AppUser user = new AppUser(
                     email,
                     passwordEncoder.encode("password"),
-                    "Max",
-                    "Musterman",
+                    "name",
+                    "surname",
                     Status.ACTIVE,
                     Set.of(userRole)
             );

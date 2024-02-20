@@ -14,7 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
-import static com.pth.taskbackend.utils.Constants.Tokens.APP_ACCESS_TOKEN;
+import static com.pth.taskbackend.utils.constants.TokenConstants.APP_ACCESS_TOKEN;
 
 @Component
 @RequiredArgsConstructor
