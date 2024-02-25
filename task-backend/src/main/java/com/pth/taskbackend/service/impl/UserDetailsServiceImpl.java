@@ -1,7 +1,7 @@
-package com.pth.taskbackend.services;
+package com.pth.taskbackend.service.impl;
 
-import com.pth.taskbackend.models.AppUserDetails;
-import com.pth.taskbackend.repositories.AppUserRepository;
+import com.pth.taskbackend.model.meta.UserDetail;
+import com.pth.taskbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final AppUserRepository appUserRepository;
+    private final UserRepository appUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return appUserRepository.findByEmail(username)
-                .map(AppUserDetails::of)
+                .map(UserDetail::of)
                 .orElseThrow();
     }
 }

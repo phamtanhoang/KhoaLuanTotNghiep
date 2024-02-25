@@ -1,6 +1,6 @@
 package com.pth.taskbackend.security;
 
-import com.pth.taskbackend.services.JwtTokenService;
+import com.pth.taskbackend.service.JwtTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
-import static com.pth.taskbackend.utils.constants.TokenConstants.APP_ACCESS_TOKEN;
+import static com.pth.taskbackend.util.constant.TokenConstants.APP_ACCESS_TOKEN;
 
 @Component
 @RequiredArgsConstructor

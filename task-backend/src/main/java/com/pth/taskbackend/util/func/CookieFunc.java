@@ -1,7 +1,6 @@
-package com.pth.taskbackend.utils.common;
+package com.pth.taskbackend.util.func;
 
-import com.pth.taskbackend.services.JwtTokenService;
-import com.pth.taskbackend.utils.constants.PathConstants;
+import com.pth.taskbackend.service.JwtTokenService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,10 +8,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Set;
 
-import static com.pth.taskbackend.utils.constants.PathConstants.*;
-import static com.pth.taskbackend.utils.constants.TokenConstants.*;
+import static com.pth.taskbackend.util.constant.TokenConstants.*;
 
-public class CookieCommon {
+public class CookieFunc {
     public static void createAndAddCookies(HttpServletRequest request,
                                            HttpServletResponse response,
                                            String username,
@@ -49,8 +47,8 @@ public class CookieCommon {
 
     public static Cookie createCookie(String cookieName, String cookieValue, boolean secure, int expiresIn) {
         Cookie cookie = new Cookie(cookieName, cookieValue);
-        cookie.setPath(PathConstants.DEFAULT_PATH);
-        cookie.setHttpOnly(PathConstants.HTTP_ONLY);
+        cookie.setPath(DEFAULT_PATH);
+        cookie.setHttpOnly(HTTP_ONLY);
         cookie.setSecure(secure);
         cookie.setMaxAge(expiresIn);
         return cookie;

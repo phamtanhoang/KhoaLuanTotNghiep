@@ -1,6 +1,7 @@
-package com.pth.taskbackend.models;
+package com.pth.taskbackend.model.meta;
 
-import com.pth.taskbackend.enums.Status;
+import com.pth.taskbackend.enums.EStatus;
+import com.pth.taskbackend.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +16,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppUser extends BaseEntity {
+public class User extends BaseEntity {
 
     private String email;
     private String password;
@@ -23,7 +24,7 @@ public class AppUser extends BaseEntity {
     private String surname;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private EStatus EStatus;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -31,5 +32,5 @@ public class AppUser extends BaseEntity {
             joinColumns = @JoinColumn(name = "app_user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<AppRole> appRoles = new HashSet<>();
+    private Set<Role> roles = new HashSet<>();
 }

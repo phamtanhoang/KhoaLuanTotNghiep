@@ -24,21 +24,21 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenFilter jwtTokenFilter;
 
-    @Bean
-    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(
-                        customizer -> customizer
-                                .requestMatchers("/auth/**").permitAll()
-                                .requestMatchers("/public/**").permitAll()
-                                .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtTokenFilter, BasicAuthenticationFilter.class)
-                .build();
-    }
+//    @Bean
+//    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+//        return http
+//                .httpBasic(AbstractHttpConfigurer::disable)
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .authorizeHttpRequests(
+//                        customizer -> customizer
+//                                .requestMatchers("/auth/**").permitAll()
+//                                .requestMatchers("/swagger-ui/**").permitAll()
+//                                .anyRequest().authenticated()
+//                )
+//                .addFilterBefore(jwtTokenFilter, BasicAuthenticationFilter.class)
+//                .build();
+//    }
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {

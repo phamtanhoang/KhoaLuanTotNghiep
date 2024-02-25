@@ -1,4 +1,4 @@
-package com.pth.taskbackend.models;
+package com.pth.taskbackend.model;
 
 import jakarta.persistence.*;
 import lombok.Data;

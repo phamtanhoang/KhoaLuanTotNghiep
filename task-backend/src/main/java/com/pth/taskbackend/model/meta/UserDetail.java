@@ -1,6 +1,6 @@
-package com.pth.taskbackend.models;
+package com.pth.taskbackend.model.meta;
 
-import com.pth.taskbackend.enums.Status;
+import com.pth.taskbackend.enums.EStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AppUserDetails implements UserDetails {
+public class UserDetail implements UserDetails {
     private String username;
     private String password;
-    private Collection<AppRole> roles = new ArrayList<>();
+    private Collection<Role> roles = new ArrayList<>();
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
@@ -28,24 +28,24 @@ public class AppUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return getRoles().stream()
-                .map(AppRole::getName)
+                .map(Role::getName)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
     }
 
-    public static AppUserDetails of(AppUser user) {
-        return new AppUserDetails(
+    public static UserDetail of(User user) {
+        return new UserDetail(
                 user.getEmail(),
                 user.getPassword(),
-                user.getAppRoles(),
+                user.getRoles(),
                 true,
                 true,
                 true,
-                Status.ACTIVE.equals(user.getStatus())
+                EStatus.ACTIVE.equals(user.getEStatus())
         );
     }
 
     public List<String> getRoleNames() {
-        return getRoles().stream().map(AppRole::getName).collect(Collectors.toList());
+        return getRoles().stream().map(Role::getName).collect(Collectors.toList());
     }
 }

@@ -7,10 +7,14 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/job-app?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/job-app
     username: root
     password: Hoang2002
 
+springdoc:
+  openapi:
+    dev-url: http://localhost:8080
+    prod-url: https://jobapp-api.com
 
 jwt:
   access-token:

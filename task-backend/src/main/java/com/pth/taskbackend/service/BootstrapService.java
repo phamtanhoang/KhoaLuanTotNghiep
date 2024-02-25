@@ -1,10 +1,10 @@
-package com.pth.taskbackend.services;
+package com.pth.taskbackend.service;
 
-import com.pth.taskbackend.enums.Status;
-import com.pth.taskbackend.models.AppRole;
-import com.pth.taskbackend.models.AppUser;
-import com.pth.taskbackend.repositories.AppRoleRepository;
-import com.pth.taskbackend.repositories.AppUserRepository;
+import com.pth.taskbackend.enums.EStatus;
+import com.pth.taskbackend.model.meta.Role;
+import com.pth.taskbackend.model.meta.User;
+import com.pth.taskbackend.repository.RoleRepository;
+import com.pth.taskbackend.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
@@ -18,25 +18,25 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class BootstrapService {
 
-    private final AppUserRepository appUserRepository;
-    private final AppRoleRepository appRoleRepository;
+    private final UserRepository appUserRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @PostConstruct
     public void bootstrap() {
-        if (appRoleRepository.findAll().isEmpty()) {
-            this.appRoleRepository.save(new AppRole("USER"));
+        if (roleRepository.findAll().isEmpty()) {
+            this.roleRepository.save(new Role("USER"));
         }
 
         String email = "test@example.com";
         if (appUserRepository.findByEmail(email).isEmpty()) {
-            AppRole userRole = appRoleRepository.findByName("USER");
-            AppUser user = new AppUser(
+            Role userRole = roleRepository.findByName("USER");
+            User user = new User(
                     email,
                     passwordEncoder.encode("password"),
                     "name",
                     "surname",
-                    Status.ACTIVE,
+                    EStatus.ACTIVE,
                     Set.of(userRole)
             );
             this.appUserRepository.save(user);

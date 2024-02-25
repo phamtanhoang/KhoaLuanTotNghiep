@@ -1,4 +1,4 @@
-package com.pth.taskbackend.services;
+package com.pth.taskbackend.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.pth.taskbackend.utils.constants.TokenConstants.*;
+import static com.pth.taskbackend.util.constant.TokenConstants.*;
 
 @Service
 @RequiredArgsConstructor

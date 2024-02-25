@@ -1,8 +1,8 @@
-package com.pth.taskbackend.controllers;
+package com.pth.taskbackend.controller;
 
-import com.pth.taskbackend.dto.requests.AuthenticationRequestDto;
-import com.pth.taskbackend.models.AppUserDetails;
-import com.pth.taskbackend.services.JwtTokenService;
+import com.pth.taskbackend.dto.request.AuthenticationRequest;
+import com.pth.taskbackend.model.meta.UserDetail;
+import com.pth.taskbackend.service.JwtTokenService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,14 +21,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.pth.taskbackend.utils.constants.PathConstants.AuthPaths.*;
-import static com.pth.taskbackend.utils.constants.TokenConstants.*;
-import static com.pth.taskbackend.utils.common.CookieCommon.createAndAddCookies;
+import static com.pth.taskbackend.util.constant.TokenConstants.*;
+import static com.pth.taskbackend.util.func.CookieFunc.createAndAddCookies;
 
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = {AUTH_PATH})
+@RequestMapping("/auth")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -36,15 +35,15 @@ public class AuthController {
 
     final Set<String> issuedRefreshTokens = Collections.synchronizedSet(new HashSet<>());
 
-    @Value("${jwt.access-token.expires:60000}")
+    @Value("${jwt.access-token.expires}")
     private long accessTokenValidityMs;
 
-    @Value("${jwt.refresh-token.expires:86400000}")
+    @Value("${jwt.refresh-token.expires}")
     private long refreshTokenValidityMs;
 
 
-    @PostMapping(value = {AUTH_LOGIN_PATH})
-    public ResponseEntity<Void> login(@RequestBody AuthenticationRequestDto requestDto,
+    @PostMapping("/login")
+    public ResponseEntity<Void> login(@RequestBody AuthenticationRequest requestDto,
                                       HttpServletRequest request,
                                       HttpServletResponse response) {
         try {
@@ -55,7 +54,7 @@ public class AuthController {
                             requestDto.password()
                     )
             );
-            AppUserDetails authenticatedUser = (AppUserDetails) authentication.getPrincipal();
+            UserDetail authenticatedUser = (UserDetail) authentication.getPrincipal();
 
             createAndAddCookies(
                     request,
@@ -73,7 +72,7 @@ public class AuthController {
         }
     }
 
-    @GetMapping(value = {AUTH_REFRESH_PATH})
+    @GetMapping("/refresh")
     public ResponseEntity<Void> refresh(@CookieValue(value = APP_REFRESH_TOKEN) String refreshToken,
                                         HttpServletRequest request,
                                         HttpServletResponse response) {

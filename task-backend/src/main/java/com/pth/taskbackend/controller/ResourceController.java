@@ -1,4 +1,4 @@
-package com.pth.taskbackend.controllers;
+package com.pth.taskbackend.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -6,10 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
-import static com.pth.taskbackend.utils.constants.PathConstants.ResourcePaths.*;
-
 @RestController
-@RequestMapping(value = {RESOURCE_PATH})
+@RequestMapping("/resource")
 public class ResourceController {
 
     @GetMapping
