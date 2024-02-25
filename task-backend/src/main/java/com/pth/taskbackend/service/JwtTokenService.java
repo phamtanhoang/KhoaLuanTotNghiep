@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.pth.taskbackend.util.constant.TokenConstants.*;
+import static com.pth.taskbackend.util.constant.TokenConstant.*;
 
 @Service
 @RequiredArgsConstructor

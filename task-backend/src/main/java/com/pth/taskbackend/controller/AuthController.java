@@ -4,6 +4,9 @@ import com.pth.taskbackend.dto.request.AuthenticationRequest;
 import com.pth.taskbackend.model.meta.UserDetail;
 import com.pth.taskbackend.service.JwtTokenService;
 import io.jsonwebtoken.Claims;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +24,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.pth.taskbackend.util.constant.TokenConstants.*;
+import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
+import static com.pth.taskbackend.util.constant.TokenConstant.*;
 import static com.pth.taskbackend.util.func.CookieFunc.createAndAddCookies;
 
-
+@CrossOrigin(origins = "*")
+@Tag(name = "Auths", description = "Auth APIs")
+@SecurityRequirement(name = "javainuseapi")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/auth")
+@RequestMapping(value = {BASE_URL + "/auth"})
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -41,11 +47,16 @@ public class AuthController {
     @Value("${jwt.refresh-token.expires}")
     private long refreshTokenValidityMs;
 
-
-    @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody AuthenticationRequest requestDto,
+    @Operation(summary = "Login/Signin", description = "", tags = {})
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Tutorial.class), mediaType = "application/json") }),
+//            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+//            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
+    @PostMapping("login")
+    public ResponseEntity<String> login(@RequestBody AuthenticationRequest requestDto,
                                       HttpServletRequest request,
                                       HttpServletResponse response) {
+        System.out.println("haahah");
         try {
             String username = requestDto.username();
             Authentication authentication = authenticationManager.authenticate(
@@ -72,7 +83,8 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/refresh")
+    @Operation(summary = "Refresh Token", description = "", tags = {})
+    @GetMapping("refresh")
     public ResponseEntity<Void> refresh(@CookieValue(value = APP_REFRESH_TOKEN) String refreshToken,
                                         HttpServletRequest request,
                                         HttpServletResponse response) {

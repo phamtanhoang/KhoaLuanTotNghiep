@@ -28,8 +28,8 @@ public class User extends BaseEntity {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "app_user_role",
-            joinColumns = @JoinColumn(name = "app_user_id"),
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();

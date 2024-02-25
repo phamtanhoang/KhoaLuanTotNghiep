@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Set;
 
-import static com.pth.taskbackend.util.constant.TokenConstants.*;
+import static com.pth.taskbackend.util.constant.TokenConstant.*;
 
 public class CookieFunc {
     public static void createAndAddCookies(HttpServletRequest request,

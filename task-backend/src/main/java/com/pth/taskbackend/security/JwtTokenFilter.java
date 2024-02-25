@@ -14,7 +14,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
-import static com.pth.taskbackend.util.constant.TokenConstants.APP_ACCESS_TOKEN;
+import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
+import static com.pth.taskbackend.util.constant.TokenConstant.APP_ACCESS_TOKEN;
 
 @Component
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
 
-    @Value("${urls.white-list:/auth/login}")
+    @Value(BASE_URL + "/auth/login")
     private List<String> whiteListedUrls;
 
     @Override

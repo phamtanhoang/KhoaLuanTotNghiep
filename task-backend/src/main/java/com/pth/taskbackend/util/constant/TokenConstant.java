@@ -1,6 +1,6 @@
 package com.pth.taskbackend.util.constant;
 
-public class TokenConstants {
+public class TokenConstant {
     public static final String APP_ACCESS_TOKEN = "app_access_token";
     public static final String APP_REFRESH_TOKEN = "app_refresh_token";
     public static final String ACCESS_TOKEN_TYPE = "access_token";
