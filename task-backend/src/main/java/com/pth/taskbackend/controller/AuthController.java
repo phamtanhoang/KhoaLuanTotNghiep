@@ -26,7 +26,7 @@ import java.util.Set;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 import static com.pth.taskbackend.util.constant.TokenConstant.*;
-import static com.pth.taskbackend.util.func.CookieFunc.createAndAddCookies;
+import static com.pth.taskbackend.util.func.CookieFunc.*;
 
 @CrossOrigin(origins = "*")
 @Tag(name = "Auths", description = "Auth APIs")
@@ -48,15 +48,10 @@ public class AuthController {
     private long refreshTokenValidityMs;
 
     @Operation(summary = "Login/Signin", description = "", tags = {})
-//    @ApiResponses({
-//            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Tutorial.class), mediaType = "application/json") }),
-//            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
-//            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     @PostMapping("login")
-    public ResponseEntity<String> login(@RequestBody AuthenticationRequest requestDto,
+    public ResponseEntity<Void> login(@RequestBody AuthenticationRequest requestDto,
                                       HttpServletRequest request,
                                       HttpServletResponse response) {
-        System.out.println("haahah");
         try {
             String username = requestDto.username();
             Authentication authentication = authenticationManager.authenticate(
@@ -67,17 +62,26 @@ public class AuthController {
             );
             UserDetail authenticatedUser = (UserDetail) authentication.getPrincipal();
 
-            createAndAddCookies(
+            addAccessTokenToCookies(
                     request,
                     response,
                     authenticatedUser.getUsername(),
-                    authenticatedUser.getRoleNames(), jwtTokenService,
+                    authenticatedUser.getRoleNames(),
+                    jwtTokenService,
+                    accessTokenValidityMs
+            );
+
+            addRefreshTokenToCookies(
+                    request,
+                    response,
+                    authenticatedUser.getUsername(),
+                    authenticatedUser.getRoleNames(),
+                    jwtTokenService,
                     issuedRefreshTokens,
-                    accessTokenValidityMs,
                     refreshTokenValidityMs
             );
 
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok().build();
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid Credentials");
         }
@@ -94,17 +98,25 @@ public class AuthController {
             String username = claims.getSubject();
             List<String> rolesNames = (List<String>) claims.get(ROLES);
 
-            createAndAddCookies(
+            addAccessTokenToCookies(
                     request,
                     response,
                     username,
                     rolesNames,
                     jwtTokenService,
-                    issuedRefreshTokens,
-                    accessTokenValidityMs,
-                    refreshTokenValidityMs);
-            return ResponseEntity.noContent().build();
+                    accessTokenValidityMs
+            );
+            return ResponseEntity.ok().build();
         }
         throw new BadCredentialsException("Invalid refresh token");
+    }
+
+    @Operation(summary = "Logout/Signout", description = "", tags = {})
+    @GetMapping("logout")
+    public ResponseEntity<Void> logout(@CookieValue(value = APP_REFRESH_TOKEN) String refreshToken,
+                                        HttpServletRequest request,
+                                        HttpServletResponse response) {
+        removeAccessTokenAndRefreshTokenInCookies(request, response);
+        return ResponseEntity.ok().build();
     }
 }

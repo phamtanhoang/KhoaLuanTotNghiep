@@ -18,6 +18,6 @@ springdoc:
 
 jwt:
   access-token:
-    expires: 60000
+    expires: 3600000
   refresh-token:
-    expires: 86400000
+    expires: 604800000
