@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface AuthService {
     BaseResponse login(String username, String password, HttpServletRequest request, HttpServletResponse response);
+    BaseResponse register(String username, String password);
     BaseResponse refresh(String refreshToken, HttpServletRequest request, HttpServletResponse response);
     BaseResponse logout(HttpServletRequest request, HttpServletResponse response);
 }

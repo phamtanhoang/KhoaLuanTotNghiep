@@ -18,30 +18,7 @@ import java.util.Set;
 public class BootstrapService {
 
     private final UserRepository appUserRepository;
-//    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-
-//    @PostConstruct
-//    public void bootstrap() {
-//        if (roleRepository.findAll().isEmpty()) {
-//            this.roleRepository.save(new Role("USER"));
-//        }
-//
-//        String email = "test@example.com";
-//        if (appUserRepository.findByEmail(email).isEmpty()) {
-//            Role userRole = roleRepository.findByName("USER");
-//            User user = new User(
-//                    email,
-//                    passwordEncoder.encode("password"),
-//                    "name",
-//                    "surname",
-//                    EStatus.ACTIVE,
-//                    Set.of(userRole)
-//            );
-//            this.appUserRepository.save(user);
-//        }
-//
-//    }
     @PostConstruct
     public void bootstrap() {
 

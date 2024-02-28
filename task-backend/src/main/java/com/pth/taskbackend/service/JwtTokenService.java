@@ -41,6 +41,9 @@ public class JwtTokenService {
 
     public Optional<String> getTokenFromCookie(HttpServletRequest request, String cookieName) {
         Cookie[] cookies = Objects.requireNonNullElse(request.getCookies(), new Cookie[]{});
+
+        System.out.println("Cookie, "+ cookies);
+
         return Arrays.stream(cookies)
                 .filter(cookie -> cookieName.equals(cookie.getName()))
                 .map(Cookie::getValue)

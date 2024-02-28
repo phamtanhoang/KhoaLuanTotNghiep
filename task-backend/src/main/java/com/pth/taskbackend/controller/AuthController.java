@@ -53,6 +53,12 @@ public class AuthController {
         );
     }
 
+    @Operation(summary = "Register/Signup", description = "", tags = {})
+    @PostMapping("register")
+    public ResponseEntity<BaseResponse> register(@RequestBody AuthenticationRequest requestDto) {
+        return ResponseEntity.ok(authService.register(requestDto.username(), requestDto.password()));
+    }
+
     @Operation(summary = "Refresh Token", description = "", tags = {})
     @GetMapping("refresh")
     public ResponseEntity<BaseResponse> refresh(@CookieValue(value = APP_REFRESH_TOKEN) String refreshToken,

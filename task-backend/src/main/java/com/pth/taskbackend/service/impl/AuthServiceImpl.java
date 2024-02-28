@@ -2,18 +2,22 @@ package com.pth.taskbackend.service;
 
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.dto.response.TokenResponse;
-import com.pth.taskbackend.model.meta.UserDetail;
+import com.pth.taskbackend.enums.ERole;
+import com.pth.taskbackend.enums.EStatus;
+import com.pth.taskbackend.model.meta.User;
+import com.pth.taskbackend.repository.UserRepository;
+import com.pth.taskbackend.security.UserInfoDetails;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -30,7 +34,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
-
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     final Set<String> issuedRefreshTokens = Collections.synchronizedSet(new HashSet<>());
 
     @Value("${jwt.access-token.expires}")
@@ -45,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
-            UserDetail authenticatedUser = (UserDetail) authentication.getPrincipal();
+            UserInfoDetails authenticatedUser = (UserInfoDetails) authentication.getPrincipal();
 
             addAccessTokenToCookies(request, response,
                     authenticatedUser.getUsername(),
@@ -70,6 +75,25 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Override
+    public BaseResponse register(String username, String password) {
+        try {
+            if (userRepository.findByEmail(username).isPresent()) {
+                return new BaseResponse("Tên người dùng đã tồn tại!", 400, null);
+            }
+            User newUser = new User();
+            newUser.setEmail(username);
+            newUser.setPassword(passwordEncoder.encode(password));
+            newUser.setStatus(EStatus.ACTIVE);
+            newUser.setRole(ERole.EMPLOYER);
+
+            userRepository.save(newUser);
+
+            return new BaseResponse("Đăng ký thành công", 200, newUser);
+        } catch (Exception e) {
+            return new BaseResponse("Lỗi khi đăng ký", 500, null);
+        }
+    }
     @Override
     public BaseResponse refresh(String refreshToken, HttpServletRequest request, HttpServletResponse response) {
         if (issuedRefreshTokens.contains(refreshToken) && jwtTokenService.validateRefreshToken(refreshToken)) {
