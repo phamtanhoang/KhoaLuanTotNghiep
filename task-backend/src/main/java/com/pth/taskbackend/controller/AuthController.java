@@ -1,7 +1,9 @@
 package com.pth.taskbackend.controller;
 
 import com.pth.taskbackend.dto.request.AuthenticationRequest;
+import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.model.meta.UserDetail;
+import com.pth.taskbackend.service.AuthService;
 import com.pth.taskbackend.service.JwtTokenService;
 import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +38,7 @@ import static com.pth.taskbackend.util.func.CookieFunc.*;
 @RequestMapping(value = {BASE_URL + "/auth"})
 public class AuthController {
 
+    private final AuthService authService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
 
@@ -49,42 +52,46 @@ public class AuthController {
 
     @Operation(summary = "Login/Signin", description = "", tags = {})
     @PostMapping("login")
-    public ResponseEntity<Void> login(@RequestBody AuthenticationRequest requestDto,
-                                      HttpServletRequest request,
-                                      HttpServletResponse response) {
-        try {
-            String username = requestDto.username();
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            username,
-                            requestDto.password()
-                    )
-            );
-            UserDetail authenticatedUser = (UserDetail) authentication.getPrincipal();
+    public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest requestDto,
+                              HttpServletRequest request,
+                              HttpServletResponse response) {
+        return ResponseEntity.ok(authService.login(requestDto.username(), requestDto.password(), request, response));
+//        try {
+//
+//            Authentication authentication = authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(
+//                            requestDto.username(),
+//                            requestDto.password()
+//                    )
+//            );
+//            System.out.println("authentication "+ authentication);
+//            UserDetail authenticatedUser = (UserDetail) authentication.getPrincipal();
+//            System.out.println("authenticatedUser "+ authenticatedUser.getUsername());
+//            System.out.println("authenticatedUser "+ authenticatedUser.getRoleNames());
+//            addAccessTokenToCookies(
+//                    request,
+//                    response,
+//                    authenticatedUser.getUsername(),
+//                    authenticatedUser.getRoleNames(),
+//                    jwtTokenService,
+//                    accessTokenValidityMs
+//            );
+//
+//            addRefreshTokenToCookies(
+//                    request,
+//                    response,
+//                    authenticatedUser.getUsername(),
+//                    authenticatedUser.getRoleNames(),
+//                    jwtTokenService,
+//                    issuedRefreshTokens,
+//                    refreshTokenValidityMs
+//            );
+//
+//            return ResponseEntity.ok().build();
+//        } catch (AuthenticationException e) {
+//            throw new BadCredentialsException("Invalid Credentials");
+//        }
 
-            addAccessTokenToCookies(
-                    request,
-                    response,
-                    authenticatedUser.getUsername(),
-                    authenticatedUser.getRoleNames(),
-                    jwtTokenService,
-                    accessTokenValidityMs
-            );
-
-            addRefreshTokenToCookies(
-                    request,
-                    response,
-                    authenticatedUser.getUsername(),
-                    authenticatedUser.getRoleNames(),
-                    jwtTokenService,
-                    issuedRefreshTokens,
-                    refreshTokenValidityMs
-            );
-
-            return ResponseEntity.ok().build();
-        } catch (AuthenticationException e) {
-            throw new BadCredentialsException("Invalid Credentials");
-        }
     }
 
     @Operation(summary = "Refresh Token", description = "", tags = {})
@@ -113,8 +120,7 @@ public class AuthController {
 
     @Operation(summary = "Logout/Signout", description = "", tags = {})
     @GetMapping("logout")
-    public ResponseEntity<Void> logout(@CookieValue(value = APP_REFRESH_TOKEN) String refreshToken,
-                                        HttpServletRequest request,
+    public ResponseEntity<Void> logout(HttpServletRequest request,
                                         HttpServletResponse response) {
         removeAccessTokenAndRefreshTokenInCookies(request, response);
         return ResponseEntity.ok().build();

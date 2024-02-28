@@ -1,5 +1,6 @@
 package com.pth.taskbackend.model.meta;
 
+import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 public class UserDetail implements UserDetails {
     private String username;
     private String password;
-    private Collection<Role> roles = new ArrayList<>();
+    private ERole role;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
@@ -27,25 +29,22 @@ public class UserDetail implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getRoles().stream()
-                .map(Role::getName)
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toSet());
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     public static UserDetail of(User user) {
         return new UserDetail(
                 user.getEmail(),
                 user.getPassword(),
-                user.getRoles(),
+                user.getRole(),
                 true,
                 true,
                 true,
-                EStatus.ACTIVE.equals(user.getEStatus())
+                EStatus.ACTIVE.equals(user.getStatus())
         );
     }
 
     public List<String> getRoleNames() {
-        return getRoles().stream().map(Role::getName).collect(Collectors.toList());
+        return Collections.singletonList(role.name());
     }
 }
