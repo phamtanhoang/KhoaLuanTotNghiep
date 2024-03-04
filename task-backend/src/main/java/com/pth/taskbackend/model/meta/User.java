@@ -26,9 +26,6 @@ public class User extends BaseEntity {
     @Column(nullable = false, updatable = false)
     private LocalDateTime created;
 
-//    @LastModifiedDate
-//    private LocalDateTime updated;
-
     private String email;
     private String password;
 
@@ -37,12 +34,4 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ERole role;
-
-//    @ManyToMany(fetch = FetchType.EAGER)
-//    @JoinTable(
-//            name = "user_role",
-//            joinColumns = @JoinColumn(name = "user_id"),
-//            inverseJoinColumns = @JoinColumn(name = "role_id")
-//    )
-//    private Set<Role> roles = new HashSet<>();
 }

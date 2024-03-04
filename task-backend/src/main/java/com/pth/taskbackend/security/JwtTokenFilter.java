@@ -1,6 +1,5 @@
 package com.pth.taskbackend.security;
 
-import com.pth.taskbackend.service.JwtTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +22,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
 
-    @Value(BASE_URL + "/auth/login")
+    @Value(BASE_URL + "/auths/login")
     private List<String> whiteListedUrls;
 
     @Override

@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 
+import static com.pth.taskbackend.util.constant.PathConstant.API_VERSION;
+
 @OpenAPIDefinition(
         info = @Info(
                 contact = @Contact(
@@ -19,7 +21,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 ),
                 description = "OpenApi documentation for Job App",
                 title = "OpenApi specification",
-                version = "1.0",
+                version = API_VERSION,
                 license = @License(
                         name = "Link project",
                         url = "https://github.com/phamtanhoang/KhoaLuanTotNghiep/tree/main/task-backend"
@@ -27,12 +29,8 @@ import io.swagger.v3.oas.annotations.servers.Server;
         ),
         servers = {
                 @Server(
-                        description = "Server URL in Development environment",
-                        url = "${springdoc.openapi.dev-url}"
-                ),
-                @Server(
-                        description = "Server URL in Production environment",
-                        url = "${springdoc.openapi.prod-url}"
+                        description = "${springdoc.openapi.description}",
+                        url = "${springdoc.openapi.url}"
                 )
         },
         security = {
