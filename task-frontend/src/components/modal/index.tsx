@@ -1,5 +1,5 @@
+import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { Login } from "./auth";
-import { CreateJob, DeleteJob } from "./job";
 
 const ModalBase = (props: any) => {
   // take props
@@ -8,9 +8,7 @@ const ModalBase = (props: any) => {
   const handleClose = props.handleClose;
 
   const modalComponents: { [key: string]: React.ReactNode } = {
-    login: <Login handleClose={handleClose} />,
-    createJob: <CreateJob handleClose={handleClose} />,
-    deleteJob: <DeleteJob handleClose={handleClose} />,
+    [MODAL_KEYS.login]: <Login handleClose={handleClose} />,
   };
 
   const selectedComponent = modalComponents[funcs] || handleClose(false);
@@ -27,3 +25,9 @@ const ModalBase = (props: any) => {
 };
 
 export default ModalBase;
+
+//open
+// onClick={() => {
+//   context.setFuncs(MODAL_KEYS.login);
+//   context.handleOpen();
+// }}

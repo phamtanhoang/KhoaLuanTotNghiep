@@ -7,7 +7,7 @@ export const ModalController = createContext<any>(null);
 const App = () => {
   // modal context
   const [funcs, setFuncs] = useState<string>("");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -16,30 +16,31 @@ const App = () => {
   const [dataModal, setDataModal] = useState<any>();
 
   return (
-    <div className="flex w-[100vw] h-[100%] min-w-[100vw] min-h-[100%]">
-      <ModalController.Provider
-        value={{
-          funcs,
-          setFuncs,
-          open,
-          setOpen,
-          handleOpen,
-          handleClose,
-          dataModal,
-          setDataModal,
-          callBack,
-          setCallBack,
-        }}
-      >
-        <ModalBase
-          open={open}
-          handleClose={handleClose}
-          funcs={funcs}
-          dataModal={dataModal}
-        />
-        <Routers />
-      </ModalController.Provider>
-    </div>
+    <ModalController.Provider
+      value={{
+        funcs,
+        setFuncs,
+        open,
+        setOpen,
+
+        handleOpen,
+        handleClose,
+
+        dataModal,
+        setDataModal,
+
+        callBack,
+        setCallBack,
+      }}
+    >
+      <ModalBase
+        open={open}
+        handleClose={handleClose}
+        funcs={funcs}
+        dataModal={dataModal}
+      />
+      <Routers />
+    </ModalController.Provider>
   );
 };
 
