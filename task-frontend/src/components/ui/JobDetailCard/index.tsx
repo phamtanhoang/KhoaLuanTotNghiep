@@ -111,33 +111,34 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
             </div>
 
             <div className="flex w-full font-lato  text-gray-800 font-bold gap-1.5 py-2">
-              {tags.map((tag: any) => (
-                <div
-                  className="inline-block relative py-1 text-xs"
-                  key={tag.id}
-                >
+              {tags &&
+                tags.map((tag: any) => (
                   <div
-                    className="absolute inset-0 flex"
-                    style={{ color: tag.color }}
+                    className="inline-block relative py-1 text-xs"
+                    key={tag.id}
                   >
-                    <svg height="100%" viewBox="0 0 50 100">
-                      <path
-                        d="M49.9,0a17.1,17.1,0,0,0-12,5L5,37.9A17,17,0,0,0,5,62L37.9,94.9a17.1,17.1,0,0,0,12,5ZM25.4,59.4a9.5,9.5,0,1,1,9.5-9.5A9.5,9.5,0,0,1,25.4,59.4Z"
-                        fill="currentColor"
-                      />
-                    </svg>
                     <div
-                      className="flex-grow h-full -ml-px  rounded-md rounded-l-none"
-                      style={{ backgroundColor: tag.color }}
-                    ></div>
+                      className="absolute inset-0 flex"
+                      style={{ color: tag.color }}
+                    >
+                      <svg height="100%" viewBox="0 0 50 100">
+                        <path
+                          d="M49.9,0a17.1,17.1,0,0,0-12,5L5,37.9A17,17,0,0,0,5,62L37.9,94.9a17.1,17.1,0,0,0,12,5ZM25.4,59.4a9.5,9.5,0,1,1,9.5-9.5A9.5,9.5,0,0,1,25.4,59.4Z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                      <div
+                        className="flex-grow h-full -ml-px  rounded-md rounded-l-none"
+                        style={{ backgroundColor: tag.color }}
+                      ></div>
+                    </div>
+                    <span className="relative text-white uppercase font-semibold">
+                      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                      {tag.name}
+                      <span>&nbsp;&nbsp;&nbsp;</span>
+                    </span>
                   </div>
-                  <span className="relative text-white uppercase font-semibold">
-                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                    {tag.name}
-                    <span>&nbsp;&nbsp;&nbsp;</span>
-                  </span>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
           <div

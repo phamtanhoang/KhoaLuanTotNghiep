@@ -1,11 +1,11 @@
-import { GreatJobs, ListJob, Search } from "./components";
+import { GreatJobs, ListJob, SearchJob } from "./components";
 
 import "react-tooltip/dist/react-tooltip.css";
 
 const JobsPage: React.FC = () => {
   return (
     <>
-      <Search />
+      <SearchJob />
       <ListJob />
       <GreatJobs />
     </>

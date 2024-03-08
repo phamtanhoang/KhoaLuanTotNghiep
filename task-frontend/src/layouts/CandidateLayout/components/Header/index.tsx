@@ -2,11 +2,7 @@ import { useEffect, useState } from "react";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { Link, NavLink } from "react-router-dom";
 import LOGO from "@/assets/images/logo.png";
-import {
-  PATH_EMPLOYERS,
-  PATH_HOME,
-  PATH_JOBS,
-} from "@/utils/constants/pathConstants";
+import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
 
 const Header = () => {
   const urlLink = window.location.pathname;
@@ -241,9 +237,9 @@ const Header = () => {
       }`}
     >
       <div className="container mx-auto flex justify-between items-center">
-        <a href="#!">
+        <NavLink to={CANDIDATE_PATHS.default}>
           <img src={LOGO} alt="logo" className="h-9" />
-        </a>
+        </NavLink>
         <nav>
           <ul
             id="nav-menu"
@@ -252,7 +248,7 @@ const Header = () => {
             <li className="sm:mr-4 lg:mr-8 uppercase">
               <NavLink
                 className="text-gray-800 hover:text-orangetext transition-colors duration-300 font-medium"
-                to={PATH_HOME}
+                to={CANDIDATE_PATHS.homePage}
               >
                 Trang chủ
               </NavLink>
@@ -260,7 +256,7 @@ const Header = () => {
             <li className="sm:mr-4 lg:mr-8 uppercase">
               <NavLink
                 className="text-gray-800 hover:text-orangetext transition-colors duration-300 font-medium"
-                to={PATH_JOBS}
+                to={CANDIDATE_PATHS.jobsPage}
               >
                 Công việc
               </NavLink>
@@ -268,7 +264,7 @@ const Header = () => {
             <li className="sm:mr-4 lg:mr-8 uppercase">
               <NavLink
                 className="text-gray-800 hover:text-orangetext transition-colors duration-300 font-medium"
-                to={PATH_EMPLOYERS}
+                to={CANDIDATE_PATHS.employersPage}
               >
                 Nhà tuyển dụng
               </NavLink>
@@ -276,7 +272,7 @@ const Header = () => {
             <li className="sm:mr-4 lg:mr-8 uppercase">
               <NavLink
                 className="text-gray-800 hover:text-orangetext transition-colors duration-300 font-medium"
-                to="/"
+                to="/999"
               >
                 Liên hệ
               </NavLink>

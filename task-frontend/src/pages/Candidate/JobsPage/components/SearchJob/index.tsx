@@ -4,7 +4,7 @@ import { FaLocationCrosshairs } from "react-icons/fa6";
 import { IoFilter } from "react-icons/io5";
 import { MdWork } from "react-icons/md";
 
-const Search = () => {
+const SearchJob = () => {
   const sectionStyle = {
     backgroundImage: `url(${BANNER_SEARCH})`,
   };
@@ -17,7 +17,7 @@ const Search = () => {
   return (
     <section
       style={sectionStyle}
-      className={`w-full bg-cover bg-center bg-no-repeat`}
+      className="w-full bg-cover bg-center bg-no-repeat"
     >
       <div className="h-full py-12 w-full lg:w-[80%] mx-auto ">
         <div className="text-2xl lg:text-3xl text-gray-800 font-bold mb-5 text-center px-5 lg:px-0 tracking-wide leading-7">
@@ -150,4 +150,4 @@ const Search = () => {
     </section>
   );
 };
-export default Search;
+export default SearchJob;

@@ -1,5 +1,12 @@
-const PATH_DEFAULT = "/";
-const PATH_HOME = "/home";
-const PATH_JOBS = "/jobs";
-const PATH_EMPLOYERS = "/employers";
-export { PATH_DEFAULT, PATH_HOME, PATH_JOBS, PATH_EMPLOYERS };
+const OTHER_PATHS = {
+  all: "*",
+};
+const CANDIDATE_PATHS = {
+  default: "/",
+  homePage: "/home",
+  jobsPage: "/jobs",
+  employersPage: "/employers",
+  jobDetails: "/jobs/:id",
+  employerDetails: "/employers/:id",
+};
+export { CANDIDATE_PATHS, OTHER_PATHS };

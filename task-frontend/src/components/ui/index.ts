@@ -1,3 +1,4 @@
+import EmployerCard from "./EmployerCard";
 import GreatEmployerCard from "./GreatEmployerCard";
 import GreatJobCard from "./GreatJobCard";
 import JobCard from "./JobCard";
@@ -18,4 +19,5 @@ export {
   Pagination,
   GreatJobCard,
   GreatEmployerCard,
+  EmployerCard
 };

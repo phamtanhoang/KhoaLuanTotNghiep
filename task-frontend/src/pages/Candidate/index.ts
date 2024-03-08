@@ -1,6 +1,6 @@
 import EmployersPage from "./EmployersPage";
 import HomePage from "./HomePage";
+import JobDetailPage from "./JobDetailPage";
 import JobsPage from "./JobsPage";
-import SchedulePage from "./SchedulePage";
 
-export { HomePage, JobsPage, EmployersPage, SchedulePage };
+export { HomePage, JobsPage, EmployersPage, JobDetailPage };

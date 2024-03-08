@@ -2,16 +2,11 @@ import { CandidateLayout } from "@/layouts";
 import {
   EmployersPage,
   HomePage,
+  JobDetailPage,
   JobsPage,
-  SchedulePage,
 } from "@/pages/Candidate";
 import ErrorPage from "@/pages/ErrorPage";
-import {
-  PATH_DEFAULT,
-  PATH_EMPLOYERS,
-  PATH_HOME,
-  PATH_JOBS,
-} from "@/utils/constants/pathConstants";
+import { CANDIDATE_PATHS, OTHER_PATHS } from "@/utils/constants/pathConstants";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 const Routers = () => {
@@ -19,16 +14,22 @@ const Routers = () => {
     <BrowserRouter>
       <Routes>
         <Route
-          path={PATH_DEFAULT}
-          element={<Navigate to={PATH_HOME} replace />}
+          path={CANDIDATE_PATHS.default}
+          element={<Navigate to={CANDIDATE_PATHS.homePage} replace />}
         />
-        <Route path={PATH_DEFAULT} element={<CandidateLayout />}>
-          <Route path={PATH_HOME} element={<HomePage />} />
-          <Route path={PATH_JOBS} element={<JobsPage />} />
-          <Route path={PATH_EMPLOYERS} element={<EmployersPage />} />
+        <Route path={CANDIDATE_PATHS.default} element={<CandidateLayout />}>
+          <Route path={CANDIDATE_PATHS.homePage} element={<HomePage />} />
+          <Route path={CANDIDATE_PATHS.jobsPage} element={<JobsPage />} />
+          <Route
+            path={CANDIDATE_PATHS.employersPage}
+            element={<EmployersPage />}
+          />
+          <Route
+            path={CANDIDATE_PATHS.jobDetails}
+            element={<JobDetailPage />}
+          />
         </Route>
-        <Route path="/schedule" element={<SchedulePage />} />
-        <Route path="*" element={<ErrorPage />} />
+        <Route path={OTHER_PATHS.all} element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   );

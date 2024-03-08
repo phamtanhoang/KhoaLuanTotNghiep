@@ -1,5 +1,5 @@
 import GreatJobs from "./GreatJobs";
 import ListJob from "./ListJob";
-import Search from "./Search";
+import SearchJob from "./SearchJob";
 
-export { Search, ListJob, GreatJobs };
+export { SearchJob, ListJob, GreatJobs };

@@ -1,9 +1,11 @@
 import "react-tooltip/dist/react-tooltip.css";
-import { GreatEmployers } from "./components";
+import { GreatEmployers, SearchEmployer, ListEmployer } from "./components";
 
 const EmployersPage: React.FC = () => {
   return (
     <>
+      <SearchEmployer />
+      <ListEmployer />
       <GreatEmployers />
     </>
   );
