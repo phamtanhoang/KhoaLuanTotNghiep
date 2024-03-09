@@ -9,7 +9,7 @@ const Login = (props: any) => {
     reloadCaptcha();
   }, []);
   return (
-    <div className="sm:w-[30rem] w-screen p-8 bg-white sm:rounded-xl relative">
+    <div className="sm:w-[30rem] w-screen p-8 bg-white sm:rounded-xl relative max-h-[90%]">
       <button
         className="hover:bg-slate-300 p-2 rounded-full absolute top-2 right-2 text-lg"
         onClick={handleClose}

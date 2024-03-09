@@ -8,7 +8,7 @@ const JobDetailPage = () => {
     <>
       <Hero
         title="Chi tiết tuyển dụng"
-        linkSearch={CANDIDATE_PATHS.jobsPage}
+        linkSearch={CANDIDATE_PATHS.jobs}
         titleSearch="Tuyển dụng khác"
       />
       <section className="pb-10 pt-8 bg-gray-100">

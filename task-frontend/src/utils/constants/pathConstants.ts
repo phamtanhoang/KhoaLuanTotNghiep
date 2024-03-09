@@ -3,10 +3,13 @@ const OTHER_PATHS = {
 };
 const CANDIDATE_PATHS = {
   default: "/",
-  homePage: "/home",
-  jobsPage: "/jobs",
-  employersPage: "/employers",
+  home: "/home",
+  jobs: "/jobs",
+  employers: "/employers",
   jobDetails: "/jobs/:id",
   employerDetails: "/employers/:id",
+  myProfile: "/profile",
+  savedJobs: "/saved-jobs",
+  appliedJobs: "/applied-jobs",
 };
 export { CANDIDATE_PATHS, OTHER_PATHS };

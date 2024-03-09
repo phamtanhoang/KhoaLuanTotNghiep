@@ -1,5 +1,6 @@
 import { CandidateLayout } from "@/layouts";
 import {
+  EmployerDetailPage,
   EmployersPage,
   HomePage,
   JobDetailPage,
@@ -15,18 +16,19 @@ const Routers = () => {
       <Routes>
         <Route
           path={CANDIDATE_PATHS.default}
-          element={<Navigate to={CANDIDATE_PATHS.homePage} replace />}
+          element={<Navigate to={CANDIDATE_PATHS.home} replace />}
         />
         <Route path={CANDIDATE_PATHS.default} element={<CandidateLayout />}>
-          <Route path={CANDIDATE_PATHS.homePage} element={<HomePage />} />
-          <Route path={CANDIDATE_PATHS.jobsPage} element={<JobsPage />} />
-          <Route
-            path={CANDIDATE_PATHS.employersPage}
-            element={<EmployersPage />}
-          />
+          <Route path={CANDIDATE_PATHS.home} element={<HomePage />} />
+          <Route path={CANDIDATE_PATHS.jobs} element={<JobsPage />} />
+          <Route path={CANDIDATE_PATHS.employers} element={<EmployersPage />} />
           <Route
             path={CANDIDATE_PATHS.jobDetails}
             element={<JobDetailPage />}
+          />
+          <Route
+            path={CANDIDATE_PATHS.employerDetails}
+            element={<EmployerDetailPage />}
           />
         </Route>
         <Route path={OTHER_PATHS.all} element={<ErrorPage />} />

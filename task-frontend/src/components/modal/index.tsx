@@ -8,7 +8,7 @@ const ModalBase = (props: any) => {
   const handleClose = props.handleClose;
 
   const modalComponents: { [key: string]: React.ReactNode } = {
-    [MODAL_KEYS.login]: <Login handleClose={handleClose} />,
+    [MODAL_KEYS.auth]: <Login handleClose={handleClose} />,
   };
 
   const selectedComponent = modalComponents[funcs] || handleClose(false);

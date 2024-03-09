@@ -248,7 +248,7 @@ const Header = () => {
             <li className="sm:mr-4 lg:mr-8 uppercase">
               <NavLink
                 className="text-gray-800 hover:text-orangetext transition-colors duration-300 font-medium"
-                to={CANDIDATE_PATHS.homePage}
+                to={CANDIDATE_PATHS.home}
               >
                 Trang chủ
               </NavLink>
@@ -256,7 +256,7 @@ const Header = () => {
             <li className="sm:mr-4 lg:mr-8 uppercase">
               <NavLink
                 className="text-gray-800 hover:text-orangetext transition-colors duration-300 font-medium"
-                to={CANDIDATE_PATHS.jobsPage}
+                to={CANDIDATE_PATHS.jobs}
               >
                 Công việc
               </NavLink>
@@ -264,7 +264,7 @@ const Header = () => {
             <li className="sm:mr-4 lg:mr-8 uppercase">
               <NavLink
                 className="text-gray-800 hover:text-orangetext transition-colors duration-300 font-medium"
-                to={CANDIDATE_PATHS.employersPage}
+                to={CANDIDATE_PATHS.employers}
               >
                 Nhà tuyển dụng
               </NavLink>

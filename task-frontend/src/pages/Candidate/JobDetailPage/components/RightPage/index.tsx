@@ -27,14 +27,16 @@ const RightPage: React.FC<RightPageProps> = ({
             <FiMapPin className="mt-0.5" />
             Địa chỉ: {location}
           </p>
-          <p className="max-w-screen-sm text-sm text-gray-500 mt-3 pt-3 border-t-2 border-gray-300 border-dotted line-clamp-4">
+          <p className="text-sm text-gray-500 mt-3 pt-3 border-t-2 border-gray-300 border-dotted line-clamp-4">
             {description}
           </p>
         </div>
       </div>
       <hr className="lg:hidden border  border-gray-300 border-dashed mx-5" />
-      <div className="w-full bg-white rounded-sm p-5 flex flex-col gap-5">
-        <h3 className="text-gray-800 font-bold text-xl">Quy trình ứng tuyển</h3>
+      <div className="w-full bg-white rounded-sm p-5 flex flex-col gap-3">
+        <h3 className="text-gray-800 font-bold text-xl leading-8">
+          Quy trình ứng tuyển
+        </h3>
         <div className="flex flex-col gap-3 border-l-2 border-dashed ml-3 ">
           {procedures &&
             procedures.map((procedure: any, index: number) => (
@@ -57,8 +59,10 @@ const RightPage: React.FC<RightPageProps> = ({
         </div>
       </div>
       <hr className="lg:hidden border border-gray-300 border-dashed mx-5" />
-      <div className="w-full bg-white rounded-sm p-5 flex flex-col gap-5">
-        <h3 className="text-gray-800 font-bold text-xl">Thông tin khác</h3>
+      <div className="w-full bg-white rounded-sm p-5 flex flex-col gap-3">
+        <h3 className="text-gray-800 font-bold text-xl leading-8">
+          Thông tin khác
+        </h3>
         <div className="flex gap-1.5 flex-wrap">
           {tags &&
             tags.map((tag: any, index: number) => (
