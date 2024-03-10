@@ -18,7 +18,7 @@ const Pagination = () => {
     num > 1 && setNum(--num);
   }
   return (
-    <div className="flex bg-white rounded-lg font-[Poppins]">
+    <div className="flex rounded-lg font-[Poppins]">
       <button
         onClick={back}
         className="h-[2.7rem] border-2 border-r-0 border-orangetext text-gray-800

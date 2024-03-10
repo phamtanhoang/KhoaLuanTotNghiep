@@ -1,43 +1,37 @@
 import { CiClock2 } from "react-icons/ci";
-import { FaBookmark, FaBuilding } from "react-icons/fa6";
+import { FaBuilding } from "react-icons/fa6";
 import { IoLocationOutline } from "react-icons/io5";
 import { MdOutlineAttachMoney } from "react-icons/md";
 import { RiVipCrown2Line } from "react-icons/ri";
 import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip } from "react-tooltip";
 import NONE_USER from "@/assets/images/non-user.jpg";
-import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
-import { LuSendHorizonal } from "react-icons/lu";
-interface JobCardProps {
+import { AiFillEye } from "react-icons/ai";
+import { BiCategoryAlt } from "react-icons/bi";
+interface JobAppliedCardProps {
   image?: string;
   name?: string;
   employer?: string;
   salary?: string;
   location?: string;
-  dateline?: string;
-  isHighlighted?: boolean;
+  appliedDate?: string;
+  category?: string;
   isVip?: boolean;
 }
 
-const JobCard: React.FC<JobCardProps> = ({
+const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
   image,
   name,
   employer,
   salary,
   location,
-  dateline,
-  isHighlighted,
+  appliedDate,
+  category,
   isVip,
 }) => {
   const urlLink = window.location.pathname;
   return (
-    <div
-      className={`w-full cursor-pointer bg-white transition-all duration-300 rounded-l-md p-5 border-2 hover:shadow-md hover:border-orangetext ${
-        isHighlighted
-          ? "border-orange-500 border-[3px]  border-r-[10px]"
-          : "border-[#D9D9D9]"
-      } `}
-    >
+    <div className="w-full cursor-pointer bg-white transition-all duration-300 rounded-l-md p-5 border-2 hover:shadow-md hover:border-orangetext border-[#D9D9D9]">
       <div className=" flex w-full gap-3">
         <img
           className="w-20 h-20 border-2  border-gray-200 p-2 shadow-sm rounded"
@@ -45,8 +39,12 @@ const JobCard: React.FC<JobCardProps> = ({
           alt={name}
         />
         <div className="w-[80%]">
+          <p className="flex gap-1 text-gray-500 text-[0.95rem] font-lato font-normal">
+            <CiClock2 className="text-[1.1rem] mt-0.5" /> Ngày ứng tuyển:{" "}
+            {appliedDate}
+          </p>
           <h1
-            className="lg:truncate text-lg uppercase font-semibold text-gray-700 max-lg:line-clamp-2"
+            className="text-lg uppercase font-semibold text-gray-700 max-lg:line-clamp-2 line-clamp-1"
             data-tooltip-id="name-tooltip"
             data-tooltip-content={name}
           >
@@ -55,7 +53,7 @@ const JobCard: React.FC<JobCardProps> = ({
           <Tooltip id="name-tooltip" />
           <div className="mt-1 relative">
             <FaBuilding className="text-gray-600 absolute top-0 left-0 text-lg " />
-            <a className="text-gray-600 text-base font-medium hover:text-gray-800  line-clamp-2">
+            <a className="text-gray-600 text-base font-medium hover:text-gray-800  line-clamp-1">
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{employer}
             </a>
           </div>
@@ -64,15 +62,16 @@ const JobCard: React.FC<JobCardProps> = ({
       <div className="flex gap-3 justify-between mt-3">
         <div className="w-full flex flex-col gap-2.5">
           <p className="flex gap-1 text-gray-500 text-[0.95rem] font-lato font-normal">
-            <IoLocationOutline className="text-[1.1rem] mt-0.5" /> Địa điểm:{" "}
-            {location}
+            <IoLocationOutline className="text-[1.1rem] mt-0.5" />
+            Địa điểm: {location}
           </p>
           <p className="flex gap-1 text-gray-500 text-[0.95rem] font-lato font-normal">
             <MdOutlineAttachMoney className="text-[1.1rem] mt-0.5" />
             Mức lương: {salary}
           </p>
           <p className="flex gap-1 text-gray-500 text-[0.95rem] font-lato font-normal">
-            <CiClock2 className="text-[1.1rem] mt-0.5" /> Thời hạn: {dateline}
+            <BiCategoryAlt className="text-[1.1rem] mt-0.5" /> Loại công việc:{" "}
+            {category}
           </p>
         </div>
         <div className="relative">
@@ -86,20 +85,13 @@ const JobCard: React.FC<JobCardProps> = ({
               <Tooltip id="tooltip" />
             </p>
           )}
-
-          {urlLink !== CANDIDATE_PATHS.savedJobs ? (
-            <button className="absolute bottom-0 right-0 text-lg p-2.5 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext">
-              <FaBookmark />
-            </button>
-          ) : (
-            <button className="absolute bottom-0 right-0 text-lg p-2.5 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext">
-              <LuSendHorizonal />
-            </button>
-          )}
+          <button className="absolute bottom-0 right-0 text-2xl p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext">
+            <AiFillEye />
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export default JobCard;
+export default JobAppliedCard;

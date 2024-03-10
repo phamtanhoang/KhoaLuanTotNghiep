@@ -1,4 +1,6 @@
 const MODAL_KEYS = {
-  auth: "auth",
+  signin: "Signin",
+  signup: "Signup",
+  changePassword: "ChangePassword",
 };
 export { MODAL_KEYS };

@@ -1,10 +1,13 @@
 import { CandidateLayout } from "@/layouts";
 import {
+  AppliedJobsPage,
   EmployerDetailPage,
   EmployersPage,
   HomePage,
   JobDetailPage,
   JobsPage,
+  ProfilePage,
+  SavedJobsPage,
 } from "@/pages/Candidate";
 import ErrorPage from "@/pages/ErrorPage";
 import { CANDIDATE_PATHS, OTHER_PATHS } from "@/utils/constants/pathConstants";
@@ -30,8 +33,13 @@ const Routers = () => {
             path={CANDIDATE_PATHS.employerDetails}
             element={<EmployerDetailPage />}
           />
+          <Route path={CANDIDATE_PATHS.savedJobs} element={<SavedJobsPage />} />
+          <Route
+            path={CANDIDATE_PATHS.appliedJobs}
+            element={<AppliedJobsPage />}
+          />
+          <Route path={CANDIDATE_PATHS.myProfile} element={<ProfilePage />} />
         </Route>
-        <Route path={OTHER_PATHS.all} element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   );
