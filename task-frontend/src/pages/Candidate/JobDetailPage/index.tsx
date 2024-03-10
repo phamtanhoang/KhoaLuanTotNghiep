@@ -25,6 +25,7 @@ const JobDetailPage = () => {
               toDate="03/02/2002"
               location="Thành phố Hồ Chí Minh"
               salary="Từ 30-50 triệu"
+              isVip
             />
           </div>
           <div className="w-full lg:w-4/12 lg:flex flex-col gap-5">

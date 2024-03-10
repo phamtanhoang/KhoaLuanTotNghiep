@@ -20,7 +20,7 @@ const Hero: React.FC<HeroProps> = ({ title, titleSearch, linkSearch }) => {
     >
       <div className="text-center lg:ml-8 py-10 lg:py-16">
         <div className="max-w-xl mx-auto">
-          <h1 className="block font-bold text-gray-700 text-3xl lg:text-4xl uppercase">
+          <h1 className="block font-bold text-gray-700 text-2xl lg:text-4xl uppercase">
             {title}
           </h1>
         </div>

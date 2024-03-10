@@ -5,6 +5,7 @@ import JobCard from "./JobCard";
 import JobDetailCard from "./JobDetailCard";
 import LoadingSpiner from "./Loading";
 import Pagination from "./Pagination";
+import ShareCard from "./ShareCard";
 import TopCategoryCard from "./TopCategoryCard";
 import TopEmployerCard from "./TopEmployerCard";
 import TopJobCard from "./TopJobCard";
@@ -19,5 +20,6 @@ export {
   Pagination,
   GreatJobCard,
   GreatEmployerCard,
-  EmployerCard
+  EmployerCard,
+  ShareCard
 };

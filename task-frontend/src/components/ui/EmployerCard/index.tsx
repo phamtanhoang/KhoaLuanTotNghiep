@@ -1,11 +1,14 @@
 import NONE_USER from "@/assets/images/non-user.jpg";
 import NONE_BACKGROUND from "@/assets/images/image-background.png";
+import { RiVipCrown2Line } from "react-icons/ri";
+import { Tooltip } from "react-tooltip";
 interface EmployerCardProps {
   image?: string;
   banner?: string;
   name?: string;
   address?: string;
   description?: string;
+  isVip?: boolean;
 }
 
 const EmployerCard: React.FC<EmployerCardProps> = ({
@@ -14,9 +17,10 @@ const EmployerCard: React.FC<EmployerCardProps> = ({
   name,
   address,
   description,
+  isVip,
 }) => {
   return (
-    <div className="transition-all duration-150 flex cursor-pointer border border-gray-300 rounded-lg">
+    <div className="transition-all duration-150 flex cursor-pointer border border-gray-300 rounded-lg relative">
       <div className="flex flex-col items-stretch pb-4 duration-150 bg-white rounded-lg shadow-orangetext/20 transition-all hover:shadow-lg hover:shadow-orangetext/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none">
         <div className="md:flex-shrink-0">
           <img
@@ -50,6 +54,18 @@ const EmployerCard: React.FC<EmployerCardProps> = ({
           {description}
         </p>
       </div>
+      {isVip && (
+        <>
+          <div
+            className="absolute top-1.5 right-1.5 text-2xl p-2.5 rounded-full text-orangebackground bg-orangetext items-center justify-center"
+            data-tooltip-id="tooltip"
+            data-tooltip-content="Nhà tuyển dụng VIP"
+          >
+            <RiVipCrown2Line />
+          </div>
+          <Tooltip id="tooltip" />
+        </>
+      )}
     </div>
   );
 };

@@ -10,6 +10,7 @@ const ListEmployer = () => {
           name="Công ty dược phẩm Phúc long"
           address="Thành phố Hồ Chí Minh"
           description="Triết lý kinh doanh: Chăm sóc sức khỏe và sắc đẹp của người phụ nữ với các mỹ phẩm thiên nhiên hướng tới hữu cơ - an toàn cho người sử dụng. "
+          isVip
         />
         <EmployerCard
           image=""
