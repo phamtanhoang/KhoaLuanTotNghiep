@@ -13,6 +13,7 @@ const CANDIDATE_PATHS = {
   appliedJobs: "/applied-jobs",
 };
 const EMPLOYER_PATHS = {
+  default:"/employer",
   signin: "/employer/signin",
   signup: "/employer/signup",
   dashboard: "/employer/dashboard",

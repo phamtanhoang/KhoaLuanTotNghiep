@@ -1,5 +1,5 @@
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import { ChangePassword, Signin, Signup } from "./auth";
+import { ChangePassword, RegisterEmployer, Signin, Signup } from "./auth";
 
 const ModalBase = (props: any) => {
   // take props
@@ -11,6 +11,9 @@ const ModalBase = (props: any) => {
     [MODAL_KEYS.signin]: <Signin handleClose={handleClose} />,
     [MODAL_KEYS.signup]: <Signup handleClose={handleClose} />,
     [MODAL_KEYS.changePassword]: <ChangePassword handleClose={handleClose} />,
+    [MODAL_KEYS.registerEmployer]: (
+      <RegisterEmployer handleClose={handleClose} />
+    ),
   };
 
   const selectedComponent = modalComponents[funcs] || handleClose(false);

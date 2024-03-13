@@ -34,7 +34,7 @@ const Signup = (props: any) => {
         <div className="content-center flex gap-5">
           <div className="w-1/2">
             <label className="text-sm font-bold text-gray-700 tracking-wide">
-              Họ
+              Họ <span className="text-red-500">*</span>
             </label>
             <input
               className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
@@ -45,7 +45,7 @@ const Signup = (props: any) => {
           </div>
           <div className="w-1/2">
             <label className="text-sm font-bold text-gray-700 tracking-wide">
-              Tên
+              Tên <span className="text-red-500">*</span>
             </label>
             <input
               className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
@@ -58,7 +58,7 @@ const Signup = (props: any) => {
         <div className="mt-4 content-center flex gap-5">
           <div className="w-1/2">
             <label className="text-sm font-bold text-gray-700 tracking-wide">
-              Ngày sinh
+              Ngày sinh <span className="text-red-500">*</span>
             </label>
             <input
               className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
@@ -68,7 +68,7 @@ const Signup = (props: any) => {
           </div>
           <div className="w-1/2">
             <label className="text-sm font-bold text-gray-700 tracking-wide">
-              Giới tính
+              Giới tính <span className="text-red-500">*</span>
             </label>
             <select className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext">
               {SEX_DATA.map((item) => (
@@ -81,7 +81,7 @@ const Signup = (props: any) => {
         </div>
         <div className="mt-4 content-center">
           <label className="text-sm font-bold text-gray-700 tracking-wide">
-            Email
+            Email <span className="text-red-500">*</span>
           </label>
           <input
             className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
@@ -93,7 +93,7 @@ const Signup = (props: any) => {
         <div className="mt-4 content-center flex gap-5">
           <div className="w-1/2">
             <label className="text-sm font-bold text-gray-700 tracking-wide">
-              Mật khẩu
+              Mật khẩu <span className="text-red-500">*</span>
             </label>
             <input
               className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
@@ -104,7 +104,7 @@ const Signup = (props: any) => {
           </div>
           <div className="w-1/2">
             <label className="text-sm font-bold text-gray-700 tracking-wide">
-              Nhập lại mật khẩu
+              Nhập lại mật khẩu <span className="text-red-500">*</span>
             </label>
             <input
               className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"

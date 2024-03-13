@@ -38,7 +38,7 @@ const Signin = (props: any) => {
       <div className="mt-8">
         <div className="relative">
           <label className="text-sm font-bold text-gray-700 tracking-wide">
-            Email
+            Email <span className="text-red-500">*</span>
           </label>
           <input
             className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
@@ -49,7 +49,7 @@ const Signin = (props: any) => {
         </div>
         <div className="mt-4 content-center">
           <label className="text-sm font-bold text-gray-700 tracking-wide">
-            Mật khẩu
+            Mật khẩu <span className="text-red-500">*</span>
           </label>
           <input
             className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
@@ -60,7 +60,7 @@ const Signin = (props: any) => {
         </div>
         <div className="mt-4 content-center">
           <label className="text-sm font-bold text-gray-700 tracking-wide">
-            Captcha
+            Captcha <span className="text-red-500">*</span>
           </label>
           <div className="flex gap-5">
             <input

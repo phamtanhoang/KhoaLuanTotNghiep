@@ -4,7 +4,7 @@ const QuestionsAndAnswer = () => {
   return (
     <section className="bg-gray-50 py-20">
       <div className="w-11/12 mx-auto md:w-10/12">
-        <h1 className="text-3xl text-center font-bold">Hỏi & Trả lzời</h1>
+        <h1 className="text-3xl text-center font-bold">Hỏi & Trả Lời</h1>
         <p className="text-base text-gray-500 text-center my-4">
           Tìm kiếm tất cả các vị trí công việc trống trên web. Nhận ước lượng
           lương cá nhân của bạn. Đọc đánh giá về hơn 30000+ công ty trên toàn

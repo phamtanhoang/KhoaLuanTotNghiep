@@ -14,7 +14,7 @@ const ListJob = () => {
     },
   ];
   return (
-    <section className="pb-10 pt-8">
+    <section className="pb-10 pt-8 ">
       <div className="w-full lg:w-[85%] px-5 lg:px-0 mx-auto flex gap-3 max-h-[90vh]">
         <div className="hidden lg:block lg:w-[55%] ">
           <JobDetailCard

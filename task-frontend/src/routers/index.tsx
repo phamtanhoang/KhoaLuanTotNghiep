@@ -1,4 +1,4 @@
-import { CandidateLayout } from "@/layouts";
+import { AuthEmployerLayout, CandidateLayout } from "@/layouts";
 import {
   AppliedJobsPage,
   EmployerDetailPage,
@@ -9,8 +9,17 @@ import {
   ProfilePage,
   SavedJobsPage,
 } from "@/pages/Candidate";
+import {
+  DashboardPage,
+  SigninEmployerPage,
+  SignupEmployerPage,
+} from "@/pages/Employer";
 import ErrorPage from "@/pages/ErrorPage";
-import { CANDIDATE_PATHS, OTHER_PATHS } from "@/utils/constants/pathConstants";
+import {
+  CANDIDATE_PATHS,
+  EMPLOYER_PATHS,
+  OTHER_PATHS,
+} from "@/utils/constants/pathConstants";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 const Routers = () => {
@@ -40,6 +49,22 @@ const Routers = () => {
           />
           <Route path={CANDIDATE_PATHS.myProfile} element={<ProfilePage />} />
         </Route>
+        <Route
+          path={EMPLOYER_PATHS.default}
+          element={<Navigate to={EMPLOYER_PATHS.signin} replace />}
+        />
+        <Route path={EMPLOYER_PATHS.default} element={<AuthEmployerLayout />}>
+          <Route
+            path={EMPLOYER_PATHS.signin}
+            element={<SigninEmployerPage />}
+          />
+          <Route
+            path={EMPLOYER_PATHS.signup}
+            element={<SignupEmployerPage />}
+          />
+        </Route>
+        <Route path={EMPLOYER_PATHS.dashboard} element={<DashboardPage />} />
+        <Route path={OTHER_PATHS.all} element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   );

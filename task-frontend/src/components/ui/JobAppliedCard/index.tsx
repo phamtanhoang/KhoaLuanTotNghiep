@@ -8,6 +8,7 @@ import { Tooltip } from "react-tooltip";
 import NONE_USER from "@/assets/images/non-user.jpg";
 import { AiFillEye } from "react-icons/ai";
 import { BiCategoryAlt } from "react-icons/bi";
+import { APPLY_STATE_DATA } from "@/utils/constants/dataConstants";
 interface JobAppliedCardProps {
   image?: string;
   name?: string;
@@ -17,6 +18,7 @@ interface JobAppliedCardProps {
   appliedDate?: string;
   category?: string;
   isVip?: boolean;
+  state?: string;
 }
 
 const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
@@ -28,6 +30,7 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
   appliedDate,
   category,
   isVip,
+  state,
 }) => {
   const urlLink = window.location.pathname;
   return (
@@ -90,6 +93,22 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
           </button>
         </div>
       </div>
+      <hr className="mt-2 sm:mt-4"></hr>
+      <p className="flex gap-1 text-gray-500 text-[0.95rem] font-lato font-normal mt-2">
+        Trạng thái:{" "}
+        {APPLY_STATE_DATA.map(
+          (item) =>
+            state === item.id && (
+              <span
+                key={item.id}
+                className="font-medium ml-1 sm:ml-3"
+                style={{ color: item.color }}
+              >
+                {item.name}
+              </span>
+            )
+        )}
+      </p>
     </div>
   );
 };
