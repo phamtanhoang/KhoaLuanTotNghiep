@@ -1,4 +1,5 @@
-import { AuthEmployerLayout, CandidateLayout } from "@/layouts";
+import { ErrorPage } from "@/components/ui";
+import { AuthEmployerLayout, CandidateLayout, EmployerLayout } from "@/layouts";
 import {
   AppliedJobsPage,
   EmployerDetailPage,
@@ -10,11 +11,18 @@ import {
   SavedJobsPage,
 } from "@/pages/Candidate";
 import {
+  ApplicationsEmployerPage,
+  ChatEmployerPage,
   DashboardPage,
+  FindCandidatePage,
+  HREmployerPage,
+  JobsEmployerPage,
+  ProcedureEmployerPage,
+  ScheduleEmployerPage,
   SigninEmployerPage,
   SignupEmployerPage,
 } from "@/pages/Employer";
-import ErrorPage from "@/pages/ErrorPage";
+import ProfileEmployerPage from "@/pages/Employer/ProfileEmployerPage";
 import {
   CANDIDATE_PATHS,
   EMPLOYER_PATHS,
@@ -63,7 +71,32 @@ const Routers = () => {
             element={<SignupEmployerPage />}
           />
         </Route>
-        <Route path={EMPLOYER_PATHS.dashboard} element={<DashboardPage />} />
+        <Route path={EMPLOYER_PATHS.default} element={<EmployerLayout />}>
+          <Route path={EMPLOYER_PATHS.dashboard} element={<DashboardPage />} />
+          <Route path={EMPLOYER_PATHS.jobs} element={<JobsEmployerPage />} />
+          <Route
+            path={EMPLOYER_PATHS.applys}
+            element={<ApplicationsEmployerPage />}
+          />
+          <Route
+            path={EMPLOYER_PATHS.findCandidate}
+            element={<FindCandidatePage />}
+          />
+          <Route path={EMPLOYER_PATHS.chat} element={<ChatEmployerPage />} />
+          <Route
+            path={EMPLOYER_PATHS.schedule}
+            element={<ScheduleEmployerPage />}
+          />
+          <Route
+            path={EMPLOYER_PATHS.procedure}
+            element={<ProcedureEmployerPage />}
+          />
+          <Route path={EMPLOYER_PATHS.hr} element={<HREmployerPage />} />
+          <Route
+            path={EMPLOYER_PATHS.profile}
+            element={<ProfileEmployerPage />}
+          />
+        </Route>
         <Route path={OTHER_PATHS.all} element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>

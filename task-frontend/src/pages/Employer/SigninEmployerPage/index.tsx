@@ -11,7 +11,7 @@ const SigninEmployerPage = () => {
   }, []);
 
   return (
-    <div className="w-full  flex-col items-center max-w-[420px] mx-auto max-sm:p-5">
+    <div className="w-full  flex-col items-center max-w-[420px] mx-auto max-sm:p-5 ">
       <h4 className="mb-2.5 text-4xl font-bold text-navy-700">
         Đăng nhập thông tin nhà tuyển dụng.
       </h4>

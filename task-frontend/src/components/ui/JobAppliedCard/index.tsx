@@ -8,7 +8,8 @@ import { Tooltip } from "react-tooltip";
 import NONE_USER from "@/assets/images/non-user.jpg";
 import { AiFillEye } from "react-icons/ai";
 import { BiCategoryAlt } from "react-icons/bi";
-import { APPLY_STATE_DATA } from "@/utils/constants/dataConstants";
+import { DataConstants } from "@/utils/constants/dataConstants";
+
 interface JobAppliedCardProps {
   image?: string;
   name?: string;
@@ -96,8 +97,8 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
       <hr className="mt-2 sm:mt-4"></hr>
       <p className="flex gap-1 text-gray-500 text-[0.95rem] font-lato font-normal mt-2">
         Trạng thái:{" "}
-        {APPLY_STATE_DATA.map(
-          (item) =>
+        {DataConstants.APPLY_STATE_DATA.map(
+          (item: any) =>
             state === item.id && (
               <span
                 key={item.id}

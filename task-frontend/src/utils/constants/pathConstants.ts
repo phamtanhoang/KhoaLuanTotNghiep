@@ -13,15 +13,20 @@ const CANDIDATE_PATHS = {
   appliedJobs: "/applied-jobs",
 };
 const EMPLOYER_PATHS = {
-  default:"/employer",
+  default: "/employer",
   signin: "/employer/signin",
   signup: "/employer/signup",
   dashboard: "/employer/dashboard",
   jobs: "/employer/jobs",
-  applys: "/employer/applys",
+  applys: "/employer/applications",
   findCandidate: "/employer/find-candidates",
+  hr: "/employer/human-resource",
   setting: "/employer/setting",
   profile: "/employer/profile",
   vips: "/employer/vips",
+  vipHistory: "/employer/vip-history",
+  schedule: "/employer/schedule",
+  chat: "/employer/chat",
+  procedure: "/employer/procedure",
 };
 export { CANDIDATE_PATHS, OTHER_PATHS, EMPLOYER_PATHS };

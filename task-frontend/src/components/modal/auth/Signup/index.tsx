@@ -1,5 +1,6 @@
 import { ModalController } from "@/App";
-import { SEX_DATA } from "@/utils/constants/dataConstants";
+import { DataConstants } from "@/utils/constants/dataConstants";
+
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { useContext } from "react";
 import { AiOutlineClose } from "react-icons/ai";
@@ -71,7 +72,7 @@ const Signup = (props: any) => {
               Giới tính <span className="text-red-500">*</span>
             </label>
             <select className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext">
-              {SEX_DATA.map((item) => (
+              {DataConstants.SEX_DATA.map((item: any) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
                 </option>

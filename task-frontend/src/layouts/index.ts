@@ -1,4 +1,5 @@
 import AuthEmployerLayout from "./AuthEmloyerLayout";
 import CandidateLayout from "./CandidateLayout";
+import EmployerLayout from "./EmployerLayout";
 
-export { CandidateLayout, AuthEmployerLayout };
+export { CandidateLayout, AuthEmployerLayout, EmployerLayout };

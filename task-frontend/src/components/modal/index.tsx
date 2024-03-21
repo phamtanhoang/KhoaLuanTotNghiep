@@ -1,5 +1,7 @@
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { ChangePassword, RegisterEmployer, Signin, Signup } from "./auth";
+import { CreateJob } from "./job";
+import FilterModal from "./filter";
 
 const ModalBase = (props: any) => {
   // take props
@@ -14,6 +16,10 @@ const ModalBase = (props: any) => {
     [MODAL_KEYS.registerEmployer]: (
       <RegisterEmployer handleClose={handleClose} />
     ),
+
+    [MODAL_KEYS.filter]: <FilterModal handleClose={handleClose} />,
+    [MODAL_KEYS.createJob]: <CreateJob handleClose={handleClose} />,
+    [MODAL_KEYS.filter]: <FilterModal handleClose={handleClose} />,
   };
 
   const selectedComponent = modalComponents[funcs] || handleClose(false);
@@ -32,6 +38,7 @@ const ModalBase = (props: any) => {
 export default ModalBase;
 
 //open
+// const context = useContext(ModalController);
 // onClick={() => {
 //   context.setFuncs(MODAL_KEYS.login);
 //   context.handleOpen();

@@ -3,5 +3,10 @@ const MODAL_KEYS = {
   signup: "Signup",
   changePassword: "ChangePassword",
   registerEmployer: "RegisterEmployer",
+  createJob: "CreateJob",
+  detailJob: "DetailJob",
+  EditJob: "EditJob",
+
+  filter: "Filter",
 };
 export { MODAL_KEYS };

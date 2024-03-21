@@ -1,13 +1,8 @@
 import Hero from "@/components/ui/Hero";
 import { GreatEmployers } from "../EmployersPage/components";
 import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
-import {
-  JobAppliedCard,
-  JobCard,
-  Pagination,
-  SearchJobs,
-} from "@/components/ui";
-import { APPLY_STATE_DATA } from "@/utils/constants/dataConstants";
+import { JobAppliedCard, Pagination, SearchJobs } from "@/components/ui";
+import { DataConstants } from "@/utils/constants/dataConstants";
 import { useEffect, useRef, useState } from "react";
 
 const AppliedJobsPage = () => {
@@ -55,7 +50,7 @@ const AppliedJobsPage = () => {
             </button>
             {openDropdown && (
               <div className="absolute right-0 mt-2 py-2 w-max bg-white rounded-md shadow-xl z-20">
-                {APPLY_STATE_DATA.map((item) => (
+                {DataConstants.APPLY_STATE_DATA.map((item: any) => (
                   <button
                     className="block px-4 py-2 text-sm capitalize text-gray-700 hover:bg-gray-100 hover:text-orangetext w-full text-left"
                     onClick={() => _onClickState(item)}

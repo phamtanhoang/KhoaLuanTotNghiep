@@ -26,7 +26,7 @@ const Hero = () => {
             môi trường chuyên nghiệp, năng động, trẻ trung.
           </p>
 
-          <div className="bg-orange-300  p-1  mt-8 w-full rounded-md lg:rounded-full lg:flex">
+          <div className="bg-white  p-1  mt-8 w-full rounded-md lg:rounded-full lg:flex">
             <div className="rounded-t-md flex gap-1 w-full lg:w-[55%] bg-white text-left py-2 px-3 pl-5 lg:rounded-l-full mb-2 lg:mb-0  lg:border-r-2 border-orange-300">
               <MdWork className="text-orangetext h-full text-2xl" />
               <input

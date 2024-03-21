@@ -1,0 +1,31 @@
+.swal2-title {
+  font-size: 25px !important;
+  margin: 0px !important;
+  color: black !important;
+}
+
+.swal2-icon {
+  font-size: 12px !important;
+}
+
+.swal2-confirm,
+.swal2-cancel {
+  padding: 10px 25px !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.swal2-confirm {
+  background-color: blue !important;
+}
+
+.swal2-cancel {
+  background-color: red !important;
+}
+
+.swal2-confirm:focus,
+.swal2-cancel:focus {
+  box-shadow: none !important;
+  border: none !important;
+}
