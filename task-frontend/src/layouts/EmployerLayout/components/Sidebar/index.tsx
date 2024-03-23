@@ -83,6 +83,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           className="hidden"
         ></button>
       </div>
+      <hr className="border-t border-borderColor" />
 
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear scrollbar-custom">
         <nav className="p-4">

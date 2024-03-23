@@ -107,7 +107,7 @@ const DropdownUser = () => {
           </li>
           <li>
             <Link
-              to={EMPLOYER_PATHS.vips}
+              to={EMPLOYER_PATHS.upgrade}
               className="block px-5 py-2.5 text-base font-medium hover:bg-gray-500/10 hover:text-orangetext"
             >
               Nâng cấp tài khoản

@@ -6,6 +6,7 @@ import EmployerCard from "./EmployerCard";
 import ErrorPage from "./ErrorPage";
 import GreatEmployerCard from "./GreatEmployerCard";
 import GreatJobCard from "./GreatJobCard";
+
 import JobAppliedCard from "./JobAppliedCard";
 import JobCard from "./JobCard";
 import JobDetailCard from "./JobDetailCard";

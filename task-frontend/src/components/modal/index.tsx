@@ -2,6 +2,8 @@ import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { ChangePassword, RegisterEmployer, Signin, Signup } from "./auth";
 import { CreateJob } from "./job";
 import FilterModal from "./filter";
+import { ChangeAvatar, ChangeBackground } from "./image";
+import ChangeInfoEmployer from "./infomation/ChangeInfoEmployer";
 
 const ModalBase = (props: any) => {
   // take props
@@ -20,6 +22,14 @@ const ModalBase = (props: any) => {
     [MODAL_KEYS.filter]: <FilterModal handleClose={handleClose} />,
     [MODAL_KEYS.createJob]: <CreateJob handleClose={handleClose} />,
     [MODAL_KEYS.filter]: <FilterModal handleClose={handleClose} />,
+
+    [MODAL_KEYS.changeAvatar]: <ChangeAvatar handleClose={handleClose} />,
+    [MODAL_KEYS.changeBackground]: (
+      <ChangeBackground handleClose={handleClose} />
+    ),
+    [MODAL_KEYS.changeInfoEmployer]: (
+      <ChangeInfoEmployer handleClose={handleClose} />
+    ),
   };
 
   const selectedComponent = modalComponents[funcs] || handleClose(false);

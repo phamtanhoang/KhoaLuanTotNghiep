@@ -1,7 +1,5 @@
-import { StateHelper } from "@/utils/helpers/stateHelper";
 import { useEffect, useRef, useState } from "react";
 import { IoMdMore } from "react-icons/io";
-import NON_USER from "@/assets/images/non-user.jpg";
 import { AiFillDelete, AiFillEye } from "react-icons/ai";
 
 interface ApplicationProps {

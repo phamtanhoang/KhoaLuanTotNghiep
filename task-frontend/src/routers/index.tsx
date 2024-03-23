@@ -23,6 +23,7 @@ import {
   SignupEmployerPage,
 } from "@/pages/Employer";
 import ProfileEmployerPage from "@/pages/Employer/ProfileEmployerPage";
+import UpgradeAccountEmployer from "@/pages/Employer/UpgradeAccountEmployer";
 import {
   CANDIDATE_PATHS,
   EMPLOYER_PATHS,
@@ -95,6 +96,10 @@ const Routers = () => {
           <Route
             path={EMPLOYER_PATHS.profile}
             element={<ProfileEmployerPage />}
+          />
+          <Route
+            path={EMPLOYER_PATHS.upgrade}
+            element={<UpgradeAccountEmployer />}
           />
         </Route>
         <Route path={OTHER_PATHS.all} element={<ErrorPage />} />

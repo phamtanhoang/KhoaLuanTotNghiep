@@ -8,5 +8,9 @@ const MODAL_KEYS = {
   EditJob: "EditJob",
 
   filter: "Filter",
+
+  changeAvatar: "ChangeAvatar",
+  changeBackground: "ChangeBackground",
+  changeInfoEmployer: "ChangeInfoEmployer",
 };
 export { MODAL_KEYS };

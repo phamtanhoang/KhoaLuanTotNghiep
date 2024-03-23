@@ -116,7 +116,7 @@ const ScheduleEmployerPage = () => {
   ];
   const fetchScheduleData = () => {};
   return (
-    <div className="bg-white relative w-full h-[100vh] lg:h-[83vh]  lg:-my-4">
+    <div className="bg-white relative w-full lg:-my-4 scale-employer">
       <Schedule value={eventList} fetchScheduleData={fetchScheduleData} />
     </div>
   );

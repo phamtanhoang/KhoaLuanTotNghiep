@@ -15,7 +15,9 @@ const ChatEmployerPage = () => {
 
   return (
     <>
-      <div className="bg-white lg:rounded-t-xl relative w-full flex border border-borderColor  h-[100vh] lg:h-[83vh]  lg:-my-4">
+      <div
+        className="bg-white lg:rounded-t-xl relative w-full flex border border-borderColor lg:-my-4 scale-employer"
+      >
         <div className="w-full lg:w-[35%] bg-white border-r flex flex-col rounded-tl-xl text-sm font-medium">
           <div className="border-b border-borderColor flex items-center justify-center gap-4">
             <div className="px-4 py-3 border-b-4 border-b-orangetext">

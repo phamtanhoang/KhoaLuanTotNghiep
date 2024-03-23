@@ -34,4 +34,12 @@
     height: 100%;
     overflow: scroll;
   }
+  .scale-employer {
+    height: 100vh;
+  }
+  @media (min-width: 1024px) {
+    .scale-employer {
+      height: calc(100vh - 110px);
+    }
+  }
 }

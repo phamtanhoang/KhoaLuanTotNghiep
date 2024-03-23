@@ -19,9 +19,9 @@ const EmployerLayout = () => {
           <main className="lg:pl-0 lg:p-4 w-full flex-1 flex flex-col gap-4">
             <Outlet />
           </main>
-          <div className="w-full py-4">
+          {/* <div className="w-full py-4">
             <Footer />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
