@@ -33,4 +33,8 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ERole role;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employer_id", referencedColumnName = "id")
+    private Employer employer;
 }

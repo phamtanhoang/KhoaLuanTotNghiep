@@ -40,7 +40,6 @@ public class CategoryController {
 
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<BaseResponse> getCategoryById(@PathVariable String id) {
         try {
             Optional<Category> category = categoryRepository.findById(id);
@@ -102,7 +101,6 @@ public class CategoryController {
     }
 
     @Operation(summary = "Create", description = "", tags = {})
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<BaseResponse> createCategory(@RequestParam("name") String name,
                                  @RequestParam("image") MultipartFile image) throws IOException {
@@ -129,7 +127,6 @@ public class CategoryController {
     }
 
     @Operation(summary = "update", description = "", tags = {})
-    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<BaseResponse> updateCategory(@PathVariable("id") String id, @RequestParam(required = false) String name,
                                                        @RequestParam(required = false) MultipartFile image) {
@@ -165,7 +162,6 @@ public class CategoryController {
     }
 
     @Operation(summary = "delete", description = "", tags = {})
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse> deleteCategory(@PathVariable("id") Long id) {
         try {

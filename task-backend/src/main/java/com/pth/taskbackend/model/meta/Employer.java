@@ -42,5 +42,8 @@ public class Employer extends BaseEntity {
     private String description;
 
     private String size;
+
+    @OneToOne(mappedBy = "employer", fetch = FetchType.LAZY)
+    private User user;
 }
 
