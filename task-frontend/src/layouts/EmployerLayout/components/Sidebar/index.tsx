@@ -177,6 +177,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           </div>
         </nav>
       </div>
+      <p className="p-2 text-center text-xs my-auto">
+        Copyright &copy; {new Date().getFullYear()}, by{" "}
+        <a href="https://github.com/phamtanhoang" className="font-medium">
+          Hoang Pham
+        </a>
+      </p>
     </aside>
   );
 };

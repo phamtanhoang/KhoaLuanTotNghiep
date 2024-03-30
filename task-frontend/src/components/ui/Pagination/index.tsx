@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { GrNext, GrPrevious } from "react-icons/gr";
-
-const Pagination = () => {
+interface PaginationProps {
+  type?: boolean;
+}
+const Pagination: React.FC<PaginationProps> = ({ type }) => {
   let [num, setNum] = useState<number>(1);
   let [cur, setCur] = useState<number>(1);
 
@@ -21,8 +23,12 @@ const Pagination = () => {
     <div className="flex rounded-lg font-[Poppins]">
       <button
         onClick={back}
-        className="h-[2.7rem] border-2 border-r-0 border-orangetext text-gray-800
-               px-4 rounded-l-lg hover:bg-orangetext hover:text-white"
+        className={`h-[2.7rem] border-2 border-r-0  text-gray-800
+               px-4 rounded-l-lg  hover:text-white ${
+                 !type
+                   ? "border-orangetext hover:bg-orangetext"
+                   : "border-bgBlue hover:bg-bgBlue"
+               }`}
       >
         <GrPrevious />
       </button>
@@ -30,16 +36,27 @@ const Pagination = () => {
         <button
           key={i}
           onClick={() => setCur(pg.page)}
-          className={`h-[2.7rem] border-2 border-r-0 border-orangetext text-gray-800
-               w-10 ${cur === pg.page && "bg-orangetext text-white"}`}
+          className={`h-[2.7rem] border-2 border-r-0  text-gray-800 
+               w-10  ${!type ? "border-orangetext" : "border-bgBlue"} 
+               ${
+                 cur === pg.page && !type
+                   ? "bg-orangetext text-white "
+                   : cur === pg.page && type
+                   ? "bg-bgBlue text-white "
+                   : ""
+               }`}
         >
           {pg.page}
         </button>
       ))}
       <button
         onClick={Next}
-        className="h-[2.7rem] border-2  border-orangetext text-gray-800
-               px-4 rounded-r-lg hover:bg-orangetext hover:text-white"
+        className={`h-[2.7rem] border-2  text-gray-800
+               px-4 rounded-r-lg hover:text-white ${
+                 !type
+                   ? "border-orangetext hover:bg-orangetext"
+                   : "border-bgBlue hover:bg-bgBlue"
+               }`}
       >
         <GrNext />
       </button>

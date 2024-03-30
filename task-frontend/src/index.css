@@ -16,9 +16,9 @@
   }
 
   .scrollbar-custom::-webkit-scrollbar {
-    width: 6px;
+    width: 7px;
     /* background-color: #D0D3D4; */
-    padding: 2px;
+    padding: 6px;
   }
 
   .scrollbar-custom::-webkit-scrollbar-thumb {

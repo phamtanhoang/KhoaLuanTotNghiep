@@ -1,21 +1,33 @@
+import { useLocation } from "react-router-dom";
+
 const ErrorPage = () => {
+  const location = useLocation();
+  const isAdminPath = location.pathname.includes("/admin/");
   return (
     <>
-      <div className="w-full bg-gradient-to-r from-purple-200 to-blue-200">
-        <div className="md:w-4/5 lg:w-3/5 m-auto py-16 min-h-screen flex items-center justify-center">
-          <div className="bg-white shadow overflow-hidden sm:rounded-lg pb-8">
-            <div className="border-t border-gray-200 text-center pt-8">
-              <h1 className="text-8xl md:text-9xl font-bold text-purple-400">
-                404
-              </h1>
-              <h1 className="text-4xl md:text-6xl font-medium py-8">
-                Không tìm thấy trang!
-              </h1>
-              <p className="text-xl md:text-2xl pb-8 px-12 font-medium">
-                Trang bạn đang tìm kiếm không tồn tại. Nó có thể có đã được di
-                chuyển hoặc bị xóa.
-              </p>
-            </div>
+      <div
+        className={`w-full bg-gradient-to-r ${
+          isAdminPath
+            ? "from-bgBlue/40 to-bgBlue"
+            : "from-orangetext/30 to-orangetext"
+        } `}
+      >
+        <div className="w-full lg:w-3/5 m-auto py-16 min-h-screen flex items-center justify-center">
+          <div className="bg-body2 shadow overflow-hidden sm:rounded-lg px-4 lg:px-16 py-8  text-center">
+            <h1
+              className={`text-8xl lg:text-9xl font-bold ${
+                isAdminPath ? "text-bgBlue" : "text-orangetext"
+              }`}
+            >
+              404
+            </h1>
+            <h1 className="text-3xl lg:text-5xl font-bold py-4 lg:py-8 text-gray-700">
+              Không tìm thấy trang!
+            </h1>
+            <p className="text-lg lg:text-xl pb-4 lg:pb-8 font-medium text-gray-600">
+              Trang bạn đang tìm kiếm không tồn tại. Nó có thể có đã được di
+              chuyển hoặc bị xóa.
+            </p>
           </div>
         </div>
       </div>

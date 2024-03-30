@@ -1,5 +1,16 @@
 import { ErrorPage } from "@/components/ui";
-import { AuthEmployerLayout, CandidateLayout, EmployerLayout } from "@/layouts";
+import {
+  AdminLayout,
+  AuthEmployerLayout,
+  CandidateLayout,
+  EmployerLayout,
+} from "@/layouts";
+import {
+  CategoryAdminPage,
+  DashboardAdminPage,
+  ServiceAdminPage,
+  SigninAdminPage,
+} from "@/pages/Admin";
 import {
   AppliedJobsPage,
   EmployerDetailPage,
@@ -25,6 +36,7 @@ import {
 import ProfileEmployerPage from "@/pages/Employer/ProfileEmployerPage";
 import UpgradeAccountEmployer from "@/pages/Employer/UpgradeAccountEmployer";
 import {
+  ADMIN_PATHS,
   CANDIDATE_PATHS,
   EMPLOYER_PATHS,
   OTHER_PATHS,
@@ -58,6 +70,7 @@ const Routers = () => {
           />
           <Route path={CANDIDATE_PATHS.myProfile} element={<ProfilePage />} />
         </Route>
+
         <Route
           path={EMPLOYER_PATHS.default}
           element={<Navigate to={EMPLOYER_PATHS.signin} replace />}
@@ -102,6 +115,27 @@ const Routers = () => {
             element={<UpgradeAccountEmployer />}
           />
         </Route>
+
+        <Route
+          path={ADMIN_PATHS.default}
+          element={<Navigate to={ADMIN_PATHS.signin} replace />}
+        />
+        <Route path={ADMIN_PATHS.signin} element={<SigninAdminPage />} />
+        <Route path={ADMIN_PATHS.default} element={<AdminLayout />}>
+          <Route
+            path={ADMIN_PATHS.dashboard}
+            element={<DashboardAdminPage />}
+          />{" "}
+          <Route
+            path={ADMIN_PATHS.categories}
+            element={<CategoryAdminPage />}
+          />
+          <Route
+            path={ADMIN_PATHS.services}
+            element={<ServiceAdminPage />}
+          />
+        </Route>
+
         <Route path={OTHER_PATHS.all} element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>

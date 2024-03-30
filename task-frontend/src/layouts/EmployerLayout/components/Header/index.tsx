@@ -1,5 +1,5 @@
 import {
-  BreadcumbsEmployer,
+  Breadcumbs,
   DropdownMessage,
   DropdownNotification,
   DropdownUser,
@@ -24,7 +24,7 @@ const Header = (props: {
           <AiOutlineMenu className="text-xl" />
         </button>
         <div className="max-lg:hidden">
-          <BreadcumbsEmployer />
+          <Breadcumbs color="#f2994a" />
         </div>
       </div>
 

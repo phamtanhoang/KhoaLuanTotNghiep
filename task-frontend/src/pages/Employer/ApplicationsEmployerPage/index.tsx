@@ -5,7 +5,7 @@ import { FiFilter } from "react-icons/fi";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { useContext } from "react";
 import { ModalController } from "@/App";
-import Swal from "sweetalert2";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
 
 const sampleData = [
   {
@@ -57,22 +57,16 @@ const ApplicationsEmployerPage = () => {
     context.handleOpen();
   };
   const _onClickDelete = () => {
-    Swal.fire({
-      icon: "warning",
-      title: "Xóa đơn ứng tuyển này?",
-      showCancelButton: true,
-      cancelButtonText: "Hủy bỏ",
-      confirmButtonText: "Đồng ý",
-
-      customClass: {
-        confirmButton: "confirm-button-class",
+    SwalHelper.Confirm(
+      "Xóa đơn ứng tuyển này?",
+      "warning",
+      () => {
+        SwalHelper.BigAlert("That bai", "error");
       },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire("Deleted!", "Your item has been deleted.", "success");
-      } else if (result.isDismissed) {
+      () => {
+        SwalHelper.MiniAlert("That bai", "error");
       }
-    });
+    );
   };
   const _onClickDetail = () => {};
   return (

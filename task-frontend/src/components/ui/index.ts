@@ -1,4 +1,4 @@
-import BreadcumbsEmployer from "./BreadcumbsEmployer";
+import Breadcumbs from "./Breadcumbs";
 import DropdownMessage from "./DropdownMessage";
 import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
@@ -16,6 +16,7 @@ import Schedule from "./Schedule";
 import SearchJobs from "./SearchJobs";
 import ShareCard from "./ShareCard";
 import SidebarLink from "./SidebarLink";
+import SidebarLinkAdmin from "./SidebarLinkAdmin";
 import TopCategoryCard from "./TopCategoryCard";
 import TopEmployerCard from "./TopEmployerCard";
 import TopJobCard from "./TopJobCard";
@@ -39,6 +40,7 @@ export {
   DropdownNotification,
   DropdownMessage,
   DropdownUser,
-  BreadcumbsEmployer,
+  Breadcumbs,
   Schedule,
+  SidebarLinkAdmin,
 };

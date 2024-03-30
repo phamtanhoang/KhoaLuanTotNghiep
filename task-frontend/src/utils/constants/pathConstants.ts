@@ -28,4 +28,16 @@ const EMPLOYER_PATHS = {
   chat: "/employer/chat",
   procedure: "/employer/procedure",
 };
-export { CANDIDATE_PATHS, OTHER_PATHS, EMPLOYER_PATHS };
+
+const ADMIN_PATHS = {
+  default: "/admin",
+  signin: "/admin/signin",
+  dashboard: "/admin/dashboard",
+  categories: "/admin/categories",
+  jobs: "/admin/jobs",
+  employers: "/admin/employers",
+  candidates: "/admin/candidates",
+  services: "/admin/services",
+  setting: "/admin/setting",
+};
+export { CANDIDATE_PATHS, OTHER_PATHS, EMPLOYER_PATHS, ADMIN_PATHS };

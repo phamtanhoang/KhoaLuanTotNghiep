@@ -16,5 +16,8 @@ public class BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime created;
 }
 

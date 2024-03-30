@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -65,7 +66,7 @@ public class AuthController {
 
         if (user.isEmpty()) {
             return ResponseEntity.ok(
-                    new BaseResponse("Email không tồn tại!", 404, null)
+                    new BaseResponse("Email không tồn tại!", HttpStatus.NOT_FOUND.value(), null)
             );
         }
         try {
@@ -90,16 +91,16 @@ public class AuthController {
             TokenResponse tokenResponse = new TokenResponse(accessToken, refreshToken);
 
             return ResponseEntity.ok(
-                    new BaseResponse("Đăng nhập thành công", 200, tokenResponse)
+                    new BaseResponse("Đăng nhập thành công", HttpStatus.OK.value(), tokenResponse)
             );
         } catch (BadCredentialsException e) {
             return ResponseEntity.ok(
-                    new BaseResponse("Mật khẩu không chính xác!", 401, null)
+                    new BaseResponse("Mật khẩu không chính xác!", HttpStatus.UNAUTHORIZED.value(), null)
             );
-        } catch (AuthenticationServiceException e) {
-            return ResponseEntity.ok(
-                    new BaseResponse("Đăng nhập không thành công", 500, null)
-            );
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 
@@ -125,12 +126,11 @@ public class AuthController {
             );
 
             return ResponseEntity.ok(
-                    new BaseResponse("Đăng ký thành công", 200, user)
+                    new BaseResponse("Đăng ký thành công", HttpStatus.OK.value(), user)
             );
         } catch (Exception e) {
-            return ResponseEntity.ok(
-                    new BaseResponse("Lỗi khi đăng ký!", 500, null)
-            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 
@@ -139,17 +139,23 @@ public class AuthController {
     public ResponseEntity<BaseResponse> refresh(@CookieValue(value = APP_REFRESH_TOKEN) String refreshToken,
                                                 HttpServletRequest request,
                                                 HttpServletResponse response) {
+        try {
+            if (refreshToken != null && issuedRefreshTokens.contains(refreshToken) && jwtTokenService.validateRefreshToken(refreshToken)) {
+                String accessToken = authService.refresh(refreshToken, request, response);
+                TokenResponse tokenResponse = new TokenResponse(accessToken, refreshToken);
 
-        if (refreshToken != null && issuedRefreshTokens.contains(refreshToken) && jwtTokenService.validateRefreshToken(refreshToken)) {
-            String accessToken = authService.refresh(refreshToken, request, response);
-            TokenResponse tokenResponse = new TokenResponse(accessToken, refreshToken);
-
-            return ResponseEntity.ok(
-                    new BaseResponse("Refresh Token thành công", 200, tokenResponse)
-            );
+                return ResponseEntity.ok(
+                        new BaseResponse("Refresh Token thành công", HttpStatus.OK.value(), tokenResponse)
+                );
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Phiên bản đăng nhập đã hết hạn!", HttpStatus.UNAUTHORIZED.value(), null)
+                );
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
-        throw new BadCredentialsException("Phiên bản đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
-
     }
 
     @Operation(summary = "Logout/Signout", description = "", tags = {})
@@ -157,10 +163,16 @@ public class AuthController {
     public ResponseEntity<BaseResponse> logout(HttpServletRequest request,
                                         HttpServletResponse response) {
 
-        authService.logout(request, response);
-        return ResponseEntity.ok(
-            new BaseResponse("Đăng xuất thành công", 200, "")
-        );
+        try{
+            authService.logout(request, response);
+            return ResponseEntity.ok(
+                new BaseResponse("Đăng xuất thành công", HttpStatus.OK.value(), "")
+            );
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
     }
 
     @Operation(summary = "Change Password", description = "", tags = {})
@@ -177,22 +189,21 @@ public class AuthController {
                     logout(request, response);
 
                     return ResponseEntity.ok(
-                            new BaseResponse("Thay đổi mật khẩu thành công", 200, null)
+                            new BaseResponse("Thay đổi mật khẩu thành công", HttpStatus.OK.value(), null)
                     );
                 } else {
                     return ResponseEntity.ok(
-                            new BaseResponse("Mật khẩu hiện tại không đúng!", 400, null)
+                            new BaseResponse("Mật khẩu hiện tại không đúng!", HttpStatus.UNAUTHORIZED.value(), null)
                     );
                 }
             } else {
                 return ResponseEntity.ok(
-                        new BaseResponse("Người dùng không tồn tại!", 404, null)
+                        new BaseResponse("Người dùng không tồn tại!",  HttpStatus.NOT_FOUND.value(), null)
                 );
             }
         } catch (Exception e) {
-            return ResponseEntity.ok(
-                    new BaseResponse("Đổi mật khẩu không thành công!", 500, null)
-            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 }

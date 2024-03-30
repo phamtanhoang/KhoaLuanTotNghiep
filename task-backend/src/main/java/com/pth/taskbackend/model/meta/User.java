@@ -22,11 +22,10 @@ import java.util.Set;
 @AllArgsConstructor
 public class User extends BaseEntity {
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime created;
-
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)

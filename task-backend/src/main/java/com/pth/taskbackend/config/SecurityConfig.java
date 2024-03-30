@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
@@ -28,7 +29,6 @@ public class SecurityConfig {
 
     private static final String[] WHITE_LIST_URL = {
             BASE_URL + "/auths/**",
-            BASE_URL + "/categories/**",
             "/auth/**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
@@ -59,4 +59,5 @@ public class SecurityConfig {
                 .passwordEncoder(passwordEncoder);
         return authenticationManagerBuilder.build();
     }
+
 }

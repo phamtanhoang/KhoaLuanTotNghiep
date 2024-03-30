@@ -1,10 +1,12 @@
-
-import { ApiConstants } from "@/utils/constants/apiConstants";
 import { AuthHelper } from "@/utils/helpers/authHelper";
 import axios from "axios";
+import { AuthAPI } from "./helper";
+
+const VERSION = "v1";
+const BASE_URL = "http://localhost:8080/api/" + VERSION;
 
 const instance = axios.create({
-  baseURL: ApiConstants.BASE_URL,
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -36,7 +38,7 @@ instance.interceptors.response.use(
 
       try {
         const refreshToken = AuthHelper.getLocalRefreshToken();
-        const response = await axios.post("/api/refresh-token", {
+        const response = await axios.post(BASE_URL + AuthAPI.refreshToken, {
           refreshToken,
         });
         const { token } = response.data;

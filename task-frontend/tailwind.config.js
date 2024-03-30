@@ -10,7 +10,8 @@ export default {
         body2: "#F5F7FD",
         borderColor: "#CFD8DC",
         lightGray: "#8A99AF",
-        lightGrayHeader: "#EFEFEFEF"
+        lightGrayHeader: "#EFEFEFEF",
+        bgBlue: "#0C56D0",
       },
       boxShadow: {
         default: "0px 8px 13px -3px rgba(0, 0, 0, 0.07)",
