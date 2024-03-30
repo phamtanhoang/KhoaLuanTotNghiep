@@ -23,15 +23,15 @@ public class BootstrapService {
     @PostConstruct
     public void bootstrap() {
 
-        String email = "admin@example.com";
-        if (userRepository.findByEmail(email).isEmpty()) {
-            User user = new User();
-            user.setEmail(email);
-            user.setPassword(passwordEncoder.encode("password"));
-            user.setStatus(EStatus.ACTIVE);
-            user.setRole(ERole.ADMIN);
-            this.userRepository.save(user);
-        }
+//        String email = "admin@example.com";
+//        if (userRepository.findByEmail(email).isEmpty()) {
+//            User user = new User();
+//            user.setEmail(email);
+//            user.setPassword(passwordEncoder.encode("password"));
+//            user.setStatus(EStatus.ACTIVE);
+//            user.setRole(ERole.ADMIN);
+//            this.userRepository.save(user);
+//        }
 
 //        Category category = new Category();
 //        category.setName("abc");

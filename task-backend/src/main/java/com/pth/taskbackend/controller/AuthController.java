@@ -6,6 +6,7 @@ import com.pth.taskbackend.dto.request.RegistrationRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.dto.response.TokenResponse;
 import com.pth.taskbackend.enums.ERole;
+import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.UserInfoDetails;
@@ -69,6 +70,27 @@ public class AuthController {
                     new BaseResponse("Email không tồn tại!", HttpStatus.NOT_FOUND.value(), null)
             );
         }
+
+        User checkUser = user.get();
+        EStatus userStatus = checkUser.getStatus();
+        ERole userRole = checkUser.getRole();
+
+        if (!userRole.equals(ERole.ADMIN)) {
+            if (!userStatus.equals(EStatus.ACTIVE)) {
+                if (userStatus.equals(EStatus.PENDING)) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(new BaseResponse("Tài khoản chưa được duyệt!", HttpStatus.FORBIDDEN.value(), null));
+                } else if (userStatus.equals(EStatus.INACTIVE)) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(new BaseResponse("Tài khoản đã bị khóa!", HttpStatus.FORBIDDEN.value(), null));
+                } else {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(new BaseResponse("Tài khoản không tồn tại!", HttpStatus.FORBIDDEN.value(), null));
+                }
+            }
+        }
+
+
         try {
             UserInfoDetails userInfoDetails =  authService.login(
                     authenticationRequest.username(),

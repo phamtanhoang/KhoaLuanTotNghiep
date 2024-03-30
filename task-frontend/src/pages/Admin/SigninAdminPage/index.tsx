@@ -37,14 +37,14 @@ const SigninAdminPage = () => {
     authsService
       .signin(email.trim(), password.trim())
       .then((res) => {
-        if (res.status == 200 && res.data.status == 200) {
+        if (res.status === 200 && res.data.Status === 200) {
           const tokenData = JSON.stringify(res.data.data);
           localStorage.setItem("Token", tokenData);
           navigate(ADMIN_PATHS.dashboard);
-          SwalHelper.MiniAlert(res.data.message, "success");
+          SwalHelper.MiniAlert(res.data.Message, "success");
         } else {
           SwalHelper.MiniAlert(
-            res.data.message || "Đăng nhập không thành công",
+            res.data.Message || "Đăng nhập không thành công",
             "error"
           );
         }
