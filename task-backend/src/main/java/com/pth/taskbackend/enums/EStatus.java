@@ -4,5 +4,7 @@ public enum EStatus {
     ACTIVE,
     PENDING,
     INACTIVE,
-    DELETED
+    DELETED,
+    ONLINE,
+    OFFLINE
 }

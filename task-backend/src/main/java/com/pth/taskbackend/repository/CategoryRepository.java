@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+public interface CategoryRepository extends JpaRepository<Category, String> {
     Optional<Category> findById(String id);
     Page<Category> findByNameContaining(String name, Pageable pageable);
     Page<Category> findAll(Pageable pageable);

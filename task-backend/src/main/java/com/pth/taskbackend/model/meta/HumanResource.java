@@ -1,6 +1,7 @@
 package com.pth.taskbackend.model.meta;
 
 import com.pth.taskbackend.enums.ERole;
+import com.pth.taskbackend.enums.ESex;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.BaseEntity;
 import jakarta.persistence.*;
@@ -10,45 +11,43 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Employer extends BaseEntity {
+public class HumanResource extends BaseEntity {
+
+    @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
 
     @Lob
-    @Column(nullable = false,length = 1000)
-    private byte[] image;
+    @Column(nullable = false, length = 1000)
+    private byte[] avatar;
 
-    @Lob
-    @Column(nullable = false,length = 1000)
-    private byte[] backgroundImage;
+    @Enumerated(EnumType.STRING)
+    private ESex sex;
 
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private String address;
-
-    @Column(nullable = false)
-    private String phoneNumber;
-
-    @Column(nullable = false, unique = true)
-    private String businessCode;
-
-    @Column(nullable = false)
-    private String description;
-
-
-    @OneToMany(mappedBy = "employer", cascade = CascadeType.ALL)
-    private List<HumanResource> humanResources;
+    @ManyToOne
+    @JoinColumn(name = "employer_id")
+    private Employer employer;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+    @Column
+    private boolean createJob;
+    @Column
+    private boolean viewJob;
+    @Column
+    private boolean editJob;
+    @Column
+    private boolean deleteJob;
+
+    // Các trường và phương thức khác
 }
 

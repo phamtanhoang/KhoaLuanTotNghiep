@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +32,7 @@ import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 @SecurityRequirement(name = "javainuseapi")
 @RequiredArgsConstructor
 @RestController
+@PreAuthorize("hasPermission(#user, 'ACTIVE')")
 @RequestMapping(value = {BASE_URL + "/categories"})
 public class CategoryController {
 
@@ -59,7 +62,7 @@ public class CategoryController {
     }
 
     @Operation(summary = "Get list", description = "", tags = {})
-    @PreAuthorize("*")
+//    @PreAuthorize("*")
     @GetMapping("")
     public ResponseEntity<BaseResponse> getCategories() {
         try {
@@ -80,7 +83,7 @@ public class CategoryController {
     }
 
     @Operation(summary = "Get by name containing", description = "", tags = {})
-    @PreAuthorize("*")
+    @PreAuthorize("hasAnyRole('EMPLOYER','ADMIN')")
     @GetMapping("/name={categoryName}")
     public ResponseEntity<BaseResponse> getCategoryByNameContaining(@PathVariable String categoryName, Pageable pageable) {
         try {
@@ -101,9 +104,12 @@ public class CategoryController {
     }
 
     @Operation(summary = "Create", description = "", tags = {})
+    @PreAuthorize("hasAuthority('EMPLOYER')")
     @PostMapping
     public ResponseEntity<BaseResponse> createCategory(@RequestParam("name") String name,
                                  @RequestParam("image") MultipartFile image) throws IOException {
+
+
         try {
 
             Optional<Category> existedCategory = categoryRepository.findByName(name);
@@ -163,7 +169,7 @@ public class CategoryController {
 
     @Operation(summary = "delete", description = "", tags = {})
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteCategory(@PathVariable("id") Long id) {
+    public ResponseEntity<BaseResponse> deleteCategory(@PathVariable("id") String id) {
         try {
             categoryRepository.deleteById(id);
             return ResponseEntity.ok(new BaseResponse("Xóa danh mục thành công", HttpStatus.OK.value(), null));

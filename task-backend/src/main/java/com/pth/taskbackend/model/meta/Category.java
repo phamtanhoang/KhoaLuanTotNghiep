@@ -13,6 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.sql.Blob;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @EqualsAndHashCode(callSuper = true)
@@ -35,4 +36,7 @@ public class Category extends BaseEntity {
     @LastModifiedDate
     private LocalDateTime updated;
 
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<Job> jobs;
 }

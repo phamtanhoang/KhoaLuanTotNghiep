@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,6 +22,7 @@ import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
@@ -33,23 +35,23 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/javainuse-openapi/**"
-    };
-    @Bean
-    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(
-                        customizer -> customizer
-                                .requestMatchers(WHITE_LIST_URL).permitAll()
-                                .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtTokenFilter, BasicAuthenticationFilter.class)
-                .build();
-    }
+ };
+ @Bean
+ public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+ return http
+ .httpBasic(AbstractHttpConfigurer::disable)
+ .csrf(AbstractHttpConfigurer::disable)
+ .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+ .authorizeHttpRequests(
+ customizer -> customizer
+ .requestMatchers(WHITE_LIST_URL).permitAll()
+ .anyRequest().authenticated()
+ )
+ .addFilterBefore(jwtTokenFilter, BasicAuthenticationFilter.class)
+ .build();
+ }
 
-    @Bean
+ @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);

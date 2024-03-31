@@ -21,6 +21,7 @@ public class UserInfoDetails implements UserDetails {
     private String username;
     private String password;
     private ERole role;
+    private EStatus status;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
@@ -28,7 +29,8 @@ public class UserInfoDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        System.out.println(role.name());
+        return Collections.singleton(new SimpleGrantedAuthority( role.name().toUpperCase()));
     }
 
     public static UserInfoDetails of(User user) {
@@ -36,10 +38,12 @@ public class UserInfoDetails implements UserDetails {
                 user.getEmail(),
                 user.getPassword(),
                 user.getRole(),
+                user.getStatus(),
                 true,
                 true,
                 true,
                 EStatus.ACTIVE.equals(user.getStatus())
+
         );
     }
 
