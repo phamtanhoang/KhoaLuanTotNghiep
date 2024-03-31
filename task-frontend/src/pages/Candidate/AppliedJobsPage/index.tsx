@@ -1,14 +1,21 @@
 import Hero from "@/components/ui/Hero";
-import { GreatEmployers } from "../EmployersPage/components";
+
 import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
-import { JobAppliedCard, Pagination, SearchJobs } from "@/components/ui";
+import { GreatEmployers, Pagination, SearchJobs } from "@/components/ui";
 import { DataConstants } from "@/utils/constants/dataConstants";
 import { useEffect, useRef, useState } from "react";
+import ModalBase from "@/components/modal";
+import { MODAL_KEYS } from "@/utils/constants/modalConstants";
+import { JobAppliedCard } from "./components";
 
 const AppliedJobsPage = () => {
   const dropdownRef = useRef<any>(null);
   const [openDropdown, setOpenDropdown] = useState<boolean>(false);
   const [selectedState, setSelectedState] = useState(null);
+  const [open, setOpen] = useState<boolean>(false);
+  const [funcs, setFuncs] = useState<string>("");
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   useEffect(() => {
     document.addEventListener("mousedown", _handleClickOutside);
@@ -25,8 +32,13 @@ const AppliedJobsPage = () => {
   const _onClickState = (item: any) => {
     setSelectedState(item);
   };
+  const _onClickDetail = () => {
+    setFuncs(MODAL_KEYS.applycationDetail);
+    handleOpen();
+  };
   return (
     <>
+      <ModalBase open={open} handleClose={handleClose} funcs={funcs} />
       <Hero
         title="Công việc đã ứng tuyển"
         linkSearch={CANDIDATE_PATHS.jobs}
@@ -75,30 +87,7 @@ const AppliedJobsPage = () => {
               category="Công nghệ thông tin"
               isVip
               state="PENDING"
-            />
-            <JobAppliedCard
-              image="https://source.unsplash.com/random/400x400"
-              name="[NA] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
-                    Web Designer[HCM] Web Designer."
-              appliedDate="03/02/2002"
-              employer="Công ty dược phẩm Phúc
-                    Long Công ty dược phẩm Phúc Long"
-              location="Thành phố Hồ Chí Minh"
-              salary="Từ 30 - 50 triệu"
-              category="Công nghệ thông tin"
-              state="FAILED"
-            />
-            <JobAppliedCard
-              image="https://source.unsplash.com/random/400x400"
-              name="[NA] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
-                    Web Designer[HCM] Web Designer."
-              appliedDate="03/02/2002"
-              employer="Công ty dược phẩm Phúc
-                    Long Công ty dược phẩm Phúc Long"
-              location="Thành phố Hồ Chí Minh"
-              salary="Từ 30 - 50 triệu"
-              category="Công nghệ thông tin"
-              state="SUCCESS"
+              _onClickDetail={_onClickDetail}
             />
           </div>
 

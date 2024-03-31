@@ -1,5 +1,8 @@
 import { GrFormNextLink } from "react-icons/gr";
 import NONE_USER from "@/assets/images/non-user.jpg";
+import ModalBase from "@/components/modal";
+import { useState } from "react";
+import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 interface JobDetailCardProps {
   image?: string;
   name?: string;
@@ -12,6 +15,8 @@ interface JobDetailCardProps {
   location?: string;
   tags?: any;
   description?: string;
+  _onClickApplyJob?: () => void;
+  _onClickSaveJob?: () => void;
 }
 
 const JobDetailCard: React.FC<JobDetailCardProps> = ({
@@ -26,6 +31,8 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
   location,
   tags,
   description,
+  _onClickApplyJob,
+  _onClickSaveJob,
 }) => {
   return (
     <>
@@ -54,12 +61,16 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
               <button
                 className="w-full lg:w-max py-3 px-4 lg:px-12 text-white rounded flex  justify-center items-center min-w-max   h-10 outline-none relative overflow-hidden duration-300 ease-linear
                             after:absolute after:inset-x-0 after:aspect-square after:scale-0 after:opacity-70 after:origin-center after:duration-300 after:ease-linear after:rounded-full after:top-0 after:left-0 after:bg-orange-500 hover:after:opacity-100 hover:after:scale-[2.5] bg-orangetext border-transparent hover:border-orange-500"
+                onClick={_onClickApplyJob}
               >
                 <span className="flex relative z-[1] font-medium gap-2 ">
                   Ứng tuyển ngay
                 </span>
               </button>
-              <button className="font-medium bg-transparent text-orangetext hover:text-orange-500 border-2 border-orangetext hover:border-orange-500 w-full lg:w-max py-3 px-4 lg:px-8 rounded flex  justify-center items-center min-w-max h-10">
+              <button
+                className="font-medium bg-transparent text-orangetext hover:text-orange-500 border-2 border-orangetext hover:border-orange-500 w-full lg:w-max py-3 px-4 lg:px-8 rounded flex  justify-center items-center min-w-max h-10"
+                onClick={_onClickSaveJob}
+              >
                 Lưu tin
               </button>
             </div>

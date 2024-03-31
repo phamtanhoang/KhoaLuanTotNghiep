@@ -4,12 +4,43 @@ import { FaPencilAlt } from "react-icons/fa";
 import { GiGraduateCap, GiSkills } from "react-icons/gi";
 import { IoNewspaperOutline } from "react-icons/io5";
 import { MdInfoOutline } from "react-icons/md";
-import { GreatJobs } from "../JobsPage/components";
+
 import { SkillExpEduProps, Information, UserCard } from "./components";
+import { GreatJobs } from "@/components/ui";
+import { useState } from "react";
+import { MODAL_KEYS } from "@/utils/constants/modalConstants";
+import ModalBase from "@/components/modal";
 
 const ProfilePage = () => {
+  const [open, setOpen] = useState(false);
+  const [funcs, setFuncs] = useState<string>("");
+  const [type, setType] = useState<string>("");
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const _onClickChangeImage = () => {
+    setFuncs(MODAL_KEYS.changeAvatar);
+    handleOpen();
+  };
+
+  const _onClickChangeInfo = () => {
+    setFuncs(MODAL_KEYS.changeInfoCandidate);
+    handleOpen();
+  };
+  const _onClickChange = (type: string) => {
+    setType(type);
+    setFuncs(MODAL_KEYS.changeExpSkillInfoCandidate);
+    handleOpen();
+  };
+
   return (
     <>
+      <ModalBase
+        type={type}
+        open={open}
+        handleClose={handleClose}
+        funcs={funcs}
+      />
       <Hero
         title="Thông tin tài khoản"
         titleSearch="Tìm việc ngay"
@@ -25,6 +56,7 @@ const ProfilePage = () => {
               description="My name is Hoang, and I am currently a fourth-year student at Open University. I am an enthusiastic
               learner, always striving to improve my skills and knowledge. I am very determined and I never give up
               when I face challenges."
+              _onClickChangeImage={_onClickChangeImage}
             />
           </div>
           <div className="w-full md:w-9/12 flex flex-col gap-5">
@@ -45,7 +77,10 @@ const ProfilePage = () => {
                 gender="Nam"
                 link="https://github.com/phamtanhoang"
               />
-              <button className="block w-full text-orangetext hover:text-orange-500 text-sm font-semibold rounded-lg hover:bg-gray-100 focus:outline-none focus:shadow-outline focus:bg-gray-100 hover:shadow-xs p-3 mt-4">
+              <button
+                className="block w-full text-orangetext hover:text-orange-500 text-sm font-semibold rounded-lg hover:bg-gray-100 focus:outline-none focus:shadow-outline focus:bg-gray-100 hover:shadow-xs p-3 mt-4"
+                onClick={_onClickChangeInfo}
+              >
                 Sửa thông tin
               </button>
             </div>
@@ -59,7 +94,10 @@ const ProfilePage = () => {
                     </span>
                     &nbsp;&nbsp;Kĩ năng
                   </h2>
-                  <button className="text-gray-800 hover:text-orangetext p-1.5">
+                  <button
+                    className="text-gray-800 hover:text-orangetext p-1.5"
+                    onClick={() => _onClickChange("skill")}
+                  >
                     <FaPencilAlt />
                   </button>
                 </div>
@@ -80,7 +118,10 @@ const ProfilePage = () => {
                     </span>
                     &nbsp;&nbsp;Kinh nghiệm làm việc
                   </h2>
-                  <button className="text-gray-800 hover:text-orangetext p-1.5">
+                  <button
+                    className="text-gray-800 hover:text-orangetext p-1.5"
+                    onClick={() => _onClickChange("exp")}
+                  >
                     <FaPencilAlt />
                   </button>
                 </div>
@@ -103,7 +144,10 @@ const ProfilePage = () => {
                     </span>
                     &nbsp;&nbsp;Trình độ học vấn
                   </h2>
-                  <button className="text-gray-800 hover:text-orangetext p-1.5">
+                  <button
+                    className="text-gray-800 hover:text-orangetext p-1.5"
+                    onClick={() => _onClickChange("edu")}
+                  >
                     <FaPencilAlt />
                   </button>
                 </div>

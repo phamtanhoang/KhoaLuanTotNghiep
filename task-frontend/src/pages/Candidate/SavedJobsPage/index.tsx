@@ -1,8 +1,7 @@
 import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
 
-import { GreatJobs } from "../JobsPage/components";
 import Hero from "@/components/ui/Hero";
-import { JobCard, Pagination, SearchJobs } from "@/components/ui";
+import { GreatJobs, JobCard, Pagination, SearchJobs } from "@/components/ui";
 
 const SavedJobsPage = () => {
   return (

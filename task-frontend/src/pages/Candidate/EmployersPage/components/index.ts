@@ -1,5 +1,6 @@
-import GreatEmployers from "./GreatEmployers";
-import SearchEmployer from "./SearchEmployer";
-import ListEmployer from "./ListEmployer";
 
-export { SearchEmployer, GreatEmployers, ListEmployer };
+import EmployerCard from "./EmployerCard";
+import SearchEmployer from "./SearchEmployer";
+
+
+export { SearchEmployer, EmployerCard };

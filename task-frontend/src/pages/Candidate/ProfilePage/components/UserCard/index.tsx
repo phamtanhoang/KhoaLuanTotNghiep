@@ -1,25 +1,36 @@
 import NON_USER from "@/assets/images/non-user.jpg";
-interface UserCardCardProps {
+import { IoCameraSharp } from "react-icons/io5";
+interface UserCardProps {
   image?: string;
   name?: string;
   job?: string;
   description?: string;
+  _onClickChangeImage?: () => void;
 }
 
-const UserCard: React.FC<UserCardCardProps> = ({
+const UserCard: React.FC<UserCardProps> = ({
   image,
   name,
   job,
   description,
+  _onClickChangeImage,
 }) => {
   return (
     <div className="bg-white p-5 border-t-4 border-orangetext shadow-sm rounded-sm">
-      <div className="image overflow-hidden">
-        <img
-          className="h-[200px] w-[200px] mx-auto rounded-full"
-          src={image ? image : NON_USER}
-          alt={name}
-        />
+      <div className="overflow-hidden  flex justify-center">
+        <div className="relative">
+          <img
+            className="h-[200px] w-[200px] rounded-full"
+            src={image ? image : NON_USER}
+            alt={name}
+          />
+          <button
+            className="absolute bottom-2.5 right-2.5 text-2xl p-2 rounded-full bg-body hover:bg-body/90 text-black/90 hover:text-black ring-2 ring-white"
+            onClick={_onClickChangeImage}
+          >
+            <IoCameraSharp />
+          </button>
+        </div>
       </div>
       <h1 className="text-gray-900 font-bold text-2xl leading-8 mt-3 text-center">
         {name}

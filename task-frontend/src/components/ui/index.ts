@@ -2,14 +2,12 @@ import Breadcumbs from "./Breadcumbs";
 import DropdownMessage from "./DropdownMessage";
 import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
-import EmployerCard from "./EmployerCard";
 import ErrorPage from "./ErrorPage";
 import GreatEmployerCard from "./GreatEmployerCard";
+import GreatEmployers from "./GreatEmployers";
 import GreatJobCard from "./GreatJobCard";
-
-import JobAppliedCard from "./JobAppliedCard";
+import GreatJobs from "./GreatJobs";
 import JobCard from "./JobCard";
-import JobDetailCard from "./JobDetailCard";
 import LoadingSpiner from "./Loading";
 import Pagination from "./Pagination";
 import Schedule from "./Schedule";
@@ -28,14 +26,11 @@ export {
   TopJobCard,
   TopEmployerCard,
   JobCard,
-  JobDetailCard,
   Pagination,
   GreatJobCard,
   GreatEmployerCard,
-  EmployerCard,
   ShareCard,
   SearchJobs,
-  JobAppliedCard,
   SidebarLink,
   DropdownNotification,
   DropdownMessage,
@@ -43,4 +38,6 @@ export {
   Breadcumbs,
   Schedule,
   SidebarLinkAdmin,
+  GreatJobs,
+  GreatEmployers,
 };

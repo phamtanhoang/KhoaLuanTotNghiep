@@ -20,6 +20,7 @@ interface JobAppliedCardProps {
   category?: string;
   isVip?: boolean;
   state?: string;
+  _onClickDetail?: () => void;
 }
 
 const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
@@ -32,6 +33,7 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
   category,
   isVip,
   state,
+  _onClickDetail,
 }) => {
   const urlLink = window.location.pathname;
   return (
@@ -89,7 +91,10 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
               <Tooltip id="tooltip" />
             </p>
           )}
-          <button className="absolute bottom-0 right-0 text-2xl p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext">
+          <button
+            className="absolute bottom-0 right-0 text-2xl p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext"
+            onClick={_onClickDetail}
+          >
             <AiFillEye />
           </button>
         </div>

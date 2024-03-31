@@ -1,20 +1,40 @@
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { ChangePassword, RegisterEmployer, Signin, Signup } from "./auth";
-import { CreateJob } from "./job";
 import FilterModal from "./filter";
+import { CreateJob } from "./job";
 import { ChangeAvatar, ChangeBackground } from "./image";
-import ChangeInfoEmployer from "./infomation/ChangeInfoEmployer";
+
+import { ChangeExpSkillInfoCandidate, ChangeInfoCandidate } from "./candidate";
+import { ApplicationDetail, ApplyJob } from "./application";
+import { ChangeInfoEmployer } from "./employer";
 
 const ModalBase = (props: any) => {
   // take props
+  const type = props.type;
   const funcs = props.funcs;
+  const setFuncs = props.setFuncs;
   const open = props.open;
   const handleClose = props.handleClose;
 
   const modalComponents: { [key: string]: React.ReactNode } = {
-    [MODAL_KEYS.signin]: <Signin handleClose={handleClose} />,
-    [MODAL_KEYS.signup]: <Signup handleClose={handleClose} />,
+    [MODAL_KEYS.signin]: (
+      <Signin handleClose={handleClose} setFuncs={setFuncs} />
+    ),
+    [MODAL_KEYS.signup]: (
+      <Signup handleClose={handleClose} setFuncs={setFuncs} />
+    ),
     [MODAL_KEYS.changePassword]: <ChangePassword handleClose={handleClose} />,
+    [MODAL_KEYS.applyJob]: <ApplyJob handleClose={handleClose} />,
+    [MODAL_KEYS.changeInfoCandidate]: (
+      <ChangeInfoCandidate handleClose={handleClose} />
+    ),
+    [MODAL_KEYS.changeExpSkillInfoCandidate]: (
+      <ChangeExpSkillInfoCandidate type={type} handleClose={handleClose} />
+    ),
+    [MODAL_KEYS.applycationDetail]: (
+      <ApplicationDetail handleClose={handleClose} />
+    ),
+
     [MODAL_KEYS.registerEmployer]: (
       <RegisterEmployer handleClose={handleClose} />
     ),
@@ -32,7 +52,7 @@ const ModalBase = (props: any) => {
     ),
   };
 
-  const selectedComponent = modalComponents[funcs] || handleClose(false);
+  const selectedComponent = modalComponents[funcs];
 
   return (
     <>
@@ -47,9 +67,7 @@ const ModalBase = (props: any) => {
 
 export default ModalBase;
 
-//open
-// const context = useContext(ModalController);
-// onClick={() => {
-//   context.setFuncs(MODAL_KEYS.login);
-//   context.handleOpen();
-// }}
+// const [open, setOpen] = useState(false);
+//   const [funcs, setFuncs] = useState<string>("");
+//   const handleOpen = () => setOpen(true);
+//   const handleClose = () => setOpen(false);

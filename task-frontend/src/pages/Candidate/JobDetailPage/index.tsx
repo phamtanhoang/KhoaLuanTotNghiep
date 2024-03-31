@@ -1,11 +1,27 @@
 import Hero from "@/components/ui/Hero";
 import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
 import { LeftPage, RightPage } from "./components";
-import { GreatJobs } from "../JobsPage/components";
+import { GreatJobs } from "@/components/ui";
+import { useState } from "react";
+import { MODAL_KEYS } from "@/utils/constants/modalConstants";
+import ModalBase from "@/components/modal";
 
 const JobDetailPage = () => {
+  const [open, setOpen] = useState(false);
+  const [funcs, setFuncs] = useState<string>("");
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const _onClickApplyJob = () => {
+    handleOpen();
+    setFuncs(MODAL_KEYS.applyJob);
+  };
+  const _onClickSaveJob = () => {
+    alert(1);
+  };
   return (
     <>
+      <ModalBase open={open} handleClose={handleClose} funcs={funcs} />
       <Hero
         title="Chi tiết tuyển dụng"
         linkSearch={CANDIDATE_PATHS.jobs}
@@ -26,6 +42,8 @@ const JobDetailPage = () => {
               location="Thành phố Hồ Chí Minh"
               salary="Từ 30-50 triệu"
               isVip
+              _onClickApplyJob={_onClickApplyJob}
+              _onClickSaveJob={_onClickSaveJob}
             />
           </div>
           <div className="w-full lg:w-4/12 lg:flex flex-col gap-5">

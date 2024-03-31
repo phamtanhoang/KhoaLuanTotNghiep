@@ -13,15 +13,17 @@ const SkillExpEduProps: React.FC<SkillExpEduPropsProps> = ({
 }) => {
   return (
     <>
-      <div className="flex justify-between gap-3">
+      <div className="lg:flex justify-between gap-3">
         <p className="font-medium">{name}</p>
         {fromDate && toDate && (
-          <p className="text-gray-500 text-xs my-auto">
+          <p className="text-gray-500 text-xs my-auto max-lg:mt-1 max-lg:text-end">
             {fromDate} - {toDate}
           </p>
         )}
       </div>
-      <p className="text-gray-500 text-xs mt-1">&nbsp;&nbsp;{description}</p>
+      <p className="text-gray-500 text-xs mt-2 lg:mt-1">
+        &nbsp;&nbsp;{description}
+      </p>
     </>
   );
 };

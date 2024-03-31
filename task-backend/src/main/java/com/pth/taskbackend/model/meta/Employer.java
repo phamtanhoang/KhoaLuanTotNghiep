@@ -43,7 +43,8 @@ public class Employer extends BaseEntity {
 
     private String size;
 
-    @OneToOne(mappedBy = "employer", fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 }
 

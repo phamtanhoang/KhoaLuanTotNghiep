@@ -20,9 +20,9 @@ const ChangeAvatar: React.FC<{ handleClose: () => void }> = (props) => {
     document.getElementById("fileInput")?.click();
   };
   return (
-    <div className="w-full sm:w-[400px] lg:w-[500px] max-lg:px-5 p-10 bg-white lg:rounded-xl max-h-[90vh] relative">
+    <div className="w-full sm:w-[400px] lg:w-[450px] max-lg:px-5 p-8 bg-white lg:rounded-xl max-h-[90vh] relative">
       <button
-        className="p-2 rounded-full absolute top-2 right-2 text-xl text-gray-800 hover:text-white hover:bg-gray-300"
+        className="p-2 rounded-full absolute top-2 right-2 text-xl text-gray-800 hover:text-white hover:bg-orangetext"
         onClick={handleClose}
       >
         <AiOutlineClose />
@@ -35,12 +35,12 @@ const ChangeAvatar: React.FC<{ handleClose: () => void }> = (props) => {
       </div>
 
       {!img && (
-        <div className="mt-8 ">
+        <div className="mt-5 ">
           <div
             className="flex items-center justify-center w-full flex-col rounded-lg border-4 border-dashed group text-center p-8 cursor-pointer"
             onClick={handleDropAreaClick}
           >
-            <div className="h-full w-full sm:w-[500px] text-center flex flex-col items-center justify-center">
+            <div className="h-full w-full sm:w-[450px] text-center flex flex-col items-center justify-center">
               <div className="flex flex-auto mx-auto -mt-8">
                 <img
                   className="has-mask h-40 object-center"
@@ -67,7 +67,7 @@ const ChangeAvatar: React.FC<{ handleClose: () => void }> = (props) => {
               onChange={_onChange}
             />
           </div>
-          <p className="mt-1.5 text-sm text-gray-300">
+          <p className="mt-1.5 text-sm text-gray-400">
             <span>Loại tệp: .png, .jpg, types of images</span>
           </p>
         </div>
@@ -75,7 +75,7 @@ const ChangeAvatar: React.FC<{ handleClose: () => void }> = (props) => {
 
       {img && (
         <>
-          <div className="my-8 w-full overflow-auto border-2 border-borderColor border-dotted flex justify-center">
+          <div className="my-5 w-full overflow-auto border-2 border-borderColor border-dotted flex justify-center">
             <ImageCropper
               img={img}
               setCroppedImg={setCroppedImg}
@@ -84,15 +84,15 @@ const ChangeAvatar: React.FC<{ handleClose: () => void }> = (props) => {
             />
           </div>
 
-          <div className="flex justify-end items-center gap-5 text-lg font-medium">
+          <div className="flex justify-end gap-4 -mx-8 -mb-8 px-8 py-4 border-t  ">
             <button
-              className="flex items-center gap-2.5 w-max h-max px-5 py-2 bg-red-500 text-white rounded-md hover:bg-red-500/85 font-base"
+              className="flex items-center gap-2 w-max h-max px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-500/85 font-medium"
               onClick={_onClearImage}
             >
-              <GrClear />
+              <GrClear className="text-base" />
               <p>Hủy bỏ</p>
             </button>
-            <button className="flex items-center gap-2.5 w-max h-max px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-600/85 font-base">
+            <button className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-600/85 font-medium">
               <FaRegSave className="text-lg" />
               <p>Lưu</p>
             </button>

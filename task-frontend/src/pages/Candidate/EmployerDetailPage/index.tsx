@@ -1,7 +1,8 @@
 import Hero from "@/components/ui/Hero";
 import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
-import { GreatEmployers } from "../EmployersPage/components";
+
 import { LeftPage, RightPage } from "./components";
+import { GreatEmployers } from "@/components/ui";
 
 const EmployerDetailPage = () => {
   return (

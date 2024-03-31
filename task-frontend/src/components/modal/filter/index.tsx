@@ -1,6 +1,5 @@
-import { ModalController } from "@/App";
+
 import { EMPLOYER_PATHS } from "@/utils/constants/pathConstants";
-import { useContext, useEffect, useRef } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FiFilter } from "react-icons/fi";
 

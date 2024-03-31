@@ -1,4 +1,4 @@
-import { GreatJobCard, TopEmployerCard } from "@/components/ui";
+import { GreatJobCard } from "@/components/ui";
 
 import { TfiArrowCircleLeft, TfiArrowCircleRight } from "react-icons/tfi";
 import { Swiper, SwiperSlide } from "swiper/react";

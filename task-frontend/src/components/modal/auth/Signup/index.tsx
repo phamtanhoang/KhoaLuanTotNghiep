@@ -1,18 +1,15 @@
-import { ModalController } from "@/App";
 import { DataConstants } from "@/utils/constants/dataConstants";
 
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import { useContext } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 
 const Signup = (props: any) => {
-  const context = useContext(ModalController);
   const handleClose = props.handleClose;
   const _onClickSignin = () => {
-    context.setFuncs(MODAL_KEYS.signin);
+    props.setFuncs(MODAL_KEYS.signin);
   };
   return (
-    <div className="sm:w-[30rem] w-screen p-8 bg-white sm:rounded-xl relative max-h-[90%] overflow-auto">
+    <div className="sm:w-[33rem] w-screen p-8 bg-white sm:rounded-xl relative h-max max-h-[90%] overflow-auto scrollbar-custom">
       <button
         className="p-2 rounded-full absolute top-2 right-2 text-xl text-gray-800 hover:text-white hover:bg-orangetext"
         onClick={handleClose}
@@ -20,7 +17,7 @@ const Signup = (props: any) => {
         <AiOutlineClose />
       </button>
       <div className="text-center">
-        <h2 className="mt-6 text-3xl font-bold text-gray-800 uppercase">
+        <h2 className="text-3xl font-bold text-gray-800 uppercase">
           Joobs xin chào!
         </h2>
         <p className="mt-2 text-base text-gray-600">

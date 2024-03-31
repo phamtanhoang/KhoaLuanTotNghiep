@@ -64,7 +64,7 @@ const SearchJob = () => {
 
           {hideFilter && (
             <>
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 border border-white p-2 rounded ">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 border border-white p-2 rounded transition-all duration-300">
                 <div className="flex rounded bg-white items-center p-2 ">
                   <svg
                     className="fill-current text-gray-800 mr-2 w-5"

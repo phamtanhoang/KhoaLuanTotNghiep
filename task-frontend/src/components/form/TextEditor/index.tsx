@@ -1,35 +1,27 @@
+import { Editor } from "@tinymce/tinymce-react";
 import React from "react";
 import { useRef } from "react";
-import { Editor } from "@tinymce/tinymce-react";
 
 interface EditorInterface {
-  label?: string;
   value?: string;
-  name?: string;
   placeholder?: string;
-  error?: string;
-  required?: boolean;
   onChange?: any;
 }
 
-const TextEditorCustom: React.FC<EditorInterface> = (props) => {
+const TextEditor: React.FC<EditorInterface> = ({
+  value,
+  placeholder,
+  onChange,
+}) => {
   const editorRef = useRef<any>(null);
-
   return (
     <>
-      {props.label && (
-        <label className="block mb-1 font-medium text-gray-900">
-          {props.label}{" "}
-          {props.required && <span className="text-red-500 font-bold">*</span>}
-        </label>
-      )}
-
       <Editor
         apiKey="0rzlxi2ly7dyfurhu9kcyk5gwq6t2z2iypfq0o16xnyzn6e0"
         onInit={(_evt, editor) => (editorRef.current = editor)}
-        initialValue={props.value}
+        initialValue={value}
         init={{
-          placeholder: props.placeholder,
+          placeholder: placeholder,
           language: "vi",
           menubar: false,
           entity_encoding: "raw",
@@ -63,19 +55,13 @@ const TextEditorCustom: React.FC<EditorInterface> = (props) => {
 
           setup: (editor) => {
             editor.on("keyup", () => {
-              props.onChange(editor.getContent());
+              onChange(editor.getContent());
             });
           },
         }}
       />
-
-      {props.error && (
-        <p className="flex items-center font-medium tracking-wide text-red-500 text-xs mt-1 ml-1 italic">
-          {props.error}!
-        </p>
-      )}
     </>
   );
 };
 
-export default TextEditorCustom;
+export default TextEditor;

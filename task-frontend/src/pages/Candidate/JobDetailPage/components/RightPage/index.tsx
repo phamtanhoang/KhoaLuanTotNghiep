@@ -1,5 +1,4 @@
 import { ShareCard } from "@/components/ui";
-import { CiLink } from "react-icons/ci";
 import { FiMapPin } from "react-icons/fi";
 interface RightPageProps {
   employer?: string;
