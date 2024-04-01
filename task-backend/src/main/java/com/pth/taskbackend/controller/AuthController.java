@@ -131,7 +131,7 @@ public class AuthController {
     }
 
     @Operation(summary = "Register/Signup", description = "", tags = {})
-    @PostMapping("/v1/register")
+    @PostMapping("/RegisterEmployer")
     public ResponseEntity<BaseResponse> registerEmployer(@RequestBody CreateEmployerRequest registrationRequest) {
         if (userRepository.findByEmail(registrationRequest.username()).isPresent()) {
             return ResponseEntity.ok(

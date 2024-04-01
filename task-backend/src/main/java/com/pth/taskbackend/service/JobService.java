@@ -10,17 +10,22 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 public interface JobService {
-    Job createJob(String name, String description, LocalDateTime created, LocalDateTime toDate, String location, EStatus status, String fromSalary, String toSalary, String experience, Category category, HumanResource humanResource) throws IOException;
+    Job create(String name, String description, LocalDateTime created, LocalDateTime toDate, String location, EStatus status, String fromSalary, String toSalary, String experience, Category category, HumanResource humanResource) throws IOException;
 
-    Job updateJob(String name, String description, LocalDateTime toDate, String location, EStatus status, String fromSalary, String toSalary, String experience, String hrId) throws IOException;
+    Job update(String name, String description, LocalDateTime toDate, String location, EStatus status, String fromSalary, String toSalary, String experience, String hrId) throws IOException;
 
-    void deleteJobById(Long jobId);
+    void deleteById(Long jobId);
 
-    Job findJobById(Long jobId);
+    void delete(Job job);
 
-    Page<Job> findAllJobs(Pageable pageable);
+    Job findById(Long jobId);
 
-    Page<Job> searchJobs(String keyword, String address, String fromSalary, String toSalary, String categoryId, LocalDateTime toDate, Pageable pageable);
+    Page<Job> findAll(Pageable pageable);
 
-    Page<Job> findJobsByEmployerId(String employerId, Pageable pageable);
+    Page<Job> searchJobs(String keyword, String address, String fromSalary, String toSalary, String categoryId , Pageable pageable);
+
+    Page<Job> findByEmployerId(String employerId, Pageable pageable);
+
+    Page<Job>findByCategoryId(String id);
+    Page<Job>findByEmployerId(String id);
 }
