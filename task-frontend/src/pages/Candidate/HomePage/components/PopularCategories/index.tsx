@@ -1,11 +1,33 @@
 import TopCategoryCard from "@/components/ui/TopCategoryCard";
 import { useState } from "react";
 
+const categories = [
+  {
+    id: "1",
+    image: "https://source.unsplash.com/random/400x400",
+    title: "title1",
+    jobCount: 3,
+  },
+  {
+    id: "2",
+    image: "https://source.unsplash.com/random/400x400",
+    title: "title2",
+    jobCount: 2,
+  },
+  {
+    id: "3",
+    image: "https://source.unsplash.com/random/400x400",
+    title: "title3",
+    jobCount: 0,
+  },
+];
+
 const Popularcategories = () => {
   const [type, setType] = useState<boolean>(true);
   const _onChangeType = () => {
     setType(!type);
   };
+  const _onClickDetail = (id: string) => {};
   return (
     <section className="mx-auto max-w-6xl py-12 lg:py-16">
       <div className="text-center">
@@ -19,11 +41,16 @@ const Popularcategories = () => {
         </p>
       </div>
       <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <TopCategoryCard
-          image="https://source.unsplash.com/random/400x400"
-          title="Công nghệ thông tin"
-          jobCount={3}
-        />
+        {categories.map((item, index) => (
+          <TopCategoryCard
+            key={index}
+            id={item.id}
+            image={item.image}
+            title={item.title}
+            jobCount={item.jobCount}
+            _onClickDetail={() => _onClickDetail(item.id)}
+          />
+        ))}
       </div>
       <div className="w-full flex justify-center items-center mt-12">
         <button

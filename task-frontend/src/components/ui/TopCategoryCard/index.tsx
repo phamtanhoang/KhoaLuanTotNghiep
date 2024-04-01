@@ -1,16 +1,23 @@
 interface TopCategoryCardProps {
+  id: string;
   image: string;
   title: string;
   jobCount: number;
+  _onClickDetail: () => void;
 }
 
 const TopCategoryCard: React.FC<TopCategoryCardProps> = ({
+  id,
   image,
   title,
   jobCount,
+  _onClickDetail,
 }) => {
   return (
-    <div className="relative overflow-hidden group rounded-md cursor-pointer">
+    <div
+      className="relative overflow-hidden group rounded-md cursor-pointer"
+      onClick={_onClickDetail}
+    >
       <img
         src={image}
         className="w-full z-0 h-full object-fill transition-transform transform duration-500 group-hover:scale-110"
