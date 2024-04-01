@@ -914,6 +914,11 @@ body {
   margin-bottom: auto;
 }
 
+.-mx-2{
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+}
+
 .-mb-8{
   margin-bottom: -2rem;
 }
@@ -1349,6 +1354,26 @@ body {
 
 .max-h-\[90vh\]{
   max-height: 90vh;
+}
+
+.max-h-\[vh\]{
+  max-height: vh;
+}
+
+.max-h-\[55vh\]{
+  max-height: 55vh;
+}
+
+.max-h-\[57vh\]{
+  max-height: 57vh;
+}
+
+.max-h-\[50vh\]{
+  max-height: 50vh;
+}
+
+.max-h-\[5vh\]{
+  max-height: 5vh;
 }
 
 .min-h-24{
@@ -3850,6 +3875,10 @@ body {
 
   .max-lg\:mt-5{
     margin-top: 1.25rem;
+  }
+
+  .max-lg\:mt-2{
+    margin-top: 0.5rem;
   }
 
   .max-lg\:line-clamp-2{
