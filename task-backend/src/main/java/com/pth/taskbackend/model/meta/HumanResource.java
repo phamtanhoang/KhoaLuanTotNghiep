@@ -25,19 +25,12 @@ public class HumanResource extends BaseEntity {
     private String lastName;
 
     @Lob
-    @Column(nullable = false, length = 1000)
+    @Column(length = 1000)
     private byte[] avatar;
 
     @Enumerated(EnumType.STRING)
     private ESex sex;
 
-    @ManyToOne
-    @JoinColumn(name = "employer_id")
-    private Employer employer;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
 
     @Column
     private boolean createJob;
@@ -47,6 +40,14 @@ public class HumanResource extends BaseEntity {
     private boolean editJob;
     @Column
     private boolean deleteJob;
+
+    @ManyToOne
+    @JoinColumn(name = "employer_id")
+    private Employer employer;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     // Các trường và phương thức khác
 }

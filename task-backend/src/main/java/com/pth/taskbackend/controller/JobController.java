@@ -57,7 +57,7 @@ public class JobController {
     public ResponseEntity<BaseResponse> createJob(@RequestBody CreateJobRequest request) throws IOException {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            System.out.println(authentication.getName()+categoryRepository.findById(request.getCategoryId()).get().getName()+humanResourceService.findByEmail(authentication.getName()).get().getFirstName());
+            System.out.println(authentication.getName() + categoryRepository.findById(request.getCategoryId()).get().getName() + humanResourceService.findByEmail(authentication.getName()).get().getFirstName());
             if (authentication != null && authentication.isAuthenticated()) {
                 String username = authentication.getName();
                 Optional<Category> existedCategory = categoryRepository.findById(request.getCategoryId());
@@ -69,8 +69,10 @@ public class JobController {
                 String toSalary = request.getToSalary();
                 LocalDateTime toDate = request.getToDate();
                 String experience = request.getExperience();
-                Job job = jobService.createJob(name, description, LocalDateTime.now(), toDate, location, EStatus.PENDING, fromSalary, toSalary, experience, existedCategory.get(), null
-                        );
+
+                System.out.println(existedHumanResource.get().getFirstName());
+                Job job = jobService.create(name, description, LocalDateTime.now(), toDate, location, EStatus.PENDING, fromSalary, toSalary, experience, existedCategory.get(), null
+                );
                 return ResponseEntity.ok(
                         new BaseResponse("Tạo danh mục thành công", HttpStatus.OK.value(), job)
                 );
@@ -87,8 +89,32 @@ public class JobController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-}
 
+    @Operation(summary = "Get list", description = "", tags = {})
+    @GetMapping("")
+    public ResponseEntity<BaseResponse> getJobs(@RequestParam(required = false) String keyword,
+                                                @RequestParam(required = false) String location,
+                                                @RequestParam(required = false) String fromSalary,
+                                                @RequestParam(required = false) String toSalary,
+                                                @RequestParam(required = false) String categoryId,
+                                                Pageable pageable) {
+        try {
+            Page<Job> jobs = jobService.searchJobs(keyword, location, fromSalary, toSalary, categoryId, pageable);
+            if (jobs.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
+                );
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobs)
+                );
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+}
 
 //    @Operation(summary = "Get by id", description = "", tags = {})
 //    @GetMapping("/{id}")

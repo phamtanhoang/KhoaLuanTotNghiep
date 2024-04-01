@@ -18,7 +18,7 @@ public class JobServiceImpl implements JobService {
     @Autowired
     JobRepository jobRepository;
     @Override
-    public Job createJob(String name, String description, LocalDateTime created, LocalDateTime toDate, String location, EStatus status, String fromSalary, String toSalary, String experience, Category category, HumanResource humanResource) throws IOException {
+    public Job create(String name, String description, LocalDateTime created, LocalDateTime toDate, String location, EStatus status, String fromSalary, String toSalary, String experience, Category category, HumanResource humanResource) throws IOException {
         Job job = new Job();
         job.setName(name);
         job.setDescription(description);
@@ -36,32 +36,47 @@ public class JobServiceImpl implements JobService {
 
 
     @Override
-    public Job updateJob(String name, String description, LocalDateTime toDate, String location, EStatus status, String fromSalary, String toSalary, String experience, String hrId) throws IOException {
+    public Job update(String name, String description, LocalDateTime toDate, String location, EStatus status, String fromSalary, String toSalary, String experience, String hrId) throws IOException {
         return null;
     }
 
     @Override
-    public void deleteJobById(Long jobId) {
+    public void deleteById(Long jobId) {
 
     }
 
     @Override
-    public Job findJobById(Long jobId) {
+    public void delete(Job job) {
+
+    }
+
+    @Override
+    public Job findById(Long jobId) {
         return null;
     }
 
     @Override
-    public Page<Job> findAllJobs(Pageable pageable) {
+    public Page<Job> findAll(Pageable pageable) {
         return null;
     }
 
     @Override
-    public Page<Job> searchJobs(String keyword, String location, String fromSalary, String toSalary, String categoryId,  LocalDateTime toDate, Pageable pageable) {
-        return jobRepository.findByKeyword(keyword,pageable);
+    public Page<Job> searchJobs(String keyword, String location, String fromSalary, String toSalary, String categoryId , Pageable pageable) {
+        return jobRepository.findBySorting(keyword,location,fromSalary,toSalary,categoryId,pageable);
     }
 
     @Override
-    public Page<Job> findJobsByEmployerId(String employerId, Pageable pageable) {
+    public Page<Job> findByEmployerId(String employerId, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<Job> findByCategoryId(String id) {
+        return null;
+    }
+
+    @Override
+    public Page<Job> findByEmployerId(String id) {
         return null;
     }
 }
