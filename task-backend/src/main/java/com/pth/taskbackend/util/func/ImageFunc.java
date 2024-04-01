@@ -12,6 +12,9 @@ public class ImageFunc {
         return contentType != null && contentType.startsWith("image");
     }
     public static byte[] compressImage(byte[] data) {
+        if (data == null) {
+            return new byte[0];
+        }
         Deflater deflater = new Deflater();
         deflater.setLevel(Deflater.BEST_COMPRESSION);
         deflater.setInput(data);

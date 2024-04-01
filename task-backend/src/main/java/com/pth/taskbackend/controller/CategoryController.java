@@ -59,7 +59,6 @@ public class CategoryController {
     }
 
     @Operation(summary = "Get list", description = "", tags = {})
-    @PreAuthorize("*")
     @GetMapping("")
     public ResponseEntity<BaseResponse> getCategories() {
         try {
@@ -80,7 +79,6 @@ public class CategoryController {
     }
 
     @Operation(summary = "Get by name containing", description = "", tags = {})
-    @PreAuthorize("*")
     @GetMapping("/name={categoryName}")
     public ResponseEntity<BaseResponse> getCategoryByNameContaining(@PathVariable String categoryName, Pageable pageable) {
         try {
