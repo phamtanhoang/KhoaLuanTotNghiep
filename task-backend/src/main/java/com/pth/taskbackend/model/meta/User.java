@@ -34,6 +34,5 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ERole role;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private Employer employer;
+
 }

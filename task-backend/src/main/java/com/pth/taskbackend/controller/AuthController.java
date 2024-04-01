@@ -2,16 +2,19 @@ package com.pth.taskbackend.controller;
 
 import com.pth.taskbackend.dto.request.AuthenticationRequest;
 import com.pth.taskbackend.dto.request.ChangePasswordRequest;
+import com.pth.taskbackend.dto.request.CreateEmployerRequest;
 import com.pth.taskbackend.dto.request.RegistrationRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.dto.response.TokenResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
+import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.UserInfoDetails;
 import com.pth.taskbackend.service.AuthService;
 import com.pth.taskbackend.security.JwtTokenService;
+import com.pth.taskbackend.service.EmployerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,6 +29,7 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -46,10 +50,10 @@ import static com.pth.taskbackend.util.func.CookieFunc.addRefreshTokenToCookies;
 public class AuthController {
 
     private final AuthService authService;
-    private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmployerService employerService;
     final Set<String> issuedRefreshTokens = Collections.synchronizedSet(new HashSet<>());
 
     @Value("${jwt.access-token.expires}")
@@ -127,8 +131,41 @@ public class AuthController {
     }
 
     @Operation(summary = "Register/Signup", description = "", tags = {})
+    @PostMapping("/v1/register")
+    public ResponseEntity<BaseResponse> registerEmployer(@RequestBody CreateEmployerRequest registrationRequest) {
+        if (userRepository.findByEmail(registrationRequest.username()).isPresent()) {
+            return ResponseEntity.ok(
+                    new BaseResponse("Tên người dùng đã tồn tại!", 400, null)
+            );
+        };
+
+        try{
+            Optional<User> user = authService.register(
+                    registrationRequest.username(),
+                    registrationRequest.password(),
+                    ERole.EMPLOYER);
+
+            Employer employer = new Employer();
+            employer.setName(registrationRequest.name());
+            employer.setLocation(registrationRequest.location());
+            employer.setDescription(registrationRequest.description());
+            employer.setBusinessCode(registrationRequest.businessCode());
+            employer.setPhoneNumber(registrationRequest.phoneNumber());
+            employer.setUser(user.get());
+            employerService.create(employer,null,null);
+
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Đăng ký thành công", HttpStatus.OK.value(), user)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "Register/Signup", description = "", tags = {})
     @PostMapping("register")
-    public ResponseEntity<BaseResponse> register(@RequestBody RegistrationRequest registrationRequest) {
+    public ResponseEntity<BaseResponse> registerEmployer(@RequestBody RegistrationRequest registrationRequest) {
         if (userRepository.findByEmail(registrationRequest.username()).isPresent()) {
             return ResponseEntity.ok(
                     new BaseResponse("Tên người dùng đã tồn tại!", 400, null)
