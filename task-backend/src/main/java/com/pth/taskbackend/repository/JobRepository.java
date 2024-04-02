@@ -32,5 +32,7 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             @Param("toSalary") String toSalary,
             @Param("categoryId") String categoryId,
             Pageable pageable);
+
+    Page<Job>findByCategoryId(String id, Pageable pageable);
 }
 

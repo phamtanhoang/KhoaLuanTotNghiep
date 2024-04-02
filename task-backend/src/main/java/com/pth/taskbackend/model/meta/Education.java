@@ -13,36 +13,28 @@ import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
 
 @Entity
-@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Candidate extends BaseEntity {
+public class Education   {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @Column(nullable = false)
-    private String firstName;
+    private String education;
 
+    private String description;
     @Column(nullable = false)
-    private String lastName;
+    private LocalDateTime fromDate;
+    private LocalDateTime toDate;
 
-    @Column(nullable = false)
-    private LocalDateTime dateOfBirth;
+    @ManyToOne
+    @JoinColumn(name = "candidate_id")
+    private Candidate candidate;
 
-    @Lob
-    @Column(nullable = false,length = 1000)
-    private byte[] avatar;
 
-    @Enumerated(EnumType.STRING)
-    private ESex sex;
 
-    private String address;
-    private String phoneNumber;
-    private String link;
-    private String job;
-    private String introduction;
-
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
 }
 

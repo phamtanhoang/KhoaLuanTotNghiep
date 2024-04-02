@@ -1,19 +1,18 @@
 package com.pth.taskbackend.controller;
 
-import com.pth.taskbackend.dto.request.AuthenticationRequest;
-import com.pth.taskbackend.dto.request.ChangePasswordRequest;
-import com.pth.taskbackend.dto.request.CreateEmployerRequest;
-import com.pth.taskbackend.dto.request.RegistrationRequest;
+import com.pth.taskbackend.dto.request.*;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.dto.response.TokenResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
+import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.UserInfoDetails;
 import com.pth.taskbackend.service.AuthService;
 import com.pth.taskbackend.security.JwtTokenService;
+import com.pth.taskbackend.service.CandidateService;
 import com.pth.taskbackend.service.EmployerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -21,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +54,8 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmployerService employerService;
+
+    @Autowired CandidateService candidateService;
     final Set<String> issuedRefreshTokens = Collections.synchronizedSet(new HashSet<>());
 
     @Value("${jwt.access-token.expires}")
@@ -131,7 +133,7 @@ public class AuthController {
     }
 
     @Operation(summary = "Register/Signup", description = "", tags = {})
-    @PostMapping("/RegisterEmployer")
+    @PostMapping("/registerEmployer")
     public ResponseEntity<BaseResponse> registerEmployer(@RequestBody CreateEmployerRequest registrationRequest) {
         if (userRepository.findByEmail(registrationRequest.username()).isPresent()) {
             return ResponseEntity.ok(
@@ -153,6 +155,39 @@ public class AuthController {
             employer.setPhoneNumber(registrationRequest.phoneNumber());
             employer.setUser(user.get());
             employerService.create(employer,null,null);
+
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Đăng ký thành công", HttpStatus.OK.value(), user)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "Register/Signup", description = "", tags = {})
+    @PostMapping("/registerCandidate")
+    public ResponseEntity<BaseResponse> registerCandidate(@RequestBody CreateCandidateRequest request) {
+        if (userRepository.findByEmail(request.username()).isPresent()) {
+            return ResponseEntity.ok(
+                    new BaseResponse("Tên người dùng đã tồn tại!", 400, null)
+            );
+        };
+
+        try{
+            Optional<User> user = authService.register(
+                    request.username(),
+                    request.password(),
+                    ERole.CANDIDATE);
+
+            Candidate candidate = new Candidate();
+            candidate.setFirstName(request.firstname());
+            candidate.setLastName(request.lastName());
+            candidate.setSex(request.sex());
+            candidate.setPhoneNumber(request.phoneNumber());
+            candidate.setUser(user.get());
+            candidateService.create(candidate,null);
 
 
             return ResponseEntity.ok(

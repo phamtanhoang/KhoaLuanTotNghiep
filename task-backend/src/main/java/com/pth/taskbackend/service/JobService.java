@@ -26,6 +26,7 @@ public interface JobService {
 
     Page<Job> findByEmployerId(String employerId, Pageable pageable);
 
-    Page<Job>findByCategoryId(String id);
+    Page<Job>findByCategoryId(String id,Pageable pageable);
     Page<Job>findByEmployerId(String id);
+
 }

@@ -1,12 +1,16 @@
 package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.response.BaseResponse;
+import com.pth.taskbackend.dto.response.TopCategoriesResponse;
 import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.repository.CategoryRepository;
+import com.pth.taskbackend.repository.JobRepository;
 import com.pth.taskbackend.service.CategoryService;
+import com.pth.taskbackend.service.JobService;
 import com.pth.taskbackend.util.func.ImageFunc;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -37,6 +41,9 @@ public class CategoryController {
     private CategoryRepository categoryRepository;
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private JobRepository jobRepository;
 
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
@@ -79,8 +86,8 @@ public class CategoryController {
     }
 
     @Operation(summary = "Get by name containing", description = "", tags = {})
-    @GetMapping("/name={categoryName}")
-    public ResponseEntity<BaseResponse> getCategoryByNameContaining(@PathVariable String categoryName, Pageable pageable) {
+    @GetMapping("/{categoryName}")
+    public ResponseEntity<BaseResponse> getCategoryByNameContaining(@PathVariable("categoryName") String categoryName, Pageable pageable) {
         try {
             Page<Category> categories = categoryRepository.findByNameContaining(categoryName, pageable);
             if (categories.isEmpty()) {
@@ -99,7 +106,7 @@ public class CategoryController {
     }
 
     @Operation(summary = "Create", description = "", tags = {})
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<BaseResponse> createCategory(@RequestParam("name") String name,
                                  @RequestParam("image") MultipartFile image) throws IOException {
         try {
@@ -110,7 +117,7 @@ public class CategoryController {
                         new BaseResponse("Vui lòng chọn hình ảnh!", HttpStatus.BAD_REQUEST.value(), null)
                 );
             }
-            Category category = categoryService.createCategory(image, name);
+            Category category = categoryService.create(image, name);
             return ResponseEntity.ok(
                     new BaseResponse("Tạo danh mục thành công", HttpStatus.OK.value(), category)
             );
@@ -144,7 +151,7 @@ public class CategoryController {
                 }
             }
 
-            Category category = categoryService.updateCategory(optionalCategory.get(), image, name);
+            Category category = categoryService.update(optionalCategory.get(), image, name);
 
             return ResponseEntity.ok(
                     new BaseResponse("Cập nhật danh mục thành công", HttpStatus.OK.value(), category)
@@ -173,4 +180,32 @@ public class CategoryController {
         }
     }
 
+    @Operation(summary = "Get top categories", description = "", tags = {})
+    @GetMapping("/topCategoies")
+    public ResponseEntity<BaseResponse> getTopCategories(Pageable pageable) {
+        try {
+           Page<Object[]> categories = categoryRepository.findCategoriesOrderedByJobCount(pageable);
+            Page<TopCategoriesResponse> topCategoriesResponses = categories.map(result -> {
+                Category category = (Category) result[0];
+                Long count = (Long) result[1];
+
+                TopCategoriesResponse dto = new TopCategoriesResponse(category.getId(),category.getName(),category.getImage(),count);
+                return dto;
+            });
+            if (categories.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách danh mục rỗng", HttpStatus.OK.value(), null)
+                );
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Danh sách danh mục", HttpStatus.OK.value(), topCategoriesResponses)
+            );
+
+
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 }

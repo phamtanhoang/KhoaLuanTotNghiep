@@ -71,8 +71,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Page<Job> findByCategoryId(String id) {
-        return null;
+    public Page<Job> findByCategoryId(String id, Pageable pageable) {
+        return jobRepository.findByCategoryId(id, pageable);
     }
 
     @Override
