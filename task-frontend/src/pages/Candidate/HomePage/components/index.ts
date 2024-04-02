@@ -1,17 +1,19 @@
 import Hero from "./Hero";
 import Intruction from "./PopularJobs";
-import PopularCategories from "./PopularCategories";
-import PopularEmployers from "./PopularEmployers";
 import RecentJobs from "./RecentJobs";
 import QuestionsAndAnswer from "./QuestionsAndAnswer";
 import PopularJobs from "./PopularJobs";
+import TopEmployerCard from "./TopEmployerCard";
+import TopCategoryCard from "./TopCategoryCard";
+import TopJobCard from "./TopJobCard";
 
 export {
   Hero,
-  PopularCategories,
+  TopEmployerCard,
+  TopCategoryCard,
   RecentJobs,
   Intruction,
-  PopularEmployers,
   QuestionsAndAnswer,
-  PopularJobs
+  PopularJobs,
+  TopJobCard
 };

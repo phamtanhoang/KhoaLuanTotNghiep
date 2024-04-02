@@ -2,7 +2,6 @@ import { FaLocationCrosshairs } from "react-icons/fa6";
 import { MdWork } from "react-icons/md";
 
 const SearchJobs = () => {
-  const urlLink = window.location.pathname;
   return (
     <div className="bg-white rounded lg:rounded-lg lg:flex w-full gap-3 border-2 border-orangetext p-2">
       <div></div>
