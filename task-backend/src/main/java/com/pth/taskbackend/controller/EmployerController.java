@@ -39,9 +39,10 @@ public class EmployerController {
     @Autowired
     private EmployerService employerService;
     @Autowired
-    AuthService authService;
+    private AuthService authService;
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getEmployerById(@PathVariable() String id) {

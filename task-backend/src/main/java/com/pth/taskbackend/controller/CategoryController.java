@@ -15,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,15 +42,11 @@ public class CategoryController {
     public ResponseEntity<BaseResponse> getCategoryById(@PathVariable String id) {
         try {
             Optional<Category> category = categoryRepository.findById(id);
-            if (category.isPresent()) {
-                return ResponseEntity.ok(
-                        new BaseResponse("Danh mục được tìm thấy", HttpStatus.OK.value(), category.get())
-                );
-            } else {
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy danh mục", HttpStatus.NOT_FOUND.value(), null)
-                );
-            }
+            return category.map(value -> ResponseEntity.ok(
+                    new BaseResponse("Danh mục được tìm thấy", HttpStatus.OK.value(), value)
+            )).orElseGet(() -> ResponseEntity.ok(
+                    new BaseResponse("Không tìm thấy danh mục", HttpStatus.NOT_FOUND.value(), null)
+            ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -59,7 +54,7 @@ public class CategoryController {
     }
 
     @Operation(summary = "Get list", description = "", tags = {})
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<BaseResponse> getCategories() {
         try {
             List<Category> categories = categoryRepository.findAll();
@@ -105,6 +100,11 @@ public class CategoryController {
         try {
 
             Optional<Category> existedCategory = categoryRepository.findByName(name);
+            if(existedCategory.isPresent()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Tên danh mục đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
+                );
+            }
             if (!ImageFunc.isImageFile(image)) {
                 return ResponseEntity.ok(
                         new BaseResponse("Vui lòng chọn hình ảnh!", HttpStatus.BAD_REQUEST.value(), null)
@@ -130,7 +130,7 @@ public class CategoryController {
                                                        @RequestParam(required = false) MultipartFile image) {
         try {
             Optional<Category> optionalCategory = categoryRepository.findById(id);
-            if (!optionalCategory.isPresent()) {
+            if (optionalCategory.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy danh mục để cập nhật!", HttpStatus.NOT_FOUND.value(), null)
                 );
@@ -161,7 +161,7 @@ public class CategoryController {
 
     @Operation(summary = "delete", description = "", tags = {})
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteCategory(@PathVariable("id") Long id) {
+    public ResponseEntity<BaseResponse> deleteCategory(@PathVariable("id") String id) {
         try {
             categoryRepository.deleteById(id);
             return ResponseEntity.ok(new BaseResponse("Xóa danh mục thành công", HttpStatus.OK.value(), null));
