@@ -35,6 +35,21 @@ public class Candidate extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ESex sex;
 
+    @Column
+    private String address;
+
+    @Column
+    private String phoneNumber;
+
+    @Column
+    private String link;
+
+    @Column
+    private String job;
+
+        @Column(columnDefinition = "TEXT")
+        private String introduction;
+
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
