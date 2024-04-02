@@ -15,16 +15,10 @@ import SearchJobs from "./SearchJobs";
 import ShareCard from "./ShareCard";
 import SidebarLink from "./SidebarLink";
 import SidebarLinkAdmin from "./SidebarLinkAdmin";
-import TopCategoryCard from "./TopCategoryCard";
-import TopEmployerCard from "./TopEmployerCard";
-import TopJobCard from "./TopJobCard";
 
 export {
   ErrorPage,
   LoadingSpiner,
-  TopCategoryCard,
-  TopJobCard,
-  TopEmployerCard,
   JobCard,
   Pagination,
   GreatJobCard,

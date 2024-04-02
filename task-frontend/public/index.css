@@ -914,6 +914,11 @@ body {
   margin-bottom: auto;
 }
 
+.-mx-2{
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+}
+
 .-mb-8{
   margin-bottom: -2rem;
 }
@@ -1349,6 +1354,26 @@ body {
 
 .max-h-\[90vh\]{
   max-height: 90vh;
+}
+
+.max-h-\[vh\]{
+  max-height: vh;
+}
+
+.max-h-\[55vh\]{
+  max-height: 55vh;
+}
+
+.max-h-\[57vh\]{
+  max-height: 57vh;
+}
+
+.max-h-\[50vh\]{
+  max-height: 50vh;
+}
+
+.max-h-\[5vh\]{
+  max-height: 5vh;
 }
 
 .min-h-24{
@@ -3488,6 +3513,10 @@ body {
   gap: 0.875rem;
 }
 
+.hover\:gap-2:hover{
+  gap: 0.5rem;
+}
+
 .hover\:border-orange-500:hover{
   --tw-border-opacity: 1;
   border-color: rgb(249 115 22 / var(--tw-border-opacity));
@@ -3814,6 +3843,11 @@ body {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
+.group:hover .group-hover\:rotate-180{
+  --tw-rotate: 180deg;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
 .group:hover .group-hover\:scale-110{
   --tw-scale-x: 1.1;
   --tw-scale-y: 1.1;
@@ -3841,6 +3875,10 @@ body {
 
   .max-lg\:mt-5{
     margin-top: 1.25rem;
+  }
+
+  .max-lg\:mt-2{
+    margin-top: 0.5rem;
   }
 
   .max-lg\:line-clamp-2{
@@ -4556,6 +4594,10 @@ body {
 
   .lg\:p-8{
     padding: 2rem;
+  }
+
+  .lg\:p-6{
+    padding: 1.5rem;
   }
 
   .lg\:px-0{
