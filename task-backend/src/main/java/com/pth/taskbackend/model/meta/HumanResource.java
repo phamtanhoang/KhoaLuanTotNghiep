@@ -34,10 +34,13 @@ public class HumanResource extends BaseEntity {
 
     @Column
     private boolean createJob;
+
     @Column
     private boolean viewJob;
+
     @Column
     private boolean editJob;
+
     @Column
     private boolean deleteJob;
 

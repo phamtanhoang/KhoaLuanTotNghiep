@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @EqualsAndHashCode(callSuper = true)
@@ -19,8 +21,10 @@ public class Job  extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    @Column
     private String description;
 
+    @Column
     private LocalDateTime toDate;
 
     @Column(nullable = false)
@@ -31,8 +35,10 @@ public class Job  extends BaseEntity {
 
     @Column
     private String fromSalary;
+
     @Column
     private String toSalary;
+
     @Column
     private String experience;
 
@@ -43,4 +49,12 @@ public class Job  extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "human_resource_id")
     private HumanResource humanResource;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "job_tag",
+            joinColumns = @JoinColumn(name = "job_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
 }
