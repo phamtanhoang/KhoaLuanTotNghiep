@@ -1,5 +1,7 @@
 import {
   GreatEmployerCard,
+  GreatJobCard,
+  TopEmployerCard,
 } from "@/components/ui";
 
 import { TfiArrowCircleLeft, TfiArrowCircleRight } from "react-icons/tfi";
@@ -49,7 +51,6 @@ const GreatEmployers = () => {
         >
           <SwiperSlide>
             <GreatEmployerCard
-              id="1"
               image="https://source.unsplash.com/random/400x400"
               name="Công ty dược phẩm Phúc Long"
               description="Đam mê kinh doanh, năng động, sáng tạo, độc lập, chủ động trong công việc, hoàn thành tốt nhiệm vụ được giao. Ưu tiên ứng viên có kinh nghiệm bán hàng các SP Sơn hoặc các SP liên quan đến vật liệu xây dựng, thầu công trình, thợ sơn, gia dụng."
@@ -57,7 +58,6 @@ const GreatEmployers = () => {
           </SwiperSlide>
           <SwiperSlide>
             <GreatEmployerCard
-              id="1"
               image="https://source.unsplash.com/random/400x400"
               name="Công ty dược phẩm Phúc Long"
               description="Đam mê kinh doanh, năng động, sáng tạo, độc lập, chủ động trong công việc, hoàn thành tốt nhiệm vụ được giao. Ưu tiên ứng viên có kinh nghiệm bán hàng các SP Sơn hoặc các SP liên quan đến vật liệu xây dựng, thầu công trình, thợ sơn, gia dụng."
@@ -65,7 +65,6 @@ const GreatEmployers = () => {
           </SwiperSlide>
           <SwiperSlide>
             <GreatEmployerCard
-              id="1"
               image="https://source.unsplash.com/random/400x400"
               name="Công ty dược phẩm Phúc Long"
               description="Đam mê kinh doanh, năng động, sáng tạo, độc lập, chủ động trong công việc, hoàn thành tốt nhiệm vụ được giao. Ưu tiên ứng viên có kinh nghiệm bán hàng các SP Sơn hoặc các SP liên quan đến vật liệu xây dựng, thầu công trình, thợ sơn, gia dụng."
@@ -73,7 +72,6 @@ const GreatEmployers = () => {
           </SwiperSlide>
           <SwiperSlide>
             <GreatEmployerCard
-              id="1"
               image="https://source.unsplash.com/random/400x400"
               name="Công ty dược phẩm Phúc Long"
               description="Đam mê kinh doanh, năng động, sáng tạo, độc lập, chủ động trong công việc, hoàn thành tốt nhiệm vụ được giao. Ưu tiên ứng viên có kinh nghiệm bán hàng các SP Sơn hoặc các SP liên quan đến vật liệu xây dựng, thầu công trình, thợ sơn, gia dụng."
@@ -81,7 +79,6 @@ const GreatEmployers = () => {
           </SwiperSlide>
           <SwiperSlide>
             <GreatEmployerCard
-              id="1"
               image="https://source.unsplash.com/random/400x400"
               name="Công ty dược phẩm Phúc Long"
               description="Đam mê kinh doanh, năng động, sáng tạo, độc lập, chủ động trong công việc, hoàn thành tốt nhiệm vụ được giao. Ưu tiên ứng viên có kinh nghiệm bán hàng các SP Sơn hoặc các SP liên quan đến vật liệu xây dựng, thầu công trình, thợ sơn, gia dụng."

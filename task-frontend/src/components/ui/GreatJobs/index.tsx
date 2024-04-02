@@ -47,7 +47,6 @@ const GreatJobs = () => {
         >
           <SwiperSlide>
             <GreatJobCard
-              id="1"
               image="https://source.unsplash.com/random/400x400"
               name="UI/UX Review Check"
               employer="Công ty dược phẩm Phúc Long"
@@ -55,7 +54,6 @@ const GreatJobs = () => {
           </SwiperSlide>
           <SwiperSlide>
             <GreatJobCard
-              id="1"
               image="https://source.unsplash.com/random/400x400"
               name="UI/UX Review Check"
               employer="Công ty dược phẩm Phúc Long"
@@ -63,7 +61,6 @@ const GreatJobs = () => {
           </SwiperSlide>
           <SwiperSlide>
             <GreatJobCard
-              id="1"
               image="https://source.unsplash.com/random/400x400"
               name="UI/UX Review Check"
               employer="Công ty dược phẩm Phúc Long"
@@ -71,7 +68,6 @@ const GreatJobs = () => {
           </SwiperSlide>
           <SwiperSlide>
             <GreatJobCard
-              id="1"
               image="https://source.unsplash.com/random/400x400"
               name="UI/UX Review Check"
               employer="Công ty dược phẩm Phúc Long"
@@ -79,7 +75,6 @@ const GreatJobs = () => {
           </SwiperSlide>
           <SwiperSlide>
             <GreatJobCard
-              id="1"
               image="https://source.unsplash.com/random/400x400"
               name="UI/UX Review Check"
               employer="Công ty dược phẩm Phúc Long"

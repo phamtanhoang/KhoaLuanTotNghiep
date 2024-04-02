@@ -57,7 +57,6 @@ public class JobController {
     public ResponseEntity<BaseResponse> createJob(@RequestBody CreateJobRequest request) throws IOException {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            System.out.println(authentication.getName() + categoryRepository.findById(request.getCategoryId()).get().getName() + humanResourceService.findByEmail(authentication.getName()).get().getFirstName());
             if (authentication != null && authentication.isAuthenticated()) {
                 String username = authentication.getName();
                 Optional<Category> existedCategory = categoryRepository.findById(request.getCategoryId());
@@ -116,55 +115,7 @@ public class JobController {
     }
 }
 
-//    @Operation(summary = "Get by id", description = "", tags = {})
-//    @GetMapping("/{id}")
-//    public ResponseEntity<BaseResponse> getCategoryById(@PathVariable String id) {
-//        try {
-//            Optional<Category> category = categoryRepository.findById(id);
-//            if (category.isPresent()) {
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Danh mục được tìm thấy", HttpStatus.OK.value(), category.get())
-//                );
-//            } else {
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Không tìm thấy danh mục", HttpStatus.NOT_FOUND.value(), null)
-//                );
-//            }
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
-//    }
-//
-//    @Operation(summary = "Get list", description = "", tags = {})
-//    @GetMapping("")
-//    public ResponseEntity<BaseResponse> getJobs(@RequestParam(required = false) String title,
-//                                             @RequestParam(required = false) String location,
-//                                             @RequestParam(required = false) String fromSalary,
-//                                             @RequestParam(required = false) String toSalary,
-//                                             @RequestParam(required = false) String categoryId,
-//                                             @RequestParam(required = false) LocalDateTime toDate,
-//
-//                                             Pageable pageable) {
-//        try {
-//            Page<Job> jobs = jobService.searchJobs(title, location, fromSalary, toSalary, categoryId, toDate, pageable);
-//            if (jobs.isEmpty()) {
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Không tìm thấy danh mục nào!", HttpStatus.NOT_FOUND.value(), null)
-//                );
-//            } else {
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Danh sách danh mục được tìm thấy", HttpStatus.OK.value(), jobs)
-//                );
-//            }
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
-//    }
-//
-//
-//
+
 
 
 

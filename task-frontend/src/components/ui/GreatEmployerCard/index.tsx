@@ -1,22 +1,15 @@
 import NONE_USER from "@/assets/images/non-user.jpg";
-import { useNavigate } from "react-router-dom";
 interface GreatEmployerCardProps {
-  id: string;
-  image: string;
-  name: string;
-  description: string;
+  image?: string;
+  name?: string;
+  description?: string;
 }
 
 const GreatEmployerCard: React.FC<GreatEmployerCardProps> = ({
-  id,
   image,
   name,
   description,
 }) => {
-  const navigate = useNavigate();
-  const _onClickDetail = () => {
-    navigate(`/employers/${id}`);
-  };
   return (
     <div className="relative flex h-max flex-col rounded-xl bg-white bg-clip-border text-gray-700 cursor-grab">
       <div className="relative mx-auto my-8 w-[120px] h-[120px] overflow-hidden rounded-xl bg-blue-gray-500 bg-clip-border text-white shadow-lg shadow-blue-gray-500/40">
@@ -35,7 +28,6 @@ const GreatEmployerCard: React.FC<GreatEmployerCardProps> = ({
           className="select-none rounded-lg bg-orangetext py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-orangetext/20 transition-all hover:shadow-lg hover:shadow-orangetext/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
           type="button"
           data-ripple-light="true"
-          onClick={_onClickDetail}
         >
           Xem chi tiết
         </button>

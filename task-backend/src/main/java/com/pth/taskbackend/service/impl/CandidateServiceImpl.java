@@ -29,21 +29,36 @@ public class CandidateServiceImpl implements CandidateService {
 
     @Override
     public Candidate create(Candidate candidate, MultipartFile avatar) throws IOException {
-        candidate.setAvatar(ImageFunc.compressImage(avatar.getBytes()));
+
+            if(avatar==null)
+                candidate.setAvatar(new byte[0]);
+            else
+                candidate.setAvatar(ImageFunc.compressImage(avatar.getBytes()));
+
+            candidateRepository.save(candidate);
+            return candidate;
+    }
+
+    @Override
+    public Candidate update(Candidate candidate) throws IOException {
+
+
+
         candidateRepository.save(candidate);
         return candidate;
     }
 
     @Override
-    public Candidate update(Candidate employer, MultipartFile avatar) throws IOException {
+    public Candidate updateAvatar(Candidate candidate, MultipartFile avatar) throws IOException {
 
         if (avatar != null) {
-            employer.setAvatar(ImageFunc.compressImage(avatar.getBytes()));
+            candidate.setAvatar(ImageFunc.compressImage(avatar.getBytes()));
         }
 
-        candidateRepository.save(employer);
-        return employer;
+        candidateRepository.save(candidate);
+        return candidate;
     }
+
 
 
     @Override
@@ -54,5 +69,10 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public void deleteById(String id) {
         candidateRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Candidate> findByUserEmail(String email) {
+        return candidateRepository.findByUserEmail(email);
     }
 }

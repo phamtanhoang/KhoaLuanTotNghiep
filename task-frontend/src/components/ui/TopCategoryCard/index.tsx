@@ -3,6 +3,7 @@ interface TopCategoryCardProps {
   image: string;
   title: string;
   jobCount: number;
+  _onClickDetail: () => void;
 }
 
 const TopCategoryCard: React.FC<TopCategoryCardProps> = ({
@@ -10,11 +11,11 @@ const TopCategoryCard: React.FC<TopCategoryCardProps> = ({
   image,
   title,
   jobCount,
+  _onClickDetail,
 }) => {
-  const _onClickDetail = () => {};
   return (
     <div
-      className="relative overflow-hidden group rounded-xl cursor-pointer"
+      className="relative overflow-hidden group rounded-md cursor-pointer"
       onClick={_onClickDetail}
     >
       <img
