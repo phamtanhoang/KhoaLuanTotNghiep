@@ -10,6 +10,7 @@ import {
   DashboardAdminPage,
   ServiceAdminPage,
   SigninAdminPage,
+  TagsAdminPage,
 } from "@/pages/Admin";
 import {
   AppliedJobsPage,
@@ -125,10 +126,13 @@ const Routers = () => {
           <Route
             path={ADMIN_PATHS.dashboard}
             element={<DashboardAdminPage />}
-          />{" "}
+          />
           <Route
             path={ADMIN_PATHS.categories}
             element={<CategoryAdminPage />}
+          /><Route
+            path={ADMIN_PATHS.tags}
+            element={<TagsAdminPage />}
           />
           <Route
             path={ADMIN_PATHS.services}

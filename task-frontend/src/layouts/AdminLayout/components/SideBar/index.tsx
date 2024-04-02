@@ -1,16 +1,57 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AiFillHome } from "react-icons/ai";
 import { BiSolidCategoryAlt } from "react-icons/bi";
-import { SidebarLinkAdmin } from "@/components/ui";
+
 import { ADMIN_PATHS } from "@/utils/constants/pathConstants";
 import { FaClipboardList, FaUserGraduate, FaUserTie } from "react-icons/fa";
 import { RiVipDiamondFill } from "react-icons/ri";
 import { IoMdSettings } from "react-icons/io";
 import { MdOutlineReadMore } from "react-icons/md";
+import { FaTags } from "react-icons/fa6";
+import { NavLink, useLocation } from "react-router-dom";
+import { ReactNode } from "react";
+
 interface SideBarProps {
   openSideBar: boolean;
   _onClickOpen: () => void;
 }
+
+interface SidebarLinkAdminProps {
+  link: string;
+  name: string;
+  icon: ReactNode;
+  openSideBar: boolean;
+}
+
+const SidebarLinkAdmin = ({
+  link,
+  name,
+  icon,
+  openSideBar,
+}: SidebarLinkAdminProps) => {
+  const location = useLocation();
+  const { pathname } = location;
+
+  return (
+    <NavLink
+      to={link}
+      className={`relative flex flex-row items-center  hover:text-bgBlue hover:bg-white rounded mx-2 p-2  ${
+        pathname === link && "bg-white text-bgBlue"
+      }`}
+    >
+      <p className={`flex gap-2  ${!openSideBar && "max-lg:mx-auto"}`}>
+        {icon}
+        <span
+          className={`text-base tracking-wide truncate  ${
+            openSideBar ? "block" : "max-lg:hidden"
+          }`}
+        >
+          {name}
+        </span>
+      </p>
+    </NavLink>
+  );
+};
 
 const SideBar: React.FC<SideBarProps> = ({ openSideBar, _onClickOpen }) => {
   return (
@@ -51,6 +92,14 @@ const SideBar: React.FC<SideBarProps> = ({ openSideBar, _onClickOpen }) => {
                 link={ADMIN_PATHS.jobs}
                 name="Công việc"
                 icon={<FaClipboardList className="text-xl lg:text-lg m-auto" />}
+                openSideBar={openSideBar}
+              />
+            </li>
+            <li>
+              <SidebarLinkAdmin
+                link={ADMIN_PATHS.tags}
+                name="Nhãn"
+                icon={<FaTags className="text-lg lg:text-lg m-auto" />}
                 openSideBar={openSideBar}
               />
             </li>

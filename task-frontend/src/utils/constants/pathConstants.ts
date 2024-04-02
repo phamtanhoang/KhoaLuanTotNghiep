@@ -35,6 +35,7 @@ const ADMIN_PATHS = {
   dashboard: "/admin/dashboard",
   categories: "/admin/categories",
   jobs: "/admin/jobs",
+  tags: "/admin/tags",
   employers: "/admin/employers",
   candidates: "/admin/candidates",
   services: "/admin/services",
