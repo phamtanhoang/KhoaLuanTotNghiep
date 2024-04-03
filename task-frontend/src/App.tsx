@@ -1,10 +1,13 @@
-import { createContext } from "react";
 import Routers from "./routers";
-
-export const ModalController = createContext<any>(null);
+import { Tooltip } from "react-tooltip";
 
 const App = () => {
-  return <Routers />;
+  return (
+    <>
+      <Tooltip id="tooltip" className="z-[999]" />
+      <Routers />
+    </>
+  );
 };
 
 export default App;

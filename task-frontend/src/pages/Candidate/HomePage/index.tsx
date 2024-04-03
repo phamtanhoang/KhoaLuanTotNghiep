@@ -126,7 +126,7 @@ const categories = [
 const HomePage: React.FC = () => {
   return (
     <>
-      <Tooltip id="home-tooltip" className="z-[999]" />
+    
       <Hero />
       <section className="py-12 lg:py-16">
         <div className="px-5 lg:px-28 flex justify-between mb-8">

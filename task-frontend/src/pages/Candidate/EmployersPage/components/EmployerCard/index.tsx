@@ -63,7 +63,6 @@ const EmployerCard: React.FC<EmployerCardProps> = ({
           >
             <RiVipCrown2Line />
           </div>
-          <Tooltip id="tooltip" />
         </>
       )}
     </div>

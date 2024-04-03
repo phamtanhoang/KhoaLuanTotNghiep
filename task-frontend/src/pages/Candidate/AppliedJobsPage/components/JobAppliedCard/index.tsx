@@ -51,12 +51,12 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
           </p>
           <h1
             className="text-lg uppercase font-semibold text-gray-700 max-lg:line-clamp-2 line-clamp-1"
-            data-tooltip-id="name-tooltip"
+            data-tooltip-id="tooltip"
             data-tooltip-content={name}
           >
             {name}
           </h1>
-          <Tooltip id="name-tooltip" />
+          
           <div className="mt-1 relative">
             <FaBuilding className="text-gray-600 absolute top-0 left-0 text-lg " />
             <a className="text-gray-600 text-base font-medium hover:text-gray-800  line-clamp-1">
@@ -88,7 +88,7 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
               data-tooltip-content="Tin tuyển dụng VIP"
             >
               <RiVipCrown2Line />
-              <Tooltip id="tooltip" />
+              
             </p>
           )}
           <button

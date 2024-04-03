@@ -68,7 +68,6 @@ const BaseInfo: React.FC<BaseInfoProps> = ({
               data-tooltip-content="Nhà tuyển dụng VIP"
             >
               <RiVipCrown2Line />
-              <Tooltip id="tooltip" />
             </p>
           )}
         </div>

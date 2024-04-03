@@ -41,7 +41,7 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
                 >
                   <RiVipCrown2Line />
                 </div>
-                <Tooltip id="tooltip" />
+                
               </>
             )}
           </div>

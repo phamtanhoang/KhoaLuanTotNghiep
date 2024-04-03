@@ -28,7 +28,7 @@ const TopJobCard: React.FC<TopJobCardProps> = ({
       <div>
         <h1
           className="text-lg group-hover:text-orangetext font-semibold"
-          data-tooltip-id="home-tooltip"
+          data-tooltip-id="tooltip"
           data-tooltip-content={name}
         >
           {name}

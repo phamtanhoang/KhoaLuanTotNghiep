@@ -1,4 +1,4 @@
-import { ModalController } from "@/App";
+
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { useContext } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
@@ -32,11 +32,11 @@ const exampleData = [
 ];
 
 const CategoryAdminPage = () => {
-  const context = useContext(ModalController);
+
 
   const _onClickFilter = () => {
-    context.setFuncs(MODAL_KEYS.filter);
-    context.handleOpen();
+    // context.setFuncs(MODAL_KEYS.filter);
+    // context.handleOpen();
   };
   const _onClickDetail = (item: any) => {};
 

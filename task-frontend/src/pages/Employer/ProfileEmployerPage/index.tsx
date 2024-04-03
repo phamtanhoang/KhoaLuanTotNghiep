@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import { BaseInfo, HumanResourceList, MoreDetail } from "./components";
-import { ModalController } from "@/App";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 
 const sampleData = [
@@ -9,19 +8,18 @@ const sampleData = [
 ];
 
 const ProfileEmployerPage = () => {
-  const context = useContext(ModalController);
 
   const _onClickChangeImage = () => {
-    context.setFuncs(MODAL_KEYS.changeAvatar);
-    context.handleOpen();
+    // context.setFuncs(MODAL_KEYS.changeAvatar);
+    // context.handleOpen();
   };
   const _onClickChangeBackgroundImage = () => {
-    context.setFuncs(MODAL_KEYS.changeBackground);
-    context.handleOpen();
+    // context.setFuncs(MODAL_KEYS.changeBackground);
+    // context.handleOpen();
   };
   const _onClickChangeInfo = () => {
-    context.setFuncs(MODAL_KEYS.changeInfoEmployer);
-    context.handleOpen();
+    // context.setFuncs(MODAL_KEYS.changeInfoEmployer);
+    // context.handleOpen();
   };
   return (
     <>

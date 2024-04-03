@@ -4,7 +4,7 @@ import { Pagination } from "@/components/ui";
 import { FiFilter } from "react-icons/fi";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { useContext } from "react";
-import { ModalController } from "@/App";
+
 import Swal from "sweetalert2";
 
 const sampleData = [
@@ -28,11 +28,10 @@ const sampleData = [
   },
 ];
 const ProceduresEmployerPage = () => {
-  const context = useContext(ModalController);
+
 
   const _onClickFilter = () => {
-    context.setFuncs(MODAL_KEYS.filter);
-    context.handleOpen();
+
   };
   const _onClickDelete = () => {
     Swal.fire({

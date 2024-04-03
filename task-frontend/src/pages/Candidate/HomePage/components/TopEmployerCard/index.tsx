@@ -33,7 +33,7 @@ const TopEmployerCard: React.FC<TopEmployerCardProps> = ({
 
       <div
         className="font-bold text-base uppercase w-full text-center line-clamp-2 cursor-default"
-        data-tooltip-id="home-tooltip"
+        data-tooltip-id="tooltip"
         data-tooltip-content={name}
       >
         {name}

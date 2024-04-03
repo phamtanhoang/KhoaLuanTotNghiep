@@ -1,8 +1,7 @@
 import { Pagination } from "@/components/ui";
-import { CandidateCard, FilterCandidate } from "./components";
+import { CandidateCard } from "./components";
 import { FiFilter } from "react-icons/fi";
 import { useContext } from "react";
-import { ModalController } from "@/App";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 
 const candidates = [
@@ -104,10 +103,8 @@ const candidates = [
   },
 ];
 const FindCandidatePage = () => {
-  const context = useContext(ModalController);
   const _onClickFilter = () => {
-    context.setFuncs(MODAL_KEYS.filter);
-    context.handleOpen();
+
   };
   return (
     <>

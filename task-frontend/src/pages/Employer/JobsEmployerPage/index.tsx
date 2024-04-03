@@ -2,11 +2,7 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 import { JobsTableMobile, JobsTableWeb } from "./components";
 import { Pagination } from "@/components/ui";
 import { FiFilter } from "react-icons/fi";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import { useContext } from "react";
-import { ModalController } from "@/App";
-import Swal from "sweetalert2";
-import "@/assets/style/Swal-Custom.css";
+
 
 const sampleData = [
   {
@@ -35,67 +31,24 @@ const sampleData = [
   },
 ];
 const JobsEmployerPage = () => {
-  const context = useContext(ModalController);
+  
   const _onClickFilter = () => {
-    context.setFuncs(MODAL_KEYS.filter);
-    context.handleOpen();
+    // context.setFuncs(MODAL_KEYS.filter);
+    // context.handleOpen();
   };
   const _onClickAdd = () => {
-    context.setFuncs(MODAL_KEYS.createJob);
-    context.handleOpen();
+    // context.setFuncs(MODAL_KEYS.createJob);
+    // context.handleOpen();
   };
 
   const _onClickDelete = () => {
-    Swal.fire({
-      icon: "warning",
-      title: "Xóa công việc này?",
-      showCancelButton: true,
-      cancelButtonText: "Hủy bỏ",
-      confirmButtonText: "Đồng ý",
-
-      customClass: {},
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire("Deleted!", "Your item has been deleted.", "success");
-      } else if (result.isDismissed) {
-      }
-    });
+   
   };
   const _onClickDetail = () => {
-    Swal.fire({
-      icon: "question",
-      title: "Xác nhận xóa công việc này1?",
-      showCancelButton: true,
-      cancelButtonText: "Hủy bỏ",
-      confirmButtonText: "Đồng ý",
-
-      customClass: {
-        confirmButton: "confirm-button-class",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire("Deleted!", "Your item has been deleted.", "success");
-      } else if (result.isDismissed) {
-      }
-    });
+    
   };
   const _onClickEdit = () => {
-    Swal.fire({
-      icon: "question",
-      title: "Xác nhận xóa công việc này3?",
-      showCancelButton: true,
-      cancelButtonText: "Hủy bỏ",
-      confirmButtonText: "Đồng ý",
-
-      customClass: {
-        confirmButton: "confirm-button-class",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire("Deleted!", "Your item has been deleted.", "success");
-      } else if (result.isDismissed) {
-      }
-    });
+    
   };
   return (
     <div className="bg-white p-4 rounded relative w-full mt-8">

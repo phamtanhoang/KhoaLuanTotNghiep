@@ -126,7 +126,7 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
               <RiVipCrown2Line />
             </div>
           </div>
-          <Tooltip id="tooltip" className="z-[100]" />
+          
         </div>
         <div className="w-full">
           <div className="border-2 border-dotted border-orangetext bg-orange-50 rounded-md m-2 lg:m-5 p-4 lg:p-3 flex flex-col gap-3">
