@@ -22,7 +22,7 @@ const Schedule: React.FC<ScheduleProps> = ({ value, fetchScheduleData }) => {
         endAccessor="end"
         style={{ height: "100%", overflowY: "auto" }}
         className="scrollbar-custom"
-        views={["day", "week", "month", "agenda"]}
+        views={["day", "week", "month"]}
         defaultDate={new Date()}
         defaultView="month"
         onSelectEvent={_onSelectEvent}

@@ -1,9 +1,12 @@
-import { Pagination } from "@/components/ui";
-import { AiOutlinePlus } from "react-icons/ai";
+import { PaginationCustom } from "@/components/ui";
+import { useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { IoIosAddCircleOutline } from "react-icons/io";
 
 const TagsAdminPage = () => {
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(10);
+
   const _onClickFilter = () => {};
   const _onClickAdd = () => {};
 
@@ -68,7 +71,12 @@ const TagsAdminPage = () => {
         /> */}
       </div>
       <div className="w-max mx-auto mt-5">
-        <Pagination type={true} />
+        <PaginationCustom
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPages={totalPages}
+          type={true}
+        />
       </div>
     </>
   );

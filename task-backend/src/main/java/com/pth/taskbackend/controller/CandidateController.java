@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -87,7 +86,7 @@ public class CandidateController {
 
             String email = authentication.getName();
             Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
-            if (!optionalCandidate.isPresent())
+            if (optionalCandidate.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
                 );
@@ -127,7 +126,7 @@ public class CandidateController {
 
             String email = authentication.getName();
             Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
-            if (!optionalCandidate.isPresent())
+            if (optionalCandidate.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
                 );
@@ -166,7 +165,7 @@ public class CandidateController {
 
             String email = authentication.getName();
             Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
-            if (!optionalCandidate.isPresent())
+            if (optionalCandidate.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
                 );

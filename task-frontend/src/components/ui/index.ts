@@ -7,6 +7,7 @@ import GreatJobs from "./GreatJobs";
 import JobCard from "./JobCard";
 import LoadingSpiner from "./Loading";
 import Pagination from "./Pagination";
+import PaginationCustom from "./PaginationCustom";
 import Schedule from "./Schedule";
 import SearchJobs from "./SearchJobs";
 import ShareCard from "./ShareCard";
@@ -24,4 +25,5 @@ export {
   Schedule,
   GreatJobs,
   GreatEmployers,
+  PaginationCustom
 };
