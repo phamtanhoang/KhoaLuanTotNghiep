@@ -1,7 +1,12 @@
 package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.request.CreateEmployerRequest;
+import com.pth.taskbackend.dto.request.UpdateCandidateRequest;
+import com.pth.taskbackend.dto.request.UpdateEmployerRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
+import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
+import com.pth.taskbackend.dto.response.GetEmployerProfileResponse;
 import com.pth.taskbackend.enums.ERole;
+import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.model.meta.User;
@@ -20,6 +25,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -127,42 +134,141 @@ public class EmployerController {
         }
     }
 
-    @Operation(summary = "update", description = "", tags = {})
-    @PatchMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateEmployer(@PathVariable("id") String id,
-                                                       @RequestBody Employer employer,
-                                                       @RequestParam MultipartFile image,
-                                                       @RequestParam MultipartFile backgroundImage) {
+    @Operation(summary = "Get by id", description = "", tags = {})
+    @GetMapping("/profile")
+    public ResponseEntity<BaseResponse> getEmployerProfile() {
         try {
-            Optional<Employer> optionalEmployer = employerService.findById(id);
-            if (!optionalEmployer.isPresent()) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication == null && !authentication.isAuthenticated())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy nhà tuyển dụng để cập nhật!", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("xác thực không hợp lệ", HttpStatus.FORBIDDEN.value(), null)
                 );
-            }
 
-            if (image != null) {
-                if (!(ImageFunc.isImageFile(image)||ImageFunc.isImageFile(backgroundImage))) {
-                    return ResponseEntity.ok(
-                            new BaseResponse("Vui lòng chọn hình ảnh!", HttpStatus.BAD_REQUEST.value(), null)
-                    );
-                }
-            }
-            employer.setId(id);
-            employerService.update(employer, image, backgroundImage);
+            String email = authentication.getName();
+            Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+            if (!optionalEmployer.isPresent())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Employer employer = optionalEmployer.get();
+            GetEmployerProfileResponse profile = new GetEmployerProfileResponse(
+                    employer.getId(),
+                    authentication.getName(),
+                    employer.getName(),
+                    employer.getDescription(),
+                    employer.getLocation(),
+                    employer.getPhoneNumber(),
+                    employer.getBusinessCode(),
+                    employer.getImage(),
+                    employer.getBackgroundImage());
 
             return ResponseEntity.ok(
-                    new BaseResponse("Cập nhật nhà tuyển dụng thành công", HttpStatus.OK.value(), employer)
+                    new BaseResponse( "Hiện thông tin nhà tuyển dụng", HttpStatus.OK.value(), profile)
             );
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.ok(
-                    new BaseResponse("Tên nhà tuyển dụng đã tồn tại!", HttpStatus.BAD_REQUEST.value(), null)
-            );
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+    @Operation(summary = "Get by id", description = "", tags = {})
+    @GetMapping("/update")
+    public ResponseEntity<BaseResponse> updateEmployerProfile(UpdateEmployerRequest request) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication == null && !authentication.isAuthenticated())
+                return ResponseEntity.ok(
+                        new BaseResponse("xác thực không hợp lệ", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            String email = authentication.getName();
+            Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+            if (!optionalEmployer.isPresent())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Employer employer = optionalEmployer.get();
+            employer.setName(request.name());
+            employer.setDescription(request.description());
+            employer.setLocation(request.location());
+            employer.setPhoneNumber(request.phoneNumber());
+            employer.setBusinessCode(request.businessCode());
+
+            employerService.update(employer);
+            return ResponseEntity.ok(
+                    new BaseResponse( "Cập nhật thông tin nhà tuyển dụng", HttpStatus.OK.value(), employer)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "Get by id", description = "", tags = {})
+    @GetMapping("/updateImage")
+    public ResponseEntity<BaseResponse> updateEmployerImage(@RequestPart MultipartFile image) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication == null && !authentication.isAuthenticated())
+                return ResponseEntity.ok(
+                        new BaseResponse("xác thực không hợp lệ", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            String email = authentication.getName();
+            Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+            if (!optionalEmployer.isPresent())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Employer employer = optionalEmployer.get();
+            employerService.updateImage(employer,image);
+            return ResponseEntity.ok(
+                    new BaseResponse( "Cập nhật ảnh đại diện ứng viên thành công", HttpStatus.OK.value(), employer)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "Get by id", description = "", tags = {})
+    @GetMapping("/updateBackgroundImage")
+    public ResponseEntity<BaseResponse> updateEmployerBackgroundImage(@RequestPart MultipartFile backgroundImage) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication == null && !authentication.isAuthenticated())
+                return ResponseEntity.ok(
+                        new BaseResponse("xác thực không hợp lệ", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            String email = authentication.getName();
+            Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+            if (!optionalEmployer.isPresent())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Employer employer = optionalEmployer.get();
+            employerService.updateBackgroundImage(employer,backgroundImage);
+            return ResponseEntity.ok(
+                    new BaseResponse( "Cập nhật ảnh đại diện ứng viên thành công", HttpStatus.OK.value(), employer)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+
 
     @Operation(summary = "delete", description = "", tags = {})
     @DeleteMapping("/{id}")

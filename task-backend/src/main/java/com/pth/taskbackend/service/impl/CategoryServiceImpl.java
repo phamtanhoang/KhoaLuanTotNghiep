@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -22,19 +23,17 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryRepository categoryRepository;
 
     @Override
-    public Category create(MultipartFile file, String name) throws IOException {
-        Category category = new Category();
-        category.setName(name);
+    public Category create(Category category, MultipartFile file) throws IOException {
+        if (file != null) {
+            category.setImage(ImageFunc.compressImage(file.getBytes()));
+        }
         category.setImage(ImageFunc.compressImage(file.getBytes()));
         categoryRepository.save(category);
         return category;
     }
 
     @Override
-    public Category update(Category category, MultipartFile image, String name) throws IOException {
-        if (name != null && !name.isEmpty()) {
-            category.setName(name);
-        }
+    public Category update(Category category, MultipartFile image) throws IOException {
 
         if (image != null) {
             category.setImage(ImageFunc.compressImage(image.getBytes()));
@@ -44,8 +43,23 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public void delete(Category category) {
+         categoryRepository.delete(category);
+    }
+
+    @Override
+    public void deleteById(String id) {
+          categoryRepository.deleteById(id);
+    }
+
+    @Override
     public Page<Object[]> findCategoriesByJobCount(Pageable pageable) {
         return categoryRepository.findCategoriesOrderedByJobCount(pageable);
+    }
+
+    @Override
+    public Optional<Category> findById(String id) {
+        return categoryRepository.findById(id);
     }
 
 }

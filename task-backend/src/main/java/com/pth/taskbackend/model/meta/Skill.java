@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @NoArgsConstructor
@@ -17,12 +18,13 @@ public class Skill extends BaseEntity  {
     @Column(nullable = false)
     private String skill;
 
-
     @Column(columnDefinition = "TEXT")
     private String description;
 
     @OneToOne
     @JoinColumn(name = "candidate_id")
     private Candidate candidate;
+
+
 }
 

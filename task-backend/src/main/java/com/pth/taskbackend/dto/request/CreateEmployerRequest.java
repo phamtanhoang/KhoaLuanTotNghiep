@@ -12,7 +12,6 @@ public record CreateEmployerRequest(
         String location,
         String description,
         String phoneNumber,
-        String businessCode){
-
-
+        String businessCode)
+{
 }

@@ -8,17 +8,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface JobService {
-    Job create(String name, String description, LocalDateTime created, LocalDateTime toDate, String location, EStatus status, String fromSalary, String toSalary, String experience, Category category, HumanResource humanResource) throws IOException;
 
-    Job update(String name, String description, LocalDateTime toDate, String location, EStatus status, String fromSalary, String toSalary, String experience, String hrId) throws IOException;
-
-    void deleteById(Long jobId);
+    Job create(Job job);
+    Job update(Job job);
+    void deleteById(String jobId);
 
     void delete(Job job);
-
-    Job findById(Long jobId);
+    Optional<Job> findById(String jobId);
 
     Page<Job> findAll(Pageable pageable);
 

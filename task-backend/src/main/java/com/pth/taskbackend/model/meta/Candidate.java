@@ -35,6 +35,7 @@ public class Candidate extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ESex sex;
 
+
     @Column
     private String address;
 

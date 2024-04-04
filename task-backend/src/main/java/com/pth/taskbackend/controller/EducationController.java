@@ -1,5 +1,4 @@
 package com.pth.taskbackend.controller;
-import com.pth.taskbackend.dto.request.CreateJobRequest;
 import com.pth.taskbackend.dto.request.EducationRequest;
 import com.pth.taskbackend.dto.request.ExperienceRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;

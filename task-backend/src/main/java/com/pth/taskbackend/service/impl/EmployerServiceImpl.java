@@ -24,6 +24,11 @@ public class EmployerServiceImpl implements EmployerService {
     }
 
     @Override
+    public Optional<Employer> findByUserEmail(String email) {
+        return employerRepository.findByUserEmail(email);
+    }
+
+    @Override
     public Optional<Employer> findById(String id) {
         return employerRepository.findById(id);
     }
@@ -44,11 +49,24 @@ public class EmployerServiceImpl implements EmployerService {
     }
 
     @Override
-    public Employer update(Employer employer, MultipartFile image, MultipartFile backgroundImage) throws IOException {
+    public Employer update(Employer employer) throws IOException {
 
+
+        employerRepository.save(employer);
+        return employer;
+    }
+
+    @Override
+    public Employer updateImage(Employer employer, MultipartFile image) throws IOException {
         if (image != null) {
             employer.setImage(ImageFunc.compressImage(image.getBytes()));
         }
+        employerRepository.save(employer);
+        return employer;
+    }
+
+    @Override
+    public Employer updateBackgroundImage(Employer employer, MultipartFile backgroundImage) throws IOException {
         if (backgroundImage != null) {
             employer.setImage(ImageFunc.compressImage(backgroundImage.getBytes()));
         }

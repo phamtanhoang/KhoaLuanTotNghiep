@@ -117,7 +117,9 @@ public class CategoryController {
                         new BaseResponse("Vui lòng chọn hình ảnh!", HttpStatus.BAD_REQUEST.value(), null)
                 );
             }
-            Category category = categoryService.create(image, name);
+            Category category = new Category();
+            category.setName(name);
+             categoryService.create(category,image);
             return ResponseEntity.ok(
                     new BaseResponse("Tạo danh mục thành công", HttpStatus.OK.value(), category)
             );
@@ -150,8 +152,9 @@ public class CategoryController {
                     );
                 }
             }
-
-            Category category = categoryService.update(optionalCategory.get(), image, name);
+            Category  category= new Category();
+            category.setName(name);
+            categoryService.update(optionalCategory.get(), image);
 
             return ResponseEntity.ok(
                     new BaseResponse("Cập nhật danh mục thành công", HttpStatus.OK.value(), category)

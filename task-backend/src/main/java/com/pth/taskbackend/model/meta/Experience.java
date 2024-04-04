@@ -1,7 +1,5 @@
 package com.pth.taskbackend.model.meta;
 
-
-import jakarta.persistence.*;
 import com.pth.taskbackend.model.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +11,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
-
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @NoArgsConstructor
@@ -23,14 +20,15 @@ public class Experience extends BaseEntity  {
     @Column(nullable = false)
     private String experience;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
 
-    @Column
+    @Column(nullable = false)
     private LocalDateTime fromDate;
 
-    @Column
+    @Column(nullable = false)
     private LocalDateTime toDate;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     @OneToOne
     @JoinColumn(name = "candidate_id")

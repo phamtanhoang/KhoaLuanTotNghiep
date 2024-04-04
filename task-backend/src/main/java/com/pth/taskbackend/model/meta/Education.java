@@ -17,17 +17,25 @@ import java.time.LocalDateTime;
 @Data
 public class Education  extends BaseEntity  {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
+
     @Column(nullable = false)
     private String education;
+
+
+    @Column(nullable = false)
+    private LocalDateTime fromDate;
+
+    @Column(nullable = false)
+    private LocalDateTime toDate;
+
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column
-    private LocalDateTime fromDate;
-
-    @Column
-    private LocalDateTime toDate;
 
     @OneToOne
     @JoinColumn(name = "candidate_id")

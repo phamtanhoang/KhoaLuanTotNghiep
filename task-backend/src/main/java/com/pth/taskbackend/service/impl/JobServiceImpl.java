@@ -13,45 +13,37 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Optional;
+
 @Service
 public class JobServiceImpl implements JobService {
     @Autowired
     JobRepository jobRepository;
     @Override
-    public Job create(String name, String description, LocalDateTime created, LocalDateTime toDate, String location, EStatus status, String fromSalary, String toSalary, String experience, Category category, HumanResource humanResource) throws IOException {
-        Job job = new Job();
-        job.setName(name);
-        job.setDescription(description);
-        job.setCreated(created);
-        job.setToDate(toDate);
-        job.setLocation(location);
-        job.setStatus(EStatus.PENDING);
-        job.setFromSalary(fromSalary);
-        job.setToSalary(toSalary);
-        job.setExperience(experience);
-        job.setCategory(category);
-        job.setHumanResource(humanResource);
+    public Job create(Job job){
         return jobRepository.save(job);
     }
 
 
     @Override
-    public Job update(String name, String description, LocalDateTime toDate, String location, EStatus status, String fromSalary, String toSalary, String experience, String hrId) throws IOException {
-        return null;
+    public Job update(Job job){
+        return jobRepository.save(job);
     }
 
     @Override
-    public void deleteById(Long jobId) {
+    public void deleteById(String id) {
+        jobRepository.deleteById(id);
 
     }
 
     @Override
     public void delete(Job job) {
+        jobRepository.delete(job);
 
     }
 
     @Override
-    public Job findById(Long jobId) {
+    public Optional<Job> findById(String id) {
         return null;
     }
 

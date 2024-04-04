@@ -14,9 +14,12 @@ import java.util.Optional;
 public interface EmployerService {
 
     Page<Employer>findByKeyword(String keyword, Pageable pageable) throws IOException;
+    Optional<Employer>findByUserEmail(String email);
     Optional<Employer>findById(String id) throws IOException;
     Employer create(Employer employer, MultipartFile image, MultipartFile backgroundImage) throws IOException, java.io.IOException;
-    Employer update(Employer employer, MultipartFile image, MultipartFile backgroundImage) throws IOException, java.io.IOException;
+    Employer update(Employer employer) throws IOException, java.io.IOException;
+    Employer updateImage(Employer employer, MultipartFile image) throws java.io.IOException;
+    Employer updateBackgroundImage(Employer employer, MultipartFile backgroundImage) throws java.io.IOException;
     void delete (Employer employer) throws IOException;
     void deleteById(String id) throws IOException;
 

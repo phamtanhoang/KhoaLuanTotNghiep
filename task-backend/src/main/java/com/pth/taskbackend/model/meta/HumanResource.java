@@ -31,19 +31,7 @@ public class HumanResource extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ESex sex;
 
-
-    @Column
-    private boolean createJob;
-
-    @Column
-    private boolean viewJob;
-
-    @Column
-    private boolean editJob;
-
-    @Column
-    private boolean deleteJob;
-
+    String phoneNumber;
     @ManyToOne
     @JoinColumn(name = "employer_id")
     private Employer employer;
