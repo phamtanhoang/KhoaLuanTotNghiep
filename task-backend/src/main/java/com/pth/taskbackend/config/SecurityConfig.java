@@ -34,6 +34,7 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/javainuse-openapi/**"
     };
+
     @Bean
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         return http

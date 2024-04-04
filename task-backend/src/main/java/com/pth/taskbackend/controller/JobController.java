@@ -1,38 +1,29 @@
 package com.pth.taskbackend.controller;
-import com.pth.taskbackend.dto.request.CreateJobRequest;
+import com.pth.taskbackend.dto.request.JobRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.model.meta.HumanResource;
 import com.pth.taskbackend.model.meta.Job;
-import com.pth.taskbackend.repository.CategoryRepository;
 import com.pth.taskbackend.repository.JobRepository;
 import com.pth.taskbackend.service.CategoryService;
 import com.pth.taskbackend.service.HumanResourceService;
 import com.pth.taskbackend.service.JobService;
-import com.pth.taskbackend.util.func.ImageFunc;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
-
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
 @CrossOrigin(origins = "*")
@@ -48,46 +39,10 @@ public class JobController {
     @Autowired
     JobRepository jobRepository;
     @Autowired
-    CategoryRepository categoryRepository;
+    CategoryService categoryService;
     @Autowired
     HumanResourceService humanResourceService;
 
-    @Operation(summary = "Create", description = "", tags = {})
-    @PostMapping("/create")
-    public ResponseEntity<BaseResponse> createJob(@RequestBody CreateJobRequest request) throws IOException {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.isAuthenticated()) {
-                String username = authentication.getName();
-                Optional<Category> existedCategory = categoryRepository.findById(request.getCategoryId());
-                Optional<HumanResource> existedHumanResource = humanResourceService.findByEmail(username);
-                String name = request.getName();
-                String description = request.getDescription();
-                String location = request.getLocation();
-                String fromSalary = request.getFromSalary();
-                String toSalary = request.getToSalary();
-                LocalDateTime toDate = request.getToDate();
-                String experience = request.getExperience();
-
-                System.out.println(existedHumanResource.get().getFirstName());
-                Job job = jobService.create(name, description, LocalDateTime.now(), toDate, location, EStatus.PENDING, fromSalary, toSalary, experience, existedCategory.get(), null
-                );
-                return ResponseEntity.ok(
-                        new BaseResponse("Tạo danh mục thành công", HttpStatus.OK.value(), job)
-                );
-            } else return ResponseEntity.ok(
-                    new BaseResponse("Bạn phải đăng nhập ", HttpStatus.FORBIDDEN.value(), null)
-            );
-
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.ok(
-                    new BaseResponse("Tên danh mục đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
 
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("")
@@ -113,6 +68,199 @@ public class JobController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
+    @Operation(summary = "Create", description = "", tags = {})
+    @PostMapping("/create")
+    public ResponseEntity<BaseResponse> createJob(@RequestBody JobRequest request) throws IOException {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new BaseResponse("Bạn phải đăng nhập", HttpStatus.UNAUTHORIZED.value(), null));
+            }
+
+            String username = authentication.getName();
+            HumanResource humanResource=null;
+            EStatus status = EStatus.ACTIVE;
+
+            boolean hasHRAuthority = authentication.getAuthorities().stream()
+                    .anyMatch(authority -> authority.getAuthority().equals("HR"));
+            if (hasHRAuthority) {
+
+                Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(username);
+                if (optionalHumanResource.isEmpty()) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new BaseResponse("Không tìm thấy HR", HttpStatus.NOT_FOUND.value(), null));
+                }
+                humanResource= optionalHumanResource.get();
+                status =EStatus.PENDING;
+            }
+
+
+            Optional<Category> existedCategory = categoryService.findById(request.categoryId());
+            if (existedCategory.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new BaseResponse("Danh mục không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
+            }
+            Job job = new Job();
+            job.setName(request.name());
+            job.setStatus(status);
+            job.setExperience(request.experience());
+            job.setDescription(request.description());
+            job.setCategory(existedCategory.get());
+            job.setFromSalary(request.fromSalary());
+            job.setToSalary(request.toSalary());
+            job.setToDate(request.toDate());
+            job.setLocation(request.location());
+            job.setHumanResource(humanResource);
+            jobService.create(job);
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Tạo công việc thành công", HttpStatus.OK.value(), job)
+            );
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new BaseResponse("Tên công việc đã tồn tại", HttpStatus.BAD_REQUEST.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+
+
+    @Operation(summary = "update", description = "", tags = {})
+    @PatchMapping("/{id}")
+    public ResponseEntity<BaseResponse> updateJob(@PathVariable("id") String id, @RequestBody JobRequest request) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new BaseResponse("Bạn phải đăng nhập", HttpStatus.UNAUTHORIZED.value(), null));
+            }
+
+            String username = authentication.getName();
+
+            boolean hasHRAuthority = authentication.getAuthorities().stream()
+                    .anyMatch(authority -> authority.getAuthority().equals("HR"));
+            if (hasHRAuthority) {
+
+                Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(username);
+                if (optionalHumanResource.isEmpty()) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new BaseResponse("Không tìm thấy HR", HttpStatus.NOT_FOUND.value(), null));
+                }
+
+            }
+
+
+            Optional<Job> optionalJob = jobService.findById(id);
+            if (optionalJob.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new BaseResponse("Không tìm thấy công việc", HttpStatus.NOT_FOUND.value(), null));
+            }
+
+            Job job = optionalJob.get();
+
+            job.setName(request.name());
+            job.setDescription(request.description());
+            job.setLocation(request.location());
+            job.setFromSalary(request.fromSalary());
+            job.setToSalary(request.toSalary());
+            job.setToDate(request.toDate());
+            job.setExperience(request.experience());
+            job.setHumanResource(humanResourceService.findByEmail(username).get());
+            if (request.categoryId() != null) {
+                Optional<Category> optionalCategory = categoryService.findById(request.categoryId());
+                if (optionalCategory.isPresent()) {
+                    job.setCategory(optionalCategory.get());
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new BaseResponse("Danh mục không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
+                }
+            }
+            if (request.humanResourceId() != null) {
+                Optional<HumanResource> optionalHumanResource = humanResourceService.findById(request.humanResourceId());
+                if (optionalHumanResource.isPresent()) {
+                    job.setHumanResource(optionalHumanResource.get());
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new BaseResponse("HR không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
+                }
+            }
+
+         jobService.update(job);
+
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Cập nhật công việc thành công", HttpStatus.OK.value(), job)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+
+    @Operation(summary = "delete job", description = "", tags = {})
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BaseResponse> deleteJob(@PathVariable("id") String id) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (!(authentication != null && authentication.isAuthenticated())) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Bạn phải đăng nhập ", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }
+
+            boolean hasHRAuthority = authentication.getAuthorities().stream()
+                    .anyMatch(authority -> authority.getAuthority().equals("HR"));
+
+            if (!hasHRAuthority) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Bạn không có quyền thực hiện thao tác này", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }
+
+            String username = authentication.getName();
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(username);
+            if (optionalHumanResource.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy hr", HttpStatus.OK.value(), null)
+                );
+            }
+
+            HumanResource hr = optionalHumanResource.get();
+
+            Optional<Job> optionalJob = jobService.findById(id);
+            if (optionalJob.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy công việc", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            Job job = optionalJob.get();
+
+
+            if (!job.getHumanResource().getId().equals(hr.getId())) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Bạn không có quyền xóa công việc này", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }
+
+            jobService.delete(job);
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Xóa công việc thành công", HttpStatus.OK.value(), null)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
 }
 
 

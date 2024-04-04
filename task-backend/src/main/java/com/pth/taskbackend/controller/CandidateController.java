@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -103,7 +103,8 @@ public class CandidateController {
                         candidate.getDateOfBirth(),
                         candidate.getLink(),
                         candidate.getJob(),
-                        candidate.getIntroduction());
+                        candidate.getIntroduction(),
+                        candidate.getAvatar());
 
                 return ResponseEntity.ok(
                         new BaseResponse( "Hiện thông tin ứng viên", HttpStatus.OK.value(), profile)
@@ -184,81 +185,18 @@ public class CandidateController {
     }
 
 
-
-
-//    @Operation(summary = "Create", description = "", tags = {})
-//    @PostMapping
-//    public ResponseEntity<BaseResponse> createCategory(@RequestParam("name") String name,
-//                                                       @RequestParam("image") MultipartFile image) throws IOException {
-//        try {
-//
-//            Optional<Category> existedCategory = categoryRepository.findByName(name);
-//            if (!ImageFunc.isImageFile(image)) {
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Vui lòng chọn hình ảnh!", HttpStatus.BAD_REQUEST.value(), null)
-//                );
-//            }
-//            Category category = categoryService.createCategory(image, name);
-//            return ResponseEntity.ok(
-//                    new BaseResponse("Tạo ứng viên thành công", HttpStatus.OK.value(), category)
-//            );
-//        } catch (DataIntegrityViolationException e) {
-//            return ResponseEntity.ok(
-//                    new BaseResponse("Tên ứng viên đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
-//            );
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
-//    }
-//
-//    @Operation(summary = "update", description = "", tags = {})
-//    @PatchMapping("/{id}")
-//    public ResponseEntity<BaseResponse> updateCategory(@PathVariable("id") String id, @RequestParam(required = false) String name,
-//                                                       @RequestParam(required = false) MultipartFile image) {
-//        try {
-//            Optional<Category> optionalCategory = categoryRepository.findById(id);
-//            if (!optionalCategory.isPresent()) {
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Không tìm thấy ứng viên để cập nhật!", HttpStatus.NOT_FOUND.value(), null)
-//                );
-//            }
-//
-//            if (image != null) {
-//                if (!ImageFunc.isImageFile(image)) {
-//                    return ResponseEntity.ok(
-//                            new BaseResponse("Vui lòng chọn hình ảnh!", HttpStatus.BAD_REQUEST.value(), null)
-//                    );
-//                }
-//            }
-//
-//            Category category = categoryService.updateCategory(optionalCategory.get(), image, name);
-//
-//            return ResponseEntity.ok(
-//                    new BaseResponse("Cập nhật ứng viên thành công", HttpStatus.OK.value(), category)
-//            );
-//        } catch (DataIntegrityViolationException e) {
-//            return ResponseEntity.ok(
-//                    new BaseResponse("Tên ứng viên đã tồn tại!", HttpStatus.BAD_REQUEST.value(), null)
-//            );
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
-//    }
-//
-//    @Operation(summary = "delete", description = "", tags = {})
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<BaseResponse> deleteCategory(@PathVariable("id") Long id) {
-//        try {
-//            categoryRepository.deleteById(id);
-//            return ResponseEntity.ok(new BaseResponse("Xóa ứng viên thành công", HttpStatus.OK.value(), null));
-//        } catch (EmptyResultDataAccessException e) {
-//            return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên cần xóa!", HttpStatus.NOT_FOUND.value(), null));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
-//    }
+    @Operation(summary = "delete", description = "", tags = {})
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BaseResponse> deleteCandidate(@PathVariable("id") String id) {
+        try {
+            candidateService.deleteById(id);
+            return ResponseEntity.ok(new BaseResponse("Xóa ứng viên thành công", HttpStatus.OK.value(), null));
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên cần xóa!", HttpStatus.NOT_FOUND.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 
 }

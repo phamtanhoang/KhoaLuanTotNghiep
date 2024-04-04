@@ -12,5 +12,6 @@ public record GetCandidateProfileResponse(
     LocalDateTime dateOfBirth,
     String link,
     String job,
-    String introduction){
+    String introduction,
+    byte[] avatar){
 }
