@@ -81,7 +81,7 @@ public class CategoryController {
     }
 
     @Operation(summary = "Get by name containing", description = "", tags = {})
-    @GetMapping("/{categoryName}")
+    @GetMapping("/name={categoryName}")
     public ResponseEntity<BaseResponse> getCategoryByNameContaining(@PathVariable("categoryName") String categoryName, Pageable pageable) {
         try {
             Page<Category> categories = categoryRepository.findByNameContaining(categoryName, pageable);

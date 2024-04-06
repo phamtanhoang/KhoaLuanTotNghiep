@@ -1,5 +1,6 @@
 package com.pth.taskbackend.controller;
 
+import com.pth.taskbackend.dto.request.TagRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.model.meta.Tag;
 import com.pth.taskbackend.service.TagService;
@@ -92,7 +93,7 @@ public class TagController {
             }
             if (tags.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách nhãn rỗng", HttpStatus.NO_CONTENT.value(), null)
+                        new BaseResponse("Danh sách nhãn rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 return ResponseEntity.ok(
@@ -106,9 +107,11 @@ public class TagController {
     }
 
     @Operation(summary = "Create", description = "", tags = {})
-    @PostMapping
-    public ResponseEntity<BaseResponse> createTag(@RequestParam String name, @RequestParam String color) {
+    @PostMapping("create")
+    public ResponseEntity<BaseResponse> createTag(@RequestBody TagRequest tagRequest) {
         try {
+            String name = tagRequest.name();
+            String color = tagRequest.color();
 
             Optional<Tag> existedTag = tagService.findByName(name);
             if(existedTag.isPresent()){
