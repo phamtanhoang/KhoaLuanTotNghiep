@@ -21,7 +21,7 @@ import static com.pth.taskbackend.util.constant.TokenConstant.*;
 @RequiredArgsConstructor
 public class JwtTokenService {
     private final UserDetailsService userDetailsService;
-    final String secret = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+    static final String secret = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
     //final String secret = Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes());
 
     public String createToken(String type, String username, List<String> roleNames, long validityInMillis) {
@@ -68,10 +68,23 @@ public class JwtTokenService {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public Jws<Claims> getClaims(String token) {
+    public static Jws<Claims> getClaims(String token) {
         return Jwts.parser().
                 verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .build().parseSignedClaims(token);
     }
+
+    public static String getEmailFromAccessToken(HttpServletRequest request  ) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("app_access_token")) {
+                    return JwtTokenService.getClaims(cookie.getValue()).getBody().getSubject();
+                }
+            }
+        }
+        return null;
+    }
+
 }
 
