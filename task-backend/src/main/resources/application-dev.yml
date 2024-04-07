@@ -11,6 +11,9 @@ spring:
     url: jdbc:mysql://sql.freedb.tech:3306/freedb_job_app
     username: ${USERNAMEDB}
     password: ${PASSWORDDB}
+#    url: jdbc:mysql://localhost:3306/job_app
+#    username: root
+#    password: Hoang2002
 
   mail:
     host: smtp.gmail.com
@@ -32,6 +35,6 @@ springdoc:
 
 jwt:
   access-token:
-    expires: 864000000
+    expires: 30000
   refresh-token:
-    expires: 86400000
+    expires: 120000
