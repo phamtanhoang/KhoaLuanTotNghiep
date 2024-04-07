@@ -10,12 +10,11 @@
   position: relative;
   display: block;
   text-align: center;
-  color: #0C56D0;
+  color: #4d4dff;
   text-decoration: none;
 }
 
-
 .page-item.active .page-link {
   color: #ffffff;
-  background-color: #0C56D0;
+  background-color: #4d4dff;
 }

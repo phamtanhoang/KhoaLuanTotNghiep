@@ -11,5 +11,11 @@ const authsService = {
       headers: { "Content-Type": "application/json" },
     });
   },
+
+  async signout() {
+    return await axiosInstance.get(AuthAPI.logout, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
 };
 export default authsService;

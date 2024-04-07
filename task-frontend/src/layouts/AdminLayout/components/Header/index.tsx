@@ -1,12 +1,48 @@
+import { authsService } from "@/services";
 import { ADMIN_PATHS } from "@/utils/constants/pathConstants";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { BiLogOut } from "react-icons/bi";
 import { RiAdminFill } from "react-icons/ri";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 interface HeaderProps {
   openSideBar: boolean;
 }
 const Header: React.FC<HeaderProps> = ({ openSideBar }) => {
-  const LogoutHandle = () => {};
+  const navigate = useNavigate();
+
+  const _onClickLogout = () => {
+
+    SwalHelper.Confirm(
+      "Bạn có muốn đăng xuất?",
+      "question",
+      () => {
+        authsService
+          .signout()
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              localStorage.removeItem("Token");
+              navigate(ADMIN_PATHS.signin);
+              SwalHelper.MiniAlert(
+                res.data.Message || "Đăng xuất thành công",
+                "success"
+              );
+            } else {
+              SwalHelper.MiniAlert(
+                res.data.Message || "Đăng xuất không thành công!",
+                "error"
+              );
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+          })
+          .finally(() => {
+
+          });
+      },
+      () => {}
+    );
+  };
   return (
     <header className="fixed top-0 bg-white shadow-md flex items-center justify-between py-0 z-10 w-full">
       <Link
@@ -31,11 +67,11 @@ const Header: React.FC<HeaderProps> = ({ openSideBar }) => {
       <div className="flex justify-between items-center h-16 header-right">
         <a
           href="#"
-          className="flex items-center mr-5 hover:text-blue-600 "
-          onClick={LogoutHandle}
+          className="flex items-center mr-5 hover:text-bgBlue "
+          onClick={_onClickLogout}
         >
           <BiLogOut className="text-lg mr-1" />
-          Logout
+          Đăng xuất
         </a>
       </div>
     </header>

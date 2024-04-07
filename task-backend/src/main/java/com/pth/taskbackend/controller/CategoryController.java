@@ -37,8 +37,6 @@ import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 public class CategoryController {
 
     @Autowired
-    private CategoryRepository categoryRepository;
-    @Autowired
     private CategoryService categoryService;
 
     @Autowired
@@ -48,7 +46,7 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getCategoryById(@PathVariable String id) {
         try {
-            Optional<Category> category = categoryRepository.findById(id);
+            Optional<Category> category = categoryService.findById(id);
             return category.map(value -> ResponseEntity.ok(
                     new BaseResponse("Danh mục được tìm thấy", HttpStatus.OK.value(), value)
             )).orElseGet(() -> ResponseEntity.ok(
@@ -60,11 +58,33 @@ public class CategoryController {
         }
     }
 
-    @Operation(summary = "Get list", description = "", tags = {})
-    @GetMapping
-    public ResponseEntity<BaseResponse> getCategories() {
+    @Operation(summary = "Get by name", description = "", tags = {})
+    @GetMapping("/name={name}")
+    public ResponseEntity<BaseResponse> getCategoryByName(@PathVariable String name) {
         try {
-            List<Category> categories = categoryRepository.findAll();
+            Optional<Category> category = categoryService.findByName(name);
+            return category.map(value -> ResponseEntity.ok(
+                    new BaseResponse("Danh mục được tìm thấy.", HttpStatus.OK.value(), value)
+            )).orElseGet(() -> ResponseEntity.ok(
+                    new BaseResponse("Không tìm thấy danh mục!", HttpStatus.NOT_FOUND.value(), null)
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+
+    @Operation(summary = "Get list by name", description = "", tags = {})
+    @GetMapping
+    public ResponseEntity<BaseResponse> getCategories(@RequestParam(required = false) String name, Pageable pageable) {
+        try {
+            Page<Category> categories;
+            if (name != null) {
+                categories = categoryService.findByNameContaining(name, pageable);
+            } else {
+                categories = categoryService.findAll(pageable);
+            }
             if (categories.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách danh mục rỗng", HttpStatus.OK.value(), null)
@@ -80,33 +100,13 @@ public class CategoryController {
         }
     }
 
-    @Operation(summary = "Get by name containing", description = "", tags = {})
-    @GetMapping("/name={categoryName}")
-    public ResponseEntity<BaseResponse> getCategoryByNameContaining(@PathVariable("categoryName") String categoryName, Pageable pageable) {
-        try {
-            Page<Category> categories = categoryRepository.findByNameContaining(categoryName, pageable);
-            if (categories.isEmpty()) {
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy danh mục nào!", HttpStatus.NOT_FOUND.value(), null)
-                );
-            } else {
-                return ResponseEntity.ok(
-                        new BaseResponse("Danh sách danh mục được tìm thấy", HttpStatus.OK.value(), categories)
-                );
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
 
     @Operation(summary = "Create", description = "", tags = {})
     @PostMapping("/create")
     public ResponseEntity<BaseResponse> createCategory(@RequestParam("name") String name,
                                  @RequestParam("image") MultipartFile image) throws IOException {
         try {
-
-            Optional<Category> existedCategory = categoryRepository.findByName(name);
+            Optional<Category> existedCategory = categoryService.findByName(name);
             if(existedCategory.isPresent()){
                 return ResponseEntity.ok(
                         new BaseResponse("Tên danh mục đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
@@ -117,9 +117,7 @@ public class CategoryController {
                         new BaseResponse("Vui lòng chọn hình ảnh!", HttpStatus.BAD_REQUEST.value(), null)
                 );
             }
-            Category category = new Category();
-            category.setName(name);
-             categoryService.create(category,image);
+            Category category = categoryService.createCategory(name, image);
             return ResponseEntity.ok(
                     new BaseResponse("Tạo danh mục thành công", HttpStatus.OK.value(), category)
             );
@@ -134,11 +132,11 @@ public class CategoryController {
     }
 
     @Operation(summary = "update", description = "", tags = {})
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<BaseResponse> updateCategory(@PathVariable("id") String id, @RequestParam(required = false) String name,
                                                        @RequestParam(required = false) MultipartFile image) {
         try {
-            Optional<Category> optionalCategory = categoryRepository.findById(id);
+            Optional<Category> optionalCategory = categoryService.findById(id);
             if (optionalCategory.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy danh mục để cập nhật!", HttpStatus.NOT_FOUND.value(), null)
@@ -152,10 +150,7 @@ public class CategoryController {
                     );
                 }
             }
-            Category  category= new Category();
-            category.setName(name);
-            categoryService.update(optionalCategory.get(), image);
-
+            Category  category = categoryService.updateCategory(optionalCategory.get(), name, image);
             return ResponseEntity.ok(
                     new BaseResponse("Cập nhật danh mục thành công", HttpStatus.OK.value(), category)
             );
@@ -173,8 +168,17 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse> deleteCategory(@PathVariable("id") String id) {
         try {
-            categoryRepository.deleteById(id);
-            return ResponseEntity.ok(new BaseResponse("Xóa danh mục thành công", HttpStatus.OK.value(), null));
+            Optional<Category> existingCategory = categoryService.findById(id);
+            if (existingCategory.isPresent()) {
+                categoryService.deleteCategory(existingCategory.get());
+                return ResponseEntity.ok(
+                        new BaseResponse("Xóa danh mục thành công", HttpStatus.OK.value(), null)
+                );
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy danh mục để xóa!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
         } catch (EmptyResultDataAccessException e) {
             return ResponseEntity.ok(new BaseResponse("Không tìm thấy danh mục cần xóa!", HttpStatus.NOT_FOUND.value(), null));
         } catch (Exception e) {
@@ -187,24 +191,22 @@ public class CategoryController {
     @GetMapping("/topCategoies")
     public ResponseEntity<BaseResponse> getTopCategories(Pageable pageable) {
         try {
-           Page<Object[]> categories = categoryRepository.findCategoriesOrderedByJobCount(pageable);
-            Page<TopCategoriesResponse> topCategoriesResponses = categories.map(result -> {
-                Category category = (Category) result[0];
-                Long count = (Long) result[1];
-
-                TopCategoriesResponse dto = new TopCategoriesResponse(category.getId(),category.getName(),category.getImage(),count);
-                return dto;
-            });
-            if (categories.isEmpty())
-                return ResponseEntity.ok(
-                        new BaseResponse("Danh sách danh mục rỗng", HttpStatus.OK.value(), null)
-                );
-
+//           Page<Object[]> categories = categoryRepository.findCategoriesOrderedByJobCount(pageable);
+//            Page<TopCategoriesResponse> topCategoriesResponses = categories.map(result -> {
+//                Category category = (Category) result[0];
+//                Long count = (Long) result[1];
+//
+//                TopCategoriesResponse dto = new TopCategoriesResponse(category.getId(),category.getName(),category.getImage(),count);
+//                return dto;
+//            });
+//            if (categories.isEmpty())
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Danh sách danh mục rỗng", HttpStatus.OK.value(), null)
+//                );
+//
             return ResponseEntity.ok(
-                    new BaseResponse("Danh sách danh mục", HttpStatus.OK.value(), topCategoriesResponses)
+                    new BaseResponse("Danh sách danh mục", HttpStatus.OK.value(), null)
             );
-
-
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

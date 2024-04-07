@@ -30,7 +30,9 @@ const ApplicationDetail = (props: any) => {
           </div>
           <div className="p-4 border border-orangetext border-dotted rounded-lg flex flex-col gap-2 text-sm ">
             <div className="content-center">
-              <label className="font-semibold tracking-wide">Họ và tên</label>
+              <label className="font-medium tracking-wide text-sm">
+                Họ và tên
+              </label>
               <input
                 className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
                 type="text"
@@ -39,7 +41,9 @@ const ApplicationDetail = (props: any) => {
             </div>
             <div className="lg:flex justify-between gap-4 content-center">
               <div className="content-center w-full">
-                <label className="font-semibold tracking-wide">Email</label>
+                <label className="font-medium tracking-wide text-sm">
+                  Email
+                </label>
                 <input
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
                   type="text"
@@ -47,7 +51,7 @@ const ApplicationDetail = (props: any) => {
                 />
               </div>
               <div className="content-center w-full">
-                <label className="font-semibold tracking-wide">
+                <label className="font-medium tracking-wide text-sm">
                   Số điện thoại
                 </label>
                 <input
@@ -58,7 +62,7 @@ const ApplicationDetail = (props: any) => {
               </div>
             </div>
             <div className="content-center">
-              <label className="font-semibold tracking-wide">
+              <label className="font-medium tracking-wide text-sm">
                 CV ứng tuyển
               </label>
 
@@ -73,7 +77,7 @@ const ApplicationDetail = (props: any) => {
           </div>
 
           <div className="content-center">
-            <label className="font-semibold tracking-wide text-base">
+            <label className="font-medium tracking-wide text-sm text-base">
               Thư giới thiệu:&nbsp;
             </label>
             <div
@@ -84,7 +88,7 @@ const ApplicationDetail = (props: any) => {
             />
           </div>
           <div className="content-center">
-            <label className="font-semibold tracking-wide text-base">
+            <label className="font-medium tracking-wide text-sm text-base">
               Quá trình ứng tuyển:&nbsp;
             </label>
             <table className="border-collapse w-full mt-1">

@@ -1,12 +1,26 @@
-const LoadingSpiner = () => {
+const Loading = () => {
   return (
-    <div className="flex items-center justify-center h-screen">
-    <div className="relative">
-        <div className="h-24 w-24 rounded-full border-t-8 border-b-8 border-gray-200"></div>
-        <div className="absolute top-0 left-0 h-24 w-24 rounded-full border-t-8 border-b-8 border-orangetext animate-spin">
+    <>
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="flex justify-center items-center space-x-1 text-sm text-gray-700">
+          <svg
+            fill="none"
+            className="w-10 h-10 animate-spin"
+            viewBox="0 0 32 32"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              clip-rule="evenodd"
+              d="M15.165 8.53a.5.5 0 01-.404.58A7 7 0 1023 16a.5.5 0 011 0 8 8 0 11-9.416-7.874.5.5 0 01.58.404z"
+              fill="currentColor"
+              fill-rule="evenodd"
+            />
+          </svg>
+
+          <div>Đang tải ...</div>
         </div>
-    </div>
-</div>
+      </div>
+    </>
   );
 };
-export default LoadingSpiner;
+export default Loading;

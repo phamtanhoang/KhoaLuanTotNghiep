@@ -78,7 +78,7 @@ const ChangeExpSkillInfoCandidate = (props: any) => {
     newData.push(newItem);
     setItems(newData);
   };
-  
+
   return (
     <div className="lg:w-[40%] w-screen bg-white relative rounded">
       <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-orangetext rounded-t">
@@ -129,7 +129,7 @@ const ChangeExpSkillInfoCandidate = (props: any) => {
                 {(type === "edu" || type === "exp") && (
                   <div className="flex lg:gap-4 gap-2 ">
                     <div className="content-center w-full">
-                      <label className="font-semibold tracking-wide ">
+                      <label className="font-medium tracking-wide text-sm ">
                         Từ ngày
                       </label>
                       <input
@@ -140,7 +140,7 @@ const ChangeExpSkillInfoCandidate = (props: any) => {
                     </div>
                     <div className="content-center w-full">
                       <div className="flex justify-between gap-2">
-                        <label className="font-semibold tracking-wide">
+                        <label className="font-medium tracking-wide text-sm">
                           Đến ngày
                         </label>
                         <button
@@ -169,7 +169,7 @@ const ChangeExpSkillInfoCandidate = (props: any) => {
                 )}
 
                 <div className="content-center">
-                  <label className="font-semibold tracking-wide ">
+                  <label className="font-medium tracking-wide text-sm ">
                     Mô tả&nbsp;
                   </label>
                   <textarea

@@ -170,10 +170,10 @@ public class AuthController {
             candidate.setFirstName(request.firstname());
             candidate.setLastName(request.lastName());
             candidate.setSex(request.sex());
+            candidate.setDateOfBirth(request.dateOfBirth());
             candidate.setPhoneNumber(request.phoneNumber());
             candidate.setUser(user.get());
             candidateService.create(candidate,null);
-
 
             return ResponseEntity.ok(
                     new BaseResponse("Đăng ký thành công", HttpStatus.OK.value(), user)

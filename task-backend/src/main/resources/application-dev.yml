@@ -8,12 +8,22 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
+<<<<<<< HEAD
     url: jdbc:mysql://localhost:3310/job_app
     username: root
     password: Goneanhem1
 
   main:
     allow-circular-references: true
+=======
+    url: jdbc:mysql://sql.freedb.tech:3306/freedb_job_app
+    username: ${USERNAMEDB}
+    password: ${PASSWORDDB}
+#    url: jdbc:mysql://localhost:3306/job_app
+#    username: root
+#    password: Hoang2002
+
+>>>>>>> 55ed1c797f780c8e1f17054c9e8913aec34fd45a
   mail:
     host: smtp.gmail.com
     port: 587
@@ -34,6 +44,12 @@ springdoc:
 
 jwt:
   access-token:
+<<<<<<< HEAD
     expires: 864000000
   refresh-token:
     expires: 86400000
+=======
+    expires: 30000
+  refresh-token:
+    expires: 120000
+>>>>>>> 55ed1c797f780c8e1f17054c9e8913aec34fd45a
