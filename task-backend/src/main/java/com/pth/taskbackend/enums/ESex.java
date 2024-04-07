@@ -4,6 +4,4 @@ public enum ESex {
     MALE,
     FEMALE,
     OTHER,
-    UNKNOWN
-
 }
