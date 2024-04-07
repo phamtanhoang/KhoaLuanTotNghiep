@@ -3,39 +3,54 @@ package com.pth.taskbackend.util.func;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.*;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.core.io.ClassPathResource;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Map;
 import java.util.UUID;
 
 @Component
 public class FileUploadFunc {
 
-    private final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/jobapp-c9389.appspot.com/o/%s?alt=media";
-
-
+    private final String STORAGE_BUCKET_NAME = "jobapp-c9389.appspot.com";
+    private final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media";
 
     public String upload(MultipartFile multipartFile) {
-
         try {
             String fileName = multipartFile.getOriginalFilename();
-            fileName = UUID.randomUUID().toString().concat(this.getExtension(fileName));
-
-            File file = this.convertToFile(multipartFile, fileName);
-            String TEMP_URL = this.uploadFile(file, fileName);
+            String fileExtension = getFileExtension(fileName);
+            if (!fileExtension.equalsIgnoreCase(".pdf")) {
+                fileName = UUID.randomUUID() + fileExtension;
+            }
+            File file = convertToFile(multipartFile, fileName);
+            String uploadedFileName = uploadFile(file, fileName);
             file.delete();
-            return fileName;
+            return uploadedFileName;
         } catch (Exception e) {
             e.printStackTrace();
-            return "ll";
+            return null;
         }
+    }
 
+    public String getFullImagePath(String fileName) {
+        return String.format(DOWNLOAD_URL, STORAGE_BUCKET_NAME, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+    }
+
+    private String uploadFile(File file, String fileName) throws IOException {
+        Resource resource = new ClassPathResource("/serviceAccountKey.json");
+        FileInputStream serviceAccount = new FileInputStream(resource.getFile());
+        Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
+        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+
+        BlobId blobId = BlobId.of(STORAGE_BUCKET_NAME, fileName);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("application/pdf").build();
+        storage.create(blobInfo, Files.readAllBytes(file.toPath()));
+
+        return fileName;
     }
 
     public byte[] download(String fileName) {
@@ -56,37 +71,16 @@ public class FileUploadFunc {
             return null;
         }
     }
-
-
-    private String uploadFile(File file, String fileName) throws IOException {
-        BlobId blobId = BlobId.of("jobapp-c9389.appspot.com", fileName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-        Resource resource = new ClassPathResource("/serviceAccountKey.json");
-        FileInputStream serviceAccount = new FileInputStream(resource.getFile());
-        Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
-        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        storage.create(blobInfo, Files.readAllBytes(file.toPath()));
-        return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
-    }
-
     private File convertToFile(MultipartFile multipartFile, String fileName) throws IOException {
         File tempFile = new File(fileName);
         try (FileOutputStream fos = new FileOutputStream(tempFile)) {
             fos.write(multipartFile.getBytes());
-            fos.close();
         }
         return tempFile;
     }
 
-    private String getExtension(String fileName) {
-        return fileName.substring(fileName.lastIndexOf("."));
-    }
-
-    private String getPublicIdFromUrl(String imageUrl) {
-        int lastIndex = imageUrl.lastIndexOf("/");
-        if (lastIndex != -1) {
-            return imageUrl.substring(lastIndex + 1, imageUrl.lastIndexOf("."));
-        }
-        return null;
+    private String getFileExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf('.');
+        return dotIndex == -1 ? "" : fileName.substring(dotIndex);
     }
 }
