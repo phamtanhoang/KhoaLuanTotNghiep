@@ -23,7 +23,7 @@ const ChangeInfoCandidate = (props: any) => {
         <div className="my-4 mx-4 text-gray-700 flex flex-col gap-2 lg:gap-4 text-sm">
           <div className="flex justify-between gap-3 lg:gap-4 content-center">
             <div className="content-center w-full">
-              <label className="font-semibold tracking-wide">
+              <label className="font-medium tracking-wide text-sm">
                 Họ&nbsp;<span className="text-red-500">*</span>
               </label>
               <input
@@ -32,7 +32,7 @@ const ChangeInfoCandidate = (props: any) => {
               />
             </div>
             <div className="content-center w-full">
-              <label className="font-semibold tracking-wide">
+              <label className="font-medium tracking-wide text-sm">
                 Tên <span className="text-red-500">*</span>
               </label>
               <input
@@ -43,7 +43,7 @@ const ChangeInfoCandidate = (props: any) => {
           </div>
           <div className="flex justify-between gap-3 lg:gap-4 content-center">
             <div className="content-center w-full">
-              <label className="font-semibold tracking-wide">
+              <label className="font-medium tracking-wide text-sm">
                 Giới tính <span className="text-red-500">*</span>
               </label>
               <input
@@ -52,7 +52,7 @@ const ChangeInfoCandidate = (props: any) => {
               />
             </div>
             <div className="content-center w-full">
-              <label className="font-semibold tracking-wide">
+              <label className="font-medium tracking-wide text-sm">
                 Ngày sinh <span className="text-red-500">*</span>
               </label>
               <input
@@ -63,7 +63,7 @@ const ChangeInfoCandidate = (props: any) => {
           </div>
           <div className="flex justify-between gap-3 lg:gap-4 content-center">
             <div className="content-center w-full">
-              <label className="font-semibold tracking-wide">
+              <label className="font-medium tracking-wide text-sm">
                 Số điện thoại
               </label>
               <input
@@ -72,7 +72,9 @@ const ChangeInfoCandidate = (props: any) => {
               />
             </div>
             <div className="content-center w-full">
-              <label className="font-semibold tracking-wide">Công việc</label>
+              <label className="font-medium tracking-wide text-sm">
+                Công việc
+              </label>
               <input
                 className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
                 type="text"
@@ -81,7 +83,7 @@ const ChangeInfoCandidate = (props: any) => {
           </div>
           <div className="lg:flex justify-between gap-3 lg:gap-4 content-center">
             <div className="content-center w-full">
-              <label className="font-semibold tracking-wide">
+              <label className="font-medium tracking-wide text-sm">
                 Email <span className="text-red-500">*</span>
               </label>
               <input
@@ -91,7 +93,9 @@ const ChangeInfoCandidate = (props: any) => {
               />
             </div>
             <div className="content-center w-full">
-              <label className="font-semibold tracking-wide">Liên kết</label>
+              <label className="font-medium tracking-wide text-sm">
+                Liên kết
+              </label>
               <input
                 className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
                 type="text"
@@ -99,7 +103,7 @@ const ChangeInfoCandidate = (props: any) => {
             </div>
           </div>
           <div className="content-center">
-            <label className="font-semibold tracking-wide">Địa chỉ</label>
+            <label className="font-medium tracking-wide text-sm">Địa chỉ</label>
             <input
               className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
               type="text"
@@ -107,7 +111,7 @@ const ChangeInfoCandidate = (props: any) => {
           </div>
 
           <div className="content-center">
-            <label className="font-semibold tracking-wide ">
+            <label className="font-medium tracking-wide text-sm ">
               Mô tả bản thân&nbsp;
             </label>
             <textarea

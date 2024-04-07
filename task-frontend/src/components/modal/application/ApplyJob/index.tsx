@@ -43,7 +43,7 @@ const ApplyJob = (props: any) => {
         <div className="my-4 mx-4 text-gray-700 flex flex-col gap-4">
           <div className="p-4 border border-orangetext border-dotted rounded-lg flex flex-col gap-2 text-sm ">
             <div className="content-center">
-              <label className="font-semibold tracking-wide">
+              <label className="font-medium tracking-wide text-sm">
                 Họ và tên <span className="text-red-500">*</span>
               </label>
               <input
@@ -54,7 +54,7 @@ const ApplyJob = (props: any) => {
             </div>
             <div className="lg:flex justify-between gap-4 content-center">
               <div className="content-center w-full">
-                <label className="font-semibold tracking-wide">
+                <label className="font-medium tracking-wide text-sm">
                   Email <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -64,7 +64,7 @@ const ApplyJob = (props: any) => {
                 />
               </div>
               <div className="content-center w-full">
-                <label className="font-semibold tracking-wide">
+                <label className="font-medium tracking-wide text-sm">
                   Số điện thoại <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -75,7 +75,7 @@ const ApplyJob = (props: any) => {
               </div>
             </div>
             <div className="content-center">
-              <label className="font-semibold tracking-wide">
+              <label className="font-medium tracking-wide text-sm">
                 Chọn CV để ứng tuyển <span className="text-red-500">*</span>
               </label>
               <div className="mt-2 flex flex-col gap-2 ">
@@ -164,7 +164,7 @@ const ApplyJob = (props: any) => {
           </div>
 
           <div className="content-center">
-            <label className="font-semibold tracking-wide text-lg">
+            <label className="font-medium tracking-wide text-sm text-lg">
               Thư giới thiệu:&nbsp;
             </label>
             <p className="text-gray-600 font-normal text-sm pb-1">

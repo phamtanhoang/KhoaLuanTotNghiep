@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 
 import "react-cropper-custom/dist/index.css";
 import { Area } from "./types";

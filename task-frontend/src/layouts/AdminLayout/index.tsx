@@ -13,7 +13,7 @@ const AdminLayout = () => {
       <Header openSideBar={openSideBar} />
       <SideBar openSideBar={openSideBar} _onClickOpen={_onClickOpen} />
       <main className="h-full ml-14 lg:ml-64 mt-[65px] p-3 lg:p-5">
-        <div className="mb-4">
+        <div className="mb-2 lg:mb-4">
           <Breadcumbs color="#0C56D0" />
         </div>
         <Outlet />

@@ -6,7 +6,7 @@ const MODAL_KEYS = {
   changeInfoCandidate: "ChangeInfoCandidate",
   changeExpSkillInfoCandidate: "ChangeExpSkillInfoCandidate",
   applycationDetail: "ApplycationDetail",
-  
+
   registerEmployer: "RegisterEmployer",
   createJob: "CreateJob",
   detailJob: "DetailJob",
@@ -15,5 +15,11 @@ const MODAL_KEYS = {
   changeAvatar: "ChangeAvatar",
   changeBackground: "ChangeBackground",
   changeInfoEmployer: "ChangeInfoEmployer",
+
+  createTag: "CreateTag",
+  updateTag: "updateTag",
+  createCategory: "CreateCategory",
+  updateCategory: "updateCategory",
+  chooseImage: "ChooseImage",
 };
 export { MODAL_KEYS };

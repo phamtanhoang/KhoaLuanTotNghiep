@@ -2,19 +2,26 @@ import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { ChangePassword, RegisterEmployer, Signin, Signup } from "./auth";
 import FilterModal from "./filter";
 import { CreateJob } from "./job";
-import { ChangeAvatar, ChangeBackground } from "./image";
+import { ChangeAvatar, ChangeBackground, ChooseImage } from "./image";
 
 import { ChangeExpSkillInfoCandidate, ChangeInfoCandidate } from "./candidate";
 import { ApplicationDetail, ApplyJob } from "./application";
 import { ChangeInfoEmployer } from "./employer";
+import { CreateTag, UpdateTag } from "./tag";
+import { CreateCategory, UpdateCategory } from "./category";
 
 const ModalBase = (props: any) => {
   // take props
+  const id = props.id;
   const type = props.type;
   const funcs = props.funcs;
   const setFuncs = props.setFuncs;
   const open = props.open;
   const handleClose = props.handleClose;
+  const setIsLoading = props.setIsLoading;
+  const image = props.image;
+  const setCroppedImg = props.setCroppedImg;
+  const fetchData = props.fetchData;
 
   const modalComponents: { [key: string]: React.ReactNode } = {
     [MODAL_KEYS.signin]: (
@@ -49,6 +56,45 @@ const ModalBase = (props: any) => {
     ),
     [MODAL_KEYS.changeInfoEmployer]: (
       <ChangeInfoEmployer handleClose={handleClose} />
+    ),
+
+    [MODAL_KEYS.createTag]: (
+      <CreateTag
+        setIsLoading={setIsLoading}
+        fetchData={fetchData}
+        handleClose={handleClose}
+      />
+    ),
+    [MODAL_KEYS.updateTag]: (
+      <UpdateTag
+        id={id}
+        fetchData={fetchData}
+        setIsLoading={setIsLoading}
+        handleClose={handleClose}
+      />
+    ),
+    [MODAL_KEYS.createCategory]: (
+      <CreateCategory
+        fetchData={fetchData}
+        setIsLoading={setIsLoading}
+        handleClose={handleClose}
+      />
+    ),
+    [MODAL_KEYS.updateCategory]: (
+      <UpdateCategory
+        id={id}
+        fetchData={fetchData}
+        setIsLoading={setIsLoading}
+        handleClose={handleClose}
+      />
+    ),
+
+    [MODAL_KEYS.chooseImage]: (
+      <ChooseImage
+        image={image}
+        setCroppedImg={setCroppedImg}
+        handleClose={handleClose}
+      />
     ),
   };
 

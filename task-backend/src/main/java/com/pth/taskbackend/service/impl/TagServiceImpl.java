@@ -38,7 +38,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Page<Tag> findByNameContaining(String name, Pageable pageable) throws IOException {
-        return tagRepository.findByNameContaining(name,pageable);
+        return tagRepository.findByNameContaining(name, pageable);
     }
 
     @Override

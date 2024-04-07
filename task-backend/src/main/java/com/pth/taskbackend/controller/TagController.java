@@ -36,9 +36,9 @@ public class TagController {
         try {
             Optional<Tag> tag = tagService.findById(id);
             return tag.map(value -> ResponseEntity.ok(
-                    new BaseResponse("Nhãn được tìm thấy", HttpStatus.OK.value(), value)
+                    new BaseResponse("Nhãn được tìm thấy.", HttpStatus.OK.value(), value)
             )).orElseGet(() -> ResponseEntity.ok(
-                    new BaseResponse("Không tìm thấy nhãn", HttpStatus.NOT_FOUND.value(), null)
+                    new BaseResponse("Không tìm thấy nhãn!", HttpStatus.NOT_FOUND.value(), null)
             ));
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -52,9 +52,9 @@ public class TagController {
         try {
             Optional<Tag> tag = tagService.findByName(name);
             return tag.map(value -> ResponseEntity.ok(
-                    new BaseResponse("Nhãn được tìm thấy", HttpStatus.OK.value(), value)
+                    new BaseResponse("Nhãn được tìm thấy.", HttpStatus.OK.value(), value)
             )).orElseGet(() -> ResponseEntity.ok(
-                    new BaseResponse("Không tìm thấy nhãn", HttpStatus.NOT_FOUND.value(), null)
+                    new BaseResponse("Không tìm thấy nhãn!", HttpStatus.NOT_FOUND.value(), null)
             ));
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -62,27 +62,8 @@ public class TagController {
         }
     }
 
-//    @GetMapping
-//    public ResponseEntity<BaseResponse> getTags(Pageable pageable) {
-//        try {
-//            Page<Tag> tags = tagService.findAll(pageable);
-//            if (tags.isEmpty()) {
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Danh sách nhãn rỗng", HttpStatus.OK.value(), null)
-//                );
-//            } else {
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Danh sách nhãn", HttpStatus.OK.value(), tags)
-//                );
-//            }
-//        } catch (IOException e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
-//    }
-
     @Operation(summary = "Get list by name", description = "", tags = {})
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<BaseResponse> getTags(@RequestParam(required = false) String name, Pageable pageable) {
         try {
             Page<Tag> tags;
@@ -125,7 +106,7 @@ public class TagController {
             );
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(
-                    new BaseResponse("Tên nhãn đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
+                    new BaseResponse("Tên nhãn đã tồn tại!", HttpStatus.BAD_REQUEST.value(), null)
             );
         }catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

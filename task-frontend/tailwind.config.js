@@ -11,7 +11,7 @@ export default {
         borderColor: "#CFD8DC",
         lightGray: "#8A99AF",
         lightGrayHeader: "#EFEFEFEF",
-        bgBlue: "#0C56D0",
+        bgBlue: "#4d4dff",
       },
       // boxShadow: {
       //   default: "0px 8px 13px -3px rgba(0, 0, 0, 0.07)",
