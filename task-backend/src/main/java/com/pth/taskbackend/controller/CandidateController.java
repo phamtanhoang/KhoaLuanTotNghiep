@@ -3,9 +3,6 @@ import com.pth.taskbackend.dto.request.UpdateCandidateRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
 import com.pth.taskbackend.model.meta.Candidate;
-import com.pth.taskbackend.model.meta.User;
-import com.pth.taskbackend.repository.UserRepository;
-import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.CandidateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -36,11 +33,6 @@ public class CandidateController {
 
     @Autowired
     private CandidateService candidateService;
-    @Autowired
-    JwtService jwtService;
-
-    @Autowired
-    UserRepository userRepository;
 
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
@@ -64,17 +56,8 @@ public class CandidateController {
 
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("")
-    public ResponseEntity<BaseResponse> getCandidates(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword, Pageable pageable) {
+    public ResponseEntity<BaseResponse> getCandidates(@RequestParam(required = false)String keyword, Pageable pageable) {
         try {
-            String email = jwtService.extractUsername(token.substring(7));
-            User user = userRepository.findByEmail(email).get();
-
-            if (user == null || !"ADMIN".equals(user.getRole())) {
-                return ResponseEntity.ok(
-                        new BaseResponse("bạn không có quyền", HttpStatus.OK.value(), null)
-                );
-            }
-
             Page<Candidate> candidates = candidateService.findByKeyword(keyword,pageable);
             if (candidates.isEmpty()) {
                 return ResponseEntity.ok(
@@ -90,6 +73,7 @@ public class CandidateController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/profile")
     public ResponseEntity<BaseResponse> getCandidateProfile() {
@@ -171,7 +155,7 @@ public class CandidateController {
     }
 
     @Operation(summary = "Get by id", description = "", tags = {})
-    @PostMapping("/updateAvatar")
+    @GetMapping("/updateAvatar")
     public ResponseEntity<BaseResponse> updateCandidateProfile(@RequestPart MultipartFile avatar) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -50,6 +50,4 @@ public class UserInfoDetails implements UserDetails {
     public List<String> getRoleNames() {
         return Collections.singletonList(role.name());
     }
-
-
 }

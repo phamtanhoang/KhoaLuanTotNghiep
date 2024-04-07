@@ -8,7 +8,7 @@ import com.pth.taskbackend.model.meta.Application;
 import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Collection;
 import com.pth.taskbackend.model.meta.Job;
-import com.pth.taskbackend.security.JwtService;
+import com.pth.taskbackend.security.JwtTokenService;
 import com.pth.taskbackend.service.ApplicationService;
 import com.pth.taskbackend.service.CandidateService;
 import com.pth.taskbackend.service.CollectionService;
@@ -46,17 +46,16 @@ public class ApplicationController {
     @Autowired
     private CandidateService candidateService;
     @Autowired
+    JwtTokenService jwtTokenService;
+    @Autowired
     ApplicationService applicationService;
     @Autowired
     JobService jobService;
     @Autowired
     CollectionService collectionService;
-    @Autowired
-    JwtService jwtService;
     FileUploadFunc fileUploadFunc = new FileUploadFunc();
     @PostMapping("/apply")
     public ResponseEntity<BaseResponse> applyJob(
-            @RequestHeader("Authorization") String token,
             @RequestPart("cVFile") MultipartFile cVFile,
             @RequestPart("application") ApplicationRequest applicationRequest,
             HttpServletRequest request
@@ -64,7 +63,7 @@ public class ApplicationController {
 
         try {
 
-            String email = jwtService.extractUsername(token.substring(7));
+            String email =JwtTokenService.getEmailFromAccessToken(request);
             Candidate candidate = candidateService.findByUserEmail(email).orElse(null);
             System.out.println(applicationRequest.jobId());
             Job job = jobService.findById(applicationRequest.jobId()).orElse(null);
