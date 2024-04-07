@@ -34,10 +34,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 import static com.pth.taskbackend.util.constant.TokenConstant.*;
@@ -65,9 +62,7 @@ public class AuthController {
 
     @Operation(summary = "Login/Signin", description = "", tags = {})
     @PostMapping("login")
-    public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest authenticationRequest,
-                              HttpServletRequest request,
-                              HttpServletResponse response) {
+    public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest authenticationRequest) {
 
         try {
 
@@ -82,34 +77,34 @@ public class AuthController {
         User checkUser = user.get();
         EStatus userStatus = checkUser.getStatus();
         ERole userRole = checkUser.getRole();
+            String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,userRole);
+            String refreshToken = jwtService.generateRefreshToken(authenticationRequest.username(), EStatus.ACTIVE,userRole);
+            Map<String,Object>response= new HashMap<>();
+            Map<String, String>tokens= new HashMap<>();
+            tokens.put("token",token);
+            tokens.put("refresh-token",refreshToken);
+            response.put("tokens",tokens);
+            switch (userRole){
+                case CANDIDATE:
+                    response.put("candidate",candidateService.findByUserEmail(authenticationRequest.username()));
+                    break;
+                case EMPLOYER:
+                    response.put("employer",employerService.findByUserEmail(authenticationRequest.username()));
 
-        if (!userRole.equals(ERole.ADMIN)) {
-            if (!userStatus.equals(EStatus.ACTIVE)) {
-                if (userStatus.equals(EStatus.PENDING)) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                            .body(new BaseResponse("Tài khoản chưa được duyệt!", HttpStatus.FORBIDDEN.value(), null));
-                } else if (userStatus.equals(EStatus.INACTIVE)) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                            .body(new BaseResponse("Tài khoản đã bị khóa!", HttpStatus.FORBIDDEN.value(), null));
-                } else {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                            .body(new BaseResponse("Tài khoản không tồn tại!", HttpStatus.FORBIDDEN.value(), null));
-                }
+                    break;
+                case ADMIN:
+                    response.put("candidate",userRepository.findByEmail(authenticationRequest.username()));
+
+                case HR:;
+//                    response.put("candidate",candidateService.findByUserEmail(authenticationRequest.username()));
+                    break;
             }
-        }
 
-        String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,userRole);
         return ResponseEntity.ok(
-                new BaseResponse("Đăng nhập thành công", HttpStatus.UNAUTHORIZED.value(), token)
+                new BaseResponse("Đăng nhập thành công", HttpStatus.OK.value(), response)
         );
 
 
-
-
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.ok(
-                    new BaseResponse("Mật khẩu không chính xác!", HttpStatus.UNAUTHORIZED.value(), null)
-            );
         }
         catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -117,6 +112,32 @@ public class AuthController {
         }
     }
 
+        @Operation(summary = "RefreshToken", description = "", tags = {})
+        @PostMapping("refresh")
+        public ResponseEntity<BaseResponse> refreshToken(@RequestHeader("Authorization") String refreshToken) {
+
+            try {
+                refreshToken = refreshToken.substring(7);
+                String email = jwtService.extractUsername(refreshToken);
+                Optional<User> optionalUser = userRepository.findByEmail(email);
+                if (optionalUser.isPresent()) {
+                   String token= jwtService.refreshToken(refreshToken, optionalUser.get().getStatus(), optionalUser.get().getRole());
+                    return ResponseEntity.ok(
+                            new BaseResponse("Tạo mới token thành công", HttpStatus.OK.value(), token)
+                    );
+                }
+
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng với email đã cung cấp", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+
+            } catch (BadCredentialsException e) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Mật khẩu không chính xác!", HttpStatus.UNAUTHORIZED.value(), null)
+                );
+            }
+        }
     @Operation(summary = "Register/Signup", description = "", tags = {})
     @PostMapping("/registerEmployer")
     public ResponseEntity<BaseResponse> registerEmployer(@RequestBody CreateEmployerRequest registrationRequest) {

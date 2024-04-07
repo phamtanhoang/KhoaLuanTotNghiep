@@ -91,11 +91,13 @@ public class JwtService {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public String generateRefreshToken(String username) {
+    public String generateRefreshToken(String username,EStatus status,ERole role) {
         Instant now = Instant.now();
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(Date.from(now))
+                .claim("status",status)
+                .claim("role",role)
                 .setExpiration(Date.from(now.plus(REFRESH_TOKEN_EXPIRATION_SECONDS, ChronoUnit.SECONDS)))
                 .signWith(getRefreshSignKey(), SignatureAlgorithm.HS256)
                 .compact();

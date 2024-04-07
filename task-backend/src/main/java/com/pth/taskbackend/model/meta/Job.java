@@ -57,4 +57,8 @@ public class Job  extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private Set<Tag> tags = new HashSet<>();
+
+    @OneToOne
+    @JoinColumn(name = "procedure_id")
+    private Procedure procedure;
 }
