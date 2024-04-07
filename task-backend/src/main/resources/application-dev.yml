@@ -8,9 +8,13 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://sql.freedb.tech:3306/freedb_job_app
-    username: ${USERNAMEDB}
-    password: ${PASSWORDDB}
+    url: jdbc:mysql://localhost:3310/job_app
+    username: root
+    password: Goneanhem1
+
+  main:
+    allow-circular-references: true
+
 #    url: jdbc:mysql://localhost:3306/job_app
 #    username: root
 #    password: Hoang2002
@@ -35,6 +39,6 @@ springdoc:
 
 jwt:
   access-token:
-    expires: 30000
+    expires: 864000000
   refresh-token:
-    expires: 120000
+    expires: 86400000

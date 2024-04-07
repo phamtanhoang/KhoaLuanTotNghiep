@@ -9,9 +9,10 @@ import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
+import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.security.UserInfoDetails;
 import com.pth.taskbackend.service.AuthService;
-import com.pth.taskbackend.security.JwtTokenService;
+import org.springframework.security.authentication.AuthenticationManager;
 import com.pth.taskbackend.service.CandidateService;
 import com.pth.taskbackend.service.EmployerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +28,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,8 +41,6 @@ import java.util.Set;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 import static com.pth.taskbackend.util.constant.TokenConstant.*;
-import static com.pth.taskbackend.util.func.CookieFunc.addAccessTokenToCookies;
-import static com.pth.taskbackend.util.func.CookieFunc.addRefreshTokenToCookies;
 
 @CrossOrigin(origins = "*")
 @Tag(name = "Auths", description = "Auth APIs")
@@ -48,27 +49,28 @@ import static com.pth.taskbackend.util.func.CookieFunc.addRefreshTokenToCookies;
 @RestController
 @RequestMapping(value = {BASE_URL + "/auths"})
 public class AuthController {
-
-    private final AuthService authService;
-    private final JwtTokenService jwtTokenService;
+    private  final AuthService authService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmployerService employerService;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     @Autowired CandidateService candidateService;
+    @Autowired
+    JwtService jwtService;
     final Set<String> issuedRefreshTokens = Collections.synchronizedSet(new HashSet<>());
 
-    @Value("${jwt.access-token.expires}")
-    private long accessTokenValidityMs;
-
-    @Value("${jwt.refresh-token.expires}")
-    private long refreshTokenValidityMs;
 
     @Operation(summary = "Login/Signin", description = "", tags = {})
     @PostMapping("login")
     public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest authenticationRequest,
                               HttpServletRequest request,
                               HttpServletResponse response) {
+
+        try {
+
         Optional<User> user = userRepository.findByEmail(authenticationRequest.username());
 
         if (user.isEmpty()) {
@@ -96,31 +98,14 @@ public class AuthController {
             }
         }
 
+        String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,userRole);
+        return ResponseEntity.ok(
+                new BaseResponse("Đăng nhập thành công", HttpStatus.UNAUTHORIZED.value(), token)
+        );
 
-        try {
-            UserInfoDetails userInfoDetails =  authService.login(
-                    authenticationRequest.username(),
-                    authenticationRequest.password(),
-                    request, response
-            );
 
-            String accessToken = addAccessTokenToCookies(request, response,
-                    userInfoDetails.getUsername(),
-                    userInfoDetails.getRoleNames(),
-                    jwtTokenService, accessTokenValidityMs
-            );
-            String refreshToken = addRefreshTokenToCookies(request, response,
-                    userInfoDetails.getUsername(),
-                    userInfoDetails.getRoleNames(),
-                    jwtTokenService, issuedRefreshTokens,
-                    refreshTokenValidityMs
-            );
 
-            TokenResponse tokenResponse = new TokenResponse(accessToken, refreshToken);
 
-            return ResponseEntity.ok(
-                    new BaseResponse("Đăng nhập thành công", HttpStatus.OK.value(), tokenResponse)
-            );
         } catch (BadCredentialsException e) {
             return ResponseEntity.ok(
                     new BaseResponse("Mật khẩu không chính xác!", HttpStatus.UNAUTHORIZED.value(), null)
@@ -228,29 +213,29 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "Refresh Token", description = "", tags = {})
-    @GetMapping("refresh")
-    public ResponseEntity<BaseResponse> refresh(@CookieValue(value = APP_REFRESH_TOKEN) String refreshToken,
-                                                HttpServletRequest request,
-                                                HttpServletResponse response) {
-        try {
-            if (refreshToken != null && issuedRefreshTokens.contains(refreshToken) && jwtTokenService.validateRefreshToken(refreshToken)) {
-                String accessToken = authService.refresh(refreshToken, request, response);
-                TokenResponse tokenResponse = new TokenResponse(accessToken, refreshToken);
-
-                return ResponseEntity.ok(
-                        new BaseResponse("Refresh Token thành công", HttpStatus.OK.value(), tokenResponse)
-                );
-            } else {
-                return ResponseEntity.ok(
-                        new BaseResponse("Phiên bản đăng nhập đã hết hạn!", HttpStatus.UNAUTHORIZED.value(), null)
-                );
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
+//    @Operation(summary = "Refresh Token", description = "", tags = {})
+//    @GetMapping("refresh")
+//    public ResponseEntity<BaseResponse> refresh(@CookieValue(value = APP_REFRESH_TOKEN) String refreshToken,
+//                                                HttpServletRequest request,
+//                                                HttpServletResponse response) {
+//        try {
+//            if (refreshToken != null && issuedRefreshTokens.contains(refreshToken) && jwtService.validateToken(refreshToken)) {
+//                String accessToken = authService.refresh(refreshToken, request, response);
+//                TokenResponse tokenResponse = new TokenResponse(accessToken, refreshToken);
+//
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Refresh Token thành công", HttpStatus.OK.value(), tokenResponse)
+//                );
+//            } else {
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Phiên bản đăng nhập đã hết hạn!", HttpStatus.UNAUTHORIZED.value(), null)
+//                );
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+//        }
+//    }
 
     @Operation(summary = "Logout/Signout", description = "", tags = {})
     @GetMapping("logout")
