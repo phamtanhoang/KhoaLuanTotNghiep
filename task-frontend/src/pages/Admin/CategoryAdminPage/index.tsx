@@ -1,5 +1,5 @@
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { LoadingSpiner, PaginationCustom } from "@/components/ui";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { categoriesService } from "@/services";
@@ -7,10 +7,12 @@ import ModalBase from "@/components/modal";
 import { MdOutlineAddCircleOutline } from "react-icons/md";
 import { CiSearch } from "react-icons/ci";
 import CategoryTableAdminWeb from "./components/CategoryTableAdminWeb";
+import { LoadingContext } from "@/App";
 
 const CategoryAdminPage = () => {
+  const context = useContext(LoadingContext);
+
   const [id, setId] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
   const [keyWord, setKeyWord] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -34,7 +36,7 @@ const CategoryAdminPage = () => {
       "Xác nhận xóa danh mục này?",
       "question",
       () => {
-        setIsLoading(true);
+        context.handleOpenLoading();
         categoriesService
           .deleteById(item.id)
           .then((res) => {
@@ -49,7 +51,7 @@ const CategoryAdminPage = () => {
             SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
           })
           .finally(() => {
-            setIsLoading(false);
+            context.handleCloseLoading();
           });
       },
       () => {}
@@ -100,10 +102,9 @@ const CategoryAdminPage = () => {
         handleClose={handleClose}
         funcs={funcs}
         setFuncs={setFuncs}
-        setIsLoading={setIsLoading}
         fetchData={fetchListData}
       />
-      {isLoading && <LoadingSpiner type={true} />}
+
       <section className="flex flex-col gap-2">
         <div className="flex justify-between gap-2 lg:gap-4">
           <h1 className="text-2xl font-semibold text-gray-700">

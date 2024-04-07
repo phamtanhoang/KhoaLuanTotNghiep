@@ -1,17 +1,81 @@
+import { LoadingContext } from "@/App";
+import { authsService } from "@/services";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
 import useCaptchaGenerator from "@/utils/hooks/useCaptchaGenerator";
-import { useEffect } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { IoReload } from "react-icons/io5";
 const Signin = (props: any) => {
   const handleClose = props.handleClose;
+  const setFuncs = props.setFuncs;
+  const context = useContext(LoadingContext);
 
   const { captchaText, canvasRef, reloadCaptcha } = useCaptchaGenerator();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [captcha, setCaptcha] = useState<string>("");
+
+  const _onChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+  const _onChangePassword = (e: ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+  const _onChangeCaptcha = (e: ChangeEvent<HTMLInputElement>) => {
+    setCaptcha(e.target.value);
+  };
+
   useEffect(() => {
     reloadCaptcha();
   }, []);
+
   const _onClickSignup = () => {
-    props.setFuncs(MODAL_KEYS.signup);
+    setFuncs(MODAL_KEYS.signup);
+  };
+
+  const _onClickSubmit = () => {
+    if (!email) {
+      SwalHelper.MiniAlert("Vui lòng nhập email!", "error");
+      return;
+    }
+    if (!password) {
+      SwalHelper.MiniAlert("Vui lòng nhập mật khẩu!", "error");
+      return;
+    }
+    if (captcha !== captchaText) {
+      SwalHelper.MiniAlert("Captcha không trùng khớp!", "error");
+      return;
+    }
+
+    context.handleOpenLoading();
+    authsService
+      .signin(email, password)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          if (res.data.Data.candidate) {
+            const tokenData = JSON.stringify(res.data.data);
+            localStorage.setItem("Token", tokenData);
+            SwalHelper.MiniAlert(res.data.Message, "success");
+          } else {
+            SwalHelper.MiniAlert(
+              "Vui lòng đăng nhập tài khoản ứng viên",
+              "error"
+            );
+          }
+        } else {
+          SwalHelper.MiniAlert(
+            res.data.Message || "Đăng nhập không thành công",
+            "error"
+          );
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
   };
   return (
     <div className="sm:w-[30rem] w-screen p-8 bg-white sm:rounded-xl relative h-max max-h-[90%] overflow-auto scrollbar-custom">
@@ -42,7 +106,8 @@ const Signin = (props: any) => {
             className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
             type="text"
             placeholder="candidate@example.com"
-            value=""
+            value={email}
+            onChange={_onChangeEmail}
           />
         </div>
         <div className="mt-4 content-center">
@@ -53,7 +118,8 @@ const Signin = (props: any) => {
             className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
             type="password"
             placeholder="**********"
-            value=""
+            value={password}
+            onChange={_onChangePassword}
           />
         </div>
         <div className="mt-4 content-center">
@@ -65,7 +131,8 @@ const Signin = (props: any) => {
               className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
               type="text"
               placeholder="Nhập mã captcha"
-              value=""
+              value={captcha}
+              onChange={_onChangeCaptcha}
             />
             <div className="flex ">
               <canvas
@@ -99,6 +166,7 @@ const Signin = (props: any) => {
             type="submit"
             className="mt-4 w-full flex justify-center bg-orangetext text-gray-100 p-3  rounded-full tracking-wide
                                 font-semibold  focus:outline-none focus:shadow-outline hover:bg-orange-500 shadow-lg cursor-pointer transition ease-in duration-300"
+            onClick={_onClickSubmit}
           >
             Đăng nhập
           </button>

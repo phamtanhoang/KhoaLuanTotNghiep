@@ -9,8 +9,8 @@ const tagsService = {
   },
   async updateById(id: string, name: string, color: string) {
     const body = {
-      name: name,
-      color: color,
+      name: name.trim(),
+      color: color.trim(),
     };
     return await axiosInstance.put(TagAPI.tagById(id), body, {
       headers: { "Content-Type": "application/json" },
@@ -23,13 +23,13 @@ const tagsService = {
   },
   async getList(name?: string, currentPage?: number, itemPerPage?: number) {
     return await axiosInstance.get(
-      TagAPI.getList(name, currentPage, itemPerPage)
+      TagAPI.getList(name?.trim(), currentPage, itemPerPage)
     );
   },
   async create(name: string, color: string) {
     const body = {
-      name: name,
-      color: color,
+      name: name.trim(),
+      color: color.trim(),
     };
     return await axiosInstance.post(TagAPI.createTag, body, {
       headers: {

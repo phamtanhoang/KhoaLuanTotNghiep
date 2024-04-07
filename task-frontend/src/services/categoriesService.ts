@@ -9,7 +9,7 @@ const categoriesService = {
   },
   async updateById(id: string, name: string, image: File) {
     const formData = new FormData();
-    formData.append("name", name);
+    formData.append("name", name.trim());
     formData.append("image", image);
     return await axiosInstance.put(CategoryAPI.categoryById(id), formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -23,13 +23,13 @@ const categoriesService = {
 
   async getList(name?: string, currentPage?: number, itemPerPage?: number) {
     return await axiosInstance.get(
-      CategoryAPI.getList(name, currentPage, itemPerPage)
+      CategoryAPI.getList(name?.trim(), currentPage, itemPerPage)
     );
   },
 
   async create(name: string, image: File) {
     const formData = new FormData();
-    formData.append("name", name);
+    formData.append("name", name.trim());
     formData.append("image", image);
     return await axiosInstance.post(CategoryAPI.createCategory, formData, {
       headers: {

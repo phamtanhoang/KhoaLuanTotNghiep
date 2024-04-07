@@ -1,7 +1,7 @@
 const SEX_DATA = [
-  { id: "1", name: "Nam" },
-  { id: "2", name: "Nữ" },
-  { id: "0", name: "Khác" },
+  { id: "MALE", name: "Nam" },
+  { id: "FEMALE", name: "Nữ" },
+  { id: "OTHER", name: "Khác" },
 ];
 const APPLY_STATE_DATA = [
   { id: "PENDING", name: "Chờ xét duyệt", color: "#FFC300" },

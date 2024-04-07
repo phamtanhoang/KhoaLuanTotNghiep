@@ -3,15 +3,17 @@ import { LoadingSpiner, PaginationCustom } from "@/components/ui";
 import { tagsService } from "@/services";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { TagTableAdminWeb } from "./components";
 import { MdOutlineAddCircleOutline } from "react-icons/md";
 import TagTableAdminMobile from "./components/TagTableAdminMobile";
+import { LoadingContext } from "@/App";
 
 const TagsAdminPage = () => {
+  const context = useContext(LoadingContext);
+
   const [id, setId] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
   const [keyWord, setKeyWord] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -30,12 +32,13 @@ const TagsAdminPage = () => {
     setFuncs(MODAL_KEYS.createTag);
     handleOpen();
   };
+  
   const _onClickDelete = (item: TagModel) => {
     SwalHelper.Confirm(
       "Xác nhận xóa nhãn này?",
       "question",
       () => {
-        setIsLoading(true);
+        context.handleOpenLoading();
         tagsService
           .deleteById(item.id)
           .then((res) => {
@@ -50,15 +53,16 @@ const TagsAdminPage = () => {
             SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
           })
           .finally(() => {
-            setIsLoading(false);
+            context.handleCloseLoading();
           });
       },
       () => {}
     );
   };
+
   const _onClickDetail = (item: TagModel) => {
     setId(item.id);
-    setFuncs(MODAL_KEYS.updateCategory);
+    setFuncs(MODAL_KEYS.updateTag);
     handleOpen();
   };
   const _onChangeKeyword = (e: ChangeEvent<HTMLInputElement>) => {
@@ -99,10 +103,9 @@ const TagsAdminPage = () => {
         handleClose={handleClose}
         funcs={funcs}
         setFuncs={setFuncs}
-        setIsLoading={setIsLoading}
         fetchData={fetchListData}
       />
-      {isLoading && <LoadingSpiner type={true} />}
+
       <section className="flex flex-col gap-2">
         <div className="flex justify-between gap-2 lg:gap-4">
           <h1 className="text-2xl font-semibold text-gray-700">

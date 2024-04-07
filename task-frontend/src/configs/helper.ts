@@ -1,9 +1,16 @@
 const AuthAPI = {
   signin: "/auths/login",
-  signup: "/auths/register",
+  signupCandidate: "/auths/registerCandidate",
+  signupEmployer: "/auths/registerEmployer",
   logout: "/auths/logout",
   changePassword: "/auths/change-password",
   refreshToken: "/auths/refresh",
+};
+
+const UserAPI = {
+  getByEmail: (email: string) => {
+    return `/uses/email=${email}`;
+  },
 };
 
 const TagAPI = {
@@ -30,4 +37,4 @@ const CategoryAPI = {
     return `/categories/${id}`;
   },
 };
-export { AuthAPI, TagAPI, CategoryAPI };
+export { AuthAPI, TagAPI, CategoryAPI, UserAPI };

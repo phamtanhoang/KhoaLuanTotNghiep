@@ -1,18 +1,19 @@
 import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
-import { HexColorPicker } from "react-colorful";
-import { ChangeEvent, useEffect, useState } from "react";
+
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { categoriesService, tagsService } from "@/services";
-import { LoadingSpiner } from "@/components/ui";
+
 import { DateHelper } from "@/utils/helpers/dateHelper";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
+import { LoadingContext } from "@/App";
 
 const UpdateCategory = (props: any) => {
   const handleClose = props.handleClose;
   const fetchListData = props.fetchData;
-  const setIsLoading = props.setIsLoading;
+  const context = useContext(LoadingContext);
 
   const [openSub, setOpenSub] = useState(false);
   const [funcsSub, setFuncsSub] = useState<string>("");
@@ -50,7 +51,7 @@ const UpdateCategory = (props: any) => {
       return;
     }
 
-    setIsLoading(true);
+    context.handleOpenLoading();
     // categoriesService
     //   .updateById(id, name.trim(), croppedImg!)
     //   .then((res) => {
@@ -71,13 +72,13 @@ const UpdateCategory = (props: any) => {
   };
 
   useEffect(() => {
-    setIsLoading(true);
+    context.handleOpenLoading();
     categoriesService
       .getById(id)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           setName(res?.data?.Data?.name);
-          console.log("res?.data?.Data?.image, ", res?.data?.Data?.image);
+          // console.log("res?.data?.Data?.image, ", res?.data?.Data?.image);
           setImage(res?.data?.Data?.image);
           setCreated(res?.data?.Data?.created);
           setUpdated(res?.data?.Data?.updated);
@@ -89,7 +90,7 @@ const UpdateCategory = (props: any) => {
         SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
-        setIsLoading(false);
+        context.handleCloseLoading();
       });
   }, []);
 

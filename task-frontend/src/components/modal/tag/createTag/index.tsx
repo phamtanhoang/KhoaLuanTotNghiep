@@ -2,15 +2,16 @@ import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
 import { HexColorPicker } from "react-colorful";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { tagsService } from "@/services";
-import { LoadingSpiner } from "@/components/ui";
+import { LoadingContext } from "@/App";
 
 const CreateTag = (props: any) => {
   const handleClose = props.handleClose;
   const fetchListData = props.fetchData;
-  const setIsLoading = props.setIsLoading;
+  const context = useContext(LoadingContext);
+
   const [name, setName] = useState<string>("");
   const [color, setColor] = useState<string>("#aabbcc");
 
@@ -27,7 +28,7 @@ const CreateTag = (props: any) => {
       SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "warning");
       return;
     }
-    setIsLoading(true);
+    context.handleOpenLoading();
     tagsService
       .create(name.trim(), color.trim())
       .then((res) => {
@@ -43,7 +44,7 @@ const CreateTag = (props: any) => {
         SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
-        setIsLoading(false);
+        context.handleCloseLoading();
       });
   };
   return (

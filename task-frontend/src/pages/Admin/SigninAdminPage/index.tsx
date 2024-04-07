@@ -1,15 +1,16 @@
+import { LoadingContext } from "@/App";
 import { LoadingSpiner } from "@/components/ui";
 import { authsService } from "@/services";
 import { ADMIN_PATHS } from "@/utils/constants/pathConstants";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 const SigninAdminPage = () => {
+  const context = useContext(LoadingContext);
+
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
 
@@ -32,15 +33,19 @@ const SigninAdminPage = () => {
       return;
     }
 
-    setIsLoading(true);
+    context.handleOpenLoading();
     authsService
       .signin(email.trim(), password.trim())
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          const tokenData = JSON.stringify(res.data.data);
-          localStorage.setItem("Token", tokenData);
-          navigate(ADMIN_PATHS.dashboard);
-          SwalHelper.MiniAlert(res.data.Message, "success");
+          if (res.data.Data.admin) {
+            const tokenData = JSON.stringify(res.data.Data);
+            localStorage.setItem("Token", tokenData);
+            navigate(ADMIN_PATHS.dashboard);
+            SwalHelper.MiniAlert(res.data.Message, "success");
+          } else {
+            setError("Bạn không có quyền truy cập!");
+          }
         } else {
           setError(res.data.Message || "Đăng nhập không thành công");
         }
@@ -49,13 +54,11 @@ const SigninAdminPage = () => {
         SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
-        setIsLoading(false);
+        context.handleCloseLoading();
       });
   };
   return (
     <>
-      {isLoading && <LoadingSpiner type={true} />}
-
       <div className="min-h-screen flex items-center justify-center w-full bg-body">
         <div
           className="bg-white shadow-md rounded-lg px-5 py-10 lg:px-10 lg:py-10 max-w-md w-full lg:w-[40%]"
@@ -107,7 +110,6 @@ const SigninAdminPage = () => {
               type="submit"
               className="mt-8 w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-bgBlue hover:bg-bgBlue/85 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bgBlue"
               onClick={_onClickSubmit}
-              disabled={isLoading}
             >
               Đăng nhập
             </button>

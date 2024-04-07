@@ -18,10 +18,12 @@ const ModalBase = (props: any) => {
   const setFuncs = props.setFuncs;
   const open = props.open;
   const handleClose = props.handleClose;
-  const setIsLoading = props.setIsLoading;
   const image = props.image;
   const setCroppedImg = props.setCroppedImg;
   const fetchData = props.fetchData;
+
+  const email = props.email;
+  const password = props.password;
 
   const modalComponents: { [key: string]: React.ReactNode } = {
     [MODAL_KEYS.signin]: (
@@ -43,7 +45,11 @@ const ModalBase = (props: any) => {
     ),
 
     [MODAL_KEYS.registerEmployer]: (
-      <RegisterEmployer handleClose={handleClose} />
+      <RegisterEmployer
+        email={email}
+        password={password}
+        handleClose={handleClose}
+      />
     ),
 
     [MODAL_KEYS.filter]: <FilterModal handleClose={handleClose} />,
@@ -59,34 +65,16 @@ const ModalBase = (props: any) => {
     ),
 
     [MODAL_KEYS.createTag]: (
-      <CreateTag
-        setIsLoading={setIsLoading}
-        fetchData={fetchData}
-        handleClose={handleClose}
-      />
+      <CreateTag fetchData={fetchData} handleClose={handleClose} />
     ),
     [MODAL_KEYS.updateTag]: (
-      <UpdateTag
-        id={id}
-        fetchData={fetchData}
-        setIsLoading={setIsLoading}
-        handleClose={handleClose}
-      />
+      <UpdateTag id={id} fetchData={fetchData} handleClose={handleClose} />
     ),
     [MODAL_KEYS.createCategory]: (
-      <CreateCategory
-        fetchData={fetchData}
-        setIsLoading={setIsLoading}
-        handleClose={handleClose}
-      />
+      <CreateCategory fetchData={fetchData} handleClose={handleClose} />
     ),
     [MODAL_KEYS.updateCategory]: (
-      <UpdateCategory
-        id={id}
-        fetchData={fetchData}
-        setIsLoading={setIsLoading}
-        handleClose={handleClose}
-      />
+      <UpdateCategory id={id} fetchData={fetchData} handleClose={handleClose} />
     ),
 
     [MODAL_KEYS.chooseImage]: (

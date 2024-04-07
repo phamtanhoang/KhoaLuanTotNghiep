@@ -1,18 +1,19 @@
 import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { categoriesService } from "@/services";
 import { MdOutlineFileUpload } from "react-icons/md";
 import ModalBase from "../..";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { ImageHelper } from "@/utils/helpers/imageHelper";
+import { LoadingContext } from "@/App";
 
 const CreateCategory = (props: any) => {
   const handleClose = props.handleClose;
   const fetchListData = props.fetchData;
-  const setIsLoading = props.setIsLoading;
+  const context = useContext(LoadingContext);
 
   const [openSub, setOpenSub] = useState(false);
   const [funcsSub, setFuncsSub] = useState<string>("");
@@ -47,7 +48,7 @@ const CreateCategory = (props: any) => {
       return;
     }
 
-    setIsLoading(true);
+    context.handleOpenLoading();
     categoriesService
       .create(name.trim(), ImageHelper.dataURItoFile(croppedImg, ""))
       .then((res) => {
@@ -63,7 +64,7 @@ const CreateCategory = (props: any) => {
         SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
-        setIsLoading(false);
+        context.handleCloseLoading();
       });
   };
   const _onClickUploadFile = () => {

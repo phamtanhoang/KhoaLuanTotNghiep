@@ -2,16 +2,17 @@ import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
 import { HexColorPicker } from "react-colorful";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { tagsService } from "@/services";
 import { LoadingSpiner } from "@/components/ui";
 import { DateHelper } from "@/utils/helpers/dateHelper";
+import { LoadingContext } from "@/App";
 
 const UpdateTag = (props: any) => {
   const handleClose = props.handleClose;
   const fetchListData = props.fetchData;
-  const setIsLoading = props.setIsLoading;
+  const context = useContext(LoadingContext);
 
   const id = props.id;
   const [name, setName] = useState<string>("");
@@ -32,7 +33,7 @@ const UpdateTag = (props: any) => {
       SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "warning");
       return;
     }
-    setIsLoading(true);
+    context.handleOpenLoading();
     tagsService
       .updateById(id, name.trim(), color.trim())
       .then((res) => {
@@ -48,12 +49,12 @@ const UpdateTag = (props: any) => {
         SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
-        setIsLoading(false);
+        context.handleCloseLoading();
       });
   };
 
   useEffect(() => {
-    setIsLoading(true);
+    context.handleOpenLoading();
     tagsService
       .getById(id)
       .then((res) => {
@@ -70,7 +71,7 @@ const UpdateTag = (props: any) => {
         SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
-        setIsLoading(false);
+        context.handleCloseLoading();
       });
   }, []);
 
