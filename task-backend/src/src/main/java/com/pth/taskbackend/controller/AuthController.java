@@ -2,7 +2,6 @@ package com.pth.taskbackend.controller;
 
 import com.pth.taskbackend.dto.request.*;
 import com.pth.taskbackend.dto.response.BaseResponse;
-import com.pth.taskbackend.dto.response.TokenResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
@@ -10,7 +9,6 @@ import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
-import com.pth.taskbackend.security.UserInfoDetails;
 import com.pth.taskbackend.service.AuthService;
 import org.springframework.security.authentication.AuthenticationManager;
 import com.pth.taskbackend.service.CandidateService;
@@ -22,25 +20,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
-import static com.pth.taskbackend.util.constant.TokenConstant.*;
 
 @CrossOrigin(origins = "*")
 @Tag(name = "Auths", description = "Auth APIs")
@@ -54,8 +42,6 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final EmployerService employerService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
     @Autowired CandidateService candidateService;
     @Autowired
@@ -65,9 +51,7 @@ public class AuthController {
 
     @Operation(summary = "Login/Signin", description = "", tags = {})
     @PostMapping("login")
-    public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest authenticationRequest,
-                              HttpServletRequest request,
-                              HttpServletResponse response) {
+    public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest authenticationRequest) {
 
         try {
 
@@ -99,10 +83,29 @@ public class AuthController {
         }
 
         String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,userRole);
-        return ResponseEntity.ok(
-                new BaseResponse("Đăng nhập thành công", HttpStatus.UNAUTHORIZED.value(), token)
-        );
+        Map<String, Object> response = new HashMap<>();
+        Map<String,String>tokens=new HashMap<>();
+            tokens.put("token", token);
+            tokens.put("refreshToken", null);
+        response.put("tokens",tokens);
+            switch (userRole) {
+                case EMPLOYER:
+                    response.put("employer", employerService.findByUserEmail(authenticationRequest.username()));
+                    break;
+                case CANDIDATE:
+                    response.put("candidate", candidateService.findByUserEmail(authenticationRequest.username()));
+                    break;
+                case ADMIN:
+                    response.put("admin", userRepository.findByEmail(authenticationRequest.username()));
+                    break;
+//                case HR:
+//                    response.put("hr", employerService.findByUserEmail(authenticationRequest.username()));
+//                    break;
 
+            }
+        return ResponseEntity.ok(
+                new BaseResponse("Đăng nhập thành công", HttpStatus.UNAUTHORIZED.value(), response)
+        );
 
 
 
@@ -116,6 +119,7 @@ public class AuthController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
 
     @Operation(summary = "Register/Signup", description = "", tags = {})
     @PostMapping("/registerEmployer")

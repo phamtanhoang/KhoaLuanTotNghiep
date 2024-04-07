@@ -1,0 +1,23 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/job_app
+    username: root
+    password: Hoang2002
+
+springdoc:
+  openapi:
+    url: https://jobapp-api.com
+    description: Server URL in Production environment
+
+jwt:
+  access-token:
+    expires: 3600000
+  refresh-token:
+    expires: 604800000

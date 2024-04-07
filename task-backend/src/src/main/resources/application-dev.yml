@@ -11,14 +11,13 @@ spring:
     url: jdbc:mysql://localhost:3310/job_app
     username: root
     password: Goneanhem1
-
-  main:
-    allow-circular-references: true
-
 #    url: jdbc:mysql://localhost:3306/job_app
 #    username: root
 #    password: Hoang2002
 
+
+  main:
+    allow-circular-references: true
   mail:
     host: smtp.gmail.com
     port: 587
@@ -39,6 +38,6 @@ springdoc:
 
 jwt:
   access-token:
-    expires: 864000000
+    expires: 86400000
   refresh-token:
     expires: 86400000
