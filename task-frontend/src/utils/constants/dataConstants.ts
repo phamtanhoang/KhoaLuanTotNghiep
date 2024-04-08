@@ -3,6 +3,13 @@ const SEX_DATA = [
   { id: "FEMALE", name: "Nữ" },
   { id: "OTHER", name: "Khác" },
 ];
+const ROLE_DATA = {
+  ADMIN: 'ADMIN',
+  CANDIDATE: 'CANDIDATE',
+  HUMANRESOURCE: 'HUMANRESOURCE',
+  EMPLOYER: 'EMPLOYER'
+};
+
 const APPLY_STATE_DATA = [
   { id: "PENDING", name: "Chờ xét duyệt", color: "#FFC300" },
   { id: "DISAPPROVE", name: "Hồ sơ chưa phù hợp", color: "#C0C0C0" },
@@ -26,4 +33,5 @@ export const DataConstants = {
   APPLY_STATE_DATA,
   JOB_STATE_DATA,
   HR_STATE_DATA,
+  ROLE_DATA
 };

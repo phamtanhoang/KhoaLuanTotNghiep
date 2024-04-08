@@ -1,5 +1,6 @@
 import { LoadingContext } from "@/App";
 import { authsService } from "@/services";
+import { DataConstants } from "@/utils/constants/dataConstants";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import useCaptchaGenerator from "@/utils/hooks/useCaptchaGenerator";
@@ -50,22 +51,15 @@ const Signin = (props: any) => {
 
     context.handleOpenLoading();
     authsService
-      .signin(email, password)
+      .signin(email, password, DataConstants.ROLE_DATA.CANDIDATE)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          if (res.data.Data.candidate) {
-            const tokenData = JSON.stringify(res.data.data);
-            localStorage.setItem("Token", tokenData);
-            SwalHelper.MiniAlert(res.data.Message, "success");
-          } else {
-            SwalHelper.MiniAlert(
-              "Vui lòng đăng nhập tài khoản ứng viên",
-              "error"
-            );
-          }
+          const tokenData = JSON.stringify(res.data.data);
+          localStorage.setItem("Token", tokenData);
+          SwalHelper.MiniAlert(res.data.Message, "success");
         } else {
           SwalHelper.MiniAlert(
-            res.data.Message || "Đăng nhập không thành công",
+            res.data.Message || "Đăng nhập không thành công!",
             "error"
           );
         }

@@ -126,14 +126,14 @@ axiosInstance.interceptors.response.use(
       const accessToken = AuthHelper.getAccessToken();
       const refreshToken = AuthHelper.getRefreshToken();
 
-      const tokenData = {
-        accessToken,
-        refreshToken,
-      };
+      // const tokenData = {
+      //   accessToken,
+      //   refreshToken,
+      // };
 
       return new Promise(function (resolve, reject) {
         axios
-          .post(AuthAPI.refreshToken, tokenData)
+          .post(AuthAPI.refreshToken, refreshToken)
           .then((res) => {
             AuthHelper.setTokens(res.data.Data.accessToken, refreshToken);
             originalRequest.headers.Authorization = `Bearer ${res.data.Data.accessToken}`;

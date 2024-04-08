@@ -1,6 +1,7 @@
 import { LoadingContext } from "@/App";
 import { LoadingSpiner } from "@/components/ui";
 import { authsService } from "@/services";
+import { DataConstants } from "@/utils/constants/dataConstants";
 import { ADMIN_PATHS } from "@/utils/constants/pathConstants";
 import { AuthHelper } from "@/utils/helpers/authHelper";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
@@ -36,23 +37,19 @@ const SigninAdminPage = () => {
 
     context.handleOpenLoading();
     authsService
-      .signin(email.trim(), password.trim())
+      .signin(email.trim(), password.trim(), DataConstants.ROLE_DATA.ADMIN)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          if (res.data.Data.admin) {
-            console.log(
-              " res.data.Data.tokens.token, ",
-              res.data.Data.tokens.token
-            );
-            AuthHelper.setTokens(
-              res.data.Data.tokens.token,
-              res.data.Data.tokens.token
-            );
-            navigate(ADMIN_PATHS.dashboard);
-            SwalHelper.MiniAlert(res.data.Message, "success");
-          } else {
-            setError("Bạn không có quyền truy cập!");
-          }
+          console.log(
+            " res.data.Data.tokens.token, ",
+            res.data.Data.tokens.token
+          );
+          AuthHelper.setTokens(
+            res.data.Data.tokens.token,
+            res.data.Data.tokens.token
+          );
+          navigate(ADMIN_PATHS.dashboard);
+          SwalHelper.MiniAlert(res.data.Message, "success");
         } else {
           setError(res.data.Message || "Đăng nhập không thành công");
         }

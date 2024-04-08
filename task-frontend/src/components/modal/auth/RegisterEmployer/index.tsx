@@ -53,12 +53,12 @@ const RegisterEmployer = (props: any) => {
         if (res.status === 200 && res.data.Status === 200) {
           handleClose();
           SwalHelper.MiniAlert(
-            "Đăng kí thành công, vui lòng đăng nhập lại!",
+            "Đăng kí thành công, vui lòng đăng nhập!",
             "success"
           );
         } else {
           SwalHelper.MiniAlert(
-            res.data.Message || "Đăng nhập không thành công",
+            res.data.Message || "Đăng nhập không thành công!",
             "error"
           );
         }
