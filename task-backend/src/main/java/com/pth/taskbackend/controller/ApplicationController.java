@@ -79,7 +79,7 @@ public class ApplicationController {
                         new BaseResponse("Đã ứng tuyển vào công việc này!!!", HttpStatus.OK.value(), null)
                     );
 
-            String cvPath = fileUploadFunc.upload(cVFile);
+            String cvPath = fileUploadFunc.uploadCV(cVFile);
             Application application = new Application();
             application.setCV(cvPath);
             application.setPhoneNumber(applicationRequest.phoneNumber());

@@ -5,6 +5,7 @@ import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.model.meta.Tag;
 import com.pth.taskbackend.repository.CategoryRepository;
 import com.pth.taskbackend.service.CategoryService;
+import com.pth.taskbackend.util.func.FileUploadFunc;
 import com.pth.taskbackend.util.func.ImageFunc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -47,7 +48,9 @@ public class CategoryServiceImpl implements CategoryService {
     public Category createCategory(String name, MultipartFile file) throws IOException {
         Category category = new Category();
         category.setName(name);
-        category.setImage(ImageFunc.compressImage(file.getBytes()));
+        FileUploadFunc fileUploadFunc = new FileUploadFunc();
+        String path = fileUploadFunc.uploadImage(file);
+        category.setImage(fileUploadFunc.getFullImagePath(path));
         categoryRepository.save(category);
         return category;
     }
@@ -57,9 +60,9 @@ public class CategoryServiceImpl implements CategoryService {
         if (name != null && !name.isEmpty()) {
             category.setName(name);
         }
-        if (file != null) {
-            category.setImage(ImageFunc.compressImage(file.getBytes()));
-        }
+//        if (file != null) {
+//            category.setImage(ImageFunc.compressImage(file.getBytes()));
+//        }
         categoryRepository.save(category);
         return category;
     }
