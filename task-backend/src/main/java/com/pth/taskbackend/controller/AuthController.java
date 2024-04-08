@@ -12,6 +12,7 @@ import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.security.UserInfoDetails;
 import com.pth.taskbackend.service.AuthService;
+import com.pth.taskbackend.util.func.CheckPermission;
 import org.springframework.security.authentication.AuthenticationManager;
 import com.pth.taskbackend.service.CandidateService;
 import com.pth.taskbackend.service.EmployerService;
@@ -34,10 +35,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 import static com.pth.taskbackend.util.constant.TokenConstant.*;
@@ -65,9 +63,8 @@ public class AuthController {
 
     @Operation(summary = "Login/Signin", description = "", tags = {})
     @PostMapping("login")
-    public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest authenticationRequest,
-                              HttpServletRequest request,
-                              HttpServletResponse response) {
+    public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest authenticationRequest
+                              ) {
 
         try {
 
@@ -83,24 +80,29 @@ public class AuthController {
         EStatus userStatus = checkUser.getStatus();
         ERole userRole = checkUser.getRole();
 
-        if (!userRole.equals(ERole.ADMIN)) {
-            if (!userStatus.equals(EStatus.ACTIVE)) {
-                if (userStatus.equals(EStatus.PENDING)) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                            .body(new BaseResponse("Tài khoản chưa được duyệt!", HttpStatus.FORBIDDEN.value(), null));
-                } else if (userStatus.equals(EStatus.INACTIVE)) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                            .body(new BaseResponse("Tài khoản đã bị khóa!", HttpStatus.FORBIDDEN.value(), null));
-                } else {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                            .body(new BaseResponse("Tài khoản không tồn tại!", HttpStatus.FORBIDDEN.value(), null));
-                }
-            }
-        }
-
         String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,userRole);
+
+        Map<String,Object> response = new HashMap<>();
+        Map<String, String>tokens=new HashMap<>();
+            tokens.put("token",token);
+            tokens.put("refresh-token",null);
+            response.put("tokens",tokens);
+        switch(userRole){
+            case CANDIDATE:
+                response.put("candidate",candidateService.findByUserEmail(authenticationRequest.username()));
+                break;
+            case EMPLOYER:
+                response.put("employer",employerService.findByUserEmail(authenticationRequest.username()));
+                break;
+            case ADMIN:
+                response.put("admin",userRepository.findByEmail(authenticationRequest.username()));
+                break;
+            case HR:
+                break;
+
+        }
         return ResponseEntity.ok(
-                new BaseResponse("Đăng nhập thành công", HttpStatus.UNAUTHORIZED.value(), token)
+                new BaseResponse("Đăng nhập thành công", HttpStatus.OK.value(), response)
         );
 
 
