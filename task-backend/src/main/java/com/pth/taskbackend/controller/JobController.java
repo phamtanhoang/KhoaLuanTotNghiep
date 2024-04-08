@@ -113,6 +113,8 @@ public class JobController {
             job.setToDate(request.toDate());
             job.setLocation(request.location());
             job.setHumanResource(humanResource);
+
+            job.setTags(request.tags());
             jobService.create(job);
 
             return ResponseEntity.ok(

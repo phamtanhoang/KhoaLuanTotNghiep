@@ -20,7 +20,7 @@ import java.util.function.Function;
 @Component
 public class JwtService {
 
-    public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+    public static final String SECRET = "Lu4byRqrMCp6OmPf3zyRUphe1NP0MZrZaB+2Kzay5OBb1Mfs6atzgSfwFCNVxpXhtQP5ToIzK1x1PgCFCpFY0Q==";
     public static final int REFRESH_TOKEN_EXPIRATION_SECONDS =30 * 24 * 60 * 60;
     private List<String> validTokens = new ArrayList<>();
     public String generateToken(String username, EStatus status, ERole role) {

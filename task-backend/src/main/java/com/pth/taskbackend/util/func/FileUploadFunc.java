@@ -11,6 +11,8 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -19,13 +21,25 @@ public class FileUploadFunc {
     private final String STORAGE_BUCKET_NAME = "jobapp-c9389.appspot.com";
     private final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media";
 
-    public String upload(MultipartFile multipartFile) {
+    public String uploadCV(MultipartFile multipartFile) {
         try {
             String fileName = multipartFile.getOriginalFilename();
             String fileExtension = getFileExtension(fileName);
-            if (!fileExtension.equalsIgnoreCase(".pdf")) {
-                fileName = UUID.randomUUID() + fileExtension;
-            }
+
+            File file = convertToFile(multipartFile, fileName);
+            String uploadedFileName = uploadFile(file, fileName);
+            file.delete();
+            return uploadedFileName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public String uploadImage(MultipartFile multipartFile) {
+        try {
+            String fileName = multipartFile.getOriginalFilename();
+            String fileExtension = getFileExtension(fileName);
+
             File file = convertToFile(multipartFile, fileName);
             String uploadedFileName = uploadFile(file, fileName);
             file.delete();
@@ -41,17 +55,33 @@ public class FileUploadFunc {
     }
 
     private String uploadFile(File file, String fileName) throws IOException {
+        String fileExtension = getFileExtension(fileName);
+        String contentType;
+
+        if (fileExtension.equalsIgnoreCase(".pdf")) {
+            contentType = "application/pdf";
+        } else if (Arrays.asList(".jpg", ".jpeg").contains(fileExtension.toLowerCase())) {
+            contentType = "image/jpeg";
+        } else if (fileExtension.equalsIgnoreCase(".png")) {
+            contentType = "image/png";
+        } else if (fileExtension.equalsIgnoreCase(".gif")) {
+            contentType = "image/gif";
+        } else {
+            contentType = "application/octet-stream";
+        }
+
         Resource resource = new ClassPathResource("/serviceAccountKey.json");
         FileInputStream serviceAccount = new FileInputStream(resource.getFile());
         Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
 
         BlobId blobId = BlobId.of(STORAGE_BUCKET_NAME, fileName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("application/pdf").build();
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(contentType).build();
         storage.create(blobInfo, Files.readAllBytes(file.toPath()));
 
         return fileName;
     }
+
 
     public byte[] download(String fileName) {
         try {

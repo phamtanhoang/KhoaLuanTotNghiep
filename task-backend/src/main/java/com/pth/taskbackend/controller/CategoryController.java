@@ -1,9 +1,14 @@
 package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.dto.response.TopCategoriesResponse;
+import com.pth.taskbackend.enums.ERole;
+import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Category;
+import com.pth.taskbackend.model.meta.Employer;
+import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.CategoryRepository;
 import com.pth.taskbackend.repository.JobRepository;
+import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.CategoryService;
 import com.pth.taskbackend.service.JobService;
@@ -45,7 +50,8 @@ public class CategoryController {
     @Autowired
     private JobRepository jobRepository;
     private final CheckPermission checkPermission ;
-
+@Autowired
+    UserRepository userRepository;
     @Autowired
     JwtService jwtService;
 
@@ -110,20 +116,28 @@ public class CategoryController {
 
     @Operation(summary = "Create", description = "", tags = {})
     @PostMapping("/create")
-    public ResponseEntity<BaseResponse> createCategory(@RequestParam("name") String name,
+    public ResponseEntity<BaseResponse> createCategory(@RequestHeader("Authourization") String token,@RequestParam("name") String name,
                                  @RequestParam("image") MultipartFile image) throws IOException {
         try {
+
+            String email = jwtService.extractUsername(token);
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isPresent())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy quản trị viên", HttpStatus.NOT_FOUND.value(), null)
+                );
             Optional<Category> existedCategory = categoryService.findByName(name);
             if(existedCategory.isPresent()){
                 return ResponseEntity.ok(
                         new BaseResponse("Tên danh mục đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
                 );
             }
-            if (!ImageFunc.isImageFile(image)) {
-                return ResponseEntity.ok(
-                        new BaseResponse("Vui lòng chọn hình ảnh!", HttpStatus.BAD_REQUEST.value(), null)
-                );
-            }
+
             Category category = categoryService.createCategory(name, image);
             return ResponseEntity.ok(
                     new BaseResponse("Tạo danh mục thành công", HttpStatus.OK.value(), category)

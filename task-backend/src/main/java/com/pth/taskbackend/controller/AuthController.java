@@ -73,18 +73,18 @@ public class AuthController {
                     new BaseResponse("Email không tồn tại!", HttpStatus.NOT_FOUND.value(), null)
             );
         }
-
-        User checkUser = user.get();
-        EStatus userStatus = checkUser.getStatus();
-        ERole userRole = checkUser.getRole();
-            String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,userRole);
-            String refreshToken = jwtService.generateRefreshToken(authenticationRequest.username(), EStatus.ACTIVE,userRole);
+        if(!user.get().getRole().equals(authenticationRequest.role()))
+            return ResponseEntity.ok(
+                    new BaseResponse("Vui lòng đăng nhập với tài khoản " + user.get().getRole()+"!!!", HttpStatus.FORBIDDEN.value(), null)
+            );
+            String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,user.get().getRole());
+//            String refreshToken = jwtService.generateRefreshToken(authenticationRequest.username(), EStatus.ACTIVE,user.get().getRole());
             Map<String,Object>response= new HashMap<>();
             Map<String, String>tokens= new HashMap<>();
             tokens.put("token",token);
-            tokens.put("refresh-token",refreshToken);
+            tokens.put("refresh-token",null);
             response.put("tokens",tokens);
-            switch (userRole){
+            switch (authenticationRequest.role()){
                 case CANDIDATE:
                     response.put("candidate",candidateService.findByUserEmail(authenticationRequest.username()));
                     break;
@@ -112,32 +112,33 @@ public class AuthController {
         }
     }
 
-        @Operation(summary = "RefreshToken", description = "", tags = {})
-        @PostMapping("refresh")
-        public ResponseEntity<BaseResponse> refreshToken(@RequestHeader("Authorization") String refreshToken) {
+//        @Operation(summary = "RefreshToken", description = "", tags = {})
+//        @PostMapping("refresh")
+//        public ResponseEntity<BaseResponse> refreshToken(@RequestHeader("Authorization") String refreshToken) {
+//
+//            try {
+//                refreshToken = refreshToken.substring(7);
+//                String email = jwtService.extractUsername(refreshToken);
+//                Optional<User> optionalUser = userRepository.findByEmail(email);
+//                if (optionalUser.isPresent()) {
+//                   String token= jwtService.refreshToken(refreshToken, optionalUser.get().getStatus(), optionalUser.get().getRole());
+//                    return ResponseEntity.ok(
+//                            new BaseResponse("Tạo mới token thành công", HttpStatus.OK.value(), token)
+//                    );
+//                }
+//
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Không tìm thấy người dùng với email đã cung cấp", HttpStatus.NOT_FOUND.value(), null)
+//                );
+//
+//
+//            } catch (BadCredentialsException e) {
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Mật khẩu không chính xác!", HttpStatus.UNAUTHORIZED.value(), null)
+//                );
+//            }
+//        }
 
-            try {
-                refreshToken = refreshToken.substring(7);
-                String email = jwtService.extractUsername(refreshToken);
-                Optional<User> optionalUser = userRepository.findByEmail(email);
-                if (optionalUser.isPresent()) {
-                   String token= jwtService.refreshToken(refreshToken, optionalUser.get().getStatus(), optionalUser.get().getRole());
-                    return ResponseEntity.ok(
-                            new BaseResponse("Tạo mới token thành công", HttpStatus.OK.value(), token)
-                    );
-                }
-
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy người dùng với email đã cung cấp", HttpStatus.NOT_FOUND.value(), null)
-                );
-
-
-            } catch (BadCredentialsException e) {
-                return ResponseEntity.ok(
-                        new BaseResponse("Mật khẩu không chính xác!", HttpStatus.UNAUTHORIZED.value(), null)
-                );
-            }
-        }
     @Operation(summary = "Register/Signup", description = "", tags = {})
     @PostMapping("/registerEmployer")
     public ResponseEntity<BaseResponse> registerEmployer(@RequestBody CreateEmployerRequest registrationRequest) {
