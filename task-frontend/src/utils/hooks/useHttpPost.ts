@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AxiosRequestConfig } from "axios";
-import axiosInstance from "@/configs/axiosInstance";
+import axiosConfig from "@/configs/axiosConfig";
 
 interface UseHttpPostProps {
   url: string;
@@ -17,7 +17,7 @@ const useHttpPost = ({ url, data, config }: UseHttpPostProps) => {
     const postData = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.post(url, data, config);
+        const response = await axiosConfig.post(url, data, config);
         setResponseData(response.data);
       } catch (error) {
         setError(error);

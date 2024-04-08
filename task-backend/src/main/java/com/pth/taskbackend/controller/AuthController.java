@@ -63,8 +63,12 @@ public class AuthController {
 
     @Operation(summary = "Login/Signin", description = "", tags = {})
     @PostMapping("login")
+<<<<<<< HEAD
     public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest authenticationRequest
                               ) {
+=======
+    public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest authenticationRequest) {
+>>>>>>> 553bd31a60174ae9abde98568ea4cd12eb5a888d
 
         try {
 
@@ -79,7 +83,21 @@ public class AuthController {
         User checkUser = user.get();
         EStatus userStatus = checkUser.getStatus();
         ERole userRole = checkUser.getRole();
+            String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,userRole);
+            String refreshToken = jwtService.generateRefreshToken(authenticationRequest.username(), EStatus.ACTIVE,userRole);
+            Map<String,Object>response= new HashMap<>();
+            Map<String, String>tokens= new HashMap<>();
+            tokens.put("token",token);
+            tokens.put("refresh-token",refreshToken);
+            response.put("tokens",tokens);
+            switch (userRole){
+                case CANDIDATE:
+                    response.put("candidate",candidateService.findByUserEmail(authenticationRequest.username()));
+                    break;
+                case EMPLOYER:
+                    response.put("employer",employerService.findByUserEmail(authenticationRequest.username()));
 
+<<<<<<< HEAD
         String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,userRole);
 
         Map<String,Object> response = new HashMap<>();
@@ -101,17 +119,22 @@ public class AuthController {
                 break;
 
         }
+=======
+                    break;
+                case ADMIN:
+                    response.put("candidate",userRepository.findByEmail(authenticationRequest.username()));
+
+                case HR:;
+//                    response.put("candidate",candidateService.findByUserEmail(authenticationRequest.username()));
+                    break;
+            }
+
+>>>>>>> 553bd31a60174ae9abde98568ea4cd12eb5a888d
         return ResponseEntity.ok(
                 new BaseResponse("Đăng nhập thành công", HttpStatus.OK.value(), response)
         );
 
 
-
-
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.ok(
-                    new BaseResponse("Mật khẩu không chính xác!", HttpStatus.UNAUTHORIZED.value(), null)
-            );
         }
         catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -119,6 +142,32 @@ public class AuthController {
         }
     }
 
+        @Operation(summary = "RefreshToken", description = "", tags = {})
+        @PostMapping("refresh")
+        public ResponseEntity<BaseResponse> refreshToken(@RequestHeader("Authorization") String refreshToken) {
+
+            try {
+                refreshToken = refreshToken.substring(7);
+                String email = jwtService.extractUsername(refreshToken);
+                Optional<User> optionalUser = userRepository.findByEmail(email);
+                if (optionalUser.isPresent()) {
+                   String token= jwtService.refreshToken(refreshToken, optionalUser.get().getStatus(), optionalUser.get().getRole());
+                    return ResponseEntity.ok(
+                            new BaseResponse("Tạo mới token thành công", HttpStatus.OK.value(), token)
+                    );
+                }
+
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng với email đã cung cấp", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+
+            } catch (BadCredentialsException e) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Mật khẩu không chính xác!", HttpStatus.UNAUTHORIZED.value(), null)
+                );
+            }
+        }
     @Operation(summary = "Register/Signup", description = "", tags = {})
     @PostMapping("/registerEmployer")
     public ResponseEntity<BaseResponse> registerEmployer(@RequestBody CreateEmployerRequest registrationRequest) {

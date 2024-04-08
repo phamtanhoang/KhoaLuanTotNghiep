@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AxiosRequestConfig } from "axios";
-import axiosInstance from "@/configs/axiosInstance";
+import axiosConfig from "@/configs/axiosConfig";
 
 interface UseHttpDeleteProps {
   url: string;
@@ -16,7 +16,7 @@ const useHttpDelete = ({ url, config }: UseHttpDeleteProps) => {
     const deleteData = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.delete(url, config);
+        const response = await axiosConfig.delete(url, config);
         setResponseData(response.data);
       } catch (error) {
         setError(error);

@@ -1,4 +1,4 @@
-import axiosInstance from "@/configs/axiosInstance";
+import axiosConfig from "@/configs/axiosConfig";
 import { AuthAPI } from "@/configs/helper";
 
 const authsService = {
@@ -7,7 +7,7 @@ const authsService = {
       username: email.trim(),
       password: password.trim(),
     };
-    return await axiosInstance.post(AuthAPI.signin, userData, {
+    return await axiosConfig.post(AuthAPI.signin, userData, {
       headers: { "Content-Type": "application/json" },
     });
   },
@@ -28,7 +28,7 @@ const authsService = {
       sex: sex.trim(),
       // phoneNumber: "",
     };
-    return await axiosInstance.post(AuthAPI.signupCandidate, userData, {
+    return await axiosConfig.post(AuthAPI.signupCandidate, userData, {
       headers: { "Content-Type": "application/json" },
     });
   },
@@ -50,13 +50,13 @@ const authsService = {
       phoneNumber: phoneNumber.trim(),
       businessCode: businessCode.trim(),
     };
-    return await axiosInstance.post(AuthAPI.signupEmployer, userData, {
+    return await axiosConfig.post(AuthAPI.signupEmployer, userData, {
       headers: { "Content-Type": "application/json" },
     });
   },
 
   async signout() {
-    return await axiosInstance.get(AuthAPI.logout, {
+    return await axiosConfig.get(AuthAPI.logout, {
       headers: { "Content-Type": "application/json" },
     });
   },

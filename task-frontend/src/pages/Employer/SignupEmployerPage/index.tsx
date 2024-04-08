@@ -43,25 +43,23 @@ const SignupEmployerPage = () => {
       return;
     }
 
-    // context.handleOpenLoading();
-    // usersService
-    //   .getByEmail(email)
-    //   .then((res) => {
-    //     if (res.status === 200 && res.data.Status === 200) {
-    //       setFuncs(MODAL_KEYS.registerEmployer);
-    //       handleOpen();
-    //     } else {
-    //       SwalHelper.MiniAlert("Email đã tồn tại!", "error");
-    //     }
-    //   })
-    //   .catch(() => {
-    //     SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-    //   })
-    //   .finally(() => {
-    //     context.handleCloseLoading();
-    //   });
-    setFuncs(MODAL_KEYS.registerEmployer);
-    handleOpen();
+    context.handleOpenLoading();
+    usersService
+      .getByEmail(email)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          setFuncs(MODAL_KEYS.registerEmployer);
+          handleOpen();
+        } else {
+          SwalHelper.MiniAlert("Email đã tồn tại!", "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
   };
 
   return (

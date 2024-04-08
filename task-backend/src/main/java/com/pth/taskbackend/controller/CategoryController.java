@@ -4,14 +4,17 @@ import com.pth.taskbackend.dto.response.TopCategoriesResponse;
 import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.repository.CategoryRepository;
 import com.pth.taskbackend.repository.JobRepository;
+import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.CategoryService;
 import com.pth.taskbackend.service.JobService;
+import com.pth.taskbackend.util.func.CheckPermission;
 import com.pth.taskbackend.util.func.ImageFunc;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -41,6 +44,10 @@ public class CategoryController {
 
     @Autowired
     private JobRepository jobRepository;
+    private final CheckPermission checkPermission ;
+
+    @Autowired
+    JwtService jwtService;
 
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")

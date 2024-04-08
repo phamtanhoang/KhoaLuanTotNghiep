@@ -1,38 +1,43 @@
 import { User } from "@/models/UserModel";
 
-const getLocalAccessToken = (): string | null =>
-  localStorage.getItem("accessToken");
-
-const getLocalRefreshToken = (): string | null =>
-  localStorage.getItem("refreshToken");
-
-const setLocalAccessToken = (token: string): void => {
-  localStorage.setItem("accessToken", token);
+const getAccessToken = () => {
+  const tokens = JSON.parse(localStorage.getItem("tokens")!);
+  return tokens ? tokens.accessToken : null;
 };
 
-const setLocalRefreshToken = (token: string): void => {
-  localStorage.setItem("refreshToken", token);
+const getRefreshToken = () => {
+  const tokens = JSON.parse(localStorage.getItem("tokens")!);
+  return tokens ? tokens.refreshToken : null;
 };
 
-const getUser = (): User | null => {
-  const userString = localStorage.getItem("user");
-  return userString ? JSON.parse(userString) : null;
+const setTokens = (accessToken: string, refreshToken: string) => {
+  const tokens = {
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+  };
+  localStorage.setItem("tokens", JSON.stringify(tokens));
 };
 
-const setUser = (user: User): void => {
-  localStorage.setItem("user", JSON.stringify(user));
+const removeTokens = () => {
+  localStorage.removeItem("tokens");
 };
 
-const removeUser = (): void => {
-  localStorage.removeItem("user");
-};
+// const getUser = (): User | null => {
+//   const userString = localStorage.getItem("user");
+//   return userString ? JSON.parse(userString) : null;
+// };
+
+// const setUser = (user: User): void => {
+//   localStorage.setItem("user", JSON.stringify(user));
+// };
+
+// const removeUser = (): void => {
+//   localStorage.removeItem("user");
+// };
 
 export const AuthHelper = {
-  getLocalRefreshToken,
-  getLocalAccessToken,
-  setLocalAccessToken,
-  setLocalRefreshToken,
-  getUser,
-  setUser,
-  removeUser,
+  getRefreshToken,
+  getAccessToken,
+  setTokens,
+  removeTokens,
 };
