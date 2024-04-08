@@ -12,6 +12,7 @@ import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.security.UserInfoDetails;
 import com.pth.taskbackend.service.AuthService;
+import com.pth.taskbackend.util.func.CheckPermission;
 import org.springframework.security.authentication.AuthenticationManager;
 import com.pth.taskbackend.service.CandidateService;
 import com.pth.taskbackend.service.EmployerService;
@@ -62,7 +63,12 @@ public class AuthController {
 
     @Operation(summary = "Login/Signin", description = "", tags = {})
     @PostMapping("login")
+<<<<<<< HEAD
+    public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest authenticationRequest
+                              ) {
+=======
     public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest authenticationRequest) {
+>>>>>>> 553bd31a60174ae9abde98568ea4cd12eb5a888d
 
         try {
 
@@ -91,6 +97,29 @@ public class AuthController {
                 case EMPLOYER:
                     response.put("employer",employerService.findByUserEmail(authenticationRequest.username()));
 
+<<<<<<< HEAD
+        String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,userRole);
+
+        Map<String,Object> response = new HashMap<>();
+        Map<String, String>tokens=new HashMap<>();
+            tokens.put("token",token);
+            tokens.put("refresh-token",null);
+            response.put("tokens",tokens);
+        switch(userRole){
+            case CANDIDATE:
+                response.put("candidate",candidateService.findByUserEmail(authenticationRequest.username()));
+                break;
+            case EMPLOYER:
+                response.put("employer",employerService.findByUserEmail(authenticationRequest.username()));
+                break;
+            case ADMIN:
+                response.put("admin",userRepository.findByEmail(authenticationRequest.username()));
+                break;
+            case HR:
+                break;
+
+        }
+=======
                     break;
                 case ADMIN:
                     response.put("candidate",userRepository.findByEmail(authenticationRequest.username()));
@@ -100,6 +129,7 @@ public class AuthController {
                     break;
             }
 
+>>>>>>> 553bd31a60174ae9abde98568ea4cd12eb5a888d
         return ResponseEntity.ok(
                 new BaseResponse("Đăng nhập thành công", HttpStatus.OK.value(), response)
         );

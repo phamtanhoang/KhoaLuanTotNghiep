@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AxiosRequestConfig } from "axios";
-import axiosInstance from "@/configs/axiosInstance";
+import axiosConfig from "@/configs/axiosConfig";
 
 interface UseHttpGetProps {
   url: string;
@@ -16,7 +16,7 @@ const useHttpGet = ({ url, config }: UseHttpGetProps) => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get(url, config);
+        const response = await axiosConfig.get(url, config);
         setData(response.data);
       } catch (error) {
         setError(error);

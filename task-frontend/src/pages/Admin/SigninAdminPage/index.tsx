@@ -2,6 +2,7 @@ import { LoadingContext } from "@/App";
 import { LoadingSpiner } from "@/components/ui";
 import { authsService } from "@/services";
 import { ADMIN_PATHS } from "@/utils/constants/pathConstants";
+import { AuthHelper } from "@/utils/helpers/authHelper";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { ChangeEvent, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -39,8 +40,14 @@ const SigninAdminPage = () => {
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           if (res.data.Data.admin) {
-            const tokenData = JSON.stringify(res.data.Data);
-            localStorage.setItem("Token", tokenData);
+            console.log(
+              " res.data.Data.tokens.token, ",
+              res.data.Data.tokens.token
+            );
+            AuthHelper.setTokens(
+              res.data.Data.tokens.token,
+              res.data.Data.tokens.token
+            );
             navigate(ADMIN_PATHS.dashboard);
             SwalHelper.MiniAlert(res.data.Message, "success");
           } else {

@@ -1,9 +1,9 @@
-import axiosInstance from "@/configs/axiosInstance";
+import axiosConfig from "@/configs/axiosConfig";
 import { TagAPI } from "@/configs/helper";
 
 const tagsService = {
   async getById(id: string) {
-    return await axiosInstance.get(TagAPI.tagById(id), {
+    return await axiosConfig.get(TagAPI.tagById(id), {
       headers: { "Content-Type": "application/json" },
     });
   },
@@ -12,17 +12,17 @@ const tagsService = {
       name: name.trim(),
       color: color.trim(),
     };
-    return await axiosInstance.put(TagAPI.tagById(id), body, {
+    return await axiosConfig.put(TagAPI.tagById(id), body, {
       headers: { "Content-Type": "application/json" },
     });
   },
   async deleteById(id: string) {
-    return await axiosInstance.delete(TagAPI.tagById(id), {
+    return await axiosConfig.delete(TagAPI.tagById(id), {
       headers: { "Content-Type": "application/json" },
     });
   },
   async getList(name?: string, currentPage?: number, itemPerPage?: number) {
-    return await axiosInstance.get(
+    return await axiosConfig.get(
       TagAPI.getList(name?.trim(), currentPage, itemPerPage)
     );
   },
@@ -31,19 +31,19 @@ const tagsService = {
       name: name.trim(),
       color: color.trim(),
     };
-    return await axiosInstance.post(TagAPI.createTag, body, {
+    return await axiosConfig.post(TagAPI.createTag, body, {
       headers: {
         "Content-Type": "application/json",
       },
     });
   },
   //   async updateById(id: string) {
-  //     return await axiosInstance.put(`${TagAPI.tagUrl}/${id}`, {
+  //     return await axiosConfig.put(`${TagAPI.tagUrl}/${id}`, {
   //       headers: { "Content-Type": "application/json" },
   //     });
   //   },
   //   async deleteById(id: string) {
-  //     return await axiosInstance.delete(`${TagAPI.tagUrl}/${id}`, {
+  //     return await axiosConfig.delete(`${TagAPI.tagUrl}/${id}`, {
   //       headers: { "Content-Type": "application/json" },
   //     });
   //   },

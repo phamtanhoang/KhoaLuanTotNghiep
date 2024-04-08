@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios, { AxiosRequestConfig } from "axios";
-import axiosInstance from "@/configs/axiosInstance";
+import axiosConfig from "@/configs/axiosConfig";
 
 interface UseHttpPutProps {
   url: string;
@@ -17,7 +17,7 @@ const useHttpPut = ({ url, data, config }: UseHttpPutProps) => {
     const putData = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.put(url, data, config);
+        const response = await axiosConfig.put(url, data, config);
         setResponseData(response.data);
       } catch (error) {
         setError(error);

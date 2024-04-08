@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AxiosRequestConfig } from "axios";
-import axiosInstance from "@/configs/axiosInstance";
+import axiosConfig from "@/configs/axiosConfig";
 
 interface UseHttpPatchProps {
   url: string;
@@ -17,7 +17,7 @@ const useHttpPatch = ({ url, data, config }: UseHttpPatchProps) => {
     const patchData = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.patch(url, data, config);
+        const response = await axiosConfig.patch(url, data, config);
         setResponseData(response.data);
       } catch (error) {
         setError(error);
