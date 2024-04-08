@@ -8,9 +8,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3310/job_app
+    url: jdbc:mysql://localhost:3306/job_app
     username: root
-    password: Goneanhem1
+    password: Hoang2002
 
   main:
     allow-circular-references: true
