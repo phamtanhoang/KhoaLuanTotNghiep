@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -23,8 +24,7 @@ public class FileUploadFunc {
 
     public String uploadCV(MultipartFile multipartFile) {
         try {
-            String fileName = multipartFile.getOriginalFilename();
-            String fileExtension = getFileExtension(fileName);
+            String fileName = UUID.randomUUID().toString()+ LocalDateTime.now();
 
             File file = convertToFile(multipartFile, fileName);
             String uploadedFileName = uploadFile(file, fileName);
@@ -37,8 +37,7 @@ public class FileUploadFunc {
     }
     public String uploadImage(MultipartFile multipartFile) {
         try {
-            String fileName = multipartFile.getOriginalFilename();
-            String fileExtension = getFileExtension(fileName);
+            String fileName = UUID.randomUUID().toString();
 
             File file = convertToFile(multipartFile, fileName);
             String uploadedFileName = uploadFile(file, fileName);
