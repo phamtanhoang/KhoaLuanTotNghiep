@@ -14,4 +14,13 @@ public interface EmployerRepository extends JpaRepository<Employer, String> {
     @Query("SELECT e FROM Employer e JOIN e.user u WHERE (:keyword IS NULL OR e.name LIKE %:keyword%) OR (:keyword IS NULL OR u.email LIKE %:keyword%)")
     Page<Employer> findByKeyword(String keyword, Pageable pageable);
     Optional<Employer> findByUserEmail(String email);
+
+    @Query("SELECT e, COUNT(j.id) as count " +
+            "FROM Employer e " +
+            "LEFT JOIN HumanResource hr ON e.id = hr.employer.id " +
+            "LEFT JOIN Job j ON j.humanResource.id = hr.id " +
+            "GROUP BY e " +
+            "HAVING COUNT(j.id) > 0 " +
+            "ORDER BY count DESC")
+    Page<Object[]> findEmployerByJobCount(Pageable pageable);
 }

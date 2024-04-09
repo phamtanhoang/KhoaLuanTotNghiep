@@ -9,6 +9,6 @@ public record GetEmployerProfileResponse(String id,
                                          String location,
                                          String phoneNumber,
                                          String businessCode,
-                                         byte[] image,
-                                         byte[] backgroundImage) {
+                                         String image,
+                                         String backgroundImage) {
 }

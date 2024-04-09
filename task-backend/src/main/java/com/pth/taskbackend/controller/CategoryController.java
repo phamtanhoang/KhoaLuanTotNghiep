@@ -121,22 +121,16 @@ public class CategoryController {
         try {
 
             String email = jwtService.extractUsername(token);
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
             if (!permission)
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
             Optional<User> optionalUser = userRepository.findByEmail(email);
-            if (optionalUser.isPresent())
+            if (optionalUser.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy quản trị viên", HttpStatus.NOT_FOUND.value(), null)
                 );
-            Optional<Category> existedCategory = categoryService.findByName(name);
-            if(existedCategory.isPresent()){
-                return ResponseEntity.ok(
-                        new BaseResponse("Tên danh mục đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
-                );
-            }
 
             Category category = categoryService.createCategory(name, image);
             return ResponseEntity.ok(
@@ -154,9 +148,23 @@ public class CategoryController {
 
     @Operation(summary = "update", description = "", tags = {})
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateCategory(@PathVariable("id") String id, @RequestParam(required = false) String name,
+    public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization")String token, @PathVariable("id") String id, @RequestParam(required = false) String name,
                                                        @RequestParam(required = false) MultipartFile image) {
         try {
+
+            String email = jwtService.extractUsername(token);
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy quản trị viên", HttpStatus.NOT_FOUND.value(), null)
+                );
+
             Optional<Category> optionalCategory = categoryService.findById(id);
             if (optionalCategory.isEmpty()) {
                 return ResponseEntity.ok(
@@ -165,11 +173,9 @@ public class CategoryController {
             }
 
             if (image != null) {
-                if (!ImageFunc.isImageFile(image)) {
                     return ResponseEntity.ok(
                             new BaseResponse("Vui lòng chọn hình ảnh!", HttpStatus.BAD_REQUEST.value(), null)
                     );
-                }
             }
             Category  category = categoryService.updateCategory(optionalCategory.get(), name, image);
             return ResponseEntity.ok(
@@ -187,8 +193,20 @@ public class CategoryController {
 
     @Operation(summary = "delete", description = "", tags = {})
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteCategory(@PathVariable("id") String id) {
+    public ResponseEntity<BaseResponse> deleteCategory(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
         try {
+
+            String email = jwtService.extractUsername(token);
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy quản trị viên", HttpStatus.NOT_FOUND.value(), null)
+                );
             Optional<Category> existingCategory = categoryService.findById(id);
             if (existingCategory.isPresent()) {
                 categoryService.deleteCategory(existingCategory.get());
@@ -212,21 +230,21 @@ public class CategoryController {
     @GetMapping("/topCategoies")
     public ResponseEntity<BaseResponse> getTopCategories(Pageable pageable) {
         try {
-//           Page<Object[]> categories = categoryRepository.findCategoriesOrderedByJobCount(pageable);
-//            Page<TopCategoriesResponse> topCategoriesResponses = categories.map(result -> {
-//                Category category = (Category) result[0];
-//                Long count = (Long) result[1];
-//
-//                TopCategoriesResponse dto = new TopCategoriesResponse(category.getId(),category.getName(),category.getImage(),count);
-//                return dto;
-//            });
-//            if (categories.isEmpty())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Danh sách danh mục rỗng", HttpStatus.OK.value(), null)
-//                );
+           Page<Object[]> categories = categoryService.findCategoriesByJobCount(pageable);
+            Page<TopCategoriesResponse> topCategoriesResponses = categories.map(result -> {
+                Category category = (Category) result[0];
+                Long count = (Long) result[1];
+
+                TopCategoriesResponse dto = new TopCategoriesResponse(category.getId(),category.getName(),category.getImage(),count);
+                return dto;
+            });
+            if (categories.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách danh mục rỗng", HttpStatus.OK.value(), null)
+                );
 //
             return ResponseEntity.ok(
-                    new BaseResponse("Danh sách danh mục", HttpStatus.OK.value(), null)
+                    new BaseResponse("Danh sách danh mục", HttpStatus.OK.value(), topCategoriesResponses)
             );
 
         } catch (Exception e) {

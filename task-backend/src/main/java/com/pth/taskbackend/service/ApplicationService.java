@@ -1,5 +1,6 @@
 package com.pth.taskbackend.service;
 
+import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Application;
 import org.springframework.data.domain.Page;
@@ -24,7 +25,9 @@ public interface ApplicationService {
 
     Page<Application> findByJobId(String jobId, Pageable pageable);
 
-    Page<Application> findByEmployerIdAndStatus(String employerId, EStatus status, Pageable pageable);
 
+    Page<Application> findByEmployerIdAndStatusAndNameContaining(String employerId, EApplyStatus status, String keyword, Pageable pageable);
+
+    Page<Application>findByEmployerIdAndStatus(String employerId, EApplyStatus status, Pageable pageable);
     Page<Application> findByHrIdAndStatus(Long hrId, EStatus status, Pageable pageable);
 }

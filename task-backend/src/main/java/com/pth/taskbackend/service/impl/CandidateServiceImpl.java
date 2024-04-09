@@ -4,6 +4,7 @@ import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.repository.CandidateRepository;
 import com.pth.taskbackend.service.CandidateService;
+import com.pth.taskbackend.util.func.FileUploadFunc;
 import com.pth.taskbackend.util.func.ImageFunc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,10 +31,10 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public Candidate create(Candidate candidate, MultipartFile avatar) throws IOException {
 
-            if(avatar==null)
-                candidate.setAvatar(new byte[0]);
-            else
-                candidate.setAvatar(ImageFunc.compressImage(avatar.getBytes()));
+        FileUploadFunc fileUploadFunc = new FileUploadFunc();
+        String uploadImage = fileUploadFunc.uploadImage(avatar);
+        uploadImage=fileUploadFunc.getFullImagePath(uploadImage);
+        candidate.setAvatar(uploadImage);
 
             candidateRepository.save(candidate);
             return candidate;
@@ -51,9 +52,10 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public Candidate updateAvatar(Candidate candidate, MultipartFile avatar) throws IOException {
 
-        if (avatar != null) {
-            candidate.setAvatar(ImageFunc.compressImage(avatar.getBytes()));
-        }
+        FileUploadFunc fileUploadFunc = new FileUploadFunc();
+        String uploadImage = fileUploadFunc.uploadImage(avatar);
+        uploadImage=fileUploadFunc.getFullImagePath(uploadImage);
+        candidate.setAvatar(uploadImage);
 
         candidateRepository.save(candidate);
         return candidate;

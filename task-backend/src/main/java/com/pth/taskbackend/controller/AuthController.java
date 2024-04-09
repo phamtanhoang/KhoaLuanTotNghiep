@@ -63,12 +63,7 @@ public class AuthController {
 
     @Operation(summary = "Login/Signin", description = "", tags = {})
     @PostMapping("login")
-<<<<<<< HEAD
-    public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest authenticationRequest
-                              ) {
-=======
     public ResponseEntity<BaseResponse> login(@RequestBody AuthenticationRequest authenticationRequest) {
->>>>>>> 553bd31a60174ae9abde98568ea4cd12eb5a888d
 
         try {
 
@@ -79,57 +74,45 @@ public class AuthController {
                     new BaseResponse("Email không tồn tại!", HttpStatus.NOT_FOUND.value(), null)
             );
         }
-        if(!user.get().getRole().equals(authenticationRequest.role()))
+        if (user.get().getStatus().equals(EStatus.DELETED)) {
             return ResponseEntity.ok(
-                    new BaseResponse("Vui lòng đăng nhập với tài khoản " + user.get().getRole()+"!!!", HttpStatus.FORBIDDEN.value(), null)
-            );
-            String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,user.get().getRole());
-//            String refreshToken = jwtService.generateRefreshToken(authenticationRequest.username(), EStatus.ACTIVE,user.get().getRole());
-            Map<String,Object>response= new HashMap<>();
-            Map<String, String>tokens= new HashMap<>();
-            tokens.put("token",token);
-            tokens.put("refresh-token",null);
-            response.put("tokens",tokens);
-            switch (authenticationRequest.role()){
-                case CANDIDATE:
-                    response.put("candidate",candidateService.findByUserEmail(authenticationRequest.username()));
-                    break;
-                case EMPLOYER:
-                    response.put("employer",employerService.findByUserEmail(authenticationRequest.username()));
-
-<<<<<<< HEAD
-        String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,userRole);
-
-        Map<String,Object> response = new HashMap<>();
-        Map<String, String>tokens=new HashMap<>();
-            tokens.put("token",token);
-            tokens.put("refresh-token",null);
-            response.put("tokens",tokens);
-        switch(userRole){
-            case CANDIDATE:
-                response.put("candidate",candidateService.findByUserEmail(authenticationRequest.username()));
-                break;
-            case EMPLOYER:
-                response.put("employer",employerService.findByUserEmail(authenticationRequest.username()));
-                break;
-            case ADMIN:
-                response.put("admin",userRepository.findByEmail(authenticationRequest.username()));
-                break;
-            case HR:
-                break;
-
-        }
-=======
-                    break;
-                case ADMIN:
-                    response.put("candidate",userRepository.findByEmail(authenticationRequest.username()));
-
-                case HR:;
-//                    response.put("candidate",candidateService.findByUserEmail(authenticationRequest.username()));
-                    break;
+                    new BaseResponse("Tài khoản bị khóa", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }
+        if (user.get().getStatus().equals(EStatus.PENDING)) {
+            return ResponseEntity.ok(new BaseResponse("Tài khoản của bạn chưa được duyệt", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }
+        if (!passwordEncoder.matches(authenticationRequest.password(),user.get().getPassword())) {
+            return ResponseEntity.ok(
+                    new BaseResponse("Mật khẩu không đúng", HttpStatus.FORBIDDEN.value(), null)
+                );
             }
 
->>>>>>> 553bd31a60174ae9abde98568ea4cd12eb5a888d
+        if(!user.get().getRole().equals(authenticationRequest.role())) return ResponseEntity.ok(
+                new BaseResponse("Vui lòng đăng nhập với tài khoản " + user.get().getRole()+"!!!", HttpStatus.FORBIDDEN.value(), null)
+            );
+        String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,user.get().getRole());
+        String refreshToken = jwtService.generateRefreshToken(authenticationRequest.username(), EStatus.ACTIVE,user.get().getRole());
+        Map<String,Object>response= new HashMap<>();
+        Map<String, String>tokens= new HashMap<>();
+        tokens.put("token",token);
+        tokens.put("refresh-token",refreshToken);
+        response.put("tokens",tokens);
+        switch (authenticationRequest.role()) {
+            case CANDIDATE:
+                response.put("candidate", candidateService.findByUserEmail(authenticationRequest.username()));
+                break;
+            case EMPLOYER:
+                response.put("employer", employerService.findByUserEmail(authenticationRequest.username()));
+                break;
+            case ADMIN:
+                response.put("admin", userRepository.findByEmail(authenticationRequest.username()));break;
+            case HR:
+                break;
+            }
+
+
         return ResponseEntity.ok(
                 new BaseResponse("Đăng nhập thành công", HttpStatus.OK.value(), response)
         );
@@ -138,7 +121,7 @@ public class AuthController {
         }
         catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+                    .body(new BaseResponse("Đăng nhập không thành công", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 

@@ -13,5 +13,5 @@ public record GetCandidateProfileResponse(
     String link,
     String job,
     String introduction,
-    byte[] avatar){
+    String avatar){
 }

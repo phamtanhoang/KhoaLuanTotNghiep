@@ -1,42 +1,38 @@
 package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.request.ApplicationRequest;
-import com.pth.taskbackend.dto.request.UpdateCandidateRequest;
+import com.pth.taskbackend.dto.response.ApplicationResponse;
 import com.pth.taskbackend.dto.response.BaseResponse;
-import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
+import com.pth.taskbackend.enums.EApplyStatus;
+import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
-import com.pth.taskbackend.model.meta.Application;
-import com.pth.taskbackend.model.meta.Candidate;
-import com.pth.taskbackend.model.meta.Collection;
-import com.pth.taskbackend.model.meta.Job;
+import com.pth.taskbackend.model.meta.*;
 import com.pth.taskbackend.security.JwtService;
-import com.pth.taskbackend.service.ApplicationService;
-import com.pth.taskbackend.service.CandidateService;
-import com.pth.taskbackend.service.CollectionService;
-import com.pth.taskbackend.service.JobService;
+import com.pth.taskbackend.service.*;
+import com.pth.taskbackend.util.func.CheckPermission;
 import com.pth.taskbackend.util.func.FileUploadFunc;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
 @CrossOrigin(origins = "*")
-@Tag(name = "applications", description = "Category APIs")
+@Tag(name = "applications", description = "Applications APIs")
 @SecurityRequirement(name = "javainuseapi")
 @RequiredArgsConstructor
 @RestController
@@ -53,40 +49,52 @@ public class ApplicationController {
     CollectionService collectionService;
     @Autowired
     JwtService jwtService;
+
+    @Autowired
+    EmployerService employerService;
+    private final CheckPermission checkPermission;
     FileUploadFunc fileUploadFunc = new FileUploadFunc();
     @PostMapping("/apply")
     public ResponseEntity<BaseResponse> applyJob(
             @RequestHeader("Authorization") String token,
             @RequestPart("cVFile") MultipartFile cVFile,
-            @RequestPart("application") ApplicationRequest applicationRequest,
-            HttpServletRequest request
+            @RequestPart("application") ApplicationRequest applicationRequest
+
     ) {
 
         try {
 
             String email = jwtService.extractUsername(token.substring(7));
-            Candidate candidate = candidateService.findByUserEmail(email).orElse(null);
-            System.out.println(applicationRequest.jobId());
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            }
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null));
+            }
+
             Job job = jobService.findById(applicationRequest.jobId()).orElse(null);
 
-            if (cVFile.isEmpty()||cVFile.getContentType().equals("application/pdf"))
+            if (cVFile.isEmpty() || Objects.equals(cVFile.getContentType(), "application/pdf"))
                 return ResponseEntity.ok(
                         new BaseResponse("Chưa có nhập file hoặc định dạng file sai!!!", HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), null)
                 );
 
-            if (applicationService.findByJobIdAndCandidateId(applicationRequest.jobId(), candidate.getId()).isPresent())
+            if (applicationService.findByJobIdAndCandidateId(applicationRequest.jobId(), optionalCandidate.get().getId()).isPresent())
                 return ResponseEntity.ok(
                         new BaseResponse("Đã ứng tuyển vào công việc này!!!", HttpStatus.OK.value(), null)
-                    );
+                );
 
             String cvPath = fileUploadFunc.uploadCV(cVFile);
             Application application = new Application();
             application.setCV(cvPath);
             application.setPhoneNumber(applicationRequest.phoneNumber());
-            application.setCandidate(candidate);
+            application.setCandidate(optionalCandidate.get());
             application.setEmail(applicationRequest.email());
             application.setLetter(applicationRequest.letter());
-            application.setStatus(EStatus.PENDING);
+            application.setStatus(EApplyStatus.PENDING);
             application.setJob(job);
             application.setFullName(applicationRequest.fullName());
             applicationService.create(application);
@@ -97,150 +105,185 @@ public class ApplicationController {
             collection.setLetter(applicationRequest.letter());
             collection.setPhoneNumber(applicationRequest.phoneNumber());
             collection.setFullName(applicationRequest.fullName());
-            collection.setCandidate(candidate);
+            collection.setCandidate(optionalCandidate.get());
 
 
-            if(applicationRequest.collectionId()!=null)
+            if (applicationRequest.collectionId() != null)
                 collection.setId(applicationRequest.collectionId());
 
             collectionService.create(collection);
             return ResponseEntity.ok(
-                       new BaseResponse("Đã ứng tuyển công việc thành công", HttpStatus.OK.value(), application)
+                    new BaseResponse("Đã ứng tuyển công việc thành công", HttpStatus.OK.value(), application)
             );
 
-        }  catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @GetMapping("/pendingApplications")
+    public ResponseEntity<BaseResponse> pendingApplications(Pageable pageable,
+            @RequestHeader("Authorization") String token) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            }
+
+            Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+            if (optionalEmployer.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
+            }
+
+            Page<Application> pendingApplications = applicationService.findByEmployerIdAndStatus(optionalEmployer.get().getId(), EApplyStatus.PENDING, pageable);
+
+            Page<ApplicationResponse> responseList = pendingApplications.map(application -> {
+                ApplicationResponse response = new ApplicationResponse(
+                        application.getId(),
+                        application.getCandidate().getId(),
+                        application.getCandidate().getUser().getEmail(),
+                        application.getCandidate().getFirstName()+application.getCandidate().getLastName() ,
+                        application.getCandidate().getAvatar(),
+                        application.getCreated(),
+                        application.getStatus(),
+                        application.getJob().getId(),
+                        application.getJob().getName(),
+                        application.getJob().getHumanResource().getEmployer().getId(),
+                        application.getJob().getHumanResource().getEmployer().getName(),
+                        application.getCV()
+                );
+                return response;
+            });
+
+
+            return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc đang đợi duyệt", HttpStatus.OK.value(), responseList));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+
+    @GetMapping("/employerApplications")
+    public ResponseEntity<?> employerApplications(
+          Pageable pageable,
+            @RequestHeader("Authorization") String token,
+            @RequestParam("title") String title,
+            @RequestParam("status")EApplyStatus status
+    ) {
+
+        try {
+        String email = jwtService.extractUsername(token.substring(7));
+        boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+        if (!hasPermission) {
+            return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+        }
+
+        Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+        if (optionalEmployer.isEmpty()) {
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
+        }
+
+
+            Page<Application> applications = applicationService.findByEmployerIdAndStatusAndNameContaining(optionalEmployer.get().getId(),status,title,pageable);
+        Page<ApplicationResponse> responseList = applications.map(application -> {
+            ApplicationResponse response = new ApplicationResponse(
+                    application.getId(),
+                    application.getCandidate().getId(),
+                    application.getCandidate().getUser().getEmail(),
+                    application.getCandidate().getFirstName()+application.getCandidate().getLastName() ,
+                    application.getCandidate().getAvatar(),
+                    application.getCreated(),
+                    application.getStatus(),
+                    application.getJob().getId(),
+                    application.getJob().getName(),
+                    application.getJob().getHumanResource().getEmployer().getId(),
+                    application.getJob().getHumanResource().getEmployer().getName(),
+                    application.getCV()
+            );
+            return response;
+        });
+
+            return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc cho nhà tuyển dụng", HttpStatus.OK.value(), responseList));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
     }
 //
-//    @GetMapping("/pendingApplications")
-//    public ResponseEntity<?> pendingApplications(
-//            @PageableDefault(page = 0, size = 10) Pageable pageable,
-//            @RequestHeader("Authorization") String token
-//    ) {
-//        try {
-//            String employerName = jwtService.extractUsername(token.substring(7));
-//            Employer employer = employerService.findByAccountUsername(employerName);
 //
-//            if (employer == null) {
-//                return ResponseEntity.badRequest().body("Không tìm thấy người sử dụng");
-//            }
+    @GetMapping("/candidateApplications")
+    public ResponseEntity<?> getCandidateApplications(
+            Pageable pageable,
+            @RequestHeader("Authorization") String token,
+            @RequestParam String state
+    ) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            }
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null));
+            }
+            Page<Application> applications = applicationService.findByCandidateId(optionalCandidate.get().getId(), pageable);
+            Page<ApplicationResponse> candidateApplications = applications.map(application -> {
+                ApplicationResponse response = new ApplicationResponse(
+                        application.getId(),
+                        application.getCandidate().getId(),
+                        application.getCandidate().getUser().getEmail(),
+                        application.getCandidate().getFirstName()+application.getCandidate().getLastName() ,
+                        application.getCandidate().getAvatar(),
+                        application.getCreated(),
+                        application.getStatus(),
+                        application.getJob().getId(),
+                        application.getJob().getName(),
+                        application.getJob().getHumanResource().getEmployer().getId(),
+                        application.getJob().getHumanResource().getEmployer().getName(),
+                        application.getCV()
+                );
+                return response;
+            });
+            return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc của ứng viên", HttpStatus.OK.value(), candidateApplications));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 //
-//            Page<Application> pendingApplications = applicationService.findPendingApplicationsByEmployerName(employer.getName(), pageable);
-//
-//            Page<ApplicationResponse> responseList = pendingApplications.map(application -> {
-//                ApplicationResponse dto = new ApplicationResponse();
-//                dto.setId(application.getId());
-//                dto.setAccountId(application.getCandidateId());
-//                dto.setJobId(application.getJobId());
-//                dto.setUserName(accountService.findById(candidateService.findById(application.getCandidateId()).get().getAccountId()).get().getUsername());
-//                dto.setAccountName(candidateService.findById(application.getCandidateId()).get().getFirstName() + " " + candidateService.findById(application.getCandidateId()).get().getLastName());
-//                dto.setApplyDate(application.getApplyDate());
-//                dto.setTitle(jobService.findById(application.getJobId()).get().getTitle());
-//                dto.setState(application.getState());
-//                dto.setImage(candidateService.findById(application.getCandidateId()).get().getAvatar());
-//                return dto;
-//            });
-//
-//            return ResponseEntity.ok(responseList);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi server vui lòng thử lại");
-//        }
-//    }
-//
-//
-//    @GetMapping("/employerApplications")
-//    public ResponseEntity<?> employerApplications(
-//            @PageableDefault(page = 0, size = 10) Pageable pageable,
-//            @RequestHeader("Authorization") String token,
-//            @RequestParam("title") String title
-//    ) {
-//        try {
-//            String employerName = jwtService.extractUsername(token.substring(7));
-//            Employer employer = employerService.findByAccountUsername(employerName);
-//            if (employer == null) {
-//                return ResponseEntity.badRequest().body("vai");
-//            }
-//            Page<Application> applications = applicationService.findApplicationsByEmployerIdAndContainingTitle(employer.getId(), pageable,title);
-//            Page<ApplicationResponse> employerApplications = applications.map(application -> {
-//                ApplicationResponse dto = new ApplicationResponse();
-//                dto.setId(application.getId());
-//                dto.setAccountId(application.getCandidateId());
-//                dto.setJobId(application.getJobId());
-//                dto.setUserName(accountService.findById(candidateService.findById(application.getCandidateId()).get().getAccountId()).get().getUsername());
-//                dto.setAccountName(candidateService.findById(application.getCandidateId()).get().getFirstName()+ " "+candidateService.findById(application.getCandidateId()).get().getLastName());
-//                dto.setApplyDate(application.getApplyDate());
-//                dto.setTitle(jobService.findById(application.getJobId()).get().getTitle());
-//                dto.setExpiredDate(jobService.findById(application.getJobId()).get().getToDate());
-//                dto.setState(application.getState());
-//                dto.setImage(candidateService.findById(application.getCandidateId()).get().getAvatar());
-//                return dto;
-//            });
-//            return ResponseEntity.ok(employerApplications);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Page.empty());
-//        }
-//    }
-//
-//
-//    @GetMapping("/candidateApplications")
-//    public ResponseEntity<?> getCandidateApplications(
-//            @PageableDefault(page = 0, size = 10) Pageable pageable,
-//            @RequestHeader("Authorization") String token,
-//            @RequestParam String state
-//    ) {
-//        try {
-//            String canidateEmail = jwtService.extractUsername(token.substring(7));
-//            Candidate candidate = candidateService.findCandidateByAccountUsername(canidateEmail).get();
-//            if (candidate == null) {
-//                return ResponseEntity.badRequest().body("vai");
-//            }
-//            Page<Application> applications = applicationService.findAllByCandidateId(candidate.getId(),state, pageable);
-//            Page<ApplicationResponse> candidateApplications = applications.map(application -> {
-//                ApplicationResponse dto = new ApplicationResponse();
-//                dto.setId(application.getId());
-//                dto.setAccountId(application.getCandidateId());
-//                dto.setJobId(application.getJobId());
-//                dto.setUserName(accountService.findById(candidateService.findById(application.getCandidateId()).get().getAccountId()).get().getUsername());
-//                dto.setAccountName(candidateService.findById(application.getCandidateId()).get().getFirstName()+ " "+candidateService.findById(application.getCandidateId()).get().getLastName());
-//                dto.setApplyDate(application.getApplyDate());
-//                dto.setTitle(jobService.findById(application.getJobId()).get().getTitle());
-//                dto.setExpiredDate(jobService.findById(application.getJobId()).get().getToDate());
-//                dto.setState(application.getState());
-//                dto.setImage(employerService.findById(jobService.findById(application.getJobId()).get().getEmployerId()).get().getImage());
-//                dto.setEmployerId(employerService.findById(jobService.findById(application.getJobId()).get().getEmployerId()).get().getId());
-//                dto.setEmployerName(employerService.findById(jobService.findById(application.getJobId()).get().getEmployerId()).get().getName());
-//                return dto;
-//            });
-//            return ResponseEntity.ok(candidateApplications);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Page.empty());
-//        }
-//    }
-//
-//    @GetMapping("/download")
-//    public ResponseEntity<Resource> downloadCV(@RequestParam String fileName) {
-//        try {
-//            byte[] pdfData = fileUploader.download(fileName);
-//            if (pdfData != null) {
-//                ByteArrayResource resource = new ByteArrayResource(pdfData);
-//
-//                HttpHeaders headers = new HttpHeaders();
-//                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-//
-//                return ResponseEntity.ok()
-//                        .headers(headers)
-//                        .contentLength(pdfData.length)
-//                        .contentType(MediaType.APPLICATION_PDF)
-//                        .body(resource);
-//            } else {
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-//        }
-//    }
+
+    @GetMapping("/download")
+    public ResponseEntity<?> downloadFile(@RequestParam String fileName) {
+        try {
+            byte[] fileData = fileUploadFunc.download(fileName);
+            if (fileData != null) {
+                HttpHeaders headers = new HttpHeaders();
+                String contentType = fileName.endsWith(".pdf") ? MediaType.APPLICATION_PDF_VALUE : MediaType.TEXT_PLAIN_VALUE;
+                headers.setContentType(MediaType.parseMediaType(contentType));
+                headers.setContentDispositionFormData("attachment", fileName);
+
+                ByteArrayResource resource = new ByteArrayResource(fileData);
+
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .contentLength(fileData.length)
+                        .body(resource);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new BaseResponse("Không tìm thấy tệp", HttpStatus.NOT_FOUND.value(), null));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 //
 //
 //    @GetMapping("/applicationDetails")
@@ -415,4 +458,3 @@ public class ApplicationController {
 //    }
 
     }
-}

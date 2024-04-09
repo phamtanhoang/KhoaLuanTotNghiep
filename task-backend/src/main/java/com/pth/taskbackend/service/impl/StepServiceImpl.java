@@ -43,6 +43,6 @@ public class StepServiceImpl implements StepService {
 
     @Override
     public Page<Step> findByProcedureId(String id, Pageable pageable) {
-        return stepRepository.findByProcedureId(id,pageable);
+        return stepRepository.findByProcessId(id,pageable);
     }
 }

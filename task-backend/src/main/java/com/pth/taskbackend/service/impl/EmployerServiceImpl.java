@@ -4,6 +4,7 @@ import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.repository.EmployerRepository;
 import com.pth.taskbackend.service.EmployerService;
+import com.pth.taskbackend.util.func.FileUploadFunc;
 import com.pth.taskbackend.util.func.ImageFunc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,15 +36,14 @@ public class EmployerServiceImpl implements EmployerService {
 
     @Override
     public Employer create(Employer employer, MultipartFile image, MultipartFile backgroundImage) throws IOException {
-        if(image==null||backgroundImage==null){
-            employer.setImage(new byte[0]);
-            employer.setBackgroundImage(new byte[0]);
-        }
-        else {
-            employer.setImage(ImageFunc.compressImage(image.getBytes()));
-            employer.setBackgroundImage(ImageFunc.compressImage(backgroundImage.getBytes()));
+        FileUploadFunc fileUploadFunc = new FileUploadFunc();
+        String uploadImage = fileUploadFunc.uploadImage(image);
+    uploadImage=fileUploadFunc.getFullImagePath(uploadImage);
+    String uploadedBackground = fileUploadFunc.uploadImage(backgroundImage);
+    uploadedBackground=fileUploadFunc.getFullImagePath(uploadedBackground);
+    employer.setImage(uploadImage);
+    employer.setBackgroundImage(uploadedBackground);
 
-        }
         employerRepository.save(employer);
         return employer;
     }
@@ -58,20 +58,24 @@ public class EmployerServiceImpl implements EmployerService {
 
     @Override
     public Employer updateImage(Employer employer, MultipartFile image) throws IOException {
-        if (image != null) {
-            employer.setImage(ImageFunc.compressImage(image.getBytes()));
-        }
+        FileUploadFunc fileUploadFunc = new FileUploadFunc();
+        String uploadImage = fileUploadFunc.uploadImage(image);
+        uploadImage=fileUploadFunc.getFullImagePath(uploadImage);
+        employer.setImage(uploadImage);
+
         employerRepository.save(employer);
         return employer;
     }
 
     @Override
     public Employer updateBackgroundImage(Employer employer, MultipartFile backgroundImage) throws IOException {
-        if (backgroundImage != null) {
-            employer.setImage(ImageFunc.compressImage(backgroundImage.getBytes()));
-        }
+        FileUploadFunc fileUploadFunc = new FileUploadFunc();
+        String uploadBackground = fileUploadFunc.uploadImage(backgroundImage);
+        uploadBackground=fileUploadFunc.getFullImagePath(uploadBackground);
+        employer.setBackgroundImage(uploadBackground);
+
         employerRepository.save(employer);
-        return employer;
+        return  employer;
     }
 
 
