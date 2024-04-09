@@ -1,5 +1,6 @@
 package com.pth.taskbackend.model.meta;
 
+import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.ESex;
 import com.pth.taskbackend.enums.EStatus;
@@ -32,8 +33,7 @@ public class Application extends BaseEntity {
     private String cV;
 
     @Enumerated(EnumType.STRING)
-    private EStatus status;
-
+    private EApplyStatus status;
 
     @Column(columnDefinition = "TEXT")
     private String letter;

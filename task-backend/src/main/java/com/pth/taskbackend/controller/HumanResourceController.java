@@ -4,11 +4,14 @@ import com.pth.taskbackend.dto.request.CreateHumanResourceRequest;
 import com.pth.taskbackend.dto.request.UpdateCandidateRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.enums.ERole;
+import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.*;
 import com.pth.taskbackend.repository.UserRepository;
+import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.AuthService;
 import com.pth.taskbackend.service.EmployerService;
 import com.pth.taskbackend.service.HumanResourceService;
+import com.pth.taskbackend.util.func.CheckPermission;
 import com.pth.taskbackend.util.func.ImageFunc;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -47,6 +50,10 @@ public class HumanResourceController {
     private UserRepository userRepository;
     @Autowired
     EmployerService employerService;
+    @Autowired
+    JwtService jwtService;
+    @Autowired
+    CheckPermission checkPermission;
 
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
@@ -71,24 +78,21 @@ public class HumanResourceController {
 
     @Operation(summary = "Create", description = "", tags = {})
     @PostMapping("/create")
-    public ResponseEntity<BaseResponse> createHumanResource(@RequestBody CreateHumanResourceRequest request
+    public ResponseEntity<BaseResponse> createHumanResource(@RequestHeader("Authorization")String token, @RequestBody CreateHumanResourceRequest request
                                                        ) throws IOException {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null && !authentication.isAuthenticated())
-            return ResponseEntity.ok(
-                    new BaseResponse("xác thực không hợp lệ", HttpStatus.FORBIDDEN.value(), null)
-            );
-
-        String email = authentication.getName();
-        Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
-        if (!optionalEmployer.isPresent())
-            return ResponseEntity.ok(
-                    new BaseResponse("Không tìm thấy nhà tuyển dụng tương ứng", HttpStatus.NOT_FOUND.value(), null)
-            );
-
         try {
+
+        String email = jwtService.extractUsername(token.substring(7));
+        boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+        if (!hasPermission) {
+            return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+        }
+
+        Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+        if (optionalEmployer.isEmpty()) {
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng ", HttpStatus.NOT_FOUND.value(), null));
+        }
+
 
             if (userRepository.findByEmail(request.username()).isPresent())
                 return ResponseEntity.ok(

@@ -60,5 +60,5 @@ public class Job  extends BaseEntity {
 
     @OneToOne
     @JoinColumn(name = "procedure_id")
-    private Procedure procedure;
+    private Process process;
 }

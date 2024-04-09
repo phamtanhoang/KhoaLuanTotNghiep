@@ -1,5 +1,6 @@
 package com.pth.taskbackend.service.impl;
 
+import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Application;
 import com.pth.taskbackend.repository.ApplicationRepository;
@@ -41,7 +42,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public Page<Application> findByCandidateId(String candidateId, Pageable pageable) {
-        return null;
+        return applicationRepository.findByCandidateId(candidateId,pageable);
     }
 
     @Override
@@ -60,8 +61,13 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public Page<Application> findByEmployerIdAndStatus(String employerId, EStatus status, Pageable pageable) {
-        return null;
+    public Page<Application> findByEmployerIdAndStatus(String employerId, EApplyStatus status, Pageable pageable) {
+        return applicationRepository.findByEmployerIdAndStatus(employerId,status,pageable);
+    }
+
+    @Override
+    public Page<Application> findByEmployerIdAndStatusAndNameContaining(String employerId, EApplyStatus status, String keyword, Pageable pageable) {
+        return applicationRepository.findByEmployerIdAndStatusAndNameContaining(employerId,status,keyword,pageable);
     }
 
     @Override

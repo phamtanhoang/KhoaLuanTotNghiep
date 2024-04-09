@@ -1,15 +1,12 @@
 package com.pth.taskbackend.model.meta;
 
 
-import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity
 @EqualsAndHashCode(callSuper = true)
@@ -28,6 +25,6 @@ public class Step extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "procedure_id")
-    private Procedure procedure;
+    private Process process;
 }
 
