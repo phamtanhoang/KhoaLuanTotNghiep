@@ -14,6 +14,7 @@ import PaginationCustom from "./PaginationCustom";
 import Schedule from "./Schedule";
 import SearchJobs from "./SearchJobs";
 import ShareCard from "./ShareCard";
+import StickySidebar from "./StickySidebar";
 
 export {
   ErrorPage,
@@ -31,4 +32,5 @@ export {
   GreatJobs,
   GreatEmployers,
   PaginationCustom,
+  StickySidebar
 };

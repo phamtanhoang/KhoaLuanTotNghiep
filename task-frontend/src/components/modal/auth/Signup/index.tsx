@@ -72,12 +72,12 @@ const Signup = (props: any) => {
         if (res.status === 200 && res.data.Status === 200) {
           setFuncs(MODAL_KEYS.signin);
           SwalHelper.MiniAlert(
-            "Đăng kí thành công, vui lòng đăng nhập lại!",
+            "Đăng kí thành công, vui lòng đăng nhập!",
             "success"
           );
         } else {
           SwalHelper.MiniAlert(
-            res.data.Message || "Đăng nhập không thành công",
+            res.data.Message || "Đăng kí không thành công!",
             "error"
           );
         }

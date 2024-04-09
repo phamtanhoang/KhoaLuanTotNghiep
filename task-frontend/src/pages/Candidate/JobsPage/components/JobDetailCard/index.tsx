@@ -36,9 +36,9 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
 }) => {
   return (
     <>
-      <div className="bg-orangetext h-[1vh]"></div>
-      <div className="bg-white border-2 border-t-0 border-[#D9D9D9] rounded-md rounded-t-none h-[89vh]">
-        <div className="w-full h-[31%] border-b-2 border-[#D9D9D9] p-5">
+      <div className="bg-orangetext h-1.5"></div>
+      <div className="bg-white border-2 border-t-0 border-[#D9D9D9] rounded-md rounded-t-none" style={{ height: "calc(100vh - 80px)" }}>
+        <div className="w-full h-[30%] border-b-2 border-[#D9D9D9] p-5">
           <div className=" flex w-full gap-3 justify-between">
             <div className="">
               <h1 className="text-[1.15rem] uppercase font-bold text-gray-700 ">
@@ -59,7 +59,7 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
           <div className="flex justify-between gap-5 mt-2">
             <div className="flex gap-3">
               <button
-                className="w-full lg:w-max py-3 px-4 lg:px-12 text-white rounded flex  justify-center items-center min-w-max   h-10 outline-none relative overflow-hidden duration-300 ease-linear
+                className="w-full lg:w-max py-3 px-4 lg:px-12 text-white rounded flex justify-center items-center min-w-max h-10 outline-none relative overflow-hidden duration-300 ease-linear
                             after:absolute after:inset-x-0 after:aspect-square after:scale-0 after:opacity-70 after:origin-center after:duration-300 after:ease-linear after:rounded-full after:top-0 after:left-0 after:bg-orange-500 hover:after:opacity-100 hover:after:scale-[2.5] bg-orangetext border-transparent hover:border-orange-500"
                 onClick={_onClickApplyJob}
               >
@@ -76,14 +76,15 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
             </div>
             <div className="relative w-max text-center overflow-hidden flex items-center">
               <p className=" font-lato font-normal flex gap-2 text-gray-700 hover:text-orangetext transition-all duration-300 cursor-pointer relative before:absolute before:w-full before:h-0.5 before:bg-orangetext before:-left-36 before:bottom-0 before:opacity-0 hover:before:left-0 hover:before:opacity-100 hover:before:transition-all hover:before:duration-500">
-                <span className="">Xem chi tiết</span>{" "}
-                <GrFormNextLink className="text-2xl" />
+                <span className="text-sm">Xem chi tiết</span>{" "}
+                <GrFormNextLink className="text-xl" />
               </p>
             </div>
           </div>
         </div>
-        <div className="scrollbar-custom w-full overflow-y-scroll h-[69%]">
-          <div className="h-30% mx-5 py-3 border-b-2  border-[#D9D9D9] border-dashed flex flex-col gap-2">
+
+        <div className="scrollbar-custom w-full overflow-y-scroll h-[70%]  text-sm">
+          <div className="h-30% mx-5 border-b-2  border-[#D9D9D9] border-dashed flex flex-col gap-2 my-3">
             <div className="flex w-full font-lato  gap-5 text-gray-800 font-bold">
               <p className="w-1/2">
                 <span className="font-medium text-gray-600">
@@ -121,7 +122,7 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
               </p>
             </div>
 
-            <div className="flex w-full font-lato  text-gray-800 font-bold gap-1.5 py-2">
+            <div className="flex w-full font-lato  text-gray-800 font-semibold gap-1.5 pb-2">
               {tags &&
                 tags.map((tag: any) => (
                   <div

@@ -1,4 +1,4 @@
-import { GreatJobs, JobCard, Pagination } from "@/components/ui";
+import { GreatJobs, JobCard, Pagination, StickySidebar } from "@/components/ui";
 import { JobDetailCard, SearchJob } from "./components";
 
 import "react-tooltip/dist/react-tooltip.css";
@@ -35,8 +35,9 @@ const JobsPage: React.FC = () => {
     <>
       <ModalBase open={open} handleClose={handleClose} funcs={funcs} />
       <SearchJob />
+      
       <section className="pb-10 pt-8 ">
-        <div className="w-full lg:w-[85%] px-5 lg:px-0 mx-auto flex gap-3 max-h-[90vh]">
+        <div className="w-full lg:w-[85%] px-5 lg:px-0 mx-auto flex gap-3">
           <div className="hidden lg:block lg:w-[55%] ">
             <JobDetailCard
               name="[HCM] WEB DESIGNER[HCM]"
@@ -91,7 +92,7 @@ const JobsPage: React.FC = () => {
               _onClickSaveJob={_onClickSaveJob}
             />
           </div>
-          <div className="w-full lg:w-[45%] overflow-y-auto  flex flex-col gap-3 scrollbar-custom">
+          <div className="w-full lg:w-[45%] flex flex-col gap-3">
             <JobCard
               image="https://source.unsplash.com/random/400x400"
               name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]

@@ -2,10 +2,11 @@ import axiosConfig from "@/configs/axiosConfig";
 import { AuthAPI } from "@/configs/helper";
 
 const authsService = {
-  async signin(email: string, password: string) {
+  async signin(email: string, password: string, role: string) {
     const userData = {
       username: email.trim(),
       password: password.trim(),
+      role: role.trim(),
     };
     return await axiosConfig.post(AuthAPI.signin, userData, {
       headers: { "Content-Type": "application/json" },
@@ -57,6 +58,15 @@ const authsService = {
 
   async signout() {
     return await axiosConfig.get(AuthAPI.logout, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
+  async changePassword(currentPassword: string, newPassword: string) {
+    const body = {
+      currentPassword: currentPassword.trim(),
+      newPassword: newPassword.trim()
+    };
+    return await axiosConfig.post(AuthAPI.changePassword, body, {
       headers: { "Content-Type": "application/json" },
     });
   },
