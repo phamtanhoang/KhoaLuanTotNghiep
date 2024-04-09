@@ -116,11 +116,11 @@ public class CategoryController {
 
     @Operation(summary = "Create", description = "", tags = {})
     @PostMapping("/create")
-    public ResponseEntity<BaseResponse> createCategory(@RequestHeader("Authourization") String token,@RequestParam("name") String name,
+    public ResponseEntity<BaseResponse> createCategory(@RequestHeader("Authorization") String token,@RequestParam("name") String name,
                                  @RequestParam("image") MultipartFile image) throws IOException {
         try {
 
-            String email = jwtService.extractUsername(token);
+            String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
             if (!permission)
                 return ResponseEntity.ok(
@@ -152,7 +152,7 @@ public class CategoryController {
                                                        @RequestParam(required = false) MultipartFile image) {
         try {
 
-            String email = jwtService.extractUsername(token);
+            String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
             if (!permission)
                 return ResponseEntity.ok(
@@ -196,7 +196,7 @@ public class CategoryController {
     public ResponseEntity<BaseResponse> deleteCategory(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
         try {
 
-            String email = jwtService.extractUsername(token);
+            String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
             if (!permission)
                 return ResponseEntity.ok(

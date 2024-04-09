@@ -2,8 +2,14 @@ package com.pth.taskbackend.controller;
 
 import com.pth.taskbackend.dto.request.TagRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
+import com.pth.taskbackend.enums.ERole;
+import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Tag;
+import com.pth.taskbackend.model.meta.User;
+import com.pth.taskbackend.repository.UserRepository;
+import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.TagService;
+import com.pth.taskbackend.util.func.CheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -29,7 +35,12 @@ import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 public class TagController {
     @Autowired
     private TagService tagService;
-
+    @Autowired
+    JwtService jwtService;
+    @Autowired
+    CheckPermission checkPermission;
+    @Autowired
+    UserRepository userRepository;
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getTagById(@PathVariable String id) {
@@ -89,8 +100,20 @@ public class TagController {
 
     @Operation(summary = "Create", description = "", tags = {})
     @PostMapping("create")
-    public ResponseEntity<BaseResponse> createTag(@RequestBody TagRequest tagRequest) {
+    public ResponseEntity<BaseResponse> createTag(@RequestHeader("Authorization")String token, @RequestBody TagRequest tagRequest) {
         try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN)||checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
             String name = tagRequest.name();
             String color = tagRequest.color();
 
@@ -116,8 +139,21 @@ public class TagController {
 
     @Operation(summary = "Update", description = "", tags = {})
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateTag(@PathVariable String id, @RequestBody Tag tag) {
+    public ResponseEntity<BaseResponse> updateTag(@RequestHeader("Authorization")String token, @PathVariable String id, @RequestBody Tag tag) {
         try {
+
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy quản trị viên", HttpStatus.NOT_FOUND.value(), null)
+                );
+
             Optional<Tag> existingTag = tagService.findById(id);
             if (existingTag.isPresent()) {
                 Tag updatedTag = tagService.updateTag(existingTag.get(), tag.getName(), tag.getColor());
@@ -141,8 +177,20 @@ public class TagController {
 
     @Operation(summary = "Delete", description = "", tags = {})
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteTag(@PathVariable String id) {
+    public ResponseEntity<BaseResponse> deleteTag(@RequestHeader("Authorization")String token, @PathVariable String id) {
         try {
+
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy quản trị viên", HttpStatus.NOT_FOUND.value(), null)
+                );
             Optional<Tag> existingTag = tagService.findById(id);
             if (existingTag.isPresent()) {
                 tagService.deleteTag(existingTag.get());
