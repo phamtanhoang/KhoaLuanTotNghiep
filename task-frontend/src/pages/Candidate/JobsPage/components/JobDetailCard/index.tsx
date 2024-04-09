@@ -37,7 +37,10 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
   return (
     <>
       <div className="bg-orangetext h-1.5"></div>
-      <div className="bg-white border-2 border-t-0 border-[#D9D9D9] rounded-md rounded-t-none" style={{ height: "calc(100vh - 80px)" }}>
+      <div
+        className="bg-white border-2 border-t-0 border-[#D9D9D9] rounded-md rounded-t-none"
+        style={{ height: "calc(100vh - 80px)" }}
+      >
         <div className="w-full h-[30%] border-b-2 border-[#D9D9D9] p-5">
           <div className=" flex w-full gap-3 justify-between">
             <div className="">
@@ -83,8 +86,8 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
           </div>
         </div>
 
-        <div className="scrollbar-custom w-full overflow-y-scroll h-[70%]  text-sm">
-          <div className="h-30% mx-5 border-b-2  border-[#D9D9D9] border-dashed flex flex-col gap-2 my-3">
+        <div className="scrollbar-custom w-full overflow-y-scroll h-[66%]  text-sm my-[2%]">
+          <div className="h-30% mx-5 border-b-2  border-[#D9D9D9] border-dashed flex flex-col gap-2">
             <div className="flex w-full font-lato  gap-5 text-gray-800 font-bold">
               <p className="w-1/2">
                 <span className="font-medium text-gray-600">
@@ -153,12 +156,17 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
                 ))}
             </div>
           </div>
-          <div
-            className="h-70% mx-5 my-3"
-            dangerouslySetInnerHTML={{
-              __html: description || "",
-            }}
-          />
+          <div className="h-70% mx-5 pt-3 flex flex-col gap-3">
+            <label className="text-xl font-semibold ">
+              Mô tả công việc
+            </label>
+            <div
+              className=""
+              dangerouslySetInnerHTML={{
+                __html: description || "",
+              }}
+            />
+          </div>
         </div>
       </div>
     </>

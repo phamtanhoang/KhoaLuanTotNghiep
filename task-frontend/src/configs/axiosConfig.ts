@@ -123,7 +123,7 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const accessToken = AuthHelper.getAccessToken();
+      // const accessToken = AuthHelper.getAccessToken();
       const refreshToken = AuthHelper.getRefreshToken();
 
       // const tokenData = {

@@ -1,4 +1,4 @@
-import { GreatJobs, JobCard, Pagination, StickySidebar } from "@/components/ui";
+import { GreatJobs, JobCard, Pagination } from "@/components/ui";
 import { JobDetailCard, SearchJob } from "./components";
 
 import "react-tooltip/dist/react-tooltip.css";
@@ -35,10 +35,9 @@ const JobsPage: React.FC = () => {
     <>
       <ModalBase open={open} handleClose={handleClose} funcs={funcs} />
       <SearchJob />
-      
       <section className="pb-10 pt-8 ">
-        <div className="w-full lg:w-[85%] px-5 lg:px-0 mx-auto flex gap-3">
-          <div className="hidden lg:block lg:w-[55%] ">
+        <div className="w-full lg:w-[85%] px-5 lg:px-0 mx-auto">
+          <div className="hidden lg:w-[55%] lg:inline-block sticky top-[74px] mr-[12px]">
             <JobDetailCard
               name="[HCM] WEB DESIGNER[HCM]"
               employer="Công ty dược phẩm Phúc Long"
@@ -92,70 +91,360 @@ const JobsPage: React.FC = () => {
               _onClickSaveJob={_onClickSaveJob}
             />
           </div>
-          <div className="w-full lg:w-[45%] flex flex-col gap-3">
-            <JobCard
-              image="https://source.unsplash.com/random/400x400"
-              name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+          <div
+            className="w-full inline-block align-top"
+            style={{ width: "calc(45% - 12px)" }}
+          >
+            <div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
                     Web Designer[HCM] Web Designer."
-              dateline="Còn 30 ngày"
-              employer="Công ty dược phẩm Phúc
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
                     Long Công ty dược phẩm Phúc Long"
-              location="Thành phố Hồ Chí Minh"
-              salary="Từ 30 - 50 triệu"
-              isVip
-              isHighlighted
-            />
-            <JobCard
-              image="https://source.unsplash.com/random/400x400"
-              name="[DL] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+                isHighlighted
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
                     Web Designer[HCM] Web Designer."
-              dateline="Còn 30 ngày"
-              employer="Công ty dược phẩm Phúc
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
                     Long Công ty dược phẩm Phúc Long"
-              location="Thành phố Hồ Chí Minh"
-              salary="Từ 30 - 50 triệu"
-            />
-            <JobCard
-              image="https://source.unsplash.com/random/400x400"
-              name="[HN] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
                     Web Designer[HCM] Web Designer."
-              dateline="Còn 30 ngày"
-              employer="Công ty dược phẩm Phúc
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
                     Long Công ty dược phẩm Phúc Long"
-              location="Thành phố Hồ Chí Minh"
-              salary="Từ 30 - 50 triệu"
-              isVip
-            />
-            <JobCard
-              image="https://source.unsplash.com/random/400x400"
-              name="[VT] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
                     Web Designer[HCM] Web Designer."
-              dateline="Còn 30 ngày"
-              employer="Công ty dược phẩm Phúc
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
                     Long Công ty dược phẩm Phúc Long"
-              location="Thành phố Hồ Chí Minh"
-              salary="Từ 30 - 50 triệu"
-            />
-            <JobCard
-              image="https://source.unsplash.com/random/400x400"
-              name="[CT] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
                     Web Designer[HCM] Web Designer."
-              dateline="Còn 30 ngày"
-              employer="Công ty dược phẩm Phúc
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
                     Long Công ty dược phẩm Phúc Long"
-              location="Thành phố Hồ Chí Minh"
-              salary="Từ 30 - 50 triệu"
-            />
-            <JobCard
-              image="https://source.unsplash.com/random/400x400"
-              name="[NA] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
                     Web Designer[HCM] Web Designer."
-              dateline="Còn 30 ngày"
-              employer="Công ty dược phẩm Phúc
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
                     Long Công ty dược phẩm Phúc Long"
-              location="Thành phố Hồ Chí Minh"
-              salary="Từ 30 - 50 triệu"
-            />
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div><div className="mb-[12px]">
+              <JobCard
+                image="https://source.unsplash.com/random/400x400"
+                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
+                    Web Designer[HCM] Web Designer."
+                dateline="Còn 30 ngày"
+                employer="Công ty dược phẩm Phúc
+                    Long Công ty dược phẩm Phúc Long"
+                location="Thành phố Hồ Chí Minh"
+                salary="Từ 30 - 50 triệu"
+                isVip
+              />
+            </div>
           </div>
         </div>
         <div className="w-max mx-auto mt-8">
