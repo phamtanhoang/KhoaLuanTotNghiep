@@ -74,30 +74,57 @@ public class AuthController {
                     new BaseResponse("Email không tồn tại!", HttpStatus.NOT_FOUND.value(), null)
             );
         }
-        if (user.get().getStatus().equals(EStatus.DELETED)) {
-            return ResponseEntity.ok(
-                    new BaseResponse("Tài khoản bị khóa", HttpStatus.FORBIDDEN.value(), null)
-                );
-            }
-        if (user.get().getStatus().equals(EStatus.PENDING)) {
-            return ResponseEntity.ok(new BaseResponse("Tài khoản của bạn chưa được duyệt", HttpStatus.FORBIDDEN.value(), null)
-                );
-            }
         if (!passwordEncoder.matches(authenticationRequest.password(),user.get().getPassword())) {
             return ResponseEntity.ok(
-                    new BaseResponse("Mật khẩu không đúng", HttpStatus.FORBIDDEN.value(), null)
+                    new BaseResponse("Mật khẩu không chính xác!", HttpStatus.FORBIDDEN.value(), null)
+            );
+        }
+
+
+        if(authenticationRequest.role().equals(ERole.ADMIN) && !user.get().getRole().equals(ERole.ADMIN))
+            return ResponseEntity.ok(
+                    new BaseResponse("Vui lòng đăng nhập với tài khoản quản trị viên!", HttpStatus.FORBIDDEN.value(), null)
+            );
+        if(authenticationRequest.role().equals(ERole.CANDIDATE) && !user.get().getRole().equals(ERole.CANDIDATE))
+            return ResponseEntity.ok(
+                    new BaseResponse("Vui lòng đăng nhập với tài khoản ứng viên!", HttpStatus.FORBIDDEN.value(), null)
+            );
+        if(authenticationRequest.role().equals(ERole.EMPLOYER)){
+
+            if(user.get().getRole().equals(ERole.EMPLOYER)||user.get().getRole().equals(ERole.HR)) {
+
+            }
+            else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Vui lòng đăng nhập với tài khoản nhà tuyển dụng!", HttpStatus.FORBIDDEN.value(), null)
                 );
             }
+        }
 
-        if(!user.get().getRole().equals(authenticationRequest.role())) return ResponseEntity.ok(
-                new BaseResponse("Vui lòng đăng nhập với tài khoản " + user.get().getRole()+"!!!", HttpStatus.FORBIDDEN.value(), null)
-            );
+            if(!authenticationRequest.role().equals(ERole.ADMIN)) {
+                if (user.get().getStatus().equals(EStatus.DELETED)) {
+                    return ResponseEntity.ok(
+                            new BaseResponse("Tài khoản không tồn tại!", HttpStatus.FORBIDDEN.value(), null)
+                    );
+                }
+                if (user.get().getStatus().equals(EStatus.INACTIVE)) {
+                    return ResponseEntity.ok(
+                            new BaseResponse("Tài khoản của bạn đã bị khóa!", HttpStatus.FORBIDDEN.value(), null)
+                    );
+                }
+                if (user.get().getStatus().equals(EStatus.PENDING)) {
+                    return ResponseEntity.ok(new BaseResponse("Tài khoản của bạn chưa được duyệt!", HttpStatus.FORBIDDEN.value(), null)
+                    );
+                }
+            }
+
+
         String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,user.get().getRole());
         String refreshToken = jwtService.generateRefreshToken(authenticationRequest.username(), EStatus.ACTIVE,user.get().getRole());
         Map<String,Object>response= new HashMap<>();
         Map<String, String>tokens= new HashMap<>();
-        tokens.put("token",token);
-        tokens.put("refresh-token",refreshToken);
+        tokens.put("accessToken",token);
+        tokens.put("refreshToken",refreshToken);
         response.put("tokens",tokens);
         switch (authenticationRequest.role()) {
             case CANDIDATE:
@@ -121,7 +148,7 @@ public class AuthController {
         }
         catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Đăng nhập không thành công", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+                    .body(new BaseResponse("Đăng nhập không thành công!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 
