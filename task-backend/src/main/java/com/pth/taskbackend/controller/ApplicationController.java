@@ -213,8 +213,10 @@ public class ApplicationController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-//
-//
+
+//    @PutMapping("/updateApplication/{id}")
+//    public ResponseEntity<BaseResponse>updateApplication(@RequestHeader("Authorization")String token,@PathVariable String id, )
+
     @GetMapping("/candidateApplications")
     public ResponseEntity<?> getCandidateApplications(
             Pageable pageable,

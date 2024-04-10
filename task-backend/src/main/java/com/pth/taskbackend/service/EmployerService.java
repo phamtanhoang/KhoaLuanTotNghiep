@@ -1,5 +1,6 @@
 package com.pth.taskbackend.service;
 
+import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.repository.EmployerRepository;
 import io.jsonwebtoken.io.IOException;
@@ -16,6 +17,8 @@ public interface EmployerService {
     Page<Employer>findByKeyword(String keyword, Pageable pageable) throws IOException;
     Optional<Employer>findByUserEmail(String email);
     Optional<Employer>findById(String id) throws IOException;
+    Page<Employer>findByKeywordAndStatus(String keyword, EStatus status, Pageable pageable) throws IOException;
+
     Employer create(Employer employer, MultipartFile image, MultipartFile backgroundImage) throws IOException, java.io.IOException;
     Employer update(Employer employer) throws IOException, java.io.IOException;
     Employer updateImage(Employer employer, MultipartFile image) throws java.io.IOException;

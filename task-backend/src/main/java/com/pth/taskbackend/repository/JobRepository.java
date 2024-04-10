@@ -34,5 +34,7 @@ public interface JobRepository extends JpaRepository<Job, String> {
             Pageable pageable);
 
     Page<Job>findByCategoryId(String id, Pageable pageable);
+
+    Page<Job>findByProcessId(String id, Pageable pageable);
 }
 

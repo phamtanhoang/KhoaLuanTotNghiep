@@ -11,6 +11,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @EqualsAndHashCode(callSuper = true)
@@ -28,7 +30,6 @@ public class Candidate extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime dateOfBirth;
 
-    @Column(nullable = false,length = 1000)
     private String avatar;
 
     @Enumerated(EnumType.STRING)
@@ -53,5 +54,12 @@ public class Candidate extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Experience> experiences = new HashSet<>();
+    @OneToMany(mappedBy = "skill", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Skill> skills = new HashSet<>();
+    @OneToMany(mappedBy = "education", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Education> educations = new HashSet<>();
 }
 

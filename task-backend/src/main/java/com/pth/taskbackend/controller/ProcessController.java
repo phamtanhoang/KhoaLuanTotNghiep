@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class ProcessController {
     private ProcessService processService;
 
     @Autowired
-    private JobRepository jobRepository;
+    private JobService jobService;
 
     @Autowired
     StepService stepService;
@@ -49,10 +50,9 @@ public class ProcessController {
     private final CheckPermission checkPermission;
 
 
-
     @Operation(summary = "Create", description = "", tags = {})
     @PostMapping("/create")
-    public ResponseEntity<BaseResponse> createProcedure(@RequestBody ProcessRequest processRequest, @RequestHeader("Authorization") String token) throws IOException {
+    public ResponseEntity<BaseResponse> createProcess(@RequestBody ProcessRequest processRequest, @RequestHeader("Authorization") String token) throws IOException {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
@@ -88,5 +88,47 @@ public class ProcessController {
         }
     }
 
+    @Operation(summary = "Update", description = "", tags = {})
+    @PatchMapping("/{id}")
+    public ResponseEntity<BaseResponse> updateProcess(@PathVariable("id") String id, @RequestBody ProcessRequest processRequest, @RequestHeader("Authorization") String token) throws IOException {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            }
+
+            Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+            if (optionalEmployer.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
+            }
+
+            Optional<Process> optionalProcess = processService.findById(id);
+            if (optionalProcess.isPresent()) {
+                if (!jobService.findByProcessId(optionalEmployer.get().getId(), Pageable.unpaged()).isEmpty())
+                    return ResponseEntity.ok(new BaseResponse("Đang có công việc sử dụng quy trình này", HttpStatus.BAD_REQUEST.value(), null));
+                else {
+                    Process process = optionalProcess.get();
+                    process.setName(processRequest.name());
+                    process.setDescription(processRequest.description());
+                    process.getSteps().clear();
+                    process.getSteps().addAll(processRequest.steps());
+                    processService.update(process);
+                    return ResponseEntity.ok(new BaseResponse("Cập nhật quy trình thành công", HttpStatus.OK.value(), process));
+
+                }
+            }
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy quy trình này", HttpStatus.NOT_FOUND.value(), null));
+
+
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.ok(new BaseResponse("Tên quy trình đã tồn tại", HttpStatus.BAD_REQUEST.value(), null));
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 
 }

@@ -18,6 +18,7 @@ public interface JobService {
 
     void delete(Job job);
     Optional<Job> findById(String jobId);
+    Page<Job>findByProcessId(String id, Pageable pageable);
 
     Page<Job> findAll(Pageable pageable);
 

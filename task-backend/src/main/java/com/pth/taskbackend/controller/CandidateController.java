@@ -2,11 +2,14 @@ package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.request.UpdateCandidateRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
+import com.pth.taskbackend.enums.ERole;
+import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.CandidateService;
+import com.pth.taskbackend.util.func.CheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,6 +45,8 @@ public class CandidateController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    CheckPermission checkPermission;
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getCandidateById(@PathVariable String id) {
@@ -63,8 +68,40 @@ public class CandidateController {
     }
 
     @Operation(summary = "Get list", description = "", tags = {})
+    @GetMapping("getList")
+    public ResponseEntity<BaseResponse> getCandidate(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword,@RequestParam(required = false)EStatus status, Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN)||checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Page<Candidate> candidates = candidateService.findByKeywordAndStatus(keyword,status,pageable);
+            if (candidates.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách ứng viên rỗng", HttpStatus.OK.value(), null)
+                );
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách ứng viên", HttpStatus.OK.value(), candidates)
+                );
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("")
-    public ResponseEntity<BaseResponse> getCandidates(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword, Pageable pageable) {
+    public ResponseEntity<BaseResponse> getCandidates(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword,@RequestParam(required = false)EStatus status, Pageable pageable) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             User user = userRepository.findByEmail(email).get();
@@ -75,7 +112,7 @@ public class CandidateController {
                 );
             }
 
-            Page<Candidate> candidates = candidateService.findByKeyword(keyword,pageable);
+            Page<Candidate> candidates = candidateService.findByKeywordAndStatus(keyword,status,pageable);
             if (candidates.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách ứng viên rỗng", HttpStatus.OK.value(), null)
@@ -132,7 +169,7 @@ public class CandidateController {
         }
     }
     @Operation(summary = "Get by id", description = "", tags = {})
-    @GetMapping("/update")
+    @PostMapping("/update")
     public ResponseEntity<BaseResponse> updateCandidateProfile(UpdateCandidateRequest request) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

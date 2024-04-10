@@ -1,5 +1,6 @@
 package com.pth.taskbackend.service.impl;
 
+import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.repository.EmployerRepository;
@@ -32,6 +33,12 @@ public class EmployerServiceImpl implements EmployerService {
     @Override
     public Optional<Employer> findById(String id) {
         return employerRepository.findById(id);
+    }
+
+    @Override
+    public Page<Employer> findByKeywordAndStatus(String keyword, EStatus status, Pageable pageable) throws io.jsonwebtoken.io.IOException {
+        return employerRepository.findByKeywordAndUserStatus(keyword,status,pageable);
+
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.pth.taskbackend.service.impl;
 
+import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.repository.CandidateRepository;
@@ -19,8 +20,8 @@ public class CandidateServiceImpl implements CandidateService {
     @Autowired
     CandidateRepository candidateRepository;
     @Override
-    public Page<Candidate> findByKeyword(String keyword, Pageable pageable) {
-        return candidateRepository.findByKeyword(keyword,pageable);
+    public Page<Candidate> findByKeywordAndStatus(String keyword, EStatus status, Pageable pageable) {
+        return candidateRepository.findByKeywordAndUserStatus(keyword,status,pageable);
     }
 
     @Override
@@ -32,10 +33,11 @@ public class CandidateServiceImpl implements CandidateService {
     public Candidate create(Candidate candidate, MultipartFile avatar) throws IOException {
 
         FileUploadFunc fileUploadFunc = new FileUploadFunc();
-        String uploadImage = fileUploadFunc.uploadImage(avatar);
-        uploadImage=fileUploadFunc.getFullImagePath(uploadImage);
-        candidate.setAvatar(uploadImage);
-
+        if(avatar!=null) {
+            String uploadImage = fileUploadFunc.uploadImage(avatar);
+            uploadImage = fileUploadFunc.getFullImagePath(uploadImage);
+            candidate.setAvatar(uploadImage);
+        }
             candidateRepository.save(candidate);
             return candidate;
     }
