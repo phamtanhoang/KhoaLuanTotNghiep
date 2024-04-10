@@ -48,6 +48,11 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public Page<Job> findByProcessId(String id, Pageable pageable) {
+        return jobRepository.findByProcessId(id,pageable);
+    }
+
+    @Override
     public Page<Job> findAll(Pageable pageable) {
         return null;
     }

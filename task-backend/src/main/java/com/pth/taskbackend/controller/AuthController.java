@@ -152,32 +152,32 @@ public class AuthController {
         }
     }
 
-//        @Operation(summary = "RefreshToken", description = "", tags = {})
-//        @PostMapping("refresh")
-//        public ResponseEntity<BaseResponse> refreshToken(@RequestHeader("Authorization") String refreshToken) {
-//
-//            try {
-//                refreshToken = refreshToken.substring(7);
-//                String email = jwtService.extractUsername(refreshToken);
-//                Optional<User> optionalUser = userRepository.findByEmail(email);
-//                if (optionalUser.isPresent()) {
-//                   String token= jwtService.refreshToken(refreshToken, optionalUser.get().getStatus(), optionalUser.get().getRole());
-//                    return ResponseEntity.ok(
-//                            new BaseResponse("Tạo mới token thành công", HttpStatus.OK.value(), token)
-//                    );
-//                }
-//
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Không tìm thấy người dùng với email đã cung cấp", HttpStatus.NOT_FOUND.value(), null)
-//                );
-//
-//
-//            } catch (BadCredentialsException e) {
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Mật khẩu không chính xác!", HttpStatus.UNAUTHORIZED.value(), null)
-//                );
-//            }
-//        }
+        @Operation(summary = "RefreshToken", description = "", tags = {})
+        @PostMapping("refresh")
+        public ResponseEntity<BaseResponse> refreshToken(@RequestHeader("Authorization") String refreshToken) {
+
+            try {
+                refreshToken = refreshToken.substring(7);
+                String email = jwtService.extractUsername(refreshToken);
+                Optional<User> optionalUser = userRepository.findByEmail(email);
+                if (optionalUser.isPresent()) {
+                   String token= jwtService.refreshToken(refreshToken, optionalUser.get().getStatus(), optionalUser.get().getRole());
+                    return ResponseEntity.ok(
+                            new BaseResponse("Tạo mới token thành công", HttpStatus.OK.value(), token)
+                    );
+                }
+
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng với email đã cung cấp", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+
+            } catch (BadCredentialsException e) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Mật khẩu không chính xác!", HttpStatus.UNAUTHORIZED.value(), null)
+                );
+            }
+        }
 
     @Operation(summary = "Register/Signup", description = "", tags = {})
     @PostMapping("/registerEmployer")
@@ -227,9 +227,9 @@ public class AuthController {
                     request.username(),
                     request.password(),
                     ERole.CANDIDATE);
-
+            System.out.println(request);
             Candidate candidate = new Candidate();
-            candidate.setFirstName(request.firstname());
+            candidate.setFirstName(request.firstName());
             candidate.setLastName(request.lastName());
             candidate.setSex(request.sex());
             candidate.setDateOfBirth(request.dateOfBirth());

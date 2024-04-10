@@ -1,5 +1,6 @@
 package com.pth.taskbackend.repository;
 
+import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.model.meta.HumanResource;
@@ -14,6 +15,12 @@ public interface EmployerRepository extends JpaRepository<Employer, String> {
     @Query("SELECT e FROM Employer e JOIN e.user u WHERE (:keyword IS NULL OR e.name LIKE %:keyword%) OR (:keyword IS NULL OR u.email LIKE %:keyword%)")
     Page<Employer> findByKeyword(String keyword, Pageable pageable);
     Optional<Employer> findByUserEmail(String email);
+
+    @Query("SELECT e FROM Employer e JOIN e.user u " +
+            "WHERE (:keyword IS NULL OR e.name LIKE %:keyword%) " +
+            "OR (:keyword IS NULL OR u.email LIKE %:keyword%) " +
+            "AND (:status IS NULL OR u.status = :status)")
+    Page<Employer> findByKeywordAndUserStatus(String keyword, EStatus status, Pageable pageable);
 
     @Query("SELECT e, COUNT(j.id) as count " +
             "FROM Employer e " +

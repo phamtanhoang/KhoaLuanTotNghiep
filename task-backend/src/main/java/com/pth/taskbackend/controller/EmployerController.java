@@ -6,13 +6,16 @@ import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
 import com.pth.taskbackend.dto.response.GetEmployerProfileResponse;
 import com.pth.taskbackend.enums.ERole;
+import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
+import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.AuthService;
 import com.pth.taskbackend.service.EmployerService;
+import com.pth.taskbackend.util.func.CheckPermission;
 import com.pth.taskbackend.util.func.ImageFunc;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -49,6 +52,10 @@ public class EmployerController {
     private AuthService authService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    JwtService jwtService;
+    @Autowired
+    CheckPermission checkPermission;
 
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
@@ -71,18 +78,30 @@ public class EmployerController {
     }
 
     @Operation(summary = "Get list", description = "", tags = {})
-    @GetMapping("")
-    public ResponseEntity<BaseResponse> getEmployers(@RequestParam(required = false) String keyword, Pageable pageable) {
+    @GetMapping("getList")
+    public ResponseEntity<BaseResponse> getEmployer(@RequestHeader("Authorization") String token, @RequestParam(required = false)String keyword, @RequestParam(required = false) EStatus status, Pageable pageable) {
         try {
-            System.out.println(keyword + "test");
-            Page<Employer> employers = employerService.findByKeyword(keyword, pageable);
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN)||checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Page<Employer> employers = employerService.findByKeywordAndStatus(keyword,status,pageable);
             if (employers.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách nhà tuyển dụng rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách nhà tuyển dụng", HttpStatus.OK.value(), employers)
+                        new BaseResponse("Danh sách ứng viên", HttpStatus.OK.value(), employers)
                 );
             }
         } catch (Exception e) {

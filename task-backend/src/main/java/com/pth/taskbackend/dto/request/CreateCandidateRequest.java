@@ -8,7 +8,7 @@ public record CreateCandidateRequest
         (String username,
          String password,
          LocalDateTime dateOfBirth,
-         String firstname,
+         String firstName,
          String lastName,
          ESex sex,
          String phoneNumber
