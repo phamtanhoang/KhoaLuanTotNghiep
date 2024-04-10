@@ -34,7 +34,7 @@ const SidebarLink = ({
   return (
     <NavLink
       to={link}
-      className={`group relative flex items-center gap-2.5 rounded-sm py-[0.6rem] px-4 font-medium  duration-300 ease-in-out  ${
+      className={`group relative flex items-center gap-2.5 rounded-sm py-2.5 px-4 font-medium  duration-300 ease-in-out  ${
         pathname === link
           ? "bg-orangetext text-white"
           : "hover:bg-gray-500/10 text-gray-600"
@@ -96,11 +96,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <aside
       ref={sidebar}
-      className={`absolute left-0 top-0 z-[99] flex w-72 h-[100vh] lg:h-[calc(100vh-32px)] flex-col overflow-y-hidden bg-white duration-300 ease-linear lg:static lg:translate-x-0 lg:m-4 lg:rounded-xl  border-r lg:border border-borderColor ${
+      className={`absolute left-0 top-0 z-[99] flex w-72 h-[100vh] lg:h-[calc(100vh-16px)] flex-col overflow-y-hidden bg-white duration-300 ease-linear lg:static lg:translate-x-0 lg:m-2 lg:rounded-xl  border-r lg:border border-borderColor ${
         sidebarOpen ? "translate-x-0" : "-translate-x-80"
       }`}
     >
-      <div className="flex items-center justify-between px-10 py-4">
+      <div className="flex items-center justify-between px-12 py-3">
         <NavLink
           to={EMPLOYER_PATHS.dashboard}
           onClick={() => setSidebarOpen(false)}
@@ -117,14 +117,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       </div>
       <hr className="border-t border-borderColor" />
 
-      <div className="flex flex-col overflow-y-auto duration-300 ease-linear scrollbar-custom">
-        <nav className="p-4">
+      <div className="flex flex-col overflow-y-auto duration-300 ease-linear scrollbar-custom my-4 mx-1">
+        <nav className="px-2">
           <div>
             <h3 className="mb-2 ml-4 text-sm font-bold text-lightGray">
               CHỨC NĂNG
             </h3>
 
-            <ul className="mb-6 flex flex-col gap-1.5">
+            <ul className="mb-4 flex flex-col gap-1.5">
               <li>
                 <SidebarLink
                   link={EMPLOYER_PATHS.dashboard}
@@ -209,9 +209,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           </div>
         </nav>
       </div>
-      <p className="p-2 text-center text-xs my-auto">
+      <p className="px-2 py-3 text-center text-xs my-auto border-t border-borderColor">
         Copyright &copy; {new Date().getFullYear()}, by{" "}
-        <a href="https://github.com/phamtanhoang" className="font-medium">
+        <a
+          href="https://github.com/phamtanhoang"
+          className="font-medium hover:text-orangetext"
+        >
           Hoang Pham
         </a>
       </p>

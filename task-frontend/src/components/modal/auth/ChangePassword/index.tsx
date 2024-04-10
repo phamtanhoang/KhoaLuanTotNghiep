@@ -93,7 +93,7 @@ const ChangePassword = (props: any) => {
           </label>
           <input
             className={`w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none ${
-              isAdminPath ? "focus:bg-bgBlue" : "focus:bg-orangetext"
+              isAdminPath ? "focus:border-bgBlue" : "focus:border-orangetext"
             }`}
             type="password"
             placeholder="**********"
@@ -107,7 +107,7 @@ const ChangePassword = (props: any) => {
           </label>
           <input
             className={`w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none ${
-              isAdminPath ? "focus:bg-bgBlue" : "focus:bg-orangetext"
+              isAdminPath ? "focus:border-bgBlue" : "focus:border-orangetext"
             }`}
             type="password"
             placeholder="**********"
@@ -121,7 +121,7 @@ const ChangePassword = (props: any) => {
           </label>
           <input
             className={`w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none ${
-              isAdminPath ? "focus:bg-bgBlue" : "focus:bg-orangetext"
+              isAdminPath ? "focus:border-bgBlue" : "focus:border-orangetext"
             }`}
             type="password"
             placeholder="**********"

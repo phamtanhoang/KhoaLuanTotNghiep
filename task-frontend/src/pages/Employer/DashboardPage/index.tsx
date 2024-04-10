@@ -89,7 +89,7 @@ const applyData = [
 const DashboardPage = () => {
   return (
     <div className="w-full flex flex-col gap-4">
-      <div className="grid gap-4  sm:grid-cols-2 xl:grid-cols-4 max-lg:px-4">
+      <div className="grid gap-2  sm:grid-cols-2 xl:grid-cols-4 max-lg:px-4">
         {statisticsCardsData.map((item, index) => (
           <StatisticsCard
             key={index}

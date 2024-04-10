@@ -1,15 +1,19 @@
-import {
-  Breadcumbs,
-} from "@/components/ui";
-import { useEffect, useRef, useState } from "react";
+import { Breadcumbs } from "@/components/ui";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AiOutlineMenu, AiOutlineMessage } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import NON_USER from "@/assets/images/non-user.jpg";
 import { IoNotificationsOutline } from "react-icons/io5";
-import { EMPLOYER_PATHS } from "@/utils/constants/pathConstants";
+import {
+  EMPLOYER_PATHS,
+} from "@/utils/constants/pathConstants";
 import { FaChevronDown } from "react-icons/fa6";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import Swal from "sweetalert2";
+import ModalBase from "@/components/modal";
+import { LoadingContext } from "@/App";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { authsService } from "@/services";
+import { AuthHelper } from "@/utils/helpers/authHelper";
 
 const DropdownMessage = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -44,7 +48,7 @@ const DropdownMessage = () => {
   });
 
   return (
-    <li className="relative" x-data="{ dropdownOpen: false, notifying: true }">
+    <li className="relative">
       <Link
         ref={trigger}
         onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -266,7 +270,14 @@ const DropdownNotification = () => {
   );
 };
 
-const DropdownUser = () => {
+interface DropdownUserProps {
+  _onClickChangePassword: () => void;
+  _onClickLogout: () => void;
+}
+const DropdownUser: React.FC<DropdownUserProps> = ({
+  _onClickChangePassword,
+  _onClickLogout,
+}) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const trigger = useRef<any>(null);
@@ -295,29 +306,6 @@ const DropdownUser = () => {
     document.addEventListener("keydown", keyHandler);
     return () => document.removeEventListener("keydown", keyHandler);
   });
-
-  const _onClickLogout = () => {
-    Swal.fire({
-      icon: "warning",
-      title: "Bạn có muốn đăng xuất?",
-      showCancelButton: true,
-      cancelButtonText: "Hủy bỏ",
-      confirmButtonText: "Đồng ý",
-
-      customClass: {
-        confirmButton: "confirm-button-class",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Swal.fire("Thành công!", "Your item has been deleted.", "success");
-      } else if (result.isDismissed) {
-      }
-    });
-  };
-  const _onClickChangePassword = () => {
-    // context.setFuncs(MODAL_KEYS.changePassword);
-    // context.handleOpen();
-  };
 
   return (
     <div className="relative">
@@ -398,36 +386,93 @@ const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
 }) => {
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [funcs, setFuncs] = useState<string>("");
+  const handleOpen = () => setOpenModal(true);
+  const handleClose = () => setOpenModal(false);
+
+  const navigate = useNavigate();
+  const context = useContext(LoadingContext);
+
+  const _onClickLogout = () => {
+    SwalHelper.Confirm(
+      "Bạn có muốn đăng xuất?",
+      "question",
+      () => {
+        context.handleOpenLoading();
+        authsService
+          .signout()
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              AuthHelper.removeTokens();
+              navigate(EMPLOYER_PATHS.signin);
+              SwalHelper.MiniAlert(
+                res.data.Message || "Đăng xuất thành công",
+                "success"
+              );
+            } else {
+              SwalHelper.MiniAlert(
+                res.data.Message || "Đăng xuất không thành công!",
+                "error"
+              );
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
+      },
+      () => {}
+    );
+  };
+
+  const _onClickChangePassword = () => {
+    setFuncs(MODAL_KEYS.changePassword);
+    handleOpen();
+  };
   return (
-    <header className="sticky top-0 lg:top-4 z-[98] flex bg-white lg:m-4 lg:ml-0 lg:rounded-xl max-lg:border-b  justify-between px-4 py-3 text-gray-800 lg:opacity-95">
-      <div className="flex items-center">
-        <button
-          aria-controls="sidebar"
-          onClick={(e) => {
-            e.stopPropagation();
-            props.setSidebarOpen(!props.sidebarOpen);
-          }}
-          className="z-[97] p-1.5 lg:hidden"
-        >
-          <AiOutlineMenu className="text-xl" />
-        </button>
-        <div className="max-lg:hidden">
-          <Breadcumbs color="#f2994a" />
+    <>
+      <ModalBase
+        open={openModal}
+        handleClose={handleClose}
+        funcs={funcs}
+        setFuncs={setFuncs}
+      />
+      <header className="sticky top-0 lg:top-2 z-[98] flex bg-white lg:m-2 lg:ml-0  lg:rounded-xl max-lg:border-b  justify-between px-4 py-3 text-gray-800 lg:opacity-95">
+        <div className="flex items-center">
+          <button
+            aria-controls="sidebar"
+            onClick={(e) => {
+              e.stopPropagation();
+              props.setSidebarOpen(!props.sidebarOpen);
+            }}
+            className="z-[97] p-1.5 lg:hidden"
+          >
+            <AiOutlineMenu className="text-xl" />
+          </button>
+          <div className="max-lg:hidden">
+            <Breadcumbs color="#f2994a" />
+          </div>
         </div>
-      </div>
 
-      <div className="flex items-center gap-3 lg:gap-6">
-        <ul className="flex items-center gap-2 lg:gap-3">
-          {/* <DarkModeSwitcher /> */}
+        <div className="flex items-center gap-3 lg:gap-6">
+          <ul className="flex items-center gap-2 lg:gap-3">
+            {/* <DarkModeSwitcher /> */}
 
-          <DropdownNotification />
+            <DropdownNotification />
 
-          <DropdownMessage />
-        </ul>
+            <DropdownMessage />
+          </ul>
 
-        <DropdownUser />
-      </div>
-    </header>
+          <DropdownUser
+            _onClickChangePassword={_onClickChangePassword}
+            _onClickLogout={_onClickLogout}
+          />
+        </div>
+      </header>
+    </>
   );
 };
 

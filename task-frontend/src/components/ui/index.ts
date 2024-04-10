@@ -11,6 +11,7 @@ import Loading from "./Loading";
 import LoadingSpiner from "./LoadingSpiner";
 import Pagination from "./Pagination";
 import PaginationCustom from "./PaginationCustom";
+import ProtectedRoute from "./ProtectedRoute";
 import Schedule from "./Schedule";
 import SearchJobs from "./SearchJobs";
 import ShareCard from "./ShareCard";
@@ -31,4 +32,5 @@ export {
   GreatJobs,
   GreatEmployers,
   PaginationCustom,
+  ProtectedRoute,
 };

@@ -7,16 +7,24 @@ import { MdInfoOutline } from "react-icons/md";
 
 import { SkillExpEduProps, Information, UserCard } from "./components";
 import { GreatJobs } from "@/components/ui";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import ModalBase from "@/components/modal";
+import { LoadingContext } from "@/App";
+import candidatesService from "@/services/candidatesService";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { DateHelper } from "@/utils/helpers/dateHelper";
 
 const ProfilePage = () => {
+  const context = useContext(LoadingContext);
+
   const [open, setOpen] = useState(false);
   const [funcs, setFuncs] = useState<string>("");
   const [type, setType] = useState<string>("");
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const [candidate, setCandidate] = useState<CandidateModel>();
 
   const _onClickChangeImage = () => {
     setFuncs(MODAL_KEYS.changeAvatar);
@@ -32,6 +40,26 @@ const ProfilePage = () => {
     setFuncs(MODAL_KEYS.changeExpSkillInfoCandidate);
     handleOpen();
   };
+
+  useEffect(() => {
+    context.handleOpenLoading();
+    candidatesService
+      .profile()
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          setCandidate(res.data.Data);
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  }, []);
+  console.log("candidate, ", candidate);
 
   return (
     <>
@@ -50,12 +78,10 @@ const ProfilePage = () => {
         <div className="w-full lg:w-[80%] px-5 lg:px-0 mx-auto flex flex-col lg:flex-row gap-5  rounded-md">
           <div className="w-full md:w-3/12 flex flex-col gap-5 ">
             <UserCard
-              image=""
-              name="Phạm Tấn Hoàng"
-              job="Front-end Developer"
-              description="My name is Hoang, and I am currently a fourth-year student at Open University. I am an enthusiastic
-              learner, always striving to improve my skills and knowledge. I am very determined and I never give up
-              when I face challenges."
+              image={candidate?.avatar}
+              name={`${candidate?.firstName} ${candidate?.lastName}`}
+              job={candidate?.job}
+              description={candidate?.introduction}
               _onClickChangeImage={_onClickChangeImage}
             />
           </div>
@@ -69,13 +95,13 @@ const ProfilePage = () => {
               </div>
 
               <Information
-                firstName="Phạm Tấn"
-                lastName="Hoàng"
-                address="354/32 Âu Cơ, Tân Bình, Hồ Chí Minh"
-                dateOfBirth="03/02/2002"
-                email="phamtanhoang3202@gmail.com"
-                gender="Nam"
-                link="https://github.com/phamtanhoang"
+                firstName={candidate?.firstName}
+                lastName={candidate?.lastName}
+                address={candidate?.address}
+                dateOfBirth={DateHelper.formatDate(candidate?.dateOfBirth)}
+                email={candidate?.email}
+                gender={candidate?.sex}
+                link={candidate?.link}
               />
               <button
                 className="block w-full text-orangetext hover:text-orange-500 text-sm font-semibold rounded-lg hover:bg-gray-100 focus:outline-none focus:shadow-outline focus:bg-gray-100 hover:shadow-xs p-3 mt-4"

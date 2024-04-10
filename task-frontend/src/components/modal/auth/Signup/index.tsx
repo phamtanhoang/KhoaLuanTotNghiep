@@ -72,7 +72,7 @@ const Signup = (props: any) => {
         if (res.status === 200 && res.data.Status === 200) {
           setFuncs(MODAL_KEYS.signin);
           SwalHelper.MiniAlert(
-            "Đăng kí thành công, vui lòng đăng nhập!",
+            "Đăng kí thành công, vui lòng đăng nhập lại!",
             "success"
           );
         } else {
@@ -116,7 +116,7 @@ const Signup = (props: any) => {
               Họ <span className="text-red-500">*</span>
             </label>
             <input
-              className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+              className=" w-full text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
               type="text"
               placeholder="Nguyễn Văn"
               value={firstName}
@@ -128,7 +128,7 @@ const Signup = (props: any) => {
               Tên <span className="text-red-500">*</span>
             </label>
             <input
-              className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+              className=" w-full text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
               type="text"
               placeholder="A"
               value={lastName}
@@ -142,7 +142,7 @@ const Signup = (props: any) => {
               Ngày sinh <span className="text-red-500">*</span>
             </label>
             <input
-              className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+              className=" w-full text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
               type="date"
               value={dob ? dob.toISOString().split("T")[0] : ""}
               onChange={_onChangeDOB}
@@ -153,7 +153,7 @@ const Signup = (props: any) => {
               Giới tính <span className="text-red-500">*</span>
             </label>
             <select
-              className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+              className=" w-full text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
               onChange={_onChangeSex}
               value={sex}
             >
@@ -170,7 +170,7 @@ const Signup = (props: any) => {
             Email <span className="text-red-500">*</span>
           </label>
           <input
-            className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+            className=" w-full text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
             type=""
             placeholder="candidate@example.com"
             value={email}
@@ -183,7 +183,7 @@ const Signup = (props: any) => {
               Mật khẩu <span className="text-red-500">*</span>
             </label>
             <input
-              className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+              className="w-full content-center text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
               type="password"
               placeholder="**********"
               value={password}
@@ -195,7 +195,7 @@ const Signup = (props: any) => {
               Nhập lại mật khẩu <span className="text-red-500">*</span>
             </label>
             <input
-              className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+              className="w-full content-center text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
               type="password"
               placeholder="**********"
               value={confirmPassword}

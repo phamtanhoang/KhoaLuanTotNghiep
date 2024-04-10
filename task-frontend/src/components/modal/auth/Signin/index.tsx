@@ -58,10 +58,10 @@ const Signin = (props: any) => {
             res.data.Data.tokens.accessToken,
             res.data.Data.tokens.refreshToken
           );
-          SwalHelper.MiniAlert(res.data.Message, "success");
+          SwalHelper.MiniAlert(res.data.Message, "success", 1500);
           setTimeout(() => {
             window.location.reload();
-          }, 3000);
+          }, 1500);
         } else {
           SwalHelper.MiniAlert(
             res.data.Message || "Đăng nhập không thành công!",
@@ -102,7 +102,7 @@ const Signin = (props: any) => {
             Email <span className="text-red-500">*</span>
           </label>
           <input
-            className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+            className=" w-full text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
             type="text"
             placeholder="candidate@example.com"
             value={email}
@@ -114,7 +114,7 @@ const Signin = (props: any) => {
             Mật khẩu <span className="text-red-500">*</span>
           </label>
           <input
-            className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+            className="w-full content-center text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
             type="password"
             placeholder="**********"
             value={password}
@@ -127,7 +127,7 @@ const Signin = (props: any) => {
           </label>
           <div className="flex gap-5">
             <input
-              className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+              className="w-full content-center text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
               type="text"
               placeholder="Nhập mã captcha"
               value={captcha}

@@ -6,8 +6,9 @@ import { categoriesService } from "@/services";
 import ModalBase from "@/components/modal";
 import { MdOutlineAddCircleOutline } from "react-icons/md";
 import { CiSearch } from "react-icons/ci";
-import CategoryTableAdminWeb from "./components/CategoryTableAdminWeb";
+
 import { LoadingContext } from "@/App";
+import { CategoryTableAdminWeb } from "./components";
 
 const CategoryAdminPage = () => {
   const context = useContext(LoadingContext);

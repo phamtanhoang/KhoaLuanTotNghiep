@@ -856,6 +856,10 @@ body {
   margin: auto;
 }
 
+.m-1{
+  margin: 0.25rem;
+}
+
 .-mx-8{
   margin-left: -2rem;
   margin-right: -2rem;
@@ -894,6 +898,11 @@ body {
 .mx-auto{
   margin-left: auto;
   margin-right: auto;
+}
+
+.my-2{
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .my-3{
@@ -1353,10 +1362,6 @@ body {
 
 .max-h-96{
   max-height: 24rem;
-}
-
-.max-h-\[57vh\]{
-  max-height: 57vh;
 }
 
 .max-h-\[60vh\]{
@@ -2736,6 +2741,16 @@ body {
   padding-bottom: 12px;
 }
 
+.px-12{
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+.py-\[2rem\]{
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
 .pb-0{
   padding-bottom: 0px;
 }
@@ -3756,6 +3771,10 @@ body {
   color: rgb(242 153 74 / var(--tw-text-opacity));
 }
 
+.hover\:text-orangetext\/80:hover{
+  color: rgb(242 153 74 / 0.8);
+}
+
 .hover\:text-red-500:hover{
   --tw-text-opacity: 1;
   color: rgb(239 68 68 / var(--tw-text-opacity));
@@ -4258,6 +4277,14 @@ body {
     top: 1rem;
   }
 
+  .lg\:top-2{
+    top: 0.5rem;
+  }
+
+  .lg\:m-2{
+    margin: 0.5rem;
+  }
+
   .lg\:m-4{
     margin: 1rem;
   }
@@ -4279,6 +4306,10 @@ body {
   .lg\:mx-32{
     margin-left: 8rem;
     margin-right: 8rem;
+  }
+
+  .lg\:-mb-2{
+    margin-bottom: -0.5rem;
   }
 
   .lg\:-mt-px{
@@ -4391,6 +4422,14 @@ body {
 
   .lg\:h-\[calc\(100vh-32px\)\]{
     height: calc(100vh - 32px);
+  }
+
+  .lg\:h-\[calc\(100vh-px\)\]{
+    height: calc(100vh - px);
+  }
+
+  .lg\:h-\[calc\(100vh-16px\)\]{
+    height: calc(100vh - 16px);
   }
 
   .lg\:max-h-\[50vh\]{
@@ -4789,6 +4828,11 @@ body {
   .lg\:py-5{
     padding-top: 1.25rem;
     padding-bottom: 1.25rem;
+  }
+
+  .lg\:py-6{
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
   }
 
   .lg\:py-8{
