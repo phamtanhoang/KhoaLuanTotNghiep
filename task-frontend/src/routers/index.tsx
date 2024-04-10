@@ -42,9 +42,13 @@ import {
   EMPLOYER_PATHS,
   OTHER_PATHS,
 } from "@/utils/constants/pathConstants";
+import { useSelector } from "react-redux";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 const Routers = () => {
+  const { role } = useSelector((state: any) => state.authReducer);
+
+  console.log("role, ", role);
   return (
     <BrowserRouter>
       <Routes>
@@ -52,6 +56,15 @@ const Routers = () => {
           path={CANDIDATE_PATHS.default}
           element={<Navigate to={CANDIDATE_PATHS.home} replace />}
         />
+        <Route
+          path={EMPLOYER_PATHS.default}
+          element={<Navigate to={EMPLOYER_PATHS.signin} replace />}
+        />
+        <Route
+          path={ADMIN_PATHS.default}
+          element={<Navigate to={ADMIN_PATHS.signin} replace />}
+        />
+
         <Route path={CANDIDATE_PATHS.default} element={<CandidateLayout />}>
           <Route path={CANDIDATE_PATHS.home} element={<HomePage />} />
           <Route path={CANDIDATE_PATHS.jobs} element={<JobsPage />} />
@@ -72,10 +85,6 @@ const Routers = () => {
           <Route path={CANDIDATE_PATHS.myProfile} element={<ProfilePage />} />
         </Route>
 
-        <Route
-          path={EMPLOYER_PATHS.default}
-          element={<Navigate to={EMPLOYER_PATHS.signin} replace />}
-        />
         <Route path={EMPLOYER_PATHS.default} element={<AuthEmployerLayout />}>
           <Route
             path={EMPLOYER_PATHS.signin}
@@ -86,6 +95,7 @@ const Routers = () => {
             element={<SignupEmployerPage />}
           />
         </Route>
+
         <Route path={EMPLOYER_PATHS.default} element={<EmployerLayout />}>
           <Route path={EMPLOYER_PATHS.dashboard} element={<DashboardPage />} />
           <Route path={EMPLOYER_PATHS.jobs} element={<JobsEmployerPage />} />
@@ -117,10 +127,6 @@ const Routers = () => {
           />
         </Route>
 
-        <Route
-          path={ADMIN_PATHS.default}
-          element={<Navigate to={ADMIN_PATHS.signin} replace />}
-        />
         <Route path={ADMIN_PATHS.signin} element={<SigninAdminPage />} />
         <Route path={ADMIN_PATHS.default} element={<AdminLayout />}>
           <Route
@@ -130,14 +136,9 @@ const Routers = () => {
           <Route
             path={ADMIN_PATHS.categories}
             element={<CategoryAdminPage />}
-          /><Route
-            path={ADMIN_PATHS.tags}
-            element={<TagsAdminPage />}
           />
-          <Route
-            path={ADMIN_PATHS.services}
-            element={<ServiceAdminPage />}
-          />
+          <Route path={ADMIN_PATHS.tags} element={<TagsAdminPage />} />
+          <Route path={ADMIN_PATHS.services} element={<ServiceAdminPage />} />
         </Route>
 
         <Route path={OTHER_PATHS.all} element={<ErrorPage />} />

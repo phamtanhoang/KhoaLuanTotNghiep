@@ -1,20 +1,23 @@
 import { LoadingContext } from "@/App";
-import { LoadingSpiner } from "@/components/ui";
 import { authsService } from "@/services";
+import { ONCHANGE_ROLE } from "@/store/reducers/authReducer";
 import { DataConstants } from "@/utils/constants/dataConstants";
 import { ADMIN_PATHS } from "@/utils/constants/pathConstants";
 import { AuthHelper } from "@/utils/helpers/authHelper";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { ChangeEvent, useContext, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const SigninAdminPage = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const context = useContext(LoadingContext);
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const navigate = useNavigate();
+  
 
   const _onChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -40,14 +43,11 @@ const SigninAdminPage = () => {
       .signin(email.trim(), password.trim(), DataConstants.ROLE_DATA.ADMIN)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          console.log(
-            " res.data.Data.tokens.token, ",
-            res.data.Data.tokens.token
-          );
           AuthHelper.setTokens(
-            res.data.Data.tokens.token,
-            res.data.Data.tokens.token
+            res.data.Data.tokens.accessToken,
+            res.data.Data.tokens.refreshToken
           );
+          dispatch(ONCHANGE_ROLE(res.data.Data.admin.role));
           navigate(ADMIN_PATHS.dashboard);
           SwalHelper.MiniAlert(res.data.Message, "success");
         } else {
@@ -64,10 +64,7 @@ const SigninAdminPage = () => {
   return (
     <>
       <div className="min-h-screen flex items-center justify-center w-full bg-body">
-        <div
-          className="bg-white shadow-md rounded-lg px-5 py-10 lg:px-10 lg:py-10 max-w-md w-full lg:w-[40%]"
-          // onSubmit={handleSubmit}
-        >
+        <div className="bg-white shadow-md rounded-lg px-5 py-10 lg:px-10 lg:py-10 max-w-md w-full lg:w-[40%]">
           <h1 className="text-3xl font-bold text-center mb-2 uppercase">
             Đăng nhập
           </h1>

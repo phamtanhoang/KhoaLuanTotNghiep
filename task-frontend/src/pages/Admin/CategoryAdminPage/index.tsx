@@ -147,6 +147,8 @@ const CategoryAdminPage = () => {
           _onClickDelete={_onClickDelete}
           _onClickDetail={_onClickDetail}
           isLoading={isLoadingTable}
+          currentPage={currentPage}
+          itemPerpage={itemPerpage}
         />
         {/* </div>
         <div className="lg:hidden">

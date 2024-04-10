@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { Link, NavLink } from "react-router-dom";
 import LOGO from "@/assets/images/logo.png";
@@ -6,8 +6,15 @@ import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import NON_USER from "@/assets/images/non-user.jpg";
 import ModalBase from "@/components/modal";
+import candidatesService from "@/services/candidatesService";
+import { LoadingContext } from "@/App";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { useDispatch } from "react-redux";
+import { ONCHANGE_INFO } from "@/store/reducers/authReducer";
 
 const Header = () => {
+  const context = useContext(LoadingContext);
+  const dispatch = useDispatch();
   const [sticky, setSticky] = useState(false);
   const [openInfo, setOpenInfo] = useState(false);
 
@@ -20,6 +27,23 @@ const Header = () => {
   const [funcs, setFuncs] = useState<string>("");
   const handleOpen = () => setOpenModal(true);
   const handleClose = () => setOpenModal(false);
+
+  useEffect(() => {
+    context.handleOpenLoading();
+    candidatesService
+      .profile()
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          dispatch(ONCHANGE_INFO(res.data.Data.employer));
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  }, []);
 
   useEffect(() => {
     window.addEventListener("scroll", () => {

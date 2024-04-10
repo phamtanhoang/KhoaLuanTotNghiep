@@ -1,12 +1,14 @@
-const dataURItoFile = (dataURI: string, filename: string): File => {
-  const byteString = atob(dataURI.split(",")[1]);
-  const ab = new ArrayBuffer(byteString.length);
-  const ia = new Uint8Array(ab);
-  for (let i = 0; i < byteString.length; i++) {
-    ia[i] = byteString.charCodeAt(i);
+const dataURItoFile = (dataURI: string, name: string) => {
+  const byteCharacters = atob(dataURI.split(",")[1]);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
   }
-
-  return new File([ab], filename, { type: "image/jpeg" });
+  const byteArray = new Uint8Array(byteNumbers);
+  const convertedFile = new File([byteArray], `${name}.jpg`, {
+    type: "image/jpeg",
+  });
+  return convertedFile;
 };
 
 export const ImageHelper = {

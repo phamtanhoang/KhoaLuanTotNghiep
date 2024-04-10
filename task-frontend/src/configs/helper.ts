@@ -13,6 +13,14 @@ const UserAPI = {
   },
 };
 
+const CandidateAPI = {
+  profile: "/candidates/profile",
+};
+
+const EmployerAPI = {
+  profile: "/employers/profile",
+};
+
 const TagAPI = {
   tags: "/tags",
   createTag: "/tags/create",
@@ -37,4 +45,4 @@ const CategoryAPI = {
     return `/categories/${id}`;
   },
 };
-export { AuthAPI, TagAPI, CategoryAPI, UserAPI };
+export { AuthAPI, TagAPI, CategoryAPI, UserAPI, CandidateAPI, EmployerAPI };

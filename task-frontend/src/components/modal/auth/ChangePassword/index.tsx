@@ -88,7 +88,7 @@ const ChangePassword = (props: any) => {
       </div>
       <div className="mt-8">
         <div className="mt-4 content-center">
-          <label className="text-sm font-bold text-gray-700 tracking-wide">
+          <label className="text-sm font-semibold text-gray-700 tracking-wide">
             Mật khẩu hiện tại
           </label>
           <input
@@ -102,7 +102,7 @@ const ChangePassword = (props: any) => {
           />
         </div>
         <div className="mt-4 content-center">
-          <label className="text-sm font-bold text-gray-700 tracking-wide">
+          <label className="text-sm font-semibold text-gray-700 tracking-wide">
             Mật khẩu mới
           </label>
           <input
@@ -116,7 +116,7 @@ const ChangePassword = (props: any) => {
           />
         </div>
         <div className="mt-4 content-center">
-          <label className="text-sm font-bold text-gray-700 tracking-wide">
+          <label className="text-sm font-semibold text-gray-700 tracking-wide">
             Nhập lại mật khẩu mới
           </label>
           <input

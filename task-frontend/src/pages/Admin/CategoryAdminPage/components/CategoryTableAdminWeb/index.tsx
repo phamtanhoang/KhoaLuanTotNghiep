@@ -7,12 +7,16 @@ interface CategoryTableAdminProps {
   _onClickDetail: (item: CategoryModel) => void;
   _onClickDelete: (item: CategoryModel) => void;
   isLoading: boolean;
+  currentPage: number;
+  itemPerpage: number;
 }
 const CategoryTableAdminWeb: React.FC<CategoryTableAdminProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,
   isLoading,
+  currentPage,
+  itemPerpage,
 }) => {
   return (
     <>
@@ -70,7 +74,9 @@ const CategoryTableAdminWeb: React.FC<CategoryTableAdminProps> = ({
                 value?.map((item: CategoryModel, index: number) => (
                   <tr>
                     <td className="px-4 py-4 font-medium text-gray-700 ">
-                      <span>{index}</span>
+                      <span>
+                        {currentPage * itemPerpage - itemPerpage + index}
+                      </span>
                     </td>
 
                     <td className="px-4 py-4 font-medium text-gray-600 ">

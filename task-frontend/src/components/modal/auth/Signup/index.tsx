@@ -112,7 +112,7 @@ const Signup = (props: any) => {
       <div className="mt-8">
         <div className="content-center flex gap-5">
           <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
+            <label className="text-sm font-semibold text-gray-700 tracking-wide">
               Họ <span className="text-red-500">*</span>
             </label>
             <input
@@ -124,7 +124,7 @@ const Signup = (props: any) => {
             />
           </div>
           <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
+            <label className="text-sm font-semibold text-gray-700 tracking-wide">
               Tên <span className="text-red-500">*</span>
             </label>
             <input
@@ -138,7 +138,7 @@ const Signup = (props: any) => {
         </div>
         <div className="mt-4 content-center flex gap-5">
           <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
+            <label className="text-sm font-semibold text-gray-700 tracking-wide">
               Ngày sinh <span className="text-red-500">*</span>
             </label>
             <input
@@ -149,7 +149,7 @@ const Signup = (props: any) => {
             />
           </div>
           <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
+            <label className="text-sm font-semibold text-gray-700 tracking-wide">
               Giới tính <span className="text-red-500">*</span>
             </label>
             <select
@@ -166,7 +166,7 @@ const Signup = (props: any) => {
           </div>
         </div>
         <div className="mt-4 content-center">
-          <label className="text-sm font-bold text-gray-700 tracking-wide">
+          <label className="text-sm font-semibold text-gray-700 tracking-wide">
             Email <span className="text-red-500">*</span>
           </label>
           <input
@@ -179,7 +179,7 @@ const Signup = (props: any) => {
         </div>
         <div className="mt-4 content-center flex gap-5">
           <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
+            <label className="text-sm font-semibold text-gray-700 tracking-wide">
               Mật khẩu <span className="text-red-500">*</span>
             </label>
             <input
@@ -191,7 +191,7 @@ const Signup = (props: any) => {
             />
           </div>
           <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
+            <label className="text-sm font-semibold text-gray-700 tracking-wide">
               Nhập lại mật khẩu <span className="text-red-500">*</span>
             </label>
             <input

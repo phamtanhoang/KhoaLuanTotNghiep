@@ -2,6 +2,7 @@ import { LoadingContext } from "@/App";
 import { authsService } from "@/services";
 import { DataConstants } from "@/utils/constants/dataConstants";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
+import { AuthHelper } from "@/utils/helpers/authHelper";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import useCaptchaGenerator from "@/utils/hooks/useCaptchaGenerator";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
@@ -34,7 +35,6 @@ const Signin = (props: any) => {
   const _onClickSignup = () => {
     setFuncs(MODAL_KEYS.signup);
   };
-
   const _onClickSubmit = () => {
     if (!email) {
       SwalHelper.MiniAlert("Vui lòng nhập email!", "error");
@@ -54,9 +54,14 @@ const Signin = (props: any) => {
       .signin(email, password, DataConstants.ROLE_DATA.CANDIDATE)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          const tokenData = JSON.stringify(res.data.data);
-          localStorage.setItem("Token", tokenData);
+          AuthHelper.setTokens(
+            res.data.Data.tokens.accessToken,
+            res.data.Data.tokens.refreshToken
+          );
           SwalHelper.MiniAlert(res.data.Message, "success");
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
         } else {
           SwalHelper.MiniAlert(
             res.data.Message || "Đăng nhập không thành công!",
@@ -93,7 +98,7 @@ const Signin = (props: any) => {
       </div>
       <div className="mt-8">
         <div className="relative">
-          <label className="text-sm font-bold text-gray-700 tracking-wide">
+          <label className="text-sm font-semibold text-gray-700 tracking-wide">
             Email <span className="text-red-500">*</span>
           </label>
           <input
@@ -105,7 +110,7 @@ const Signin = (props: any) => {
           />
         </div>
         <div className="mt-4 content-center">
-          <label className="text-sm font-bold text-gray-700 tracking-wide">
+          <label className="text-sm font-semibold text-gray-700 tracking-wide">
             Mật khẩu <span className="text-red-500">*</span>
           </label>
           <input
@@ -117,7 +122,7 @@ const Signin = (props: any) => {
           />
         </div>
         <div className="mt-4 content-center">
-          <label className="text-sm font-bold text-gray-700 tracking-wide">
+          <label className="text-sm font-semibold text-gray-700 tracking-wide">
             Captcha <span className="text-red-500">*</span>
           </label>
           <div className="flex gap-5">

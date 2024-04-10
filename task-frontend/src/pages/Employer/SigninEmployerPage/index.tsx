@@ -1,15 +1,19 @@
 import { LoadingContext } from "@/App";
 import { authsService } from "@/services";
+import { ONCHANGE_ROLE } from "@/store/reducers/authReducer";
 import { DataConstants } from "@/utils/constants/dataConstants";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { EMPLOYER_PATHS } from "@/utils/constants/pathConstants";
+import { AuthHelper } from "@/utils/helpers/authHelper";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import useCaptchaGenerator from "@/utils/hooks/useCaptchaGenerator";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { IoReload } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 
 const SigninEmployerPage = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const context = useContext(LoadingContext);
 
   const { captchaText, canvasRef, reloadCaptcha } = useCaptchaGenerator();
@@ -50,8 +54,12 @@ const SigninEmployerPage = () => {
       .signin(email, password, DataConstants.ROLE_DATA.EMPLOYER)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          const tokenData = JSON.stringify(res.data.data);
-          localStorage.setItem("Token", tokenData);
+          AuthHelper.setTokens(
+            res.data.Data.tokens.accessToken,
+            res.data.Data.tokens.refreshToken
+          );
+          dispatch(ONCHANGE_ROLE(res.data.Data.employer.user.role));
+          navigate(EMPLOYER_PATHS.dashboard);
           SwalHelper.MiniAlert(res.data.Message, "success");
         } else {
           SwalHelper.MiniAlert(
@@ -84,7 +92,7 @@ const SigninEmployerPage = () => {
         <input
           className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
           type="text"
-          placeholder="candidate@example.com"
+          placeholder="employer@example.com"
           value={email}
           onChange={_onChangeEmail}
         />
