@@ -164,7 +164,7 @@ public class EmployerController {
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            Optional<User> optionalEmployer = userRepository.findByEmployerId(id);
+            Optional<User> optionalEmployer = userRepository.findById(id);
             if (optionalEmployer.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
