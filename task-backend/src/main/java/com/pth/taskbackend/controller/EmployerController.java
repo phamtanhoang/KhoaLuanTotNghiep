@@ -113,7 +113,7 @@ public class EmployerController {
 
     @Operation(summary = "update status", description = "", tags = {})
     @PatchMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody EStatus status) {
+    public ResponseEntity<BaseResponse> updateEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestPart EStatus status) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
@@ -133,7 +133,7 @@ public class EmployerController {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
                 );
-            if(status==EStatus.DELETED)
+            if(status.equals(EStatus.DELETED))
                 return ResponseEntity.ok(
                         new BaseResponse("Không được xóa", HttpStatus.NOT_FOUND.value(), null)
                 );
@@ -141,6 +141,10 @@ public class EmployerController {
             switch (status)
             {
                 case ACTIVE :
+                    if(employer.getStatus().equals(EStatus.ACTIVE))
+                        return ResponseEntity.ok(
+                                new BaseResponse("Đã duyệt nhà tuyển dụng này rồi", HttpStatus.OK.value(), null)
+                        );
                     employer.setStatus(EStatus.ACTIVE);
                     userRepository.save(employer);
 
@@ -148,6 +152,10 @@ public class EmployerController {
                                 new BaseResponse("Duyệt nhà tuyển dụng thành công", HttpStatus.OK.value(), null)
                         );
                 case INACTIVE:
+                    if(employer.getStatus().equals(EStatus.INACTIVE))
+                        return ResponseEntity.ok(
+                                new BaseResponse("Đã khóa nhà tuyển dụng này rồi", HttpStatus.OK.value(), null)
+                        );
                     employer.setStatus(EStatus.INACTIVE);
                     userRepository.save(employer);
 

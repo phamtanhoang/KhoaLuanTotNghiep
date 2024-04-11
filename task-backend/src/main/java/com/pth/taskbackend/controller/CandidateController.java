@@ -109,7 +109,7 @@ public class CandidateController {
 
     @Operation(summary = "update status", description = "", tags = {})
     @PatchMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateCandidate(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody EStatus status) {
+    public ResponseEntity<BaseResponse> updateCandidate(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestPart EStatus status) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
@@ -137,6 +137,10 @@ public class CandidateController {
             switch (status)
             {
                 case ACTIVE :
+                    if(candidate.getStatus().equals(EStatus.ACTIVE))
+                        return ResponseEntity.ok(
+                                new BaseResponse("Đã duyệt ứng viên này rồi", HttpStatus.OK.value(), null)
+                        );
                     candidate.setStatus(EStatus.ACTIVE);
                     userRepository.save(candidate);
 
@@ -144,6 +148,10 @@ public class CandidateController {
                             new BaseResponse("Duyệt ứng viên dụng thành công", HttpStatus.OK.value(), null)
                     );
                 case INACTIVE:
+                    if(candidate.getStatus().equals(EStatus.INACTIVE))
+                        return ResponseEntity.ok(
+                                new BaseResponse("Đã khóa ứng viên này rồi", HttpStatus.OK.value(), null)
+                        );
                     candidate.setStatus(EStatus.INACTIVE);
                     userRepository.save(candidate);
 
