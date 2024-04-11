@@ -212,7 +212,7 @@ public class EmployerController {
 
             if (optionalEmployer.get().getUser().getStatus().equals(EStatus.DELETED))
                 return ResponseEntity.ok(
-                        new BaseResponse("Không thể truy cập  nhà tuyển dụng đã xóa", HttpStatus.OK.value(), null)
+                        new BaseResponse("Không thể truy cập  nhà tuyển dụng đã xóa", HttpStatus.NOT_FOUND.value(), null)
                 );
             Employer employer = optionalEmployer.get();
             EmployerResponse employerResponse =  new EmployerResponse(

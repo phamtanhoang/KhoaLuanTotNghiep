@@ -207,7 +207,7 @@ public class CandidateController {
                 );
             if (optionalCandidate.get().getUser().getStatus().equals(EStatus.DELETED))
                 return ResponseEntity.ok(
-                        new BaseResponse("Không thể truy cập thông tin ứng viên đã xóa", HttpStatus.OK.value(), null)
+                        new BaseResponse("Không thể truy cập thông tin ứng viên đã xóa", HttpStatus.NO_CONTENT.value(), null)
                 );
             Candidate candidate = optionalCandidate.get();
 
