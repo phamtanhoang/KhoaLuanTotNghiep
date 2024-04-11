@@ -11,15 +11,17 @@ import {
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import scheduleReducer from "./reducers/scheduleReducer";
+import authReducer from "./reducers/authReducer";
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: [],
+  whitelist: ["authReducer"],
 };
 
 const rootReducer = combineReducers({
   scheduleReducer: scheduleReducer,
+  authReducer: authReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

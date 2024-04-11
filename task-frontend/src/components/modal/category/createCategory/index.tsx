@@ -1,7 +1,7 @@
 import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
-import { ChangeEvent, useContext, useState } from "react";
+import { ChangeEvent, useContext, useId, useState } from "react";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { categoriesService } from "@/services";
 import { MdOutlineFileUpload } from "react-icons/md";
@@ -21,17 +21,25 @@ const CreateCategory = (props: any) => {
   const handleCloseSub = () => setOpenSub(false);
 
   const [name, setName] = useState<string>("");
-  const [image, setImage] = useState<string | undefined>();
-  const [croppedImg, setCroppedImg] = useState<string | undefined>();
+  const [image, setImage] = useState<string | null>(null);
+  const [croppedImg, setCroppedImg] = useState<string | null>(null);
 
   const _onChangeName = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setName(value);
   };
   const _onChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const selectedFile = e.target.files[0];
-    setImage(URL.createObjectURL(selectedFile));
+    const file = e.target.files?.[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setCroppedImg(null);
+    }
 
     handleOpenSub();
     setFuncsSub(MODAL_KEYS.chooseImage);
@@ -47,10 +55,11 @@ const CreateCategory = (props: any) => {
       SwalHelper.MiniAlert("Vui lòng chọn hình ảnh!", "warning");
       return;
     }
+    let img: File = ImageHelper.dataURItoFile(croppedImg, name);
 
     context.handleOpenLoading();
     categoriesService
-      .create(name.trim(), ImageHelper.dataURItoFile(croppedImg, ""))
+      .create(name.trim(), img)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           SwalHelper.MiniAlert(res.data.Message, "success");

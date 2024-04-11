@@ -788,34 +788,6 @@ body {
   top: 0.175rem;
 }
 
-.top-64{
-  top: 16rem;
-}
-
-.top-\[64px\]{
-  top: 64px;
-}
-
-.top-\[6px\]{
-  top: 6px;
-}
-
-.top-\[px\]{
-  top: px;
-}
-
-.top-\[70px\]{
-  top: 70px;
-}
-
-.top-\[72px\]{
-  top: 72px;
-}
-
-.top-\[75px\]{
-  top: 75px;
-}
-
 .top-\[74px\]{
   top: 74px;
 }
@@ -884,6 +856,10 @@ body {
   margin: auto;
 }
 
+.m-1{
+  margin: 0.25rem;
+}
+
 .-mx-8{
   margin-left: -2rem;
   margin-right: -2rem;
@@ -924,6 +900,11 @@ body {
   margin-right: auto;
 }
 
+.my-2{
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 .my-3{
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
@@ -944,39 +925,14 @@ body {
   margin-bottom: 2rem;
 }
 
-.my-auto{
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
-.my-\[\]{
-  margin-top: ;
-  margin-bottom: ;
-}
-
-.my-\[50\]{
-  margin-top: 50;
-  margin-bottom: 50;
-}
-
-.my-\[50px\]{
-  margin-top: 50px;
-  margin-bottom: 50px;
-}
-
-.mx-0{
-  margin-left: 0px;
-  margin-right: 0px;
-}
-
-.my-\[1\%\]{
-  margin-top: 1%;
-  margin-bottom: 1%;
-}
-
 .my-\[2\%\]{
   margin-top: 2%;
   margin-bottom: 2%;
+}
+
+.my-auto{
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .-mb-8{
@@ -1051,6 +1007,10 @@ body {
   margin-bottom: 2.25rem;
 }
 
+.mb-\[12px\]{
+  margin-bottom: 12px;
+}
+
 .mb-auto{
   margin-bottom: auto;
 }
@@ -1113,6 +1073,10 @@ body {
 
 .mr-6{
   margin-right: 1.5rem;
+}
+
+.mr-\[12px\]{
+  margin-right: 12px;
 }
 
 .mt-0{
@@ -1185,22 +1149,6 @@ body {
 
 .mt-px{
   margin-top: 1px;
-}
-
-.mr-\[3\%\]{
-  margin-right: 3%;
-}
-
-.mr-\[1\%\]{
-  margin-right: 1%;
-}
-
-.mr-\[12px\]{
-  margin-right: 12px;
-}
-
-.mb-\[12px\]{
-  margin-bottom: 12px;
 }
 
 .line-clamp-1{
@@ -1379,12 +1327,12 @@ body {
   height: 60vh;
 }
 
-.h-\[6rem\]{
-  height: 6rem;
+.h-\[66\%\]{
+  height: 66%;
 }
 
-.h-\[70\%\]{
-  height: 70%;
+.h-\[6rem\]{
+  height: 6rem;
 }
 
 .h-\[80px\]{
@@ -1412,36 +1360,8 @@ body {
   height: 100vh;
 }
 
-.h-\[250px\]{
-  height: 250px;
-}
-
-.h-\[2400px\]{
-  height: 2400px;
-}
-
-.h-\[6\%\]{
-  height: 6%;
-}
-
-.h-\[68\%\]{
-  height: 68%;
-}
-
-.h-\[64\%\]{
-  height: 64%;
-}
-
-.h-\[66\%\]{
-  height: 66%;
-}
-
 .max-h-96{
   max-height: 24rem;
-}
-
-.max-h-\[57vh\]{
-  max-height: 57vh;
 }
 
 .max-h-\[60vh\]{
@@ -1663,18 +1583,6 @@ body {
 
 .w-screen{
   width: 100vw;
-}
-
-.w-\[1100px\]{
-  width: 1100px;
-}
-
-.w-\[750\]{
-  width: 750;
-}
-
-.w-\[750px\]{
-  width: 750px;
 }
 
 .min-w-full{
@@ -2498,16 +2406,6 @@ body {
   background-color: rgb(250 204 21 / var(--tw-bg-opacity));
 }
 
-.bg-\[\#bbb\]{
-  --tw-bg-opacity: 1;
-  background-color: rgb(187 187 187 / var(--tw-bg-opacity));
-}
-
-.bg-\[\#ddd\]{
-  --tw-bg-opacity: 1;
-  background-color: rgb(221 221 221 / var(--tw-bg-opacity));
-}
-
 .bg-opacity-35{
   --tw-bg-opacity: 0.35;
 }
@@ -2843,9 +2741,14 @@ body {
   padding-bottom: 12px;
 }
 
-.py-\[20px\]{
-  padding-top: 20px;
-  padding-bottom: 20px;
+.px-12{
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+.py-\[2rem\]{
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
 .pb-0{
@@ -3868,6 +3771,10 @@ body {
   color: rgb(242 153 74 / var(--tw-text-opacity));
 }
 
+.hover\:text-orangetext\/80:hover{
+  color: rgb(242 153 74 / 0.8);
+}
+
 .hover\:text-red-500:hover{
   --tw-text-opacity: 1;
   color: rgb(239 68 68 / var(--tw-text-opacity));
@@ -4370,6 +4277,14 @@ body {
     top: 1rem;
   }
 
+  .lg\:top-2{
+    top: 0.5rem;
+  }
+
+  .lg\:m-2{
+    margin: 0.5rem;
+  }
+
   .lg\:m-4{
     margin: 1rem;
   }
@@ -4391,6 +4306,10 @@ body {
   .lg\:mx-32{
     margin-left: 8rem;
     margin-right: 8rem;
+  }
+
+  .lg\:-mb-2{
+    margin-bottom: -0.5rem;
   }
 
   .lg\:-mt-px{
@@ -4503,6 +4422,14 @@ body {
 
   .lg\:h-\[calc\(100vh-32px\)\]{
     height: calc(100vh - 32px);
+  }
+
+  .lg\:h-\[calc\(100vh-px\)\]{
+    height: calc(100vh - px);
+  }
+
+  .lg\:h-\[calc\(100vh-16px\)\]{
+    height: calc(100vh - 16px);
   }
 
   .lg\:max-h-\[50vh\]{
@@ -4632,18 +4559,6 @@ body {
   .lg\:w-max{
     width: -moz-max-content;
     width: max-content;
-  }
-
-  .lg\:w-\[4\%\]{
-    width: 4%;
-  }
-
-  .lg\:w-\[42\%\]{
-    width: 42%;
-  }
-
-  .lg\:w-\[44\%\]{
-    width: 44%;
   }
 
   .lg\:max-w-2xl{
@@ -4913,6 +4828,11 @@ body {
   .lg\:py-5{
     padding-top: 1.25rem;
     padding-bottom: 1.25rem;
+  }
+
+  .lg\:py-6{
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
   }
 
   .lg\:py-8{

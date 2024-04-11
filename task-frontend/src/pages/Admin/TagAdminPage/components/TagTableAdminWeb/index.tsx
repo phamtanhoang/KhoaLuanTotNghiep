@@ -7,13 +7,18 @@ interface TagTableAdminProps {
   _onClickDetail: (item: TagModel) => void;
   _onClickDelete: (item: TagModel) => void;
   isLoading: boolean;
+  currentPage: number;
+  itemPerpage: number;
 }
 const TagTableAdminWeb: React.FC<TagTableAdminProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,
   isLoading,
+  currentPage,
+  itemPerpage,
 }) => {
+  console.log("currentPage ", currentPage);
   return (
     <>
       <table className="min-w-full divide-y divide-borderColor cursor-default">
@@ -77,7 +82,7 @@ const TagTableAdminWeb: React.FC<TagTableAdminProps> = ({
                   <tr>
                     <td className="table-cell">
                       <div className="px-4 py-4 font-medium text-gray-700 w-full">
-                        <span>{index}</span>
+                        <span>{currentPage * itemPerpage - itemPerpage + index}</span>
                       </div>
                     </td>
 

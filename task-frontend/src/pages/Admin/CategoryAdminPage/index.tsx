@@ -6,8 +6,9 @@ import { categoriesService } from "@/services";
 import ModalBase from "@/components/modal";
 import { MdOutlineAddCircleOutline } from "react-icons/md";
 import { CiSearch } from "react-icons/ci";
-import CategoryTableAdminWeb from "./components/CategoryTableAdminWeb";
+
 import { LoadingContext } from "@/App";
+import { CategoryTableAdminWeb } from "./components";
 
 const CategoryAdminPage = () => {
   const context = useContext(LoadingContext);
@@ -147,6 +148,8 @@ const CategoryAdminPage = () => {
           _onClickDelete={_onClickDelete}
           _onClickDetail={_onClickDetail}
           isLoading={isLoadingTable}
+          currentPage={currentPage}
+          itemPerpage={itemPerpage}
         />
         {/* </div>
         <div className="lg:hidden">

@@ -7,10 +7,10 @@ const categoriesService = {
       headers: { "Content-Type": "application/json" },
     });
   },
-  async updateById(id: string, name: string, image: File) {
+  async updateById(id: string, name: string, image: File | null) {
     const formData = new FormData();
     formData.append("name", name.trim());
-    formData.append("image", image);
+    if (image) formData.append("image", image);
     return await axiosConfig.put(CategoryAPI.categoryById(id), formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });

@@ -1,13 +1,11 @@
-import { ErrorPage } from "@/components/ui";
+import { ErrorPage, ProtectedRoute } from "@/components/ui";
+import { AdminLayout, CandidateLayout, EmployerLayout } from "@/layouts";
 import {
-  AdminLayout,
-  AuthEmployerLayout,
-  CandidateLayout,
-  EmployerLayout,
-} from "@/layouts";
-import {
+  CandidateAdminPage,
   CategoryAdminPage,
   DashboardAdminPage,
+  EmployerAdminPage,
+  JobAdminPage,
   ServiceAdminPage,
   SigninAdminPage,
   TagsAdminPage,
@@ -32,7 +30,6 @@ import {
   ProcedureEmployerPage,
   ScheduleEmployerPage,
   SigninEmployerPage,
-  SignupEmployerPage,
 } from "@/pages/Employer";
 import ProfileEmployerPage from "@/pages/Employer/ProfileEmployerPage";
 import UpgradeAccountEmployer from "@/pages/Employer/UpgradeAccountEmployer";
@@ -42,9 +39,17 @@ import {
   EMPLOYER_PATHS,
   OTHER_PATHS,
 } from "@/utils/constants/pathConstants";
+import { useSelector } from "react-redux";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
 
 const Routers = () => {
+  const { role } = useSelector((state: any) => state.authReducer);
+
+  console.log("role, ", role);
+
+  const isAuthenticated = true;
+
   return (
     <BrowserRouter>
       <Routes>
@@ -52,7 +57,16 @@ const Routers = () => {
           path={CANDIDATE_PATHS.default}
           element={<Navigate to={CANDIDATE_PATHS.home} replace />}
         />
-        <Route path={CANDIDATE_PATHS.default} element={<CandidateLayout />}>
+        <Route
+          path={EMPLOYER_PATHS.default}
+          element={<Navigate to={EMPLOYER_PATHS.signin} replace />}
+        />
+        <Route
+          path={ADMIN_PATHS.default}
+          element={<Navigate to={ADMIN_PATHS.signin} replace />}
+        />
+
+        <Route element={<CandidateLayout />}>
           <Route path={CANDIDATE_PATHS.home} element={<HomePage />} />
           <Route path={CANDIDATE_PATHS.jobs} element={<JobsPage />} />
           <Route path={CANDIDATE_PATHS.employers} element={<EmployersPage />} />
@@ -64,80 +78,122 @@ const Routers = () => {
             path={CANDIDATE_PATHS.employerDetails}
             element={<EmployerDetailPage />}
           />
-          <Route path={CANDIDATE_PATHS.savedJobs} element={<SavedJobsPage />} />
           <Route
-            path={CANDIDATE_PATHS.appliedJobs}
-            element={<AppliedJobsPage />}
-          />
-          <Route path={CANDIDATE_PATHS.myProfile} element={<ProfilePage />} />
+            element={
+              <ProtectedRoute
+                isAllowed={isAuthenticated}
+                redirectTo={CANDIDATE_PATHS.home}
+              />
+            }
+          >
+            <Route
+              path={CANDIDATE_PATHS.savedJobs}
+              element={<SavedJobsPage />}
+            />
+            <Route
+              path={CANDIDATE_PATHS.appliedJobs}
+              element={<AppliedJobsPage />}
+            />
+            <Route path={CANDIDATE_PATHS.myProfile} element={<ProfilePage />} />
+          </Route>
         </Route>
 
         <Route
-          path={EMPLOYER_PATHS.default}
-          element={<Navigate to={EMPLOYER_PATHS.signin} replace />}
-        />
-        <Route path={EMPLOYER_PATHS.default} element={<AuthEmployerLayout />}>
+          element={
+            <ProtectedRoute
+              isAllowed={!isAuthenticated}
+              redirectTo={EMPLOYER_PATHS.dashboard}
+            />
+          }
+        >
           <Route
             path={EMPLOYER_PATHS.signin}
             element={<SigninEmployerPage />}
           />
-          <Route
-            path={EMPLOYER_PATHS.signup}
-            element={<SignupEmployerPage />}
-          />
-        </Route>
-        <Route path={EMPLOYER_PATHS.default} element={<EmployerLayout />}>
-          <Route path={EMPLOYER_PATHS.dashboard} element={<DashboardPage />} />
-          <Route path={EMPLOYER_PATHS.jobs} element={<JobsEmployerPage />} />
-          <Route
-            path={EMPLOYER_PATHS.applys}
-            element={<ApplicationsEmployerPage />}
-          />
-          <Route
-            path={EMPLOYER_PATHS.findCandidate}
-            element={<FindCandidatePage />}
-          />
-          <Route path={EMPLOYER_PATHS.chat} element={<ChatEmployerPage />} />
-          <Route
-            path={EMPLOYER_PATHS.schedule}
-            element={<ScheduleEmployerPage />}
-          />
-          <Route
-            path={EMPLOYER_PATHS.procedure}
-            element={<ProcedureEmployerPage />}
-          />
-          <Route path={EMPLOYER_PATHS.hr} element={<HREmployerPage />} />
-          <Route
-            path={EMPLOYER_PATHS.profile}
-            element={<ProfileEmployerPage />}
-          />
-          <Route
-            path={EMPLOYER_PATHS.upgrade}
-            element={<UpgradeAccountEmployer />}
-          />
         </Route>
 
         <Route
-          path={ADMIN_PATHS.default}
-          element={<Navigate to={ADMIN_PATHS.signin} replace />}
-        />
-        <Route path={ADMIN_PATHS.signin} element={<SigninAdminPage />} />
-        <Route path={ADMIN_PATHS.default} element={<AdminLayout />}>
-          <Route
-            path={ADMIN_PATHS.dashboard}
-            element={<DashboardAdminPage />}
-          />
-          <Route
-            path={ADMIN_PATHS.categories}
-            element={<CategoryAdminPage />}
-          /><Route
-            path={ADMIN_PATHS.tags}
-            element={<TagsAdminPage />}
-          />
-          <Route
-            path={ADMIN_PATHS.services}
-            element={<ServiceAdminPage />}
-          />
+          element={
+            <ProtectedRoute
+              isAllowed={isAuthenticated}
+              redirectTo={EMPLOYER_PATHS.dashboard}
+            />
+          }
+        >
+          <Route element={<EmployerLayout />}>
+            <Route
+              path={EMPLOYER_PATHS.dashboard}
+              element={<DashboardPage />}
+            />
+            <Route path={EMPLOYER_PATHS.jobs} element={<JobsEmployerPage />} />
+            <Route
+              path={EMPLOYER_PATHS.applys}
+              element={<ApplicationsEmployerPage />}
+            />
+            <Route
+              path={EMPLOYER_PATHS.findCandidate}
+              element={<FindCandidatePage />}
+            />
+            <Route path={EMPLOYER_PATHS.chat} element={<ChatEmployerPage />} />
+            <Route
+              path={EMPLOYER_PATHS.schedule}
+              element={<ScheduleEmployerPage />}
+            />
+            <Route
+              path={EMPLOYER_PATHS.procedure}
+              element={<ProcedureEmployerPage />}
+            />
+            <Route path={EMPLOYER_PATHS.hr} element={<HREmployerPage />} />
+            <Route
+              path={EMPLOYER_PATHS.profile}
+              element={<ProfileEmployerPage />}
+            />
+            <Route
+              path={EMPLOYER_PATHS.upgrade}
+              element={<UpgradeAccountEmployer />}
+            />
+          </Route>
+        </Route>
+
+        <Route
+          element={
+            <ProtectedRoute
+              isAllowed={isAuthenticated}
+              redirectTo={ADMIN_PATHS.dashboard}
+            />
+          }
+        >
+          <Route path={ADMIN_PATHS.signin} element={<SigninAdminPage />} />
+        </Route>
+        <Route
+          element={
+            <ProtectedRoute
+              isAllowed={isAuthenticated}
+              redirectTo={ADMIN_PATHS.signin}
+            />
+          }
+        >
+          <Route path={ADMIN_PATHS.default} element={<AdminLayout />}>
+            <Route
+              path={ADMIN_PATHS.dashboard}
+              element={<DashboardAdminPage />}
+            />
+            <Route
+              path={ADMIN_PATHS.categories}
+              element={<CategoryAdminPage />}
+            />
+            <Route path={ADMIN_PATHS.jobs} element={<JobAdminPage />} />
+            <Route path={ADMIN_PATHS.tags} element={<TagsAdminPage />} />
+            <Route
+              path={ADMIN_PATHS.employers}
+              element={<EmployerAdminPage />}
+            />
+            <Route
+              path={ADMIN_PATHS.candidates}
+              element={<CandidateAdminPage />}
+            />
+            <Route path={ADMIN_PATHS.services} element={<ServiceAdminPage />} />
+          </Route>
         </Route>
 
         <Route path={OTHER_PATHS.all} element={<ErrorPage />} />

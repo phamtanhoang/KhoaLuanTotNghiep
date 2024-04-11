@@ -24,10 +24,9 @@ const authsService = {
       username: email.trim(),
       password: password.trim(),
       dateOfBirth: dob,
-      firstname: firstName.trim(),
+      firstName: firstName.trim(),
       lastName: lastName.trim(),
       sex: sex.trim(),
-      // phoneNumber: "",
     };
     return await axiosConfig.post(AuthAPI.signupCandidate, userData, {
       headers: { "Content-Type": "application/json" },
@@ -64,7 +63,7 @@ const authsService = {
   async changePassword(currentPassword: string, newPassword: string) {
     const body = {
       currentPassword: currentPassword.trim(),
-      newPassword: newPassword.trim()
+      newPassword: newPassword.trim(),
     };
     return await axiosConfig.post(AuthAPI.changePassword, body, {
       headers: { "Content-Type": "application/json" },

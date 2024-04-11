@@ -72,7 +72,7 @@ const Signup = (props: any) => {
         if (res.status === 200 && res.data.Status === 200) {
           setFuncs(MODAL_KEYS.signin);
           SwalHelper.MiniAlert(
-            "Đăng kí thành công, vui lòng đăng nhập!",
+            "Đăng kí thành công, vui lòng đăng nhập lại!",
             "success"
           );
         } else {
@@ -112,11 +112,11 @@ const Signup = (props: any) => {
       <div className="mt-8">
         <div className="content-center flex gap-5">
           <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
+            <label className="text-sm font-semibold text-gray-700 tracking-wide">
               Họ <span className="text-red-500">*</span>
             </label>
             <input
-              className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+              className=" w-full text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
               type="text"
               placeholder="Nguyễn Văn"
               value={firstName}
@@ -124,11 +124,11 @@ const Signup = (props: any) => {
             />
           </div>
           <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
+            <label className="text-sm font-semibold text-gray-700 tracking-wide">
               Tên <span className="text-red-500">*</span>
             </label>
             <input
-              className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+              className=" w-full text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
               type="text"
               placeholder="A"
               value={lastName}
@@ -138,22 +138,22 @@ const Signup = (props: any) => {
         </div>
         <div className="mt-4 content-center flex gap-5">
           <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
+            <label className="text-sm font-semibold text-gray-700 tracking-wide">
               Ngày sinh <span className="text-red-500">*</span>
             </label>
             <input
-              className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+              className=" w-full text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
               type="date"
               value={dob ? dob.toISOString().split("T")[0] : ""}
               onChange={_onChangeDOB}
             />
           </div>
           <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
+            <label className="text-sm font-semibold text-gray-700 tracking-wide">
               Giới tính <span className="text-red-500">*</span>
             </label>
             <select
-              className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+              className=" w-full text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
               onChange={_onChangeSex}
               value={sex}
             >
@@ -166,11 +166,11 @@ const Signup = (props: any) => {
           </div>
         </div>
         <div className="mt-4 content-center">
-          <label className="text-sm font-bold text-gray-700 tracking-wide">
+          <label className="text-sm font-semibold text-gray-700 tracking-wide">
             Email <span className="text-red-500">*</span>
           </label>
           <input
-            className=" w-full text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+            className=" w-full text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
             type=""
             placeholder="candidate@example.com"
             value={email}
@@ -179,11 +179,11 @@ const Signup = (props: any) => {
         </div>
         <div className="mt-4 content-center flex gap-5">
           <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
+            <label className="text-sm font-semibold text-gray-700 tracking-wide">
               Mật khẩu <span className="text-red-500">*</span>
             </label>
             <input
-              className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+              className="w-full content-center text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
               type="password"
               placeholder="**********"
               value={password}
@@ -191,11 +191,11 @@ const Signup = (props: any) => {
             />
           </div>
           <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
+            <label className="text-sm font-semibold text-gray-700 tracking-wide">
               Nhập lại mật khẩu <span className="text-red-500">*</span>
             </label>
             <input
-              className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
+              className="w-full content-center text-base py-2  border-b  border-borderColor focus:outline-none focus:border-orangetext"
               type="password"
               placeholder="**********"
               value={confirmPassword}

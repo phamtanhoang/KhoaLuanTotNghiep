@@ -16,7 +16,7 @@ const EmployerLayout = () => {
           <div className="lg:hidden p-4">
             <Breadcumbs color="#f2994a" />
           </div>
-          <main className="lg:pl-0 lg:p-4 w-full flex-1 flex flex-col gap-4">
+          <main className="lg:pl-0 lg:p-2 w-full flex-1 flex flex-col gap-4">
             <Outlet />
           </main>
         </div>

@@ -10,7 +10,7 @@ interface CategoryTableAdminProps {
   currentPage: number;
   itemPerpage: number;
 }
-const CategoryTableAdminWeb: React.FC<CategoryTableAdminProps> = ({
+const EmployerTableAdminWeb: React.FC<CategoryTableAdminProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,
@@ -111,4 +111,4 @@ const CategoryTableAdminWeb: React.FC<CategoryTableAdminProps> = ({
     </>
   );
 };
-export default CategoryTableAdminWeb;
+export default EmployerTableAdminWeb;

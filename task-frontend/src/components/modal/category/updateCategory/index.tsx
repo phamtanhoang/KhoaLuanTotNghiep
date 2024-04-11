@@ -9,6 +9,9 @@ import { categoriesService, tagsService } from "@/services";
 import { DateHelper } from "@/utils/helpers/dateHelper";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { LoadingContext } from "@/App";
+import { MdOutlineFileUpload } from "react-icons/md";
+import ModalBase from "../..";
+import { ImageHelper } from "@/utils/helpers/imageHelper";
 
 const UpdateCategory = (props: any) => {
   const handleClose = props.handleClose;
@@ -22,8 +25,9 @@ const UpdateCategory = (props: any) => {
 
   const id = props.id;
   const [name, setName] = useState<string>("");
-  const [image, setImage] = useState<string | null>();
-  const [croppedImg, setCroppedImg] = useState<string | undefined>();
+  const [image, setImage] = useState<string | null>(null);
+  const [newImage, setNewImage] = useState<string | null>(null);
+  const [croppedImg, setCroppedImg] = useState<string | null>(null);
   const [created, setCreated] = useState<Date | null>(null);
   const [updated, setUpdated] = useState<Date | null>(null);
 
@@ -32,9 +36,17 @@ const UpdateCategory = (props: any) => {
     setName(value);
   };
   const _onChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const selectedFile = e.target.files[0];
-    setImage(URL.createObjectURL(selectedFile));
+    const file = e.target.files?.[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setNewImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setCroppedImg(null);
+    }
 
     handleOpenSub();
     setFuncsSub(MODAL_KEYS.chooseImage);
@@ -46,29 +58,29 @@ const UpdateCategory = (props: any) => {
       return;
     }
 
-    if (croppedImg === null || croppedImg === undefined) {
-      SwalHelper.MiniAlert("Vui lòng chọn hình ảnh!", "warning");
-      return;
+    let img: File | null = null;
+    if (croppedImg !== null && croppedImg !== undefined) {
+      img = ImageHelper.dataURItoFile(croppedImg, name);
     }
 
     context.handleOpenLoading();
-    // categoriesService
-    //   .updateById(id, name.trim(), croppedImg!)
-    //   .then((res) => {
-    //     if (res.status === 200 && res.data.Status === 200) {
-    //       SwalHelper.MiniAlert(res.data.Message, "success");
-    //       fetchListData();
-    //       handleClose();
-    //     } else {
-    //       SwalHelper.MiniAlert(res.data.Message, "error");
-    //     }
-    //   })
-    //   .catch(() => {
-    //     SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-    //   })
-    //   .finally(() => {
-    //     setIsLoading(false);
-    //   });
+    categoriesService
+      .updateById(id, name.trim(), img || null)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          SwalHelper.MiniAlert(res.data.Message, "success");
+          fetchListData();
+          handleClose();
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
   };
 
   useEffect(() => {
@@ -93,11 +105,21 @@ const UpdateCategory = (props: any) => {
         context.handleCloseLoading();
       });
   }, []);
+  const _onClickUploadFile = () => {
+    document.getElementById("fileInput")?.click();
+  };
 
   // console.log("image, ", image);
 
   return (
     <>
+      <ModalBase
+        open={openSub}
+        handleClose={handleCloseSub}
+        funcs={funcsSub}
+        image={newImage}
+        setCroppedImg={setCroppedImg}
+      />
       <div className="md:w-[50%] xl:w-[30%] w-screen bg-white relative lg:rounded">
         <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-bgBlue lg:rounded-t">
           <h2 className="text-xl font-medium  line-clamp-1 my-auto">
@@ -116,17 +138,40 @@ const UpdateCategory = (props: any) => {
             <p className="font-semibold text-black bg-body2 pl-1 pr-1 pt-1.5 pb-1.5 rounded-sm shadow-sm w-full truncate">
               Mã - {id}
             </p>
-            {image && <img src={image} alt="Image Preview" />}
+
             <div className="content-center">
+              {croppedImg ? (
+                <img
+                  className="mb-2 w-1/2 mx-auto"
+                  src={croppedImg}
+                  alt="Cropped Image"
+                />
+              ) : image ? (
+                <img
+                  className="mb-2 w-1/2 mx-auto"
+                  src={image}
+                  alt="Image Preview"
+                />
+              ) : (
+                ""
+              )}
               <label className="font-medium tracking-wide text-sm">
-                Tên nhãn <span className="text-red-500">*</span>
+                Hình ảnh <span className="text-red-500">*</span>
               </label>
-              <input
-                className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
-                type="text"
-                value={name}
-                onChange={_onChangeName}
-              />
+              <div
+                className="flex items-center gap-2 cursor-pointer bg-blue-500 hover:bg-blue-500/85 w-max text-white p-2 mt-1 rounded"
+                onClick={_onClickUploadFile}
+              >
+                <input
+                  id="fileInput"
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={_onChangeImage}
+                />
+                <MdOutlineFileUpload className="text-lg" />
+                <span className="text-sm font-[450]">Tải ảnh</span>
+              </div>
             </div>
             <div className="content-center">
               <label className="font-medium tracking-wide text-sm">

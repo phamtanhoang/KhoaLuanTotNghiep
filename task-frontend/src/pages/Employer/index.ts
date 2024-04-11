@@ -7,11 +7,9 @@ import JobsEmployerPage from "./JobsEmployerPage";
 import ProcedureEmployerPage from "./ProcedureEmployerPage";
 import ScheduleEmployerPage from "./ScheduleEmployerPage";
 import SigninEmployerPage from "./SigninEmployerPage";
-import SignupEmployerPage from "./SignupEmployerPage";
 
 export {
   SigninEmployerPage,
-  SignupEmployerPage,
   DashboardPage,
   JobsEmployerPage,
   ApplicationsEmployerPage,

@@ -88,12 +88,12 @@ const ChangePassword = (props: any) => {
       </div>
       <div className="mt-8">
         <div className="mt-4 content-center">
-          <label className="text-sm font-bold text-gray-700 tracking-wide">
+          <label className="text-sm font-semibold text-gray-700 tracking-wide">
             Mật khẩu hiện tại
           </label>
           <input
             className={`w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none ${
-              isAdminPath ? "focus:bg-bgBlue" : "focus:bg-orangetext"
+              isAdminPath ? "focus:border-bgBlue" : "focus:border-orangetext"
             }`}
             type="password"
             placeholder="**********"
@@ -102,12 +102,12 @@ const ChangePassword = (props: any) => {
           />
         </div>
         <div className="mt-4 content-center">
-          <label className="text-sm font-bold text-gray-700 tracking-wide">
+          <label className="text-sm font-semibold text-gray-700 tracking-wide">
             Mật khẩu mới
           </label>
           <input
             className={`w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none ${
-              isAdminPath ? "focus:bg-bgBlue" : "focus:bg-orangetext"
+              isAdminPath ? "focus:border-bgBlue" : "focus:border-orangetext"
             }`}
             type="password"
             placeholder="**********"
@@ -116,12 +116,12 @@ const ChangePassword = (props: any) => {
           />
         </div>
         <div className="mt-4 content-center">
-          <label className="text-sm font-bold text-gray-700 tracking-wide">
+          <label className="text-sm font-semibold text-gray-700 tracking-wide">
             Nhập lại mật khẩu mới
           </label>
           <input
             className={`w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none ${
-              isAdminPath ? "focus:bg-bgBlue" : "focus:bg-orangetext"
+              isAdminPath ? "focus:border-bgBlue" : "focus:border-orangetext"
             }`}
             type="password"
             placeholder="**********"

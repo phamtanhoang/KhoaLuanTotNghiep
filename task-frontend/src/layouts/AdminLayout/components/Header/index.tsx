@@ -1,6 +1,9 @@
+import { LoadingContext } from "@/App";
 import { authsService } from "@/services";
 import { ADMIN_PATHS } from "@/utils/constants/pathConstants";
+import { AuthHelper } from "@/utils/helpers/authHelper";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { useContext } from "react";
 import { BiLogOut } from "react-icons/bi";
 import { RiAdminFill } from "react-icons/ri";
 import { Link, useNavigate } from "react-router-dom";
@@ -9,18 +12,19 @@ interface HeaderProps {
 }
 const Header: React.FC<HeaderProps> = ({ openSideBar }) => {
   const navigate = useNavigate();
+  const context = useContext(LoadingContext);
 
   const _onClickLogout = () => {
-
     SwalHelper.Confirm(
       "Bạn có muốn đăng xuất?",
       "question",
       () => {
+        context.handleOpenLoading();
         authsService
           .signout()
           .then((res) => {
             if (res.status === 200 && res.data.Status === 200) {
-              localStorage.removeItem("Token");
+              AuthHelper.removeTokens();
               navigate(ADMIN_PATHS.signin);
               SwalHelper.MiniAlert(
                 res.data.Message || "Đăng xuất thành công",
@@ -37,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({ openSideBar }) => {
             SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
           })
           .finally(() => {
-
+            context.handleCloseLoading();
           });
       },
       () => {}

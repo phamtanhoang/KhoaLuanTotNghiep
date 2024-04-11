@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { Link, NavLink } from "react-router-dom";
 import LOGO from "@/assets/images/logo.png";
@@ -6,8 +6,13 @@ import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import NON_USER from "@/assets/images/non-user.jpg";
 import ModalBase from "@/components/modal";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { authsService } from "@/services";
+import { AuthHelper } from "@/utils/helpers/authHelper";
+import { LoadingContext } from "@/App";
 
 const Header = () => {
+  const context = useContext(LoadingContext);
   const [sticky, setSticky] = useState(false);
   const [openInfo, setOpenInfo] = useState(false);
 
@@ -66,6 +71,38 @@ const Header = () => {
   const _onClickChangePassword = () => {
     setFuncs(MODAL_KEYS.changePassword);
     handleOpen();
+  };
+  const _onClickSignout = () => {
+    SwalHelper.Confirm(
+      "Bạn có muốn đăng xuất?",
+      "question",
+      () => {
+        context.handleOpenLoading();
+        authsService
+          .signout()
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              AuthHelper.removeTokens();
+              SwalHelper.MiniAlert(res.data.Message, "success", 1500);
+              setTimeout(() => {
+                window.location.reload();
+              }, 1500);
+            } else {
+              SwalHelper.MiniAlert(
+                res.data.Message || "Đăng xuất không thành công!",
+                "error"
+              );
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
+      },
+      () => {}
+    );
   };
 
   return (
@@ -187,7 +224,7 @@ const Header = () => {
                         <li>
                           <a
                             className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
-                            // onClick={LogoutHandle}
+                            onClick={_onClickSignout}
                           >
                             Đăng xuất
                           </a>
