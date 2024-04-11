@@ -1,6 +1,8 @@
 package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.request.UpdateCandidateRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
+import com.pth.taskbackend.dto.response.CandidateResponse;
+import com.pth.taskbackend.dto.response.EmployerResponse;
 import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
@@ -71,13 +73,30 @@ public class CandidateController {
                 );
 
             Page<Candidate> candidates = candidateService.findByKeywordAndStatus(keyword,status,pageable);
+            Page<CandidateResponse> responseList = candidates.map(candidate -> new CandidateResponse(
+                    candidate.getId(),
+                    candidate.getCreated(),
+                    candidate.getUpdated(),
+                    candidate.getFirstName(),
+                    candidate.getLastName(),
+                    candidate.getPhoneNumber(),
+                    candidate.getSex(),
+                    candidate.getAvatar(),
+                    candidate.getDateOfBirth(),
+                    candidate.getIntroduction(),
+                    candidate.getJob(),
+                    candidate.getLink(),
+                    candidate.getUser().getStatus(),
+                    candidate.getUser().getEmail(),
+                    candidate.getUser().getId()
+            ));
             if (candidates.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách ứng viên rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách ứng viên", HttpStatus.OK.value(), candidates)
+                        new BaseResponse("Danh sách ứng viên", HttpStatus.OK.value(), responseList)
                 );
             }
         } catch (Exception e) {

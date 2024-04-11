@@ -13,6 +13,7 @@ import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.security.UserInfoDetails;
 import com.pth.taskbackend.service.AuthService;
 import com.pth.taskbackend.util.func.CheckPermission;
+import org.springframework.http.HttpRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import com.pth.taskbackend.service.CandidateService;
 import com.pth.taskbackend.service.EmployerService;
@@ -35,6 +36,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.http.HttpResponse;
 import java.util.*;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
@@ -55,6 +57,7 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired CheckPermission checkPermission;
     @Autowired CandidateService candidateService;
     @Autowired
     JwtService jwtService;
@@ -317,31 +320,42 @@ public class AuthController {
     }
 
     @Operation(summary = "Change Password", description = "", tags = {})
-    @PostMapping("change-password")
-    public ResponseEntity<BaseResponse> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest,
-                                                       HttpServletRequest request,
-                                                       HttpServletResponse response) {
+    @PatchMapping("changePassword")
+    public ResponseEntity<BaseResponse> changePassword(@RequestHeader("Authorization")String token, @RequestBody ChangePasswordRequest changePasswordRequest, HttpServletRequest request, HttpServletResponse response) {
         try {
-            Optional<User> user = userRepository.findById(changePasswordRequest.id());
-            if (user.isPresent()) {
 
-                if (passwordEncoder.matches(changePasswordRequest.currentPassword(), user.get().getPassword())) {
-                    authService.changePassword(user, changePasswordRequest.newPassword());
-                    logout(request, response);
+            String email = jwtService.extractUsername(token.substring(7));
+             Optional<User> optionalUser = userRepository.findByEmail(email);
 
-                    return ResponseEntity.ok(
-                            new BaseResponse("Thay đổi mật khẩu thành công", HttpStatus.OK.value(), null)
-                    );
-                } else {
-                    return ResponseEntity.ok(
-                            new BaseResponse("Mật khẩu hiện tại không đúng!", HttpStatus.UNAUTHORIZED.value(), null)
-                    );
-                }
-            } else {
+            if (optionalUser.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Người dùng không tồn tại!",  HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
-            }
+
+            User user = optionalUser.get();
+
+                if(user.getStatus()==EStatus.DELETED||user.getStatus()==EStatus.INACTIVE)
+                    return ResponseEntity.ok(
+                            new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                    );
+
+
+                if (!passwordEncoder.matches(changePasswordRequest.currentPassword(), user.getPassword()))
+                    return ResponseEntity.ok(
+                            new BaseResponse("Mật khẩu hiện tại không đúng", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+
+            if (changePasswordRequest.currentPassword().equals(changePasswordRequest.newPassword()) )
+                return ResponseEntity.ok(
+                        new BaseResponse("Mật khẩu không được trùng với mật khẩu hiện tại", HttpStatus.BAD_REQUEST.value(), null)
+                );
+
+            authService.changePassword(optionalUser, changePasswordRequest.newPassword());
+            logout(request, response);
+            return ResponseEntity.ok(
+                    new BaseResponse("Thay đổi mật khẩu thành công", HttpStatus.OK.value(), null)
+            );
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));

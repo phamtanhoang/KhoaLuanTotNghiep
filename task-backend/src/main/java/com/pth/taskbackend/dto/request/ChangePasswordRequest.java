@@ -1,4 +1,4 @@
 package com.pth.taskbackend.dto.request;
 
-public record ChangePasswordRequest(String id, String currentPassword, String newPassword) {
+public record ChangePasswordRequest( String currentPassword, String newPassword) {
 }

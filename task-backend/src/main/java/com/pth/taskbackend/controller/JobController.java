@@ -1,14 +1,19 @@
 package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.request.JobRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
+import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.model.meta.HumanResource;
 import com.pth.taskbackend.model.meta.Job;
+import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.JobRepository;
+import com.pth.taskbackend.repository.UserRepository;
+import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.CategoryService;
 import com.pth.taskbackend.service.HumanResourceService;
 import com.pth.taskbackend.service.JobService;
+import com.pth.taskbackend.util.func.CheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,7 +47,10 @@ public class JobController {
     CategoryService categoryService;
     @Autowired
     HumanResourceService humanResourceService;
-
+    @Autowired
+    JwtService jwtService;
+    @Autowired
+    CheckPermission checkPermission;
 
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("")
@@ -71,30 +79,20 @@ public class JobController {
 
     @Operation(summary = "Create", description = "", tags = {})
     @PostMapping("/create")
-    public ResponseEntity<BaseResponse> createJob(@RequestBody JobRequest request) throws IOException {
+    public ResponseEntity<BaseResponse> createJob(@RequestHeader("Authorization")String token, @RequestBody JobRequest request) throws IOException {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !authentication.isAuthenticated()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new BaseResponse("Bạn phải đăng nhập", HttpStatus.UNAUTHORIZED.value(), null));
-            }
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
 
-            String username = authentication.getName();
-            HumanResource humanResource=null;
-            EStatus status = EStatus.ACTIVE;
-
-            boolean hasHRAuthority = authentication.getAuthorities().stream()
-                    .anyMatch(authority -> authority.getAuthority().equals("HR"));
-            if (hasHRAuthority) {
-
-                Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(username);
-                if (optionalHumanResource.isEmpty()) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body(new BaseResponse("Không tìm thấy HR", HttpStatus.NOT_FOUND.value(), null));
-                }
-                humanResource= optionalHumanResource.get();
-                status =EStatus.PENDING;
-            }
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
+            if (optionalHumanResource.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)
+                );
 
 
             Optional<Category> existedCategory = categoryService.findById(request.categoryId());
@@ -104,7 +102,7 @@ public class JobController {
             }
             Job job = new Job();
             job.setName(request.name());
-            job.setStatus(status);
+            job.setStatus(EStatus.PENDING);
             job.setExperience(request.experience());
             job.setDescription(request.description());
             job.setCategory(existedCategory.get());
@@ -112,7 +110,7 @@ public class JobController {
             job.setToSalary(request.toSalary());
             job.setToDate(request.toDate());
             job.setLocation(request.location());
-            job.setHumanResource(humanResource);
+            job.setHumanResource(optionalHumanResource.get());
 
             job.setTags(request.tags());
             jobService.create(job);
@@ -133,27 +131,21 @@ public class JobController {
 
     @Operation(summary = "update", description = "", tags = {})
     @PatchMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateJob(@PathVariable("id") String id, @RequestBody JobRequest request) {
+    public ResponseEntity<BaseResponse> updateJob(@RequestHeader("Authorization")String token,@PathVariable("id") String id, @RequestBody JobRequest request) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !authentication.isAuthenticated()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new BaseResponse("Bạn phải đăng nhập", HttpStatus.UNAUTHORIZED.value(), null));
-            }
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
 
-            String username = authentication.getName();
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
+            if (optionalHumanResource.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)
+                );
 
-            boolean hasHRAuthority = authentication.getAuthorities().stream()
-                    .anyMatch(authority -> authority.getAuthority().equals("HR"));
-            if (hasHRAuthority) {
-
-                Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(username);
-                if (optionalHumanResource.isEmpty()) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body(new BaseResponse("Không tìm thấy HR", HttpStatus.NOT_FOUND.value(), null));
-                }
-
-            }
 
 
             Optional<Job> optionalJob = jobService.findById(id);
@@ -171,7 +163,8 @@ public class JobController {
             job.setToSalary(request.toSalary());
             job.setToDate(request.toDate());
             job.setExperience(request.experience());
-            job.setHumanResource(humanResourceService.findByEmail(username).get());
+            job.setHumanResource(optionalHumanResource.get());
+
             if (request.categoryId() != null) {
                 Optional<Category> optionalCategory = categoryService.findById(request.categoryId());
                 if (optionalCategory.isPresent()) {
@@ -181,15 +174,7 @@ public class JobController {
                             .body(new BaseResponse("Danh mục không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
                 }
             }
-            if (request.humanResourceId() != null) {
-                Optional<HumanResource> optionalHumanResource = humanResourceService.findById(request.humanResourceId());
-                if (optionalHumanResource.isPresent()) {
-                    job.setHumanResource(optionalHumanResource.get());
-                } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body(new BaseResponse("HR không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
-                }
-            }
+
 
          jobService.update(job);
 

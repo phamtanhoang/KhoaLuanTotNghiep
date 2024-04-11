@@ -2,9 +2,7 @@ package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.request.CreateEmployerRequest;
 import com.pth.taskbackend.dto.request.UpdateCandidateRequest;
 import com.pth.taskbackend.dto.request.UpdateEmployerRequest;
-import com.pth.taskbackend.dto.response.BaseResponse;
-import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
-import com.pth.taskbackend.dto.response.GetEmployerProfileResponse;
+import com.pth.taskbackend.dto.response.*;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
@@ -81,13 +79,29 @@ public class EmployerController {
                 );
 
             Page<Employer> employers = employerService.findByKeywordAndStatus(keyword,status,pageable);
+
+            Page<EmployerResponse> responseList = employers.map(employer -> new EmployerResponse(
+                    employer.getId(),
+                    employer.getCreated(),
+                    employer.getUpdated(),
+                    employer.getImage(),
+                    employer.getBackgroundImage(),
+                    employer.getName(),
+                    employer.getLocation(),
+                    employer.getPhoneNumber(),
+                    employer.getBusinessCode(),
+                    employer.getDescription(),
+                    employer.getUser().getEmail(),
+                    employer.getUser().getStatus(),
+                    employer.getUser().getId()
+            ));
             if (employers.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách nhà tuyển dụng rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách nhà tuyển dụng ", HttpStatus.OK.value(), employers)
+                        new BaseResponse("Danh sách nhà tuyển dụng ", HttpStatus.OK.value(), responseList)
                 );
             }
         } catch (Exception e) {
