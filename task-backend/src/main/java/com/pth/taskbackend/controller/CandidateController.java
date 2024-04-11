@@ -109,7 +109,7 @@ public class CandidateController {
 
     @Operation(summary = "update status", description = "", tags = {})
     @PatchMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateCandidate(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestParam EStatus status) {
+    public ResponseEntity<BaseResponse> updateCandidate(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody EStatus status) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);

@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Optional;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
@@ -112,7 +113,7 @@ public class EmployerController {
 
     @Operation(summary = "update status", description = "", tags = {})
     @PatchMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestParam EStatus status) {
+    public ResponseEntity<BaseResponse> updateEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody EStatus status) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
@@ -202,7 +203,7 @@ public class EmployerController {
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-
+            System.out.println(Instant.now());
             System.out.println(jwtService.extractAllClaims(token.substring(7)));
             Optional<Employer> optionalEmployer = employerService.findById(id);
             if (optionalEmployer.isEmpty())
