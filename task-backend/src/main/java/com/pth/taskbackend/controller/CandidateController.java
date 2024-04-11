@@ -134,9 +134,27 @@ public class CandidateController {
                         new BaseResponse("Không được xóa", HttpStatus.NOT_FOUND.value(), null)
                 );
             User candidate = optionalCandidate.get();
-            candidate.setStatus(status);
-            userRepository.save(candidate);
-            return ResponseEntity.ok(new BaseResponse("Cập nhật ứng viên thành công", HttpStatus.OK.value(), null));
+            switch (status)
+            {
+                case ACTIVE :
+                    candidate.setStatus(EStatus.ACTIVE);
+                    userRepository.save(candidate);
+
+                    return ResponseEntity.ok(
+                            new BaseResponse("Duyệt ứng viên dụng thành công", HttpStatus.OK.value(), null)
+                    );
+                case INACTIVE:
+                    candidate.setStatus(EStatus.INACTIVE);
+                    userRepository.save(candidate);
+
+                    return ResponseEntity.ok(
+                            new BaseResponse("Khóa ứng viên dụng thành công", HttpStatus.OK.value(), null)
+                    );
+                default:
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
+            }
+
         } catch (EmptyResultDataAccessException e) {
             return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên cần xóa!", HttpStatus.NOT_FOUND.value(), null));
         } catch (Exception e) {
@@ -160,7 +178,7 @@ public class CandidateController {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
-            Optional<User> optionalCandidate = userRepository.findById(id);
+            Optional<User> optionalCandidate = userRepository.findByCandidateId(id);
             if (optionalCandidate.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null)

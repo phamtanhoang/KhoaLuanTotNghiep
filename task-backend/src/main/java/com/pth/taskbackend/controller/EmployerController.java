@@ -138,9 +138,27 @@ public class EmployerController {
                         new BaseResponse("Không được xóa", HttpStatus.NOT_FOUND.value(), null)
                 );
             User employer = optionalEmployer.get();
-            employer.setStatus(status);
-            userRepository.save(employer);
-            return ResponseEntity.ok(new BaseResponse("Cập nhật nhà tuyển dụng thành công", HttpStatus.OK.value(), null));
+            switch (status)
+            {
+                case ACTIVE :
+                    employer.setStatus(EStatus.ACTIVE);
+                    userRepository.save(employer);
+
+                        return ResponseEntity.ok(
+                                new BaseResponse("Duyệt nhà tuyển dụng thành công", HttpStatus.OK.value(), null)
+                        );
+                case INACTIVE:
+                    employer.setStatus(EStatus.INACTIVE);
+                    userRepository.save(employer);
+
+                    return ResponseEntity.ok(
+                            new BaseResponse("Khóa nhà tuyển dụng thành công", HttpStatus.OK.value(), null)
+                    );
+                default:
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
+            }
+
         } catch (EmptyResultDataAccessException e) {
             return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng cần xóa!", HttpStatus.NOT_FOUND.value(), null));
         } catch (Exception e) {
@@ -165,7 +183,7 @@ public class EmployerController {
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            Optional<User> optionalEmployer = userRepository.findById(id);
+            Optional<User> optionalEmployer = userRepository.findByEmployerId(id);
             if (optionalEmployer.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)

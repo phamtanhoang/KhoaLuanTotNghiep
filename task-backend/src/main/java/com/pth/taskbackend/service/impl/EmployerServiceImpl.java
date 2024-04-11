@@ -7,6 +7,8 @@ import com.pth.taskbackend.repository.EmployerRepository;
 import com.pth.taskbackend.service.EmployerService;
 import com.pth.taskbackend.util.func.FileUploadFunc;
 import com.pth.taskbackend.util.func.ImageFunc;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,10 @@ import java.util.Optional;
 public class EmployerServiceImpl implements EmployerService {
     @Autowired
     EmployerRepository employerRepository;
+
+    @Autowired
+    private EntityManager entityManager;
+
     @Override
     public Page<Employer> findByKeyword(String keyword, Pageable pageable) {
         return employerRepository.findByKeyword(keyword,pageable);
@@ -37,6 +43,7 @@ public class EmployerServiceImpl implements EmployerService {
 
     @Override
     public Page<Employer> findByKeywordAndStatus(String keyword, EStatus status, Pageable pageable)  {
+
         return employerRepository.findByKeywordAndUserStatus(keyword,status,pageable);
 
     }
