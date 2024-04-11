@@ -1,5 +1,6 @@
 package com.pth.taskbackend.security;
 
+import com.google.api.client.util.Value;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import io.jsonwebtoken.Claims;
@@ -21,7 +22,8 @@ import java.util.function.Function;
 public class JwtService {
 
     public static final String SECRET = "Lu4byRqrMCp6OmPf3zyRUphe1NP0MZrZaB+2Kzay5OBb1Mfs6atzgSfwFCNVxpXhtQP5ToIzK1x1PgCFCpFY0Q==";
-    public static final int REFRESH_TOKEN_EXPIRATION_SECONDS =30 * 24 * 60 * 60;
+    public static  int REFRESH_TOKEN_EXPIRATION_SECONDS = 6000 ;
+    public static  int ACCESS_TOKEN_EXPIRATION_SECONDS =3000;
     private List<String> validTokens = new ArrayList<>();
     public String generateToken(String username, EStatus status, ERole role) {
         Map<String, Object> claims = new HashMap<>();
@@ -29,13 +31,15 @@ public class JwtService {
     }
 
     private String createToken(Map<String, Object> claims, String username,EStatus status,ERole role) {
+        System.out.println(ACCESS_TOKEN_EXPIRATION_SECONDS);
+        Instant now = Instant.now();
         String token = Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
                 .claim("status",status)
                 .claim("role",role)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 90))
+                .setExpiration(Date.from(now.plus(ACCESS_TOKEN_EXPIRATION_SECONDS, ChronoUnit.SECONDS)))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
         validTokens.add(token);
         return token;
@@ -86,18 +90,15 @@ public class JwtService {
     public void invalidateToken(String token) {
         validTokens.remove(token);
     }
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public Boolean validateToken(String token) {
+        return  !isTokenExpired(token);
     }
 
-    public String generateRefreshToken(String username,EStatus status,ERole role) {
+    public String generateRefreshToken(String username) {
         Instant now = Instant.now();
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(Date.from(now))
-                .claim("status",status)
-                .claim("role",role)
                 .setExpiration(Date.from(now.plus(REFRESH_TOKEN_EXPIRATION_SECONDS, ChronoUnit.SECONDS)))
                 .signWith(getRefreshSignKey(), SignatureAlgorithm.HS256)
                 .compact();

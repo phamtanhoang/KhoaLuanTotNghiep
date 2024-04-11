@@ -7,6 +7,7 @@ import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
+import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.model.meta.HumanResource;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
@@ -180,25 +181,60 @@ public class CandidateController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-//    @Operation(summary = "Get by id", description = "", tags = {})
-//    @GetMapping("/{id}")
-//    public ResponseEntity<BaseResponse> getCandidateById(@PathVariable String id) {
-//        try {
-//            Optional<Candidate> candidate = candidateService.findById(id);
-//            if (candidate.isPresent()) {
-//                return ResponseEntity.ok(
-//                        new BaseResponse( "ứng viên được tìm thấy", HttpStatus.OK.value(), candidate.get())
-//                );
-//            } else {
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null)
-//                );
-//            }
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
-//    }
+    @Operation(summary = "Get by id", description = "", tags = {})
+    @GetMapping("/{id}")
+    public ResponseEntity<BaseResponse> getCandidateByAdmin(@RequestHeader("Authorization")String token, @PathVariable() String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+
+
+            Optional<Candidate> optionalCandidate = candidateService.findById(id);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null)
+                );
+            if (optionalCandidate.get().getUser().getStatus().equals(EStatus.DELETED))
+                return ResponseEntity.ok(
+                        new BaseResponse("Không thể truy cập thông tin ứng viên đã xóa", HttpStatus.OK.value(), null)
+                );
+            Candidate candidate = optionalCandidate.get();
+
+            CandidateResponse response = new CandidateResponse(
+                    candidate.getId(),
+                    candidate.getCreated(),
+                    candidate.getUpdated(),
+                    candidate.getFirstName(),
+                    candidate.getLastName(),
+                    candidate.getPhoneNumber(),
+                    candidate.getSex(),
+                    candidate.getAvatar(),
+                    candidate.getDateOfBirth(),
+                    candidate.getIntroduction(),
+                    candidate.getJob(),
+                    candidate.getLink(),
+                    candidate.getUser().getStatus(),
+                    candidate.getUser().getEmail(),
+                    candidate.getUser().getId());
+            return ResponseEntity.ok(
+                    new BaseResponse("Chi tiết ứng viên", HttpStatus.OK.value(), response)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 
 
     @Operation(summary = "Get list", description = "", tags = {})
