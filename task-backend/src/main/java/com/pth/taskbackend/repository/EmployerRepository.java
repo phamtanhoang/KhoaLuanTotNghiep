@@ -21,7 +21,7 @@ public interface EmployerRepository extends JpaRepository<Employer, String> {
                 "WHERE (:keyword IS NULL OR e.name LIKE %:keyword%) " +
                 "OR (:keyword IS NULL OR u.email LIKE %:keyword%) " +
                 "AND (:status IS NULL OR u.status = :status) " +
-                "AND u.status <> 'DELETED'")
+                "AND u.status != 'DELETED'")
         Page<Employer> findByKeywordAndUserStatus(String keyword, EStatus status, Pageable pageable);
 
 

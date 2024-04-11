@@ -36,7 +36,7 @@ public class EmployerServiceImpl implements EmployerService {
     }
 
     @Override
-    public Page<Employer> findByKeywordAndStatus(String keyword, EStatus status, Pageable pageable) throws io.jsonwebtoken.io.IOException {
+    public Page<Employer> findByKeywordAndStatus(String keyword, EStatus status, Pageable pageable)  {
         return employerRepository.findByKeywordAndUserStatus(keyword,status,pageable);
 
     }

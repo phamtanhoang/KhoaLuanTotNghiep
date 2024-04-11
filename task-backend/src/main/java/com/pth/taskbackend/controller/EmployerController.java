@@ -171,6 +171,10 @@ public class EmployerController {
                 );
 
             User employer = optionalEmployer.get();
+            if (employer.getStatus().equals(EStatus.DELETED))
+                return ResponseEntity.ok(
+                        new BaseResponse("Đã xóa nhà tuyển dụng này", HttpStatus.OK.value(), null)
+                );
             employer.setStatus(EStatus.DELETED);
             userRepository.save(employer);
             return ResponseEntity.ok(new BaseResponse("Xóa nhà tuyển dụng thành công", HttpStatus.OK.value(), null));

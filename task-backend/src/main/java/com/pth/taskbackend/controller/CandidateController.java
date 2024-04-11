@@ -166,6 +166,10 @@ public class CandidateController {
                 );
 
             User candidate = optionalCandidate.get();
+            if (candidate.getStatus().equals(EStatus.DELETED))
+                return ResponseEntity.ok(
+                        new BaseResponse("Đã xóa ứng viên này", HttpStatus.OK.value(), null)
+                );
             candidate.setStatus(EStatus.DELETED);
             userRepository.save(candidate);
             return ResponseEntity.ok(new BaseResponse("Xóa ứng viên thành công", HttpStatus.OK.value(), null));
