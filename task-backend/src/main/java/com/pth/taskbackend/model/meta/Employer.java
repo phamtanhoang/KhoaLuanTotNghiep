@@ -18,10 +18,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Employer extends BaseEntity {
 
-    @Column(nullable = false,length = 1000)
     private String image;
 
-    @Column(nullable = false,length = 1000)
     private String backgroundImage;
 
     @Column(nullable = false)

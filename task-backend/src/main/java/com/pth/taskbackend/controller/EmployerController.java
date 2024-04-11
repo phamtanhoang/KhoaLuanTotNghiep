@@ -57,6 +57,116 @@ public class EmployerController {
     @Autowired
     CheckPermission checkPermission;
 
+
+    @Operation(summary = "Get list", description = "", tags = {})
+    @GetMapping("getEmployers-admin")
+    public ResponseEntity<BaseResponse> getEmployersByAdmin(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword,@RequestParam(required = false)EStatus status, Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            if(status==EStatus.DELETED)
+                return ResponseEntity.ok(
+                        new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
+                );
+
+            Page<Employer> employers = employerService.findByKeywordAndStatus(keyword,status,pageable);
+            if (employers.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách nhà tuyển dụng rỗng", HttpStatus.OK.value(), null)
+                );
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách nhà tuyển dụng ", HttpStatus.OK.value(), employers)
+                );
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "update status", description = "", tags = {})
+    @PatchMapping("/{id}")
+    public ResponseEntity<BaseResponse> updateEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestParam EStatus status) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<User> optionalEmployer = userRepository.findByEmployerId(id);
+            if (optionalEmployer.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
+                );
+            if(status==EStatus.DELETED)
+                return ResponseEntity.ok(
+                        new BaseResponse("Không được xóa", HttpStatus.NOT_FOUND.value(), null)
+                );
+            User employer = optionalEmployer.get();
+            employer.setStatus(status);
+            userRepository.save(employer);
+            return ResponseEntity.ok(new BaseResponse("Cập nhật nhà tuyển dụng thành công", HttpStatus.OK.value(), null));
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng cần xóa!", HttpStatus.NOT_FOUND.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "delete", description = "", tags = {})
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BaseResponse> deleteCandidate(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<User> optionalEmployer = userRepository.findByCandidateId(id);
+            if (optionalEmployer.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            User employer = optionalEmployer.get();
+            employer.setStatus(EStatus.DELETED);
+            userRepository.save(employer);
+            return ResponseEntity.ok(new BaseResponse("Xóa nhà tuyển dụng thành công", HttpStatus.OK.value(), null));
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng cần xóa!", HttpStatus.NOT_FOUND.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getEmployerById(@PathVariable() String id) {
@@ -77,31 +187,20 @@ public class EmployerController {
         }
     }
 
+
     @Operation(summary = "Get list", description = "", tags = {})
-    @GetMapping("getList")
-    public ResponseEntity<BaseResponse> getEmployer(@RequestHeader("Authorization") String token, @RequestParam(required = false)String keyword, @RequestParam(required = false) EStatus status, Pageable pageable) {
+    @GetMapping("")
+    public ResponseEntity<BaseResponse> getEmployer( @RequestParam(required = false)String keyword, Pageable pageable) {
         try {
-            String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN)||checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
-            if (!permission)
-                return ResponseEntity.ok(
-                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-                );
 
-            Optional<User> optionalUser = userRepository.findByEmail(email);
-            if (optionalUser.isEmpty())
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
-                );
-
-            Page<Employer> employers = employerService.findByKeywordAndStatus(keyword,status,pageable);
+            Page<Employer> employers = employerService.findByKeywordAndStatus(keyword,EStatus.ACTIVE,pageable);
             if (employers.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách nhà tuyển dụng rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách ứng viên", HttpStatus.OK.value(), employers)
+                        new BaseResponse("Danh sách nhà tuyển dụng", HttpStatus.OK.value(), employers)
                 );
             }
         } catch (Exception e) {
@@ -193,7 +292,7 @@ public class EmployerController {
         }
     }
     @Operation(summary = "Get by id", description = "", tags = {})
-    @GetMapping("/update")
+    @PatchMapping("/update")
     public ResponseEntity<BaseResponse> updateEmployerProfile(UpdateEmployerRequest request) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -229,7 +328,7 @@ public class EmployerController {
     }
 
     @Operation(summary = "Get by id", description = "", tags = {})
-    @GetMapping("/updateImage")
+    @PatchMapping("/updateImage")
     public ResponseEntity<BaseResponse> updateEmployerImage(@RequestPart MultipartFile image) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -243,13 +342,13 @@ public class EmployerController {
             Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
             if (!optionalEmployer.isPresent())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng tương ứng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
             Employer employer = optionalEmployer.get();
             employerService.updateImage(employer,image);
             return ResponseEntity.ok(
-                    new BaseResponse( "Cập nhật ảnh đại diện ứng viên thành công", HttpStatus.OK.value(), employer)
+                    new BaseResponse( "Cập nhật ảnh đại diện nhà tuyển dụng thành công", HttpStatus.OK.value(), employer)
             );
 
         } catch (Exception e) {
@@ -258,7 +357,7 @@ public class EmployerController {
         }
     }
     @Operation(summary = "Get by id", description = "", tags = {})
-    @GetMapping("/updateBackgroundImage")
+    @PatchMapping("/updateBackgroundImage")
     public ResponseEntity<BaseResponse> updateEmployerBackgroundImage(@RequestPart MultipartFile backgroundImage) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -272,13 +371,13 @@ public class EmployerController {
             Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
             if (!optionalEmployer.isPresent())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng tương ứng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
             Employer employer = optionalEmployer.get();
             employerService.updateBackgroundImage(employer,backgroundImage);
             return ResponseEntity.ok(
-                    new BaseResponse( "Cập nhật ảnh đại diện ứng viên thành công", HttpStatus.OK.value(), employer)
+                    new BaseResponse( "Cập nhật ảnh đại diện nhà tuyển dụng thành công", HttpStatus.OK.value(), employer)
             );
 
         } catch (Exception e) {
@@ -289,19 +388,7 @@ public class EmployerController {
 
 
 
-    @Operation(summary = "delete", description = "", tags = {})
-    @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteEmployer(@PathVariable("id") String id) {
-        try {
-            employerService.deleteById(id);
-            return ResponseEntity.ok(new BaseResponse("Xóa nhà tuyển dụng thành công", HttpStatus.OK.value(), null));
-        } catch (EmptyResultDataAccessException e) {
-            return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng cần xóa!", HttpStatus.NOT_FOUND.value(), null));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
+
 
 
 }

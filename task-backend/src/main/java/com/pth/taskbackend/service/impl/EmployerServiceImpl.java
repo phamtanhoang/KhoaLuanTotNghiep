@@ -44,12 +44,15 @@ public class EmployerServiceImpl implements EmployerService {
     @Override
     public Employer create(Employer employer, MultipartFile image, MultipartFile backgroundImage) throws IOException {
         FileUploadFunc fileUploadFunc = new FileUploadFunc();
-        String uploadImage = fileUploadFunc.uploadImage(image);
-    uploadImage=fileUploadFunc.getFullImagePath(uploadImage);
-    String uploadedBackground = fileUploadFunc.uploadImage(backgroundImage);
-    uploadedBackground=fileUploadFunc.getFullImagePath(uploadedBackground);
-    employer.setImage(uploadImage);
-    employer.setBackgroundImage(uploadedBackground);
+        if(image!=null&&backgroundImage!=null) {
+            String uploadImage = fileUploadFunc.uploadImage(image);
+            uploadImage=fileUploadFunc.getFullImagePath(uploadImage);
+            String uploadedBackground = fileUploadFunc.uploadImage(backgroundImage);
+            uploadedBackground=fileUploadFunc.getFullImagePath(uploadedBackground);
+            employer.setImage(uploadImage);
+            employer.setBackgroundImage(uploadedBackground);
+
+        }
 
         employerRepository.save(employer);
         return employer;

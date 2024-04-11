@@ -92,7 +92,7 @@ public class ApplicationController {
             application.setCV(cvPath);
             application.setPhoneNumber(applicationRequest.phoneNumber());
             application.setCandidate(optionalCandidate.get());
-            application.setEmail(applicationRequest.email());
+            application.setEmail(email);
             application.setLetter(applicationRequest.letter());
             application.setStatus(EApplyStatus.PENDING);
             application.setJob(job);
