@@ -28,9 +28,8 @@ public class Candidate extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime dateOfBirth;
 
-    @Lob
     @Column(nullable = false,length = 1000)
-    private byte[] avatar;
+    private String avatar;
 
     @Enumerated(EnumType.STRING)
     private ESex sex;

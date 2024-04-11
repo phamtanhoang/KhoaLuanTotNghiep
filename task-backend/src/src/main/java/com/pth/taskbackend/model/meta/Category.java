@@ -24,7 +24,6 @@ public class Category extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Lob
-    @Column(nullable = false,length = 1000)
-    private byte[] image;
+    @Column(nullable = false)
+    private String image;
 }
