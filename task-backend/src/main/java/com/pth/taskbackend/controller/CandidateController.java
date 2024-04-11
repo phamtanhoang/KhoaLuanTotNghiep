@@ -159,7 +159,13 @@ public class CandidateController {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
-            User candidate = optionalUser.get();
+            Optional<User> optionalCandidate = userRepository.findByCandidateId(id);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            User candidate = optionalCandidate.get();
             candidate.setStatus(EStatus.DELETED);
             userRepository.save(candidate);
             return ResponseEntity.ok(new BaseResponse("Xóa ứng viên thành công", HttpStatus.OK.value(), null));
