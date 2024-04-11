@@ -7,6 +7,7 @@ import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
+import com.pth.taskbackend.model.meta.HumanResource;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
@@ -158,8 +159,9 @@ public class CandidateController {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
-
-            candidateService.deleteById(id);
+            User candidate = optionalUser.get();
+            candidate.setStatus(EStatus.DELETED);
+            userRepository.save(candidate);
             return ResponseEntity.ok(new BaseResponse("Xóa ứng viên thành công", HttpStatus.OK.value(), null));
         } catch (EmptyResultDataAccessException e) {
             return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên cần xóa!", HttpStatus.NOT_FOUND.value(), null));
@@ -168,25 +170,25 @@ public class CandidateController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-    @Operation(summary = "Get by id", description = "", tags = {})
-    @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse> getCandidateById(@PathVariable String id) {
-        try {
-            Optional<Candidate> candidate = candidateService.findById(id);
-            if (candidate.isPresent()) {
-                return ResponseEntity.ok(
-                        new BaseResponse( "ứng viên được tìm thấy", HttpStatus.OK.value(), candidate.get())
-                );
-            } else {
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null)
-                );
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
+//    @Operation(summary = "Get by id", description = "", tags = {})
+//    @GetMapping("/{id}")
+//    public ResponseEntity<BaseResponse> getCandidateById(@PathVariable String id) {
+//        try {
+//            Optional<Candidate> candidate = candidateService.findById(id);
+//            if (candidate.isPresent()) {
+//                return ResponseEntity.ok(
+//                        new BaseResponse( "ứng viên được tìm thấy", HttpStatus.OK.value(), candidate.get())
+//                );
+//            } else {
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null)
+//                );
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+//        }
+//    }
 
 
     @Operation(summary = "Get list", description = "", tags = {})
@@ -223,22 +225,20 @@ public class CandidateController {
     }
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/profile")
-    public ResponseEntity<BaseResponse> getCandidateProfile() {
+    public ResponseEntity<BaseResponse> getCandidateProfile(@RequestHeader("Authorization")String token) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (authentication == null && !authentication.isAuthenticated())
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
                 return ResponseEntity.ok(
-                        new BaseResponse("xác thực khng hợp lệ", HttpStatus.FORBIDDEN.value(), null)
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
 
-            String email = authentication.getName();
             Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
             if (optionalCandidate.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
                 );
-
                 Candidate candidate = optionalCandidate.get();
                 GetCandidateProfileResponse profile = new GetCandidateProfileResponse(
                         candidate.getId(),
@@ -251,7 +251,8 @@ public class CandidateController {
                         candidate.getLink(),
                         candidate.getJob(),
                         candidate.getIntroduction(),
-                        candidate.getAvatar());
+                        candidate.getAvatar(),
+                        candidate.getSex());
 
                 return ResponseEntity.ok(
                         new BaseResponse( "Hiện thông tin ứng viên", HttpStatus.OK.value(), profile)
@@ -262,74 +263,77 @@ public class CandidateController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-//    @Operation(summary = "Get by id", description = "", tags = {})
-//    @PatchMapping("/{id}")
-//    public ResponseEntity<BaseResponse> updateCandidateProfile(UpdateCandidateRequest request) {
-//        try {
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//            if (authentication == null && !authentication.isAuthenticated())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("xác thực khng hợp lệ", HttpStatus.FORBIDDEN.value(), null)
-//                );
-//
-//            String email = authentication.getName();
-//            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
-//            if (optionalCandidate.isEmpty())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
-//                );
-//
-//            Candidate update = optionalCandidate.get();
-//            update.setFirstName(request.firstName());
-//            update.setLastName(request.lastName());
-//            update.setAddress(request.address());
-//            update.setPhoneNumber(request.phoneNumber());
-//            update.setDateOfBirth(request.dateOfBirth());
-//            update.setLink(request.link());
-//            update.setJob(request.job());
-//            update.setIntroduction(request.introduction());
-//
-//            candidateService.update(update);
-//            return ResponseEntity.ok(
-//                    new BaseResponse( "Cập nhật thông tin ứng viên thành công", HttpStatus.OK.value(), update)
-//            );
-//
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
-//    }
 
-//    @Operation(summary = "Get by id", description = "", tags = {})
-//    @PostMapping("/updateAvatar")
-//    public ResponseEntity<BaseResponse> updateCandidateProfile(@RequestPart MultipartFile avatar) {
-//        try {
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//            if (authentication == null && !authentication.isAuthenticated())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("xác thực không hợp lệ", HttpStatus.FORBIDDEN.value(), null)
-//                );
-//
-//            String email = authentication.getName();
-//            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
-//            if (optionalCandidate.isEmpty())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
-//                );
-//
-//            Candidate update = optionalCandidate.get();
-//            candidateService.updateAvatar(update,avatar);
-//            return ResponseEntity.ok(
-//                    new BaseResponse( "Cập nhật ảnh đại diện ứng viên thành công", HttpStatus.OK.value(), update)
-//            );
-//
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
-//    }
+
+    @Operation(summary = "update by token", description = "", tags = {})
+    @PatchMapping("/updateProfile")
+    public ResponseEntity<BaseResponse> updateCandidateProfile(@RequestHeader("Authorization")String token, UpdateCandidateRequest request) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Candidate update = optionalCandidate.get();
+            update.setFirstName(request.firstName());
+            update.setLastName(request.lastName());
+            update.setAddress(request.address());
+            update.setPhoneNumber(request.phoneNumber());
+            update.setDateOfBirth(request.dateOfBirth());
+            update.setLink(request.link());
+            update.setJob(request.job());
+            update.setIntroduction(request.introduction());
+            update.setSex(request.sex());
+            candidateService.update(update);
+            return ResponseEntity.ok(
+                    new BaseResponse( "Cập nhật thông tin ứng viên thành công", HttpStatus.OK.value(), update)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "Get by id", description = "", tags = {})
+    @PatchMapping("/updateAvatar")
+    public ResponseEntity<BaseResponse> updateCandidateAvatar(@RequestHeader("Authorization")String token,@RequestPart MultipartFile avatar) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                );
+            if(avatar.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Vui lòng chọn ảnh đại diện", HttpStatus.BAD_REQUEST.value(), null)
+                );
+            Candidate update = optionalCandidate.get();
+            candidateService.updateAvatar(update,avatar);
+            return ResponseEntity.ok(
+                    new BaseResponse( "Cập nhật ảnh đại diện ứng viên thành công", HttpStatus.OK.value(), update)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 
 
 

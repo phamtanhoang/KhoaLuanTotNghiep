@@ -24,7 +24,7 @@ public class ExperienceServiceImpl implements ExperienceService {
     }
 
     @Override
-    public List<Experience> save(List<Experience> Experiences) throws IOException, java.io.IOException {
+    public List<Experience> save(List<Experience> Experiences) throws IOException {
         return experienceRepository.saveAll(Experiences);
     }
 

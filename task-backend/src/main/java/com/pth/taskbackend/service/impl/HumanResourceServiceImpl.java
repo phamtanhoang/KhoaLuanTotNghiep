@@ -3,6 +3,7 @@ package com.pth.taskbackend.service.impl;
 import com.pth.taskbackend.model.meta.HumanResource;
 import com.pth.taskbackend.repository.HumanResourceRepository;
 import com.pth.taskbackend.service.HumanResourceService;
+import com.pth.taskbackend.util.func.FileUploadFunc;
 import com.pth.taskbackend.util.func.ImageFunc;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import java.util.Optional;
 public class HumanResourceServiceImpl implements HumanResourceService {
     @Autowired
     HumanResourceRepository humanResourceRepository;
+    @Autowired
+    FileUploadFunc fileUploadFunc;
     @Override
     public Optional<HumanResource> findByEmail(String email) {
         return humanResourceRepository.findByUserEmail(email);
@@ -33,7 +36,7 @@ public class HumanResourceServiceImpl implements HumanResourceService {
     }
 
     @Override
-    public HumanResource create(HumanResource humanResource) throws IOException {
+    public HumanResource create(HumanResource humanResource) {
 
         humanResourceRepository.save(humanResource);
         return humanResource;
@@ -47,11 +50,14 @@ public class HumanResourceServiceImpl implements HumanResourceService {
     }
 
     @Override
-    public HumanResource updateAvatar(HumanResource humanResource, MultipartFile avatar) throws IOException {
+    public HumanResource updateAvatar(HumanResource humanResource, MultipartFile avatar) {
 
-        if(avatar!=null)
-            humanResource.setAvatar(ImageFunc.compressImage(avatar.getBytes()));
+        if(avatar!=null) {
+            String uploadImage = fileUploadFunc.uploadImage(avatar);
+            uploadImage=fileUploadFunc.getFullImagePath(uploadImage);
+            humanResource.setAvatar(uploadImage);
 
+        }
         humanResourceRepository.save(humanResource);
         return humanResource;
 

@@ -10,11 +10,11 @@ import java.util.Optional;
 
 public interface HumanResourceService {
     Optional<HumanResource>findByEmail(String email) throws IOException;
-    Optional<HumanResource>findById(String id);
-    Page<HumanResource>findByEmployerId(String id, Pageable pageable);
-    HumanResource create(HumanResource humanResource) throws java.io.IOException;
-    HumanResource update(HumanResource humanResource);
-    HumanResource updateAvatar(HumanResource humanResource, MultipartFile avatar) throws java.io.IOException;
-    void deleteById(String id);
-    void delete(HumanResource humanResource);
+    Optional<HumanResource>findById(String id)throws IOException;
+    Page<HumanResource>findByEmployerId(String id, Pageable pageable)throws IOException;
+    HumanResource create(HumanResource humanResource)throws IOException;
+    HumanResource update(HumanResource humanResource)throws IOException;
+    HumanResource updateAvatar(HumanResource humanResource, MultipartFile avatar) throws IOException;
+    void deleteById(String id)throws IOException;
+    void delete(HumanResource humanResource)throws IOException;
 }

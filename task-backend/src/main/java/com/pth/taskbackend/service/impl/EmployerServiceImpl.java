@@ -42,7 +42,7 @@ public class EmployerServiceImpl implements EmployerService {
     }
 
     @Override
-    public Employer create(Employer employer, MultipartFile image, MultipartFile backgroundImage) throws IOException {
+    public Employer create(Employer employer, MultipartFile image, MultipartFile backgroundImage) {
         FileUploadFunc fileUploadFunc = new FileUploadFunc();
         if(image!=null&&backgroundImage!=null) {
             String uploadImage = fileUploadFunc.uploadImage(image);
@@ -59,7 +59,7 @@ public class EmployerServiceImpl implements EmployerService {
     }
 
     @Override
-    public Employer update(Employer employer) throws IOException {
+    public Employer update(Employer employer) {
 
 
         employerRepository.save(employer);
@@ -67,7 +67,7 @@ public class EmployerServiceImpl implements EmployerService {
     }
 
     @Override
-    public Employer updateImage(Employer employer, MultipartFile image) throws IOException {
+    public Employer updateImage(Employer employer, MultipartFile image)  {
         FileUploadFunc fileUploadFunc = new FileUploadFunc();
         String uploadImage = fileUploadFunc.uploadImage(image);
         uploadImage=fileUploadFunc.getFullImagePath(uploadImage);
@@ -78,7 +78,7 @@ public class EmployerServiceImpl implements EmployerService {
     }
 
     @Override
-    public Employer updateBackgroundImage(Employer employer, MultipartFile backgroundImage) throws IOException {
+    public Employer updateBackgroundImage(Employer employer, MultipartFile backgroundImage)  {
         FileUploadFunc fileUploadFunc = new FileUploadFunc();
         String uploadBackground = fileUploadFunc.uploadImage(backgroundImage);
         uploadBackground=fileUploadFunc.getFullImagePath(uploadBackground);

@@ -13,7 +13,7 @@ public interface SkillService {
     Optional<Skill> findById(String id) throws IOException;
     public List<Skill> save(List<Skill> skills)  throws IOException, java.io.IOException;
 
-    Page<Skill>findByCandidateId(String id, Pageable pageable);
+    Page<Skill>findByCandidateId(String id, Pageable pageable)throws IOException;
     void delete (Skill Skill) throws IOException;
     void deleteById(String id) throws IOException;
 

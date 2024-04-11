@@ -146,8 +146,6 @@ public class JobController {
                         new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-
-
             Optional<Job> optionalJob = jobService.findById(id);
             if (optionalJob.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -192,31 +190,20 @@ public class JobController {
 
     @Operation(summary = "delete job", description = "", tags = {})
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteJob(@PathVariable("id") String id) {
+    public ResponseEntity<BaseResponse> deleteJob(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (!(authentication != null && authentication.isAuthenticated())) {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
                 return ResponseEntity.ok(
-                        new BaseResponse("Bạn phải đăng nhập ", HttpStatus.FORBIDDEN.value(), null)
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
-            }
 
-            boolean hasHRAuthority = authentication.getAuthorities().stream()
-                    .anyMatch(authority -> authority.getAuthority().equals("HR"));
-
-            if (!hasHRAuthority) {
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
+            if (optionalHumanResource.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Bạn không có quyền thực hiện thao tác này", HttpStatus.FORBIDDEN.value(), null)
+                        new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)
                 );
-            }
-
-            String username = authentication.getName();
-            Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(username);
-            if (optionalHumanResource.isEmpty()) {
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy hr", HttpStatus.OK.value(), null)
-                );
-            }
 
             HumanResource hr = optionalHumanResource.get();
 
@@ -228,7 +215,6 @@ public class JobController {
             }
 
             Job job = optionalJob.get();
-
 
             if (!job.getHumanResource().getId().equals(hr.getId())) {
                 return ResponseEntity.ok(

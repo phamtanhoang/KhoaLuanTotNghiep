@@ -24,9 +24,7 @@ public class HumanResource extends BaseEntity {
     @Column(nullable = false)
     private String lastName;
 
-    @Lob
-    @Column(length = 1000)
-    private byte[] avatar;
+    private String avatar;
 
     @Enumerated(EnumType.STRING)
     private ESex sex;

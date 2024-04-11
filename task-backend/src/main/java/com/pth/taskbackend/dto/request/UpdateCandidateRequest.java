@@ -1,5 +1,7 @@
 package com.pth.taskbackend.dto.request;
 
+import com.pth.taskbackend.enums.ESex;
+
 import java.time.LocalDateTime;
 
 public record UpdateCandidateRequest (String id,
@@ -10,5 +12,7 @@ public record UpdateCandidateRequest (String id,
                                       LocalDateTime dateOfBirth,
                                       String link,
                                       String job,
-                                      String introduction){
+                                      String introduction,
+                                      ESex sex
+){
 }

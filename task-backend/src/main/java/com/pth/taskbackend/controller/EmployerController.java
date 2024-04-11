@@ -149,7 +149,7 @@ public class EmployerController {
     }
     @Operation(summary = "delete", description = "", tags = {})
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteCandidate(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+    public ResponseEntity<BaseResponse> deleteEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
@@ -164,7 +164,7 @@ public class EmployerController {
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            Optional<User> optionalEmployer = userRepository.findByCandidateId(id);
+            Optional<User> optionalEmployer = userRepository.findByEmployerId(id);
             if (optionalEmployer.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
@@ -306,7 +306,7 @@ public class EmployerController {
         }
     }
     @Operation(summary = "Get by id", description = "", tags = {})
-    @PatchMapping("/update")
+    @PatchMapping("/updateProfile")
     public ResponseEntity<BaseResponse> updateEmployerProfile(UpdateEmployerRequest request) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -343,22 +343,24 @@ public class EmployerController {
 
     @Operation(summary = "Get by id", description = "", tags = {})
     @PatchMapping("/updateImage")
-    public ResponseEntity<BaseResponse> updateEmployerImage(@RequestPart MultipartFile image) {
+    public ResponseEntity<BaseResponse> updateEmployerImage(@RequestHeader("Authorization")String token,@RequestPart MultipartFile image) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (authentication == null && !authentication.isAuthenticated())
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
                 return ResponseEntity.ok(
-                        new BaseResponse("xác thực không hợp lệ", HttpStatus.FORBIDDEN.value(), null)
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
 
-            String email = authentication.getName();
             Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
-            if (!optionalEmployer.isPresent())
+            if (optionalEmployer.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy nhà tuyển dụng tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng ", HttpStatus.NOT_FOUND.value(), null)
                 );
-
+            if(image.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Vui lòng chọn ảnh đại diện", HttpStatus.BAD_REQUEST.value(), null)
+                );
             Employer employer = optionalEmployer.get();
             employerService.updateImage(employer,image);
             return ResponseEntity.ok(
@@ -372,22 +374,24 @@ public class EmployerController {
     }
     @Operation(summary = "Get by id", description = "", tags = {})
     @PatchMapping("/updateBackgroundImage")
-    public ResponseEntity<BaseResponse> updateEmployerBackgroundImage(@RequestPart MultipartFile backgroundImage) {
+    public ResponseEntity<BaseResponse> updateEmployerBackgroundImage(@RequestHeader("Authorization")String token,@RequestPart MultipartFile backgroundImage) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (authentication == null && !authentication.isAuthenticated())
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
                 return ResponseEntity.ok(
-                        new BaseResponse("xác thực không hợp lệ", HttpStatus.FORBIDDEN.value(), null)
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
 
-            String email = authentication.getName();
             Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
-            if (!optionalEmployer.isPresent())
+            if (optionalEmployer.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy nhà tuyển dụng tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng ", HttpStatus.NOT_FOUND.value(), null)
                 );
-
+            if(backgroundImage.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Vui lòng chọn ảnh đại diện", HttpStatus.BAD_REQUEST.value(), null)
+                );
             Employer employer = optionalEmployer.get();
             employerService.updateBackgroundImage(employer,backgroundImage);
             return ResponseEntity.ok(

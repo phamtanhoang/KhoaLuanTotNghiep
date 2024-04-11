@@ -30,7 +30,7 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
-    public Candidate create(Candidate candidate, MultipartFile avatar) throws IOException {
+    public Candidate create(Candidate candidate, MultipartFile avatar)  {
 
         FileUploadFunc fileUploadFunc = new FileUploadFunc();
         if(avatar!=null) {
@@ -43,7 +43,7 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
-    public Candidate update(Candidate candidate) throws IOException {
+    public Candidate update(Candidate candidate)  {
 
 
 
@@ -52,7 +52,7 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
-    public Candidate updateAvatar(Candidate candidate, MultipartFile avatar) throws IOException {
+    public Candidate updateAvatar(Candidate candidate, MultipartFile avatar)  {
 
         FileUploadFunc fileUploadFunc = new FileUploadFunc();
         String uploadImage = fileUploadFunc.uploadImage(avatar);

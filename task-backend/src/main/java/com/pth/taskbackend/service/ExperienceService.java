@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public interface ExperienceService {
     Optional<Experience> findById(String id) throws IOException;
-    public List<Experience> save(List<Experience> experiences)  throws IOException, java.io.IOException;
+    public List<Experience> save(List<Experience> experiences)  throws IOException;
 
-    Page<Experience> findByCandidateId(String id, Pageable pageable);
+    Page<Experience> findByCandidateId(String id, Pageable pageable)throws IOException;
     void delete (Experience experience) throws IOException;
     void deleteById(String id) throws IOException;
 }

@@ -79,7 +79,7 @@ public class HumanResourceController {
     @Operation(summary = "Create", description = "", tags = {})
     @PostMapping("/create")
     public ResponseEntity<BaseResponse> createHumanResource(@RequestHeader("Authorization")String token, @RequestBody CreateHumanResourceRequest request
-                                                       ) throws IOException {
+                                                       )  {
         try {
 
         String email = jwtService.extractUsername(token.substring(7));
@@ -127,67 +127,59 @@ public class HumanResourceController {
         }
     }
 
-//    @Operation(summary = "Get by id", description = "", tags = {})
-//    @GetMapping("/update")
-//    public ResponseEntity<BaseResponse> updateHumanResource(UpdateCandidateRequest request) {
-//        try {
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//            if (authentication == null && !authentication.isAuthenticated())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("xác thực khng hợp lệ", HttpStatus.FORBIDDEN.value(), null)
-//                );
-//
-//            String email = authentication.getName();
-//            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
-//            if (!optionalCandidate.isPresent())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
-//                );
-//
-//            Candidate update = optionalCandidate.get();
-//            update.setFirstName(request.firstName());
-//            update.setLastName(request.lastName());
-//            update.setAddress(request.address());
-//            update.setPhoneNumber(request.phoneNumber());
-//            update.setDateOfBirth(request.dateOfBirth());
-//            update.setLink(request.link());
-//            update.setJob(request.job());
-//            update.setIntroduction(request.introduction());
-//
-//            candidateService.update(update);
-//            return ResponseEntity.ok(
-//                    new BaseResponse( "Cập nhật thông tin ứng viên thành công", HttpStatus.OK.value(), update)
-//            );
-//
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
-//    }
+    @Operation(summary = "Get by id", description = "", tags = {})
+    @GetMapping("/update")
+    public ResponseEntity<BaseResponse> updateHumanResource(@RequestHeader("Authorization")String token, CreateHumanResourceRequest request) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            }
+
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
+            if (optionalHumanResource.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null));
+            }
+            HumanResource hr = optionalHumanResource.get();
+            hr.setFirstName(request.firstName());
+            hr.setLastName(request.lastName());
+            hr.setSex(request.sex());
+            hr.setPhoneNumber(request.phoneNumber());
+
+            humanResourceService.update(hr);
+            return ResponseEntity.ok(
+                    new BaseResponse( "Cập nhật thông tin HR thành công", HttpStatus.OK.value(), hr)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/updateAvatar")
-    public ResponseEntity<BaseResponse> updateHumanResourceProfile(@RequestPart MultipartFile avatar) {
+    public ResponseEntity<BaseResponse> updateHumanResourceProfile(@RequestHeader("Authorization")String token, @RequestPart MultipartFile avatar) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            }
 
-            if (authentication == null && !authentication.isAuthenticated())
-                return ResponseEntity.ok(
-                        new BaseResponse("xác thực không hợp lệ", HttpStatus.FORBIDDEN.value(), null)
-                );
-
-            String email = authentication.getName();
             Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
-            if (!optionalHumanResource.isPresent())
+            if (optionalHumanResource.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null));
+            }
+            if(avatar.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Vui lòng chọn ảnh đại diện", HttpStatus.BAD_REQUEST.value(), null)
                 );
-
-            HumanResource hr = optionalHumanResource.get();
-            humanResourceService.updateAvatar(hr,avatar);
+            HumanResource humanResource = optionalHumanResource.get();
+            humanResourceService.updateAvatar(humanResource,avatar);
             return ResponseEntity.ok(
-                    new BaseResponse( "Cập nhật ảnh đại diện ứng viên thành công", HttpStatus.OK.value(), hr)
+                    new BaseResponse( "Cập nhật ảnh đại diện nhà tuyển dụng thành công", HttpStatus.OK.value(), humanResource)
             );
 
         } catch (Exception e) {

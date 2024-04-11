@@ -1,5 +1,7 @@
 package com.pth.taskbackend.dto.response;
 
+import com.pth.taskbackend.enums.ESex;
+
 import java.time.LocalDateTime;
 
 public record GetCandidateProfileResponse(
@@ -13,5 +15,6 @@ public record GetCandidateProfileResponse(
     String link,
     String job,
     String introduction,
-    String avatar){
+    String avatar,
+    ESex sex){
 }

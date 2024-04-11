@@ -24,7 +24,7 @@ public class EducationServiceImpl implements EducationService {
     }
 
     @Override
-    public List<Education> save(List<Education> educations) throws IOException, java.io.IOException {
+    public List<Education> save(List<Education> educations) throws IOException{
         return educationRepository.saveAll(educations);
     }
 

@@ -13,13 +13,13 @@ public interface CandidateService {
 
     Page<Candidate>findByKeywordAndStatus(String keyword, EStatus status, Pageable pageable) throws IOException;
     Optional<Candidate>findById(String id) throws IOException;
-    Candidate create(Candidate candidate, MultipartFile avatar) throws IOException, java.io.IOException;
-    Candidate update(Candidate candidate) throws IOException, java.io.IOException;
+    Candidate create(Candidate candidate, MultipartFile avatar) throws IOException;
+    Candidate update(Candidate candidate) throws IOException ;
 
-    Candidate updateAvatar(Candidate candidate, MultipartFile avatar) throws java.io.IOException;
+    Candidate updateAvatar(Candidate candidate, MultipartFile avatar)throws IOException;
     void delete (Candidate candidate) throws IOException;
     void deleteById(String id) throws IOException;
 
-    Optional<Candidate>findByUserEmail(String email);
+    Optional<Candidate>findByUserEmail(String email)throws IOException;
 
 }
