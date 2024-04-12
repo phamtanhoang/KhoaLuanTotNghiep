@@ -1,6 +1,8 @@
 package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.request.JobRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
+import com.pth.taskbackend.dto.response.JobResponse;
+import com.pth.taskbackend.dto.response.StepResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Category;
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +31,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
 @CrossOrigin(origins = "*")
@@ -62,20 +69,144 @@ public class JobController {
                                                 Pageable pageable) {
         try {
             Page<Job> jobs = jobService.searchJobs(keyword, location, fromSalary, toSalary, categoryId, pageable);
+
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
+                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.NOT_FOUND.value(), null)
                 );
             } else {
+                List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
+                    List<StepResponse> stepResponses;
+                    if (job.getProcess() != null) {
+                        stepResponses = job.getProcess().getSteps().stream()
+                                .map(step -> new StepResponse(
+                                        step.getId(),
+                                        step.getName(),
+                                        step.getNumber(),
+                                        step.getProcess() != null ? step.getProcess().getId() : null
+                                ))
+                                .collect(Collectors.toList());
+                    } else {
+                        stepResponses = Collections.emptyList();
+                    }
+
+                    return new JobResponse(
+                            job.getId(),
+                            job.getCreated(),
+                            job.getUpdated(),
+                            job.getToDate(),
+                            job.getName(),
+                            job.getDescription(),
+                            job.getExperience(),
+                            job.getFromSalary(),
+                            job.getToSalary(),
+                            job.getLocation(),
+                            job.getStatus(),
+                            job.getCategory().getId(),
+                            job.getCategory().getName(),
+                            job.getHumanResource().getId(),
+                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
+                            job.getHumanResource().getEmployer().getName(),
+                            job.getHumanResource().getEmployer().getId(),
+                            job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getProcess() != null ? job.getProcess().getId() : null,
+                            stepResponses
+                    );
+                }).collect(Collectors.toList());
+
+                Page<JobResponse> jobResponsePage = new PageImpl<>(jobResponses, jobs.getPageable(), jobs.getTotalElements());
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobs)
+                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobResponsePage)
                 );
+
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
+
     }
+
+//    @Operation(summary = "Get list", description = "", tags = {})
+//    @GetMapping("/getJobs-hr")
+//    public ResponseEntity<BaseResponse> getJobsByHR(@RequestHeader("Authorization")String token,@RequestParam(required = false) String keyword,
+//                                                Pageable pageable) {
+//        try {
+//            String email = jwtService.extractUsername(token.substring(7));
+//            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+//            if (!permission)
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+//                );
+//
+//            Optional<User> optionalUser = userRepository.findByEmail(email);
+//            if (optionalUser.isEmpty())
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+//                );
+//
+//            if(status==EStatus.DELETED)
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
+//                );
+//            Page<Job> jobs = jobService.searchJobs(keyword, location, fromSalary, toSalary, categoryId, pageable);
+//
+//            if (jobs.isEmpty()) {
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.NOT_FOUND.value(), null)
+//                );
+//            } else {
+//                List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
+//                    List<StepResponse> stepResponses;
+//                    if (job.getProcess() != null) {
+//                        stepResponses = job.getProcess().getSteps().stream()
+//                                .map(step -> new StepResponse(
+//                                        step.getId(),
+//                                        step.getName(),
+//                                        step.getNumber(),
+//                                        step.getProcess() != null ? step.getProcess().getId() : null
+//                                ))
+//                                .collect(Collectors.toList());
+//                    } else {
+//                        stepResponses = Collections.emptyList();
+//                    }
+//
+//                    return new JobResponse(
+//                            job.getId(),
+//                            job.getCreated(),
+//                            job.getUpdated(),
+//                            job.getToDate(),
+//                            job.getName(),
+//                            job.getDescription(),
+//                            job.getExperience(),
+//                            job.getFromSalary(),
+//                            job.getToSalary(),
+//                            job.getLocation(),
+//                            job.getStatus(),
+//                            job.getCategory().getId(),
+//                            job.getCategory().getName(),
+//                            job.getHumanResource().getId(),
+//                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
+//                            job.getHumanResource().getEmployer().getName(),
+//                            job.getHumanResource().getEmployer().getId(),
+//                            job.getHumanResource().getEmployer().getUser().getEmail(),
+//                            job.getProcess() != null ? job.getProcess().getId() : null,
+//                            stepResponses
+//                    );
+//                }).collect(Collectors.toList());
+//
+//                Page<JobResponse> jobResponsePage = new PageImpl<>(jobResponses, jobs.getPageable(), jobs.getTotalElements());
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobResponsePage)
+//                );
+//
+//            }
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+//        }
+//
+//    }
 
     @Operation(summary = "Create", description = "", tags = {})
     @PostMapping("/create")

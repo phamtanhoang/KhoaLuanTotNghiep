@@ -94,7 +94,7 @@ public class CandidateController {
             ));
             if (candidates.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách ứng viên rỗng", HttpStatus.OK.value(), null)
+                        new BaseResponse("Danh sách ứng viên rỗng", HttpStatus.NOT_FOUND.value(), null)
                 );
             } else {
                 return ResponseEntity.ok(
@@ -339,7 +339,7 @@ public class CandidateController {
 
     @Operation(summary = "update by token", description = "", tags = {})
     @PatchMapping("/updateProfile")
-    public ResponseEntity<BaseResponse> updateCandidateProfile(@RequestHeader("Authorization")String token, UpdateCandidateRequest request) {
+    public ResponseEntity<BaseResponse> updateCandidateProfile(@RequestHeader("Authorization")String token,@RequestBody UpdateCandidateRequest request) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);

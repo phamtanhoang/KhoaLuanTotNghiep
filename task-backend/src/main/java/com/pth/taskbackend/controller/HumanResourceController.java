@@ -3,6 +3,9 @@ import com.pth.taskbackend.dto.request.CreateEmployerRequest;
 import com.pth.taskbackend.dto.request.CreateHumanResourceRequest;
 import com.pth.taskbackend.dto.request.UpdateCandidateRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
+import com.pth.taskbackend.dto.response.CandidateResponse;
+import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
+import com.pth.taskbackend.dto.response.HumanResourceResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.*;
@@ -55,18 +58,106 @@ public class HumanResourceController {
     @Autowired
     CheckPermission checkPermission;
 
-    @Operation(summary = "Get by id", description = "", tags = {})
-    @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse> getEmployerById(@PathVariable() String id) {
+
+    @Operation(summary = "Get list", description = "", tags = {})
+    @GetMapping("getHumanResource-admin")
+    public ResponseEntity<BaseResponse> getHumanResourceByAdmin(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword,@RequestParam(required = false)EStatus status, Pageable pageable) {
         try {
-            Optional<HumanResource> humanResource = humanResourceService.findById(id);
-            if (humanResource.isPresent()) {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
                 return ResponseEntity.ok(
-                        new BaseResponse("nhà tuyển dụng được tìm thấy", HttpStatus.OK.value(), humanResource.get())
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            if(status==EStatus.DELETED)
+                return ResponseEntity.ok(
+                        new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
+                );
+
+            Page<HumanResource> humanResources = humanResourceService.findByKeywordAndStatus(keyword,status,pageable);
+            Page<HumanResourceResponse> responseList = humanResources.map(humanResource -> new HumanResourceResponse(
+                    humanResource.getId(),
+                    humanResource.getCreated(),
+                    humanResource.getUpdated(),
+                    humanResource.getFirstName(),
+                    humanResource.getLastName(),
+                    humanResource.getPhoneNumber(),
+                    humanResource.getSex(),
+                    humanResource.getAvatar(),
+                    humanResource.getEmployer().getName(),
+                    humanResource.getEmployer().getId(),
+                    humanResource.getUser().getId(),
+                    humanResource.getUser().getStatus().toString(),
+                    humanResource.getUser().getEmail()
+            ));
+
+            if (humanResources.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách HR rỗng", HttpStatus.NO_CONTENT.value(), null)
                 );
             } else {
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy hr", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Danh sách HR", HttpStatus.OK.value(), responseList)
+                );
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "Get list", description = "", tags = {})
+    @GetMapping("getHumanResource-employer")
+    public ResponseEntity<BaseResponse> getHumanResourceByEmployer(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword,@RequestParam(required = false)EStatus status, Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+            if (optionalEmployer.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            if(status==EStatus.DELETED)
+                return ResponseEntity.ok(
+                        new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
+                );
+
+            Page<HumanResource> humanResources = humanResourceService.findByKeywordAndStatusAndEmployerId(keyword,status,optionalEmployer.get().getId(),pageable);
+            Page<HumanResourceResponse> responseList = humanResources.map(humanResource -> new HumanResourceResponse(
+                    humanResource.getId(),
+                    humanResource.getCreated(),
+                    humanResource.getUpdated(),
+                    humanResource.getFirstName(),
+                    humanResource.getLastName(),
+                    humanResource.getPhoneNumber(),
+                    humanResource.getSex(),
+                    humanResource.getAvatar(),
+                    humanResource.getEmployer().getName(),
+                    humanResource.getEmployer().getId(),
+                    humanResource.getUser().getId(),
+                    humanResource.getUser().getStatus().toString(),
+                    humanResource.getUser().getEmail()
+            ));
+
+            if (humanResources.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách HR rỗng", HttpStatus.NO_CONTENT.value(), null)
+                );
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách HR", HttpStatus.OK.value(), responseList)
                 );
             }
         } catch (Exception e) {
@@ -75,9 +166,62 @@ public class HumanResourceController {
         }
     }
 
+    @Operation(summary = "Get by id", description = "", tags = {})
+    @GetMapping("/{id}")
+    public ResponseEntity<BaseResponse> getHumanResourceByAdmin(@RequestHeader("Authorization")String token, @PathVariable() String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+
+
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findById(id);
+            if (optionalHumanResource.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy HR", HttpStatus.NOT_FOUND.value(), null)
+                );
+            if (optionalHumanResource.get().getUser().getStatus().equals(EStatus.DELETED))
+                return ResponseEntity.ok(
+                        new BaseResponse("Không thể truy cập thông tin HR đã xóa", HttpStatus.NO_CONTENT.value(), null)
+                );
+            HumanResource hr = optionalHumanResource.get();
+
+            HumanResourceResponse response= new HumanResourceResponse(
+                    hr.getId(),
+                    hr.getCreated(),
+                    hr.getUpdated(),
+                    hr.getFirstName(),
+                    hr.getLastName(),
+                    hr.getPhoneNumber(),
+                    hr.getSex(),
+                    hr.getAvatar(),
+                    hr.getEmployer().getName(),
+                    hr.getEmployer().getId(),
+                    hr.getUser().getId(),
+                    hr.getUser().getStatus().toString(),
+                    hr.getUser().getEmail());
+            return ResponseEntity.ok(
+                    new BaseResponse("Chi tiết HR", HttpStatus.OK.value(), response)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
 
     @Operation(summary = "Create", description = "", tags = {})
-    @PostMapping("/create")
+    @PostMapping("")
     public ResponseEntity<BaseResponse> createHumanResource(@RequestHeader("Authorization")String token, @RequestBody CreateHumanResourceRequest request
                                                        )  {
         try {
@@ -126,27 +270,169 @@ public class HumanResourceController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-
-    @Operation(summary = "Get by id", description = "", tags = {})
-    @GetMapping("/update")
-    public ResponseEntity<BaseResponse> updateHumanResource(@RequestHeader("Authorization")String token, CreateHumanResourceRequest request) {
+    @Operation(summary = "update status", description = "", tags = {})
+    @PatchMapping("/{id}")
+    public ResponseEntity<BaseResponse> updateHR(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestPart EStatus status) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
-            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
-            if (!hasPermission) {
-                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<User> optionalHR = userRepository.findByHumanResourceId(id);
+            if (optionalHR.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy HR tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                );
+            if(status==EStatus.DELETED)
+                return ResponseEntity.ok(
+                        new BaseResponse("Không được xóa", HttpStatus.NOT_FOUND.value(), null)
+                );
+            User hr = optionalHR.get();
+            switch (status)
+            {
+                case ACTIVE :
+                    if(hr.getStatus().equals(EStatus.ACTIVE))
+                        return ResponseEntity.ok(
+                                new BaseResponse("Đã duyệt HR này rồi", HttpStatus.OK.value(), null)
+                        );
+                    hr.setStatus(EStatus.ACTIVE);
+                    userRepository.save(hr);
+
+                    return ResponseEntity.ok(
+                            new BaseResponse("Duyệt HR dụng thành công", HttpStatus.OK.value(), null)
+                    );
+                case INACTIVE:
+                    if(hr.getStatus().equals(EStatus.INACTIVE))
+                        return ResponseEntity.ok(
+                                new BaseResponse("Đã khóa HR này rồi", HttpStatus.OK.value(), null)
+                        );
+                    hr.setStatus(EStatus.INACTIVE);
+                    userRepository.save(hr);
+
+                    return ResponseEntity.ok(
+                            new BaseResponse("Khóa HR dụng thành công", HttpStatus.OK.value(), null)
+                    );
+                default:
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
             }
 
-            Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
-            if (optionalHumanResource.isEmpty()) {
-                return ResponseEntity.ok(new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null));
-            }
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy HR cần xóa!", HttpStatus.NOT_FOUND.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "delete", description = "", tags = {})
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BaseResponse> deleteHR(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Optional<User> optionalHR = userRepository.findByHumanResourceId(id);
+            if (optionalHR.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy HR", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            User hr = optionalHR.get();
+            if (hr.getStatus().equals(EStatus.DELETED))
+                return ResponseEntity.ok(
+                        new BaseResponse("Đã xóa HR này", HttpStatus.OK.value(), null)
+                );
+            hr.setStatus(EStatus.DELETED);
+            userRepository.save(hr);
+            return ResponseEntity.ok(new BaseResponse("Xóa HR thành công", HttpStatus.OK.value(), null));
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy HR cần xóa!", HttpStatus.NOT_FOUND.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "Get by id", description = "", tags = {})
+    @GetMapping("/profile")
+    public ResponseEntity<BaseResponse> getHumanResourceProfile(@RequestHeader("Authorization")String token) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findById(email);
+            if (optionalHumanResource.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)
+                );
+            HumanResource hr = optionalHumanResource.get();
+            HumanResourceResponse profile= new HumanResourceResponse(
+                    hr.getId(),
+                    hr.getCreated(),
+                    hr.getUpdated(),
+                    hr.getFirstName(),
+                    hr.getLastName(),
+                    hr.getPhoneNumber(),
+                    hr.getSex(),
+                    hr.getAvatar(),
+                    hr.getEmployer().getName(),
+                    hr.getEmployer().getId(),
+                    hr.getUser().getId(),
+                    hr.getUser().getStatus().toString(),
+                    hr.getUser().getEmail());
+            return ResponseEntity.ok(
+                    new BaseResponse( "Hiện thông tin HR", HttpStatus.OK.value(), profile)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "update by token", description = "", tags = {})
+    @PatchMapping("/updateProfile")
+    public ResponseEntity<BaseResponse> updateHumanResourceProfile(@RequestHeader("Authorization")String token,@RequestBody UpdateCandidateRequest request) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findById(email);
+            if (optionalHumanResource.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)
+                );
             HumanResource hr = optionalHumanResource.get();
             hr.setFirstName(request.firstName());
             hr.setLastName(request.lastName());
             hr.setSex(request.sex());
             hr.setPhoneNumber(request.phoneNumber());
-
             humanResourceService.update(hr);
             return ResponseEntity.ok(
                     new BaseResponse( "Cập nhật thông tin HR thành công", HttpStatus.OK.value(), hr)
@@ -157,6 +443,7 @@ public class HumanResourceController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
 
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/updateAvatar")
@@ -179,7 +466,7 @@ public class HumanResourceController {
             HumanResource humanResource = optionalHumanResource.get();
             humanResourceService.updateAvatar(humanResource,avatar);
             return ResponseEntity.ok(
-                    new BaseResponse( "Cập nhật ảnh đại diện nhà tuyển dụng thành công", HttpStatus.OK.value(), humanResource)
+                    new BaseResponse( "Cập nhật ảnh đại diện HR thành công", HttpStatus.OK.value(), humanResource)
             );
 
         } catch (Exception e) {
@@ -187,19 +474,7 @@ public class HumanResourceController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-    @Operation(summary = "delete", description = "", tags = {})
-    @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteHumanResource(@PathVariable("id") String id) {
-        try {
-            humanResourceService.deleteById(id);
-            return ResponseEntity.ok(new BaseResponse("Xóa ứng viên thành công", HttpStatus.OK.value(), null));
-        } catch (EmptyResultDataAccessException e) {
-            return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên cần xóa!", HttpStatus.NOT_FOUND.value(), null));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
+
 
 
 }

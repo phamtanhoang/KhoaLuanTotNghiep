@@ -1,10 +1,12 @@
 package com.pth.taskbackend.service.impl;
 
+import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.HumanResource;
 import com.pth.taskbackend.repository.HumanResourceRepository;
 import com.pth.taskbackend.service.HumanResourceService;
 import com.pth.taskbackend.util.func.FileUploadFunc;
 import com.pth.taskbackend.util.func.ImageFunc;
+import io.jsonwebtoken.io.IOException;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Optional;
 @Service
 public class HumanResourceServiceImpl implements HumanResourceService {
@@ -33,6 +34,16 @@ public class HumanResourceServiceImpl implements HumanResourceService {
     @Override
     public Page<HumanResource> findByEmployerId(String id, Pageable pageable) {
         return null;
+    }
+
+    @Override
+    public Page<HumanResource> findByKeywordAndStatus(String keyword, EStatus status, Pageable pageable) throws IOException {
+        return humanResourceRepository.findByKeywordAndStatus(keyword,status,pageable);
+    }
+
+    @Override
+    public Page<HumanResource> findByKeywordAndStatusAndEmployerId(String keyword, EStatus status, String employerId, Pageable pageable) throws IOException {
+        return humanResourceRepository.findByKeywordAndStatusAndEmployerId(keyword,status,employerId,pageable);
     }
 
     @Override

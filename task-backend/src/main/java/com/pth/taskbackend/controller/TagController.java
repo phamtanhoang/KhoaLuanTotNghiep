@@ -59,8 +59,10 @@ public class TagController {
 
     @Operation(summary = "Get by name", description = "", tags = {})
     @GetMapping("/name={name}")
-    public ResponseEntity<BaseResponse> getTagByName(@PathVariable String name) {
+    public ResponseEntity<BaseResponse> getTagByName( @PathVariable String name) {
         try {
+
+
             Optional<Tag> tag = tagService.findByName(name);
             return tag.map(value -> ResponseEntity.ok(
                     new BaseResponse("Nhãn được tìm thấy.", HttpStatus.OK.value(), value)
@@ -77,6 +79,7 @@ public class TagController {
     @GetMapping
     public ResponseEntity<BaseResponse> getTags(@RequestParam(required = false) String name, Pageable pageable) {
         try {
+
             Page<Tag> tags;
             if (name != null) {
                 tags = tagService.findByNameContaining(name, pageable);
