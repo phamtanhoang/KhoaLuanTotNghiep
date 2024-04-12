@@ -14,9 +14,12 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
+
 public class BankingConfig {
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:8080/api/VNPay/paymentResult";
+    public static String vnp_ReturnUrl ="http://localhost:8080/api/v1/bankings/payResponse";
     public static String vnp_TmnCode = "V9TZGVS9";
     public static String secretKey = "NAWBHJNBBLZXSDESGVSNOKXXMQSFULRU";
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";

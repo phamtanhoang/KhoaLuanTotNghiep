@@ -1,5 +1,6 @@
 package com.pth.taskbackend.service;
 
+import com.pth.taskbackend.model.meta.VipCandidate;
 import com.pth.taskbackend.model.meta.VipEmployer;
 import com.pth.taskbackend.repository.VipEmployerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public interface VipEmployerService {
 
     public Optional<VipEmployer>findByIdAndEmployerId(String id,String employerId)throws IOException;
 
-    public VipEmployer save(VipEmployer vipEmployer)throws IOException;
+    VipEmployer create(VipEmployer vipEmployer)throws IOException;
 
     public Optional<VipEmployer> findByEmployerIdAndAvailable(String employerId)throws IOException;
 

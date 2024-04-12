@@ -48,13 +48,14 @@ public class VipEmployerServiceImpl implements VipEmployerService {
     }
 
     @Override
-    public VipEmployer save(VipEmployer vipEmployer) throws IOException {
-        return null;
+    public VipEmployer create(VipEmployer vipEmployer) throws IOException {
+        return vipEmployerRepository.save(vipEmployer);
     }
 
+
     @Override
-    public Optional<VipEmployer> findByEmployerIdAndAvailable(String employerId) throws IOException {
-        return Optional.empty();
+    public Optional<VipEmployer> findByEmployerIdAndAvailable(String employerId)  {
+        return  vipEmployerRepository.findLatestByEmployerId(employerId);
     }
 
     @Override
