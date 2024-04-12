@@ -373,7 +373,7 @@ public class EmployerController {
             Employer employer = optionalEmployer.get();
             GetEmployerProfileResponse profile = new GetEmployerProfileResponse(
                     employer.getId(),
-                    employer.getName(),
+                    employer.getUser().getEmail(),
                     employer.getName(),
                     employer.getDescription(),
                     employer.getLocation(),
