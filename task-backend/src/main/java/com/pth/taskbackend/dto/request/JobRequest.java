@@ -18,6 +18,8 @@ public record JobRequest (
          String experience,
          String categoryId,
          String humanResourceId,
+         String processId,
          Set<Tag> tags
+
 ){
 }

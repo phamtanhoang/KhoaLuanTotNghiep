@@ -1,11 +1,13 @@
 package com.pth.taskbackend.repository;
 
+import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Job;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDateTime;
 
@@ -33,8 +35,50 @@ public interface JobRepository extends JpaRepository<Job, String> {
             @Param("categoryId") String categoryId,
             Pageable pageable);
 
+    Page<Job>findByNameContainingAndCategoryIdAndStatus(String name,String categoryId,EStatus status,Pageable pageable);
+    Page<Job>findByStatusOrderByCreatedDesc(EStatus status, Pageable pageable);
+
+    @Query("SELECT j FROM Job j " +
+            "INNER JOIN j.category c " +
+            "WHERE (:keyword IS NULL OR " +
+            "       (LOWER(j.name) LIKE %:keyword% " +
+            "       OR LOWER(j.description) LIKE %:keyword% " +
+            "       OR LOWER(j.experience) LIKE %:keyword% " +
+            "       OR LOWER(c.name) LIKE %:keyword%)) " +
+            "AND (:status IS NULL OR j.status = :status) " +
+            "AND (:categoryId IS NULL OR j.category.id = :categoryId) " +
+            "And j.humanResource.id=:hRId " +
+            "ORDER BY j.created DESC")
+    Page<Job> findByKeywordAndStatusAndCategoryIdAndHRId(
+            @Param("keyword") String keyword,
+            @Param("status") EStatus status,
+            @Param("categoryId") String categoryId,
+            @Param("hRId")String hRId,
+            Pageable pageable);
+
+    @Query("SELECT j FROM Job j " +
+            "INNER JOIN j.category c " +
+            "WHERE (:keyword IS NULL OR " +
+            "       (LOWER(j.name) LIKE %:keyword% " +
+            "       OR LOWER(j.description) LIKE %:keyword% " +
+            "       OR LOWER(j.experience) LIKE %:keyword% " +
+            "       OR LOWER(c.name) LIKE %:keyword%)) " +
+            "AND (:status IS NULL OR j.status = :status) " +
+            "AND (:categoryId IS NULL OR j.category.id = :categoryId) " +
+            "And j.humanResource.employer.id=:employerId " +
+            "ORDER BY j.created DESC")
+    Page<Job> findByKeywordAndStatusAndCategoryIdAndEmployerId(
+            @Param("keyword") String keyword,
+            @Param("status") EStatus status,
+            @Param("categoryId") String categoryId,
+            @Param("employerId")String employerId,
+            Pageable pageable);
+
     Page<Job>findByCategoryId(String id, Pageable pageable);
 
     Page<Job>findByProcessId(String id, Pageable pageable);
+
+    @Query("SELECT COUNT(e) FROM Job e")
+    Long countAll();
 }
 

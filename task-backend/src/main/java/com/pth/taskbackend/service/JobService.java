@@ -20,14 +20,20 @@ public interface JobService {
     void delete(Job job)throws IOException;
     Optional<Job> findById(String jobId)throws IOException;
     Page<Job>findByProcessId(String id, Pageable pageable)throws IOException;
+    Page<Job>findByNameContainingAndCategoryIdAndStatus(String name,String categoryId,EStatus status,Pageable pageable)throws IOException;
+    Page<Job>findByStatusOrderByCreatedDesc(EStatus status, Pageable pageable)throws IOException;
 
     Page<Job> findAll(Pageable pageable)throws IOException;
 
     Page<Job> searchJobs(String keyword, String address, String fromSalary, String toSalary, String categoryId , Pageable pageable)throws IOException;
 
+    Page<Job>findByKeywordAndStatusAndCategoryIdAndHRId(String keyword, EStatus status,String categoryId,String hRId,Pageable pageable)throws IOException;
+    Page<Job>findByKeywordAndStatusAndCategoryIdAndEmployerId(String keyword, EStatus status,String categoryId,String employerId,Pageable pageable)throws IOException;
     Page<Job> findByEmployerId(String employerId, Pageable pageable)throws IOException;
 
     Page<Job>findByCategoryId(String id,Pageable pageable)throws IOException;
     Page<Job>findByEmployerId(String id)throws IOException;
+
+    Long countAll()throws IOException;
 
 }
