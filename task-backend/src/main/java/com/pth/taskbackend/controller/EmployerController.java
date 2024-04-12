@@ -117,7 +117,7 @@ public class EmployerController {
     }
 
     @Operation(summary = "update status", description = "", tags = {})
-    @PatchMapping("/{id}")
+    @PatchMapping ("/{id}")
     public ResponseEntity<BaseResponse> updateEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody String status) {
         try {
             Map<String, String> jsonMap = objectMapper.readValue(status, new TypeReference<Map<String, String>>() {});

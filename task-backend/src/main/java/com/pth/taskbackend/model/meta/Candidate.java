@@ -55,6 +55,10 @@ public class Candidate extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToOne
+    @JoinColumn(name = "vip_candidate_id", referencedColumnName = "id")
+    private VipCandidate vipCandidate;
+
     @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Experience> experiences = new HashSet<>();
     @OneToMany(mappedBy = "skill", cascade = CascadeType.ALL, orphanRemoval = true)

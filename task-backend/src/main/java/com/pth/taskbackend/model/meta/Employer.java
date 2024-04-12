@@ -40,5 +40,9 @@ public class Employer extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToOne
+    @JoinColumn(name = "vip_employer_id", referencedColumnName = "id")
+    private VipEmployer vipEmployer;
 }
 
