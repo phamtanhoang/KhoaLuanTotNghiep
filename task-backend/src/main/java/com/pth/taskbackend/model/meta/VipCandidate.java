@@ -26,8 +26,13 @@ public class VipCandidate  {
     @Column(nullable = false)
     private Long price;
 
-    @OneToOne(mappedBy = "vipCandidate")
+    @ManyToOne
+    @JoinColumn(name = "candidate_id")
     private Candidate candidate;
+
+    @ManyToOne
+    @JoinColumn(name = "vip_id")
+    private Vip vip;
 
 
 }

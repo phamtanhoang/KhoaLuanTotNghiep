@@ -15,6 +15,7 @@ import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.AuthService;
 import com.pth.taskbackend.service.EmployerService;
+import com.pth.taskbackend.service.VipEmployerService;
 import com.pth.taskbackend.util.func.CheckPermission;
 import com.pth.taskbackend.util.func.ImageFunc;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -61,7 +62,8 @@ public class EmployerController {
     CheckPermission checkPermission;
     @Autowired
     private ObjectMapper objectMapper;
-
+    @Autowired
+    VipEmployerService vipEmployerService;
 
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("getEmployers-admin")
@@ -371,6 +373,7 @@ public class EmployerController {
                 );
 
             Employer employer = optionalEmployer.get();
+            boolean isVip = vipEmployerService.isVip(employer.getId());
             GetEmployerProfileResponse profile = new GetEmployerProfileResponse(
                     employer.getId(),
                     employer.getUser().getEmail(),
@@ -380,8 +383,8 @@ public class EmployerController {
                     employer.getPhoneNumber(),
                     employer.getBusinessCode(),
                     employer.getImage(),
-                    employer.getBackgroundImage());
-
+                    employer.getBackgroundImage(),
+                    isVip);
             return ResponseEntity.ok(
                     new BaseResponse( "Hiện thông tin nhà tuyển dụng", HttpStatus.OK.value(), profile)
             );

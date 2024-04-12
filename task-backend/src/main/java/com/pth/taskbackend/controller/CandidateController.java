@@ -15,6 +15,7 @@ import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.CandidateService;
+import com.pth.taskbackend.service.VipCandidateService;
 import com.pth.taskbackend.util.func.CheckPermission;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,6 +59,8 @@ public class CandidateController {
 
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    VipCandidateService vipCandidateService;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("getCandidates-admin")
     public ResponseEntity<BaseResponse> getCandidatesByAdmin(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword,@RequestParam(required = false)EStatus status, Pageable pageable) {
@@ -337,6 +340,7 @@ public class CandidateController {
                         new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
                 );
                 Candidate candidate = optionalCandidate.get();
+                boolean isVip = vipCandidateService.isVip(candidate.getId());
                 GetCandidateProfileResponse profile = new GetCandidateProfileResponse(
                         candidate.getId(),
                         candidate.getUser().getEmail(),
@@ -349,7 +353,8 @@ public class CandidateController {
                         candidate.getJob(),
                         candidate.getIntroduction(),
                         candidate.getAvatar(),
-                        candidate.getSex());
+                        candidate.getSex(),
+                        isVip);
 
                 return ResponseEntity.ok(
                         new BaseResponse( "Hiện thông tin ứng viên", HttpStatus.OK.value(), profile)

@@ -10,6 +10,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @EqualsAndHashCode(callSuper = true)
@@ -41,8 +43,8 @@ public class Employer extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne
-    @JoinColumn(name = "vip_employer_id", referencedColumnName = "id")
-    private VipEmployer vipEmployer;
+    @OneToMany(mappedBy = "employer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<VipEmployer> vipEmployers = new HashSet<>();
+
 }
 

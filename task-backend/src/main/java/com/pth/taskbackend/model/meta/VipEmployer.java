@@ -34,8 +34,12 @@ public class VipEmployer  {
     @Column(nullable = false)
     private Long price;
 
-    @OneToOne(mappedBy = "vipEmployer")
+    @ManyToOne
+    @JoinColumn(name = "employer_id")
     private Employer employer;
 
+    @ManyToOne
+    @JoinColumn(name = "vip_id")
+    private Vip vip;
 }
 

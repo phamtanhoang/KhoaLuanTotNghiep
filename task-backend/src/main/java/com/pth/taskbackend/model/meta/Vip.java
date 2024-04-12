@@ -36,6 +36,12 @@ public class Vip extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private EVipStatus status;
 
+    @OneToMany(mappedBy = "vip", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<VipEmployer> vipEmployers = new HashSet<>();
+
+    @OneToMany(mappedBy = "vip", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<VipCandidate> vipCandidates = new HashSet<>();
+
 
 }
 
