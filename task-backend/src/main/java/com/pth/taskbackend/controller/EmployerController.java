@@ -332,26 +332,25 @@ public class EmployerController {
 
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/profile")
-    public ResponseEntity<BaseResponse> getEmployerProfile() {
+    public ResponseEntity<BaseResponse> getEmployerProfile(@RequestHeader("Authorization")String token) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (authentication == null && !authentication.isAuthenticated())
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
                 return ResponseEntity.ok(
-                        new BaseResponse("xác thực không hợp lệ", HttpStatus.FORBIDDEN.value(), null)
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
 
-            String email = authentication.getName();
             Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
-            if (!optionalEmployer.isPresent())
+            if (optionalEmployer.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy nhà tuyển dụng tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
             Employer employer = optionalEmployer.get();
             GetEmployerProfileResponse profile = new GetEmployerProfileResponse(
                     employer.getId(),
-                    authentication.getName(),
+                    employer.getName(),
                     employer.getName(),
                     employer.getDescription(),
                     employer.getLocation(),
@@ -371,21 +370,21 @@ public class EmployerController {
     }
     @Operation(summary = "Get by id", description = "", tags = {})
     @PatchMapping("/updateProfile")
-    public ResponseEntity<BaseResponse> updateEmployerProfile(UpdateEmployerRequest request) {
+    public ResponseEntity<BaseResponse> updateEmployerProfile(@RequestHeader("Authorization")String token,@RequestBody UpdateEmployerRequest request) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (authentication == null && !authentication.isAuthenticated())
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
                 return ResponseEntity.ok(
-                        new BaseResponse("xác thực không hợp lệ", HttpStatus.FORBIDDEN.value(), null)
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
 
-            String email = authentication.getName();
             Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
-            if (!optionalEmployer.isPresent())
+            if (optionalEmployer.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy nhà tuyển dụng tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
+
 
             Employer employer = optionalEmployer.get();
             employer.setName(request.name());
