@@ -13,5 +13,9 @@ public interface StepService {
     void  deleteById(String id)throws IOException;
     void delete(Step step)throws IOException;
     Optional<Step>findById(String id)throws IOException;
-    Page<Step> findByProcedureId(String id, Pageable pageable)throws IOException;
+    Page<Step> findByProcessId(String id, Pageable pageable)throws IOException;
+    Optional<Step>findByProcessIdAndNumber(String processId,int number);
+
+    Long countAllByProcessId(String processId);
+
 }
