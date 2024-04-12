@@ -1,4 +1,6 @@
 package com.pth.taskbackend.controller;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pth.taskbackend.dto.request.CreateEmployerRequest;
 import com.pth.taskbackend.dto.request.UpdateCandidateRequest;
 import com.pth.taskbackend.dto.request.UpdateEmployerRequest;
@@ -33,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
@@ -55,6 +58,8 @@ public class EmployerController {
     JwtService jwtService;
     @Autowired
     CheckPermission checkPermission;
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
     @Operation(summary = "Get list", description = "", tags = {})
@@ -113,8 +118,13 @@ public class EmployerController {
 
     @Operation(summary = "update status", description = "", tags = {})
     @PatchMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestPart EStatus status) {
+    public ResponseEntity<BaseResponse> updateEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody String status) {
         try {
+            Map<String, String> jsonMap = objectMapper.readValue(status, new TypeReference<Map<String, String>>() {});
+
+            String statusValue = jsonMap.get("status");
+            EStatus statusEnum = EStatus.fromString(statusValue);
+
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
             if (!permission)
@@ -133,12 +143,12 @@ public class EmployerController {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
                 );
-            if(status.equals(EStatus.DELETED))
+            if(statusEnum.equals(EStatus.DELETED))
                 return ResponseEntity.ok(
                         new BaseResponse("Không được xóa", HttpStatus.NOT_FOUND.value(), null)
                 );
             User employer = optionalEmployer.get();
-            switch (status)
+            switch (statusEnum)
             {
                 case ACTIVE :
                     if(employer.getStatus().equals(EStatus.ACTIVE))
