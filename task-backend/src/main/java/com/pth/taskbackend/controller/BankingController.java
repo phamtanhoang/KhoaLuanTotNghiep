@@ -12,24 +12,18 @@ import com.pth.taskbackend.util.func.CheckPermission;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -235,15 +229,16 @@ public class BankingController {
             LocalDateTime newFromDate = toDate.plusDays(1);
 
             vipEmployer.setFromDate(newFromDate);
-            vipEmployer.setToDate(newFromDate.plusMonths(1).plusDays(1));
+            vipEmployer.setToDate(newFromDate.plusMonths(1));
         } else {
             LocalDateTime now = LocalDateTime.now();
             vipEmployer.setFromDate(now);
-            vipEmployer.setToDate(now.plusMonths(1).plusDays(1));
+            vipEmployer.setToDate(now.plusMonths(1));
             vipEmployer.setPrice(vip.getPrice());
         }
         return vipEmployer;
     }
+
     private VipCandidate processVipCandidate(Vip vip, Candidate candidate, String vnpTransactionNo) throws IOException {
         Optional<VipCandidate> optionalVipCandidate = vipCandidateService.findByCandidateIdAndAvailable(candidate.getId());
 
@@ -260,15 +255,16 @@ public class BankingController {
             LocalDateTime newFromDate = toDate.plusDays(1);
 
             vipCandidate.setFromDate(newFromDate);
-            vipCandidate.setToDate(newFromDate.plusMonths(1).plusDays(1));
+            vipCandidate.setToDate(newFromDate.plusMonths(1));
         } else {
             LocalDateTime now = LocalDateTime.now();
             vipCandidate.setFromDate(now);
-            vipCandidate.setToDate(now.plusMonths(1).plusDays(1));
+            vipCandidate.setToDate(now.plusMonths(1));
             vipCandidate.setPrice(vip.getPrice());
         }
         return vipCandidate;
     }
+
 
 }
 
