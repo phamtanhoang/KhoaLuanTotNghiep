@@ -10,6 +10,7 @@ import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.VipService;
 import com.pth.taskbackend.util.func.CheckPermission;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -107,6 +108,9 @@ public class VipController {
             return ResponseEntity.ok(
                     new BaseResponse("Tạo Vip thành công", HttpStatus.OK.value(), vip)
             );
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(
                     new BaseResponse("Tên Vip đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
@@ -156,6 +160,9 @@ public class VipController {
             return ResponseEntity.ok(
                     new BaseResponse("Cập nhật Vip thành công", HttpStatus.OK.value(), vip)
             );
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(
                     new BaseResponse("Tên Vip đã tồn tại!", HttpStatus.BAD_REQUEST.value(), null)
@@ -197,6 +204,9 @@ public class VipController {
                         new BaseResponse("Không tìm thấy Vip để xóa!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (EmptyResultDataAccessException e) {
             return ResponseEntity.ok(new BaseResponse("Không tìm thấy Vip cần xóa!", HttpStatus.NOT_FOUND.value(), null));
         } catch (Exception e) {

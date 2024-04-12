@@ -10,6 +10,7 @@ import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.TagService;
 import com.pth.taskbackend.util.func.CheckPermission;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -130,6 +131,9 @@ public class TagController {
             return ResponseEntity.ok(
                     new BaseResponse("Tạo nhãn thành công", HttpStatus.OK.value(), tag)
             );
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(
                     new BaseResponse("Tên nhãn đã tồn tại!", HttpStatus.BAD_REQUEST.value(), null)
@@ -168,6 +172,9 @@ public class TagController {
                         new BaseResponse("Không tìm thấy nhãn để cập nhật!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(
                     new BaseResponse("Tên nhãn đã tồn tại!", HttpStatus.BAD_REQUEST.value(), null)
@@ -205,6 +212,9 @@ public class TagController {
                         new BaseResponse("Không tìm thấy nhãn để xóa!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));

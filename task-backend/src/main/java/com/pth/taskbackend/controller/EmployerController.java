@@ -17,6 +17,7 @@ import com.pth.taskbackend.service.AuthService;
 import com.pth.taskbackend.service.EmployerService;
 import com.pth.taskbackend.util.func.CheckPermission;
 import com.pth.taskbackend.util.func.ImageFunc;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -110,6 +111,9 @@ public class EmployerController {
                         new BaseResponse("Danh sách nhà tuyển dụng ", HttpStatus.OK.value(), responseList)
                 );
             }
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -177,7 +181,10 @@ public class EmployerController {
                             .body(new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
             }
 
-        } catch (EmptyResultDataAccessException e) {
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (EmptyResultDataAccessException e) {
             return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng cần xóa!", HttpStatus.NOT_FOUND.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -215,7 +222,10 @@ public class EmployerController {
             employer.setStatus(EStatus.DELETED);
             userRepository.save(employer);
             return ResponseEntity.ok(new BaseResponse("Xóa nhà tuyển dụng thành công", HttpStatus.OK.value(), null));
-        } catch (EmptyResultDataAccessException e) {
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (EmptyResultDataAccessException e) {
             return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng cần xóa!", HttpStatus.NOT_FOUND.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -269,7 +279,10 @@ public class EmployerController {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách nhà tuyển dụng ", HttpStatus.OK.value(), employerResponse)
                 );
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
@@ -297,48 +310,48 @@ public class EmployerController {
         }
     }
 
-    @Operation(summary = "Create", description = "", tags = {})
-    @PostMapping
-    public ResponseEntity<BaseResponse> createEmployer(@RequestBody CreateEmployerRequest createEmployerRequest,
-                                                       @RequestParam("image") MultipartFile image,
-                                                       @RequestParam("backgroundImage") MultipartFile backgroundImage) throws IOException {
-        if (userRepository.findByEmail(createEmployerRequest.username()).isPresent()) {
-            return ResponseEntity.ok(
-                    new BaseResponse("Tên người dùng đã tồn tại!", 400, null)
-            );
-        };
-        try {
-            if (!(ImageFunc.isImageFile(image)||ImageFunc.isImageFile(backgroundImage))) {
-                return ResponseEntity.ok(
-                        new BaseResponse("Vui lòng chọn hình ảnh!", HttpStatus.BAD_REQUEST.value(), null)
-                );
-            }
-            Optional<User> user = authService.register(
-                    createEmployerRequest.username(),
-                    createEmployerRequest.password(),
-                    ERole.EMPLOYER);
-
-            Employer employer = new Employer();
-            employer.setName(createEmployerRequest.name());
-            employer.setLocation(createEmployerRequest.location());
-            employer.setDescription(createEmployerRequest.description());
-            employer.setBusinessCode(createEmployerRequest.businessCode());
-            employer.setPhoneNumber(createEmployerRequest.phoneNumber());
-            employer.setUser(user.get());
-            employerService.create(employer,image,backgroundImage);
-
-            return ResponseEntity.ok(
-                    new BaseResponse("Tạo nhà tuyển dụng thành công", HttpStatus.OK.value(), employer)
-            );
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.ok(
-                    new BaseResponse("Tên nhà tuyển dụng đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
+//    @Operation(summary = "Create", description = "", tags = {})
+//    @PostMapping
+//    public ResponseEntity<BaseResponse> createEmployer(@RequestBody CreateEmployerRequest createEmployerRequest,
+//                                                       @RequestParam("image") MultipartFile image,
+//                                                       @RequestParam("backgroundImage") MultipartFile backgroundImage) throws IOException {
+//        if (userRepository.findByEmail(createEmployerRequest.username()).isPresent()) {
+//            return ResponseEntity.ok(
+//                    new BaseResponse("Tên người dùng đã tồn tại!", 400, null)
+//            );
+//        };
+//        try {
+//            if (!(ImageFunc.isImageFile(image)||ImageFunc.isImageFile(backgroundImage))) {
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Vui lòng chọn hình ảnh!", HttpStatus.BAD_REQUEST.value(), null)
+//                );
+//            }
+//            Optional<User> user = authService.register(
+//                    createEmployerRequest.username(),
+//                    createEmployerRequest.password(),
+//                    ERole.EMPLOYER);
+//
+//            Employer employer = new Employer();
+//            employer.setName(createEmployerRequest.name());
+//            employer.setLocation(createEmployerRequest.location());
+//            employer.setDescription(createEmployerRequest.description());
+//            employer.setBusinessCode(createEmployerRequest.businessCode());
+//            employer.setPhoneNumber(createEmployerRequest.phoneNumber());
+//            employer.setUser(user.get());
+//            employerService.create(employer,image,backgroundImage);
+//
+//            return ResponseEntity.ok(
+//                    new BaseResponse("Tạo nhà tuyển dụng thành công", HttpStatus.OK.value(), employer)
+//            );
+//        } catch (DataIntegrityViolationException e) {
+//            return ResponseEntity.ok(
+//                    new BaseResponse("Tên nhà tuyển dụng đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
+//            );
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+//        }
+//    }
 
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/profile")
@@ -373,7 +386,10 @@ public class EmployerController {
                     new BaseResponse( "Hiện thông tin nhà tuyển dụng", HttpStatus.OK.value(), profile)
             );
 
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
@@ -408,6 +424,9 @@ public class EmployerController {
                     new BaseResponse( "Cập nhật thông tin nhà tuyển dụng", HttpStatus.OK.value(), employer)
             );
 
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -440,6 +459,9 @@ public class EmployerController {
                     new BaseResponse( "Cập nhật ảnh đại diện nhà tuyển dụng thành công", HttpStatus.OK.value(), employer)
             );
 
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -471,6 +493,9 @@ public class EmployerController {
                     new BaseResponse( "Cập nhật ảnh đại diện nhà tuyển dụng thành công", HttpStatus.OK.value(), employer)
             );
 
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
