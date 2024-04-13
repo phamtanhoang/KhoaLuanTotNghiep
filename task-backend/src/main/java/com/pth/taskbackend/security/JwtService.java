@@ -28,7 +28,6 @@ public class JwtService {
     }
 
     private String createToken(Map<String, Object> claims, String username,EStatus status,ERole role) {
-        System.out.println(ACCESS_TOKEN_EXPIRATION_SECONDS);
         Instant now = Instant.now();
         String token = Jwts.builder()
                 .setClaims(claims)
@@ -96,14 +95,22 @@ public class JwtService {
         return  !isTokenExpired(token);
     }
 
-    public String generateRefreshToken(String username) {
+    public String generateToken(String username) {
+        Map<String, Object> claims = new HashMap<>();
+        return createRefreshToken(claims, username);
+    }
+    private String createRefreshToken(Map<String, Object> claims, String username) {
         Instant now = Instant.now();
-        return Jwts.builder()
+        String token = Jwts.builder()
+                .setClaims(claims)
                 .setSubject(username)
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(now.plus(REFRESH_TOKEN_EXPIRATION_SECONDS, ChronoUnit.SECONDS)))
-                .signWith(getRefreshSignKey(), SignatureAlgorithm.HS256)
-                .compact();
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(Date.from(now.plus(ACCESS_TOKEN_EXPIRATION_SECONDS, ChronoUnit.SECONDS)))
+                .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+        validTokens.add(token);
+        return token;
+
+
     }
 
     public String refreshToken(String refreshToken,EStatus status,ERole role) {
