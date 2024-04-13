@@ -10,5 +10,7 @@ public record GetEmployerProfileResponse(String id,
                                          String phoneNumber,
                                          String businessCode,
                                          String image,
-                                         String backgroundImage) {
+                                         String backgroundImage,
+                                         boolean isVip
+                                        ) {
 }

@@ -16,5 +16,6 @@ public record GetCandidateProfileResponse(
     String job,
     String introduction,
     String avatar,
-    ESex sex){
+    ESex sex,
+    boolean isVip){
 }

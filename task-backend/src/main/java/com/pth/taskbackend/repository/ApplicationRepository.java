@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.Optional;
 
 @Repository
-public interface ApplicationRepository extends JpaRepository<Application, Long> {
+public interface ApplicationRepository extends JpaRepository<Application, String> {
 
     Optional<Application>findByJobIdAndCandidateId(String jobId, String candidateId);
     Page<Application> findByCandidateId(String candidate_id, Pageable pageable);

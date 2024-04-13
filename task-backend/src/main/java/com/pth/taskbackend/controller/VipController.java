@@ -1,152 +1,95 @@
 package com.pth.taskbackend.controller;
-
-import com.pth.taskbackend.dto.request.TagRequest;
+import com.pth.taskbackend.dto.request.UpdateVipRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
-import com.pth.taskbackend.model.meta.Tag;
-import com.pth.taskbackend.model.meta.User;
+import com.pth.taskbackend.enums.EType;
+import com.pth.taskbackend.enums.EVipStatus;
+import com.pth.taskbackend.model.meta.*;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
-import com.pth.taskbackend.service.TagService;
+import com.pth.taskbackend.service.VipService;
 import com.pth.taskbackend.util.func.CheckPermission;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Pageable;
-import java.io.IOException;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Optional;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
 @CrossOrigin(origins = "*")
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Tags", description = "Tag APIs")
+@Tag(name = "Vips", description = "Vip APIs")
 @SecurityRequirement(name = "javainuseapi")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = {BASE_URL + "/tags"})
-public class TagController {
+@RequestMapping(value = {BASE_URL + "/vips"})
+public class VipController {
+
     @Autowired
-    private TagService tagService;
+    VipService vipService;
     @Autowired
-    JwtService jwtService;
-    @Autowired
-    CheckPermission checkPermission;
+    private final CheckPermission checkPermission ;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    JwtService jwtService;
+
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse> getTagById(@PathVariable String id) {
+    public ResponseEntity<BaseResponse> getVipById(@PathVariable String id) {
         try {
-            Optional<Tag> tag = tagService.findById(id);
-            return tag.map(value -> ResponseEntity.ok(
-                    new BaseResponse("Nhãn được tìm thấy.", HttpStatus.OK.value(), value)
+            Optional<Vip> vip = vipService.findById(id);
+            return vip.map(value -> ResponseEntity.ok(
+                    new BaseResponse("Vip được tìm thấy", HttpStatus.OK.value(), value)
             )).orElseGet(() -> ResponseEntity.ok(
-                    new BaseResponse("Không tìm thấy nhãn!", HttpStatus.NOT_FOUND.value(), null)
+                    new BaseResponse("Không tìm thấy Vip", HttpStatus.NOT_FOUND.value(), null)
             ));
-        } catch (IOException e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 
-    @Operation(summary = "Get by name", description = "", tags = {})
-    @GetMapping("/name={name}")
-    public ResponseEntity<BaseResponse> getTagByName( @PathVariable String name) {
-        try {
 
 
-            Optional<Tag> tag = tagService.findByName(name);
-            return tag.map(value -> ResponseEntity.ok(
-                    new BaseResponse("Nhãn được tìm thấy.", HttpStatus.OK.value(), value)
-            )).orElseGet(() -> ResponseEntity.ok(
-                    new BaseResponse("Không tìm thấy nhãn!", HttpStatus.NOT_FOUND.value(), null)
-            ));
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
 
-    @Operation(summary = "Get list by name", description = "", tags = {})
+    @Operation(summary = "Get list by type and status", description = "", tags = {})
     @GetMapping
-    public ResponseEntity<BaseResponse> getTags(@RequestParam(required = false) String name, Pageable pageable) {
+    public ResponseEntity<BaseResponse> getVips(@RequestParam(required = false)EType type, @RequestParam(required = false)EVipStatus status, Pageable pageable) {
         try {
+            Page<Vip> vips = vipService.findByStatusAndType(type,status,pageable);
 
-            Page<Tag> tags;
-            if (name != null) {
-                tags = tagService.findByNameContaining(name, pageable);
-            } else {
-                tags = tagService.findAll(pageable);
-            }
-            if (tags.isEmpty()) {
+            if (vips.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách nhãn rỗng", HttpStatus.OK.value(), null)
+                        new BaseResponse("Danh sách Vip rỗng", HttpStatus.NO_CONTENT.value(), null)
                 );
             } else {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách nhãn", HttpStatus.OK.value(), tags)
+                        new BaseResponse("Danh sách Vip", HttpStatus.OK.value(), vips)
                 );
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
 
     @Operation(summary = "Create", description = "", tags = {})
-    @PostMapping("create")
-    public ResponseEntity<BaseResponse> createTag(@RequestHeader("Authorization")String token, @RequestBody TagRequest tagRequest) {
-        try {
-            String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN)||checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
-            if (!permission)
-                return ResponseEntity.ok(
-                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-                );
-            Optional<User> optionalUser = userRepository.findByEmail(email);
-            if (optionalUser.isEmpty())
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
-                );
-
-            String name = tagRequest.name();
-            String color = tagRequest.color();
-
-            Optional<Tag> existedTag = tagService.findByName(name);
-            if(existedTag.isPresent()){
-                return ResponseEntity.ok(
-                        new BaseResponse("Tên nhãn đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
-                );
-            }
-            Tag tag = tagService.createTag(name, color);
-            return ResponseEntity.ok(
-                    new BaseResponse("Tạo nhãn thành công", HttpStatus.OK.value(), tag)
-            );
-        }catch (ExpiredJwtException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.ok(
-                    new BaseResponse("Tên nhãn đã tồn tại!", HttpStatus.BAD_REQUEST.value(), null)
-            );
-        }catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
-
-    @Operation(summary = "Update", description = "", tags = {})
-    @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateTag(@RequestHeader("Authorization")String token, @PathVariable String id, @RequestBody Tag tag) {
+    @PostMapping("")
+    public ResponseEntity<BaseResponse> createVip(@RequestHeader("Authorization") String token,@RequestBody Vip vip) {
         try {
 
             String email = jwtService.extractUsername(token.substring(7));
@@ -161,23 +104,16 @@ public class TagController {
                         new BaseResponse("Không tìm thấy quản trị viên", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            Optional<Tag> existingTag = tagService.findById(id);
-            if (existingTag.isPresent()) {
-                Tag updatedTag = tagService.updateTag(existingTag.get(), tag.getName(), tag.getColor());
-                return ResponseEntity.ok(
-                        new BaseResponse("Cập nhật nhãn thành công", HttpStatus.OK.value(), updatedTag)
-                );
-            } else {
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy nhãn để cập nhật!", HttpStatus.NOT_FOUND.value(), null)
-                );
-            }
+          vipService.create(vip);
+            return ResponseEntity.ok(
+                    new BaseResponse("Tạo Vip thành công", HttpStatus.OK.value(), vip)
+            );
         }catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(
-                    new BaseResponse("Tên nhãn đã tồn tại!", HttpStatus.BAD_REQUEST.value(), null)
+                    new BaseResponse("Tên Vip đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -185,9 +121,61 @@ public class TagController {
         }
     }
 
-    @Operation(summary = "Delete", description = "", tags = {})
+    @Operation(summary = "update", description = "", tags = {})
+    @PatchMapping("/{id}")
+    public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization")String token, @PathVariable("id") String id, @RequestBody UpdateVipRequest request) {
+        try {
+
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy quản trị viên", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Vip> optionalVip = vipService.findById(id);
+            if (optionalVip.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy Vip để cập nhật!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            if(request.status()==EVipStatus.DELETED)
+                return ResponseEntity.ok(
+                        new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
+                );
+        Vip vip = optionalVip.get();
+            vip.setName(request.name());
+            vip.setMonth(request.month());
+            vip.setStatus(request.status());
+            vip.setPrice(request.price());
+            vip.setColor(request.color());
+         vipService.update(vip);
+            return ResponseEntity.ok(
+                    new BaseResponse("Cập nhật Vip thành công", HttpStatus.OK.value(), vip)
+            );
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.ok(
+                    new BaseResponse("Tên Vip đã tồn tại!", HttpStatus.BAD_REQUEST.value(), null)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "delete", description = "", tags = {})
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteTag(@RequestHeader("Authorization")String token, @PathVariable String id) {
+    public ResponseEntity<BaseResponse> deleteCategory(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
         try {
 
             String email = jwtService.extractUsername(token.substring(7));
@@ -201,23 +189,30 @@ public class TagController {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy quản trị viên", HttpStatus.NOT_FOUND.value(), null)
                 );
-            Optional<Tag> existingTag = tagService.findById(id);
-            if (existingTag.isPresent()) {
-                tagService.deleteTag(existingTag.get());
+            Optional<Vip> optionalVip = vipService.findById(id);
+            if (optionalVip.isPresent()) {
+                if(optionalVip.get().getStatus()==EVipStatus.DELETED)
+                    return ResponseEntity.ok(
+                            new BaseResponse("Vip này đã được xóa trước đó", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+                vipService.deleteById(optionalVip.get().getId());
                 return ResponseEntity.ok(
-                        new BaseResponse("Xóa nhãn thành công", HttpStatus.OK.value(), null)
+                        new BaseResponse("Xóa Vip thành công", HttpStatus.OK.value(), null)
                 );
             } else {
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy nhãn để xóa!", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy Vip để xóa!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
         }catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy Vip cần xóa!", HttpStatus.NOT_FOUND.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
 }

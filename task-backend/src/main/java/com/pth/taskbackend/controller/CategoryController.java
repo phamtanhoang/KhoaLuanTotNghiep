@@ -14,6 +14,7 @@ import com.pth.taskbackend.service.CategoryService;
 import com.pth.taskbackend.service.JobService;
 import com.pth.taskbackend.util.func.CheckPermission;
 import com.pth.taskbackend.util.func.ImageFunc;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -136,7 +137,10 @@ public class CategoryController {
             return ResponseEntity.ok(
                     new BaseResponse("Tạo danh mục thành công", HttpStatus.OK.value(), category)
             );
-        } catch (DataIntegrityViolationException e) {
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(
                     new BaseResponse("Tên danh mục đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
             );
@@ -181,7 +185,10 @@ public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization
             return ResponseEntity.ok(
                     new BaseResponse("Cập nhật danh mục thành công", HttpStatus.OK.value(), category)
             );
-        } catch (DataIntegrityViolationException e) {
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(
                     new BaseResponse("Tên danh mục đã tồn tại!", HttpStatus.BAD_REQUEST.value(), null)
             );
@@ -218,6 +225,9 @@ public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization
                         new BaseResponse("Không tìm thấy danh mục để xóa!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (EmptyResultDataAccessException e) {
             return ResponseEntity.ok(new BaseResponse("Không tìm thấy danh mục cần xóa!", HttpStatus.NOT_FOUND.value(), null));
         } catch (Exception e) {

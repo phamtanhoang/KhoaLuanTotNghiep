@@ -12,6 +12,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @EqualsAndHashCode(callSuper = true)
@@ -32,6 +34,8 @@ public class Application extends BaseEntity {
     @Column(nullable = false)
     private String cV;
 
+    private int currentStep;
+
     @Enumerated(EnumType.STRING)
     private EApplyStatus status;
 
@@ -45,5 +49,10 @@ public class Application extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "job_id")
     private Job job;
+
+
+    @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ApplicationStep> applicationSteps = new HashSet<>();
+
 }
 

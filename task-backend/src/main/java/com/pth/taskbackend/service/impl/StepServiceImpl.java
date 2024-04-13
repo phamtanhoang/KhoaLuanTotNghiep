@@ -42,7 +42,17 @@ public class StepServiceImpl implements StepService {
     }
 
     @Override
-    public Page<Step> findByProcedureId(String id, Pageable pageable) {
+    public Optional<Step> findByProcessIdAndNumber(String processId, int number) {
+        return stepRepository.findByProcessIdAndNumber(processId,number);
+    }
+
+    @Override
+    public Long countAllByProcessId(String processId) {
+        return stepRepository.countAllByProcessId(processId);
+    }
+
+    @Override
+    public Page<Step> findByProcessId(String id, Pageable pageable) {
         return stepRepository.findByProcessId(id,pageable);
     }
 }

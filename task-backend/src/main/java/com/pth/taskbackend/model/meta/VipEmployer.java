@@ -1,7 +1,9 @@
 package com.pth.taskbackend.model.meta;
 
 import com.pth.taskbackend.enums.ERole;
+import com.pth.taskbackend.enums.ESex;
 import com.pth.taskbackend.enums.EStatus;
+import com.pth.taskbackend.enums.EType;
 import com.pth.taskbackend.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,37 +16,30 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Employer extends BaseEntity {
+public class VipEmployer  {
 
-    private String image;
-
-    private String backgroundImage;
-
-    @Column(nullable = false)
-    private String name;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @Column(nullable = false)
-    private String location;
+    private LocalDateTime fromDate;
 
     @Column(nullable = false)
-    private String phoneNumber;
-
-    @Column(nullable = false, unique = true)
-    private String businessCode;
+    private LocalDateTime toDate;
 
     @Column(nullable = false)
-    private String description;
+    private Long price;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ManyToOne
+    @JoinColumn(name = "employer_id")
+    private Employer employer;
 
-    @OneToMany(mappedBy = "employer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<VipEmployer> vipEmployers = new HashSet<>();
-
+    @ManyToOne
+    @JoinColumn(name = "vip_id")
+    private Vip vip;
 }
 

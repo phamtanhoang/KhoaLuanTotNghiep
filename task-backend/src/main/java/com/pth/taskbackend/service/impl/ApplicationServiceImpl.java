@@ -36,6 +36,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    public Optional<Application> findById(String id) {
+        return applicationRepository.findById(id);
+    }
+
+    @Override
     public Optional<Application> findByJobIdAndCandidateId(String jobId, String candidateId) {
         return applicationRepository.findByJobIdAndCandidateId(jobId,candidateId);
     }
@@ -51,7 +56,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public Page<Application> findByHrId(Long hrId, Pageable pageable) {
+    public Page<Application> findByHrId(String hrId, Pageable pageable) {
         return null;
     }
 
@@ -71,7 +76,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public Page<Application> findByHrIdAndStatus(Long hrId, EStatus status, Pageable pageable) {
+    public Page<Application> findByHrIdAndStatus(String hrId, EStatus status, Pageable pageable) {
         return null;
     }
 }
