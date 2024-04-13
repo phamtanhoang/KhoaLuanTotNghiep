@@ -19,6 +19,7 @@
         @Column(nullable = false)
         private String name;
 
+        private int index;
         @Column
         private String description;
 
