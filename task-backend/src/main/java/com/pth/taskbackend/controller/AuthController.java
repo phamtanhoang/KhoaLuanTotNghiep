@@ -2,6 +2,7 @@ package com.pth.taskbackend.controller;
 
 import com.pth.taskbackend.dto.request.*;
 import com.pth.taskbackend.dto.response.BaseResponse;
+import com.pth.taskbackend.dto.response.LoginResponse;
 import com.pth.taskbackend.dto.response.TokenResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
@@ -122,23 +123,28 @@ public class AuthController {
 
         String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,user.get().getRole());
         String refreshToken = jwtService.generateRefreshToken(authenticationRequest.username());
+
         Map<String,Object>response= new HashMap<>();
         Map<String, String>tokens= new HashMap<>();
+        User u = user.get();
+        LoginResponse loginResponse = new LoginResponse(u.getId(),u.getCreated(),u.getUpdated(),u.getEmail(),u.getRole(),u.getStatus());
+        response.put("user",loginResponse);
+
         tokens.put("accessToken",token);
         tokens.put("refreshToken",refreshToken);
         response.put("tokens",tokens);
-        switch (authenticationRequest.role()) {
-            case CANDIDATE:
-                response.put("candidate", candidateService.findByUserEmail(authenticationRequest.username()));
-                break;
-            case EMPLOYER:
-                response.put("employer", employerService.findByUserEmail(authenticationRequest.username()));
-                break;
-            case ADMIN:
-                response.put("admin", userRepository.findByEmail(authenticationRequest.username()));break;
-            case HR:
-                break;
-            }
+//        switch (authenticationRequest.role()) {
+//            case CANDIDATE:
+//                response.put("candidate", candidateService.findByUserEmail(authenticationRequest.username()));
+//                break;
+//            case EMPLOYER:
+//                response.put("employer", employerService.findByUserEmail(authenticationRequest.username()));
+//                break;
+//            case ADMIN:
+//                response.put("admin", userRepository.findByEmail(authenticationRequest.username()));break;
+//            case HR:
+//                break;
+//            }
 
 
         return ResponseEntity.ok(
