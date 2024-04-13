@@ -1,6 +1,7 @@
 import { LoadingContext } from "@/App";
 import { authsService } from "@/services";
-import { ONCHANGE_ROLE } from "@/store/reducers/authReducer";
+import { CLEAR_CURRENT_CANDIDATE } from "@/store/reducers/candidateReducer";
+import { CLEAR_CURRENT_EMPLOYER } from "@/store/reducers/employerReducer";
 import { DataConstants } from "@/utils/constants/dataConstants";
 import { ADMIN_PATHS } from "@/utils/constants/pathConstants";
 import { AuthHelper } from "@/utils/helpers/authHelper";
@@ -17,7 +18,6 @@ const SigninAdminPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-  
 
   const _onChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -43,11 +43,9 @@ const SigninAdminPage = () => {
       .signin(email.trim(), password.trim(), DataConstants.ROLE_DATA.ADMIN)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          AuthHelper.setTokens(
-            res.data.Data.tokens.accessToken,
-            res.data.Data.tokens.refreshToken
-          );
-          dispatch(ONCHANGE_ROLE(res.data.Data.admin.role));
+          dispatch(CLEAR_CURRENT_EMPLOYER());
+          dispatch(CLEAR_CURRENT_CANDIDATE());
+          AuthHelper.setAuthenticaton(res.data.Data.tokens, res.data.Data.user);
           navigate(ADMIN_PATHS.dashboard);
           SwalHelper.MiniAlert(res.data.Message, "success");
         } else {

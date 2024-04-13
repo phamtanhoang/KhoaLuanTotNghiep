@@ -20,7 +20,7 @@ const UserCard: React.FC<UserCardProps> = ({
       <div className="overflow-hidden  flex justify-center">
         <div className="relative">
           <img
-            className="h-[200px] w-[200px] rounded-full"
+            className="h-[200px] w-[200px] rounded-full border-2 border-borderColor"
             src={image ? image : NON_USER}
             alt={name}
           />

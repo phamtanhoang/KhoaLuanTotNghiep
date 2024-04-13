@@ -14,4 +14,5 @@ interface CandidateModel {
   status: string;
   email: string;
   userId: string;
+  isVip: boolean;
 }

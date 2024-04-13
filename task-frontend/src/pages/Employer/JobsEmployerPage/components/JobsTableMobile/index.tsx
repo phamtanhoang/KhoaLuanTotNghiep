@@ -1,4 +1,4 @@
-import { StateHelper } from "@/utils/helpers/stateHelper";
+import { ConstantsHelper } from "@/utils/helpers/constantsHelper";
 import { useEffect, useRef, useState } from "react";
 import { AiFillDelete, AiFillEdit, AiFillEye } from "react-icons/ai";
 import { IoMdMore } from "react-icons/io";
@@ -23,7 +23,7 @@ const ItemTSX: React.FC<{
   _onClickDetail: () => void;
   _onClickEdit: () => void;
 }> = ({ item, index, _onClickDelete, _onClickDetail, _onClickEdit }) => {
-  let data = StateHelper.findJobStateById(item.state);
+  let data = ConstantsHelper.findJobStateById(item.state);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const trigger = useRef<any>(null);

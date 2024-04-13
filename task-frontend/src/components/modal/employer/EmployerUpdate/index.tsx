@@ -7,7 +7,7 @@ import { IoMdExit } from "react-icons/io";
 import NON_BG from "@/assets/images/image-background.png";
 import NON_USER from "@/assets/images/non-user.jpg";
 import { DateHelper } from "@/utils/helpers/dateHelper";
-import { StateHelper } from "@/utils/helpers/stateHelper";
+import { ConstantsHelper } from "@/utils/helpers/constantsHelper";
 import { MdOutlineNotStarted, MdPauseCircleOutline } from "react-icons/md";
 import { DataConstants } from "@/utils/constants/dataConstants";
 

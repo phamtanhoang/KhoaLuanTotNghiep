@@ -1,4 +1,4 @@
-import { StateHelper } from "@/utils/helpers/stateHelper";
+import { ConstantsHelper } from "@/utils/helpers/constantsHelper";
 import { useEffect, useRef, useState } from "react";
 import { IoMdMore } from "react-icons/io";
 import NON_USER from "@/assets/images/non-user.jpg";
@@ -24,7 +24,7 @@ const ItemTSX: React.FC<{
   _onClickDelete: () => void;
   _onClickDetail: () => void;
 }> = ({ item, index, _onClickDelete, _onClickDetail }) => {
-  let data = StateHelper.findApplicationStateById(item.state);
+  let data = ConstantsHelper.findApplicationStateById(item.state);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const trigger = useRef<any>(null);

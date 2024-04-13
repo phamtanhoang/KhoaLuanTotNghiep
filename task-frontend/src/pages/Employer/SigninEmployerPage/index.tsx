@@ -1,7 +1,7 @@
 import { LoadingContext } from "@/App";
 import ModalBase from "@/components/modal";
 import { authsService } from "@/services";
-import { ONCHANGE_ROLE } from "@/store/reducers/authReducer";
+import { CLEAR_CURRENT_CANDIDATE } from "@/store/reducers/candidateReducer";
 import { DataConstants } from "@/utils/constants/dataConstants";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { EMPLOYER_PATHS } from "@/utils/constants/pathConstants";
@@ -63,11 +63,8 @@ const SigninEmployerPage = () => {
       .signin(email, password, DataConstants.ROLE_DATA.EMPLOYER)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          AuthHelper.setTokens(
-            res.data.Data.tokens.accessToken,
-            res.data.Data.tokens.refreshToken
-          );
-          dispatch(ONCHANGE_ROLE(res.data.Data.employer.user.role));
+          dispatch(CLEAR_CURRENT_CANDIDATE());
+          AuthHelper.setAuthenticaton(res.data.Data.tokens, res.data.Data.user);
           navigate(EMPLOYER_PATHS.dashboard);
           SwalHelper.MiniAlert(res.data.Message, "success");
         } else {

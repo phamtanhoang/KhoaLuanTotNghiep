@@ -7,16 +7,23 @@ import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import NON_USER from "@/assets/images/non-user.jpg";
 import ModalBase from "@/components/modal";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
-import { authsService } from "@/services";
 import { AuthHelper } from "@/utils/helpers/authHelper";
 import { LoadingContext } from "@/App";
-import { ONCHANGE_ROLE } from "@/store/reducers/authReducer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import candidatesService from "@/services/candidatesService";
+import {
+  CLEAR_CURRENT_CANDIDATE,
+  ONCHANGE_CURRENT_CANDIDATE,
+} from "@/store/reducers/candidateReducer";
 
 const Header = () => {
   const context = useContext(LoadingContext);
   const [sticky, setSticky] = useState(false);
   const [openInfo, setOpenInfo] = useState(false);
+
+  const { currentCandidate } = useSelector(
+    (state: any) => state.candidateReducer
+  );
 
   const dropdownRef = useRef<any>(null);
   const menuRef = useRef<any>(null);
@@ -80,8 +87,8 @@ const Header = () => {
       "question",
       () => {
         context.handleOpenLoading();
-        AuthHelper.removeTokens();
-        dispatch(ONCHANGE_ROLE(""));
+        AuthHelper.removeAuthenticaton();
+        dispatch(CLEAR_CURRENT_CANDIDATE());
         SwalHelper.MiniAlert("Đăng xuất thành công", "success", 1500);
         setTimeout(() => {
           window.location.reload();
@@ -92,6 +99,30 @@ const Header = () => {
     );
   };
 
+  const fetchData = () => {
+    context.handleOpenLoading();
+    candidatesService
+      .profile()
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          dispatch(ONCHANGE_CURRENT_CANDIDATE(res.data.Data));
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  };
+
+  useEffect(() => {
+    if (AuthHelper.isCandidate()) {
+      fetchData();
+    }
+  }, []);
   return (
     <>
       <ModalBase
@@ -143,83 +174,98 @@ const Header = () => {
             </ul>
             <div className="flex items-center  gap-5">
               <div className="flex gap-3">
-                <button
-                  className="relative hidden lg:block w-max px-4 py-1.5 text-orangetext transition duration-700 ease-out bg-white border-2 border-orangetext rounded-lg hover:border-orange-500 hover:text-orange-500"
-                  onClick={_onClickSignin}
-                >
-                  Đăng nhập
-                </button>
-                <button
-                  className="relative hidden lg:block w-max px-4 py-1.5 text-white transition duration-500 ease-out bg-orangetext rounded-lg hover:bg-orange-500 hover:ease-in "
-                  onClick={_onClickSignup}
-                >
-                  Đăng kí
-                </button>
-                <p className="hidden text-base px-2 pt-2 sm:block">
-                  Chào{" "}
-                  <span className="text-orangetext font-medium">Hoàng</span> !!!
-                </p>
-                <div className="relative" ref={dropdownRef}>
-                  <img
-                    className="w-10 h-10 rounded-full "
-                    src={NON_USER}
-                    alt="candidate logo"
-                  />
-                  {openInfo && (
-                    <div className="top-9 right-0 absolute my-4 text-base list-none  bg-[#fffefe] divide-y divide-gray-200 rounded-lg shadow-2xl z-[999]">
-                      <div className="px-4 py-3 max-w-[200px]">
-                        <span className="block text-sm text-gray-900 ">
-                          Phạm Tấn Hoàng
-                        </span>
-                        <span className="block text-xs text-gray-500 truncate ">
-                          phamtanoang3202@gmail.com
-                        </span>
-                      </div>
-                      <ul className="py-2 w-[200px]">
-                        <li>
-                          <Link
-                            to={CANDIDATE_PATHS.myProfile}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
-                          >
-                            Quản lý hồ sơ
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to={CANDIDATE_PATHS.appliedJobs}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
-                          >
-                            Công việc đã ứng tuyển
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to={CANDIDATE_PATHS.savedJobs}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
-                          >
-                            Công việc đã lưu
-                          </Link>
-                        </li>
-                        <li>
-                          <a
-                            className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
-                            onClick={_onClickChangePassword}
-                          >
-                            Đổi mật khẩu
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
-                            onClick={_onClickSignout}
-                          >
-                            Đăng xuất
-                          </a>
-                        </li>
-                      </ul>
+                {AuthHelper.isCandidate() ? (
+                  <>
+                    <p className="hidden  px-2 pt-2 sm:block font-normal text-sm text-gray-600">
+                      Chào{" "}
+                      <span className="text-orangetext font-medium text-base">
+                        {currentCandidate?.lastName}
+                      </span>{" "}
+                      !!!
+                    </p>
+                    <div className="relative" ref={dropdownRef}>
+                      <img
+                        className="w-10 h-10 rounded-full border border-borderColor"
+                        src={
+                          currentCandidate?.avatar
+                            ? currentCandidate.avatar
+                            : NON_USER
+                        }
+                        alt="candidate logo"
+                      />
+                      {openInfo && (
+                        <div className="top-9 right-0 absolute my-4 text-base list-none  bg-[#fffefe] divide-y divide-gray-200 rounded-lg shadow-2xl z-[999]">
+                          <div className="px-4 py-3 max-w-[200px]">
+                            <span className="block text-sm text-gray-900 ">
+                              {currentCandidate?.firstName}{" "}
+                              {currentCandidate?.lastName}
+                            </span>
+                            <span className="block text-xs text-gray-500 truncate ">
+                              {currentCandidate?.email}
+                            </span>
+                          </div>
+                          <ul className="py-2 w-[200px]">
+                            <li>
+                              <Link
+                                to={CANDIDATE_PATHS.myProfile}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
+                              >
+                                Quản lý hồ sơ
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                to={CANDIDATE_PATHS.appliedJobs}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
+                              >
+                                Công việc đã ứng tuyển
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                to={CANDIDATE_PATHS.savedJobs}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
+                              >
+                                Công việc đã lưu
+                              </Link>
+                            </li>
+                            <li>
+                              <a
+                                className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
+                                onClick={_onClickChangePassword}
+                              >
+                                Đổi mật khẩu
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
+                                onClick={_onClickSignout}
+                              >
+                                Đăng xuất
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      className="relative hidden lg:block w-max px-4 py-1.5 text-orangetext transition duration-700 ease-out bg-white border-2 border-orangetext rounded-lg hover:border-orange-500 hover:text-orange-500"
+                      onClick={_onClickSignin}
+                    >
+                      Đăng nhập
+                    </button>
+                    <button
+                      className="relative hidden lg:block w-max px-4 py-1.5 text-white transition duration-500 ease-out bg-orangetext rounded-lg hover:bg-orange-500 hover:ease-in "
+                      onClick={_onClickSignup}
+                    >
+                      Đăng kí
+                    </button>
+                  </>
+                )}
               </div>
               <button
                 className="cursor-pointer lg:hidden text-2xl text-orangetext"
@@ -233,7 +279,7 @@ const Header = () => {
         <div
           ref={menuRef}
           className={`lg:hidden text-gray-700 absolute w-full
-              py-10 font-medium bg-gray-50 top-19  duration-500 z-[999] px-10 ${
+              py-10 font-medium bg-white top-19  duration-500 z-[999] px-10 ${
                 open ? "left-0" : "-left-full"
               }`}
         >
@@ -262,20 +308,22 @@ const Header = () => {
                 Nhà tuyển dụng
               </NavLink>
             </li>
-            <li className="flex gap-5">
-              <button
-                className="w-full px-6 py-2 text-orangetext transition duration-700 ease-out bg-white border-2 border-orangetext rounded-lg hover:bg-orangetext hover:text-white"
-                onClick={_onClickSignin}
-              >
-                Đăng nhập
-              </button>
-              <button
-                className="w-full px-6 py-2 text-white transition duration-500 ease-out bg-orangetext rounded-lg hover:bg-orange-500 hover:ease-in "
-                onClick={_onClickSignup}
-              >
-                Đăng kí
-              </button>
-            </li>
+            {!AuthHelper.isCandidate && (
+              <li className="flex gap-5">
+                <button
+                  className="w-full px-6 py-2 text-orangetext transition duration-700 ease-out bg-white border-2 border-orangetext rounded-lg hover:bg-orangetext hover:text-white"
+                  onClick={_onClickSignin}
+                >
+                  Đăng nhập
+                </button>
+                <button
+                  className="w-full px-6 py-2 text-white transition duration-500 ease-out bg-orangetext rounded-lg hover:bg-orange-500 hover:ease-in "
+                  onClick={_onClickSignup}
+                >
+                  Đăng kí
+                </button>
+              </li>
+            )}
           </ul>
         </div>
       </header>

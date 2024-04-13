@@ -3,7 +3,7 @@ const AuthAPI = {
   signupCandidate: "/auths/registerCandidate",
   signupEmployer: "/auths/registerEmployer",
   logout: "/auths/logout",
-  changePassword: "/auths/change-password",
+  changePassword: "/auths/changePassword",
   refreshToken: "/auths/refresh",
 };
 
@@ -27,6 +27,9 @@ const CandidateAPI = {
   candidateById: (id?: string) => {
     return `/candidates/${id}`;
   },
+
+  changeImage: "/candidates/updateAvatar",
+  updateProfile: "/candidates/updateProfile",
 };
 
 const EmployerAPI = {

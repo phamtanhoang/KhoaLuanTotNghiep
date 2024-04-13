@@ -1,6 +1,4 @@
 import { LoadingContext } from "@/App";
-import { authsService } from "@/services";
-import { ONCHANGE_ROLE } from "@/store/reducers/authReducer";
 import { ADMIN_PATHS } from "@/utils/constants/pathConstants";
 import { AuthHelper } from "@/utils/helpers/authHelper";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
@@ -23,12 +21,9 @@ const Header: React.FC<HeaderProps> = ({ openSideBar }) => {
       "question",
       () => {
         context.handleOpenLoading();
-
-        AuthHelper.removeTokens();
-        dispatch(ONCHANGE_ROLE(""));
+        AuthHelper.removeAuthenticaton();
         navigate(ADMIN_PATHS.signin);
         SwalHelper.MiniAlert("Đăng xuất thành công", "success");
-
         context.handleCloseLoading();
       },
       () => {}

@@ -8,6 +8,8 @@ import { LoadingContext } from "@/App";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { ImageHelper } from "@/utils/helpers/imageHelper";
 import employersService from "@/services/employersService";
+import { AuthHelper } from "@/utils/helpers/authHelper";
+import candidatesService from "@/services/candidatesService";
 
 const ChangeAvatar = (props: any) => {
   const handleClose = props.handleClose;
@@ -43,24 +45,48 @@ const ChangeAvatar = (props: any) => {
       return;
     }
     context.handleOpenLoading();
-    let img: File = ImageHelper.dataURItoFile(croppedImg, "123");
-    employersService
-      .changeImage(img)
-      .then((res) => {
-        if (res.status === 200 && res.data.Status === 200) {
-          SwalHelper.MiniAlert(res.data.Message, "success");
-          fetchData();
-          handleClose();
-        } else {
-          SwalHelper.MiniAlert(res.data.Message, "error");
-        }
-      })
-      .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-      })
-      .finally(() => {
-        context.handleCloseLoading();
-      });
+    let img: File = ImageHelper.dataURItoFile(
+      croppedImg,
+      "avatar" + AuthHelper.getUser().id
+    );
+    if (AuthHelper.isCandidate()) {
+      candidatesService
+        .changeImage(img)
+        .then((res) => {
+          if (res.status === 200 && res.data.Status === 200) {
+            SwalHelper.MiniAlert(res.data.Message, "success");
+            fetchData();
+            handleClose();
+          } else {
+            SwalHelper.MiniAlert(res.data.Message, "error");
+          }
+        })
+        .catch((e) => {
+          console.log(e.message);
+          SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+        })
+        .finally(() => {
+          context.handleCloseLoading();
+        });
+    } else if (AuthHelper.isEmployer()) {
+      employersService
+        .changeImage(img)
+        .then((res) => {
+          if (res.status === 200 && res.data.Status === 200) {
+            SwalHelper.MiniAlert(res.data.Message, "success");
+            fetchData();
+            handleClose();
+          } else {
+            SwalHelper.MiniAlert(res.data.Message, "error");
+          }
+        })
+        .catch(() => {
+          SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+        })
+        .finally(() => {
+          context.handleCloseLoading();
+        });
+    }
   };
   return (
     <div className="w-full sm:w-[400px] lg:w-[450px] max-lg:px-5 p-8 bg-white lg:rounded-xl max-h-[90vh] relative">

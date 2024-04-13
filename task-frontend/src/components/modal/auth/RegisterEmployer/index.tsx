@@ -81,7 +81,7 @@ const RegisterEmployer = (props: any) => {
           );
         } else {
           SwalHelper.MiniAlert(
-            res.data.Message || "Đăng nhập không thành công!",
+            res.data.Message || "Đăng kí không thành công!",
             "error"
           );
         }

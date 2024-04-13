@@ -20,27 +20,27 @@ const MoreDetail: React.FC<MoreDetailProps> = ({
       <h4 className="text-xl text-gray-900 font-bold">Thông tin tài khoản</h4>
       <ul className="mt-3 text-gray-700">
         <li className="flex border-y border-dashed border-borderColor py-3 gap-4">
-          <span className="font-bold w-[35%] lg:w-[20%]">
+          <span className="font-medium w-[35%] lg:w-[20%]">
             Tên doanh nghiệp:
           </span>
           <span className="text-gray-700 w-[65%] lg:w-[80%]">{name}</span>
         </li>
         <li className="flex border-b border-dashed border-borderColor py-3 gap-4">
-          <span className="font-bold w-[35%] lg:w-[20%]">Địa chỉ:</span>
+          <span className="font-medium w-[35%] lg:w-[20%]">Địa chỉ:</span>
           <span className="text-gray-700 w-[65%] lg:w-[80%]">{address}</span>
         </li>
         <li className="flex border-b border-dashed border-borderColor py-3 gap-4">
-          <span className="font-bold w-[35%] lg:w-[20%]">Số điện thoại:</span>
+          <span className="font-medium w-[35%] lg:w-[20%]">Số điện thoại:</span>
           <span className="text-gray-700 w-[65%] lg:w-[80%]">
             {phoneNumber}
           </span>
         </li>
         <li className="flex border-b border-dashed border-borderColor py-3 gap-4">
-          <span className="font-bold w-[35%] lg:w-[20%]">Email:</span>
+          <span className="font-medium w-[35%] lg:w-[20%]">Email:</span>
           <span className="text-gray-700 w-[65%] lg:w-[80%]">{email}</span>
         </li>
         <li className="flex border-b border-dashed border-borderColor py-3 gap-4">
-          <span className="font-bold w-[35%] lg:w-[20%]">
+          <span className="font-medium w-[35%] lg:w-[20%]">
             Mã số kinh doanh:
           </span>
           <span className="text-gray-700 w-[65%] lg:w-[80%]">

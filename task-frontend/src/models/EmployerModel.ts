@@ -12,4 +12,5 @@ interface EmployerModel {
   status: string;
   email: string;
   userId: string;
+  isVip:boolean;
 }

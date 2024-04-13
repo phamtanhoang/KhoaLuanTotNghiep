@@ -10,9 +10,13 @@ const findApplicationStateById = (id: string) => {
 const findHRStateById = (id: string) => {
   return DataConstants.HR_STATE_DATA.find((state: any) => state.id === id);
 };
+const findSexById = (id: string) => {
+  return DataConstants.SEX_DATA.find((state: any) => state.id === id);
+};
 
-export const StateHelper = {
+export const ConstantsHelper = {
   findJobStateById,
   findApplicationStateById,
   findHRStateById,
+  findSexById,
 };

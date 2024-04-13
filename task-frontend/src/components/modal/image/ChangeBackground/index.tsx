@@ -8,6 +8,7 @@ import { LoadingContext } from "@/App";
 import employersService from "@/services/employersService";
 import { ImageHelper } from "@/utils/helpers/imageHelper";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { AuthHelper } from "@/utils/helpers/authHelper";
 
 const ChangeBackground = (props: any) => {
   const handleClose = props.handleClose;
@@ -44,7 +45,10 @@ const ChangeBackground = (props: any) => {
       return;
     }
     context.handleOpenLoading();
-    let img: File = ImageHelper.dataURItoFile(croppedImg, "123");
+    let img: File = ImageHelper.dataURItoFile(
+      croppedImg,
+      "bg_img"+ AuthHelper.getUser().id 
+    );
     employersService
       .ChangeBackgroundImage(img)
       .then((res) => {

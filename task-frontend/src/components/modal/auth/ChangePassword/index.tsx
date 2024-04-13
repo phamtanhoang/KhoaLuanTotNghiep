@@ -1,15 +1,20 @@
 import { LoadingContext } from "@/App";
 import { authsService } from "@/services";
+import { CLEAR_CURRENT_CANDIDATE } from "@/store/reducers/candidateReducer";
+import { CLEAR_CURRENT_EMPLOYER } from "@/store/reducers/employerReducer";
+import { MODAL_KEYS } from "@/utils/constants/modalConstants";
+import { AuthHelper } from "@/utils/helpers/authHelper";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { ChangeEvent, useContext, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
+import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 
 const ChangePassword = (props: any) => {
   const handleClose = props.handleClose;
   const setFuncs = props.setFuncs;
   const context = useContext(LoadingContext);
-
+  const dispatch = useDispatch();
   const location = useLocation();
   const isAdminPath = location.pathname.includes("/admin/");
 
@@ -28,11 +33,7 @@ const ChangePassword = (props: any) => {
   };
 
   const _onClickSubmit = () => {
-    if (
-      !currentPassword ||
-      !confirmNewPassword ||
-      !newPassword
-    ) {
+    if (!currentPassword || !confirmNewPassword || !newPassword) {
       SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "error");
       return;
     }
@@ -41,28 +42,44 @@ const ChangePassword = (props: any) => {
       return;
     }
 
-    context.handleOpenLoading();
-    authsService
-      .changePassword(currentPassword, newPassword)
-      .then((res) => {
-        if (res.status === 200 && res.data.Status === 200) {
-          SwalHelper.MiniAlert(
-            "Đổi mật khẩu thành công, vui lòng đăng nhập lại!",
-            "success"
-          );
-        } else {
-          SwalHelper.MiniAlert(
-            res.data.Message || "Đổi mật khẩu không thành công!",
-            "error"
-          );
-        }
-      })
-      .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-      })
-      .finally(() => {
-        context.handleCloseLoading();
-      });
+    SwalHelper.Confirm(
+      "Xác nhận đổi mật khẩu?",
+      "question",
+      () => {
+        context.handleOpenLoading();
+        authsService
+          .changePassword(currentPassword, newPassword)
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              if (AuthHelper.isCandidate()) {
+                dispatch(CLEAR_CURRENT_CANDIDATE());
+              }
+              if (AuthHelper.isEmployer()) {
+                dispatch(CLEAR_CURRENT_EMPLOYER());
+              }
+              AuthHelper.removeAuthenticaton();
+              SwalHelper.MiniAlert(
+                "Đổi mật khẩu thành công, vui lòng đăng nhập lại!",
+                "success"
+              );
+
+              setFuncs(MODAL_KEYS.signin);
+            } else {
+              SwalHelper.MiniAlert(
+                res.data.Message || "Đổi mật khẩu không thành công!",
+                "error"
+              );
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
+      },
+      () => {}
+    );
   };
   return (
     <div className="sm:w-[30rem] w-screen p-8 bg-white sm:rounded-xl relative h-max max-h-[90%] overflow-auto scrollbar-custom">

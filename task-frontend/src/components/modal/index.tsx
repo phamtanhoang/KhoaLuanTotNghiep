@@ -34,10 +34,12 @@ const ModalBase = (props: any) => {
     [MODAL_KEYS.signup]: (
       <Signup handleClose={handleClose} setFuncs={setFuncs} />
     ),
-    [MODAL_KEYS.changePassword]: <ChangePassword handleClose={handleClose} />,
+    [MODAL_KEYS.changePassword]: (
+      <ChangePassword setFuncs={setFuncs} handleClose={handleClose} />
+    ),
     [MODAL_KEYS.applyJob]: <ApplyJob handleClose={handleClose} />,
     [MODAL_KEYS.changeInfoCandidate]: (
-      <ChangeInfoCandidate handleClose={handleClose} />
+      <ChangeInfoCandidate fetchData={fetchData} handleClose={handleClose} />
     ),
     [MODAL_KEYS.changeExpSkillInfoCandidate]: (
       <ChangeExpSkillInfoCandidate type={type} handleClose={handleClose} />

@@ -1,4 +1,4 @@
-import { StateHelper } from "@/utils/helpers/stateHelper";
+import { ConstantsHelper } from "@/utils/helpers/constantsHelper";
 import { AiFillDelete, AiFillEye } from "react-icons/ai";
 
 import NON_USER from "@/assets/images/non-user.jpg";
@@ -23,7 +23,7 @@ const ItemTSX: React.FC<{
   _onClickDelete: () => void;
   _onClickDetail: () => void;
 }> = ({ item, index, _onClickDelete, _onClickDetail }) => {
-  let data = StateHelper.findHRStateById(item.state);
+  let data = ConstantsHelper.findHRStateById(item.state);
 
   return (
     <tr

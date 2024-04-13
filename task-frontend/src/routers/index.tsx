@@ -40,16 +40,10 @@ import {
   EMPLOYER_PATHS,
   OTHER_PATHS,
 } from "@/utils/constants/pathConstants";
-import { useSelector } from "react-redux";
+import { AuthHelper } from "@/utils/helpers/authHelper";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 const Routers = () => {
-  const { role } = useSelector((state: any) => state.authReducer);
-
-  const isCandidate = role === DataConstants.ROLE_DATA.CANDIDATE;
-  const isEmployer = role === DataConstants.ROLE_DATA.EMPLOYER;
-  const isAdmin = role === DataConstants.ROLE_DATA.ADMIN;
-
   return (
     <BrowserRouter>
       <Routes>
@@ -81,7 +75,7 @@ const Routers = () => {
           <Route
             element={
               <ProtectedRoute
-                isAllowed={isCandidate}
+                isAllowed={AuthHelper.isCandidate()}
                 redirectTo={CANDIDATE_PATHS.home}
               />
             }
@@ -101,7 +95,7 @@ const Routers = () => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={!isEmployer}
+              isAllowed={!AuthHelper.isEmployer()}
               redirectTo={EMPLOYER_PATHS.dashboard}
             />
           }
@@ -115,7 +109,7 @@ const Routers = () => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={isEmployer}
+              isAllowed={AuthHelper.isEmployer()}
               redirectTo={EMPLOYER_PATHS.signin}
             />
           }
@@ -158,7 +152,7 @@ const Routers = () => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={!isAdmin}
+              isAllowed={!AuthHelper.isAdmin()}
               redirectTo={ADMIN_PATHS.dashboard}
             />
           }
@@ -168,7 +162,7 @@ const Routers = () => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={isAdmin}
+              isAllowed={AuthHelper.isAdmin()}
               redirectTo={ADMIN_PATHS.signin}
             />
           }

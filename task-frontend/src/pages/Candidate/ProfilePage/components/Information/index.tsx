@@ -1,3 +1,5 @@
+import { ConstantsHelper } from "@/utils/helpers/constantsHelper";
+
 interface InformationCardProps {
   firstName?: string;
   lastName?: string;
@@ -19,6 +21,7 @@ const Information: React.FC<InformationCardProps> = ({
   email,
   link,
 }) => {
+  const sex = ConstantsHelper.findSexById(gender!);
   return (
     <div className="grid md:grid-cols-2 text-sm gap-4 lg:px-3">
       <div className="flex gap-5">
@@ -31,7 +34,7 @@ const Information: React.FC<InformationCardProps> = ({
       </div>
       <div className="flex gap-5">
         <div className="font-semibold w-[35%]">Giới tính:</div>
-        <div className="w-[65%]">{gender}</div>
+        <div className="w-[65%]">{sex?.name}</div>
       </div>
       <div className="flex gap-5">
         <div className="font-semibold w-[35%]">Số điện thoại:</div>

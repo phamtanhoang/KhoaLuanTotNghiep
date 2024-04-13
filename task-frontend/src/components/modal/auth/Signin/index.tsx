@@ -1,5 +1,6 @@
 import { LoadingContext } from "@/App";
 import { authsService } from "@/services";
+import { CLEAR_CURRENT_EMPLOYER } from "@/store/reducers/employerReducer";
 import { DataConstants } from "@/utils/constants/dataConstants";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { AuthHelper } from "@/utils/helpers/authHelper";
@@ -8,10 +9,12 @@ import useCaptchaGenerator from "@/utils/hooks/useCaptchaGenerator";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { IoReload } from "react-icons/io5";
+import { useDispatch } from "react-redux";
 const Signin = (props: any) => {
   const handleClose = props.handleClose;
   const setFuncs = props.setFuncs;
   const context = useContext(LoadingContext);
+  const dispatch = useDispatch();
 
   const { captchaText, canvasRef, reloadCaptcha } = useCaptchaGenerator();
   const [email, setEmail] = useState<string>("");
@@ -54,10 +57,8 @@ const Signin = (props: any) => {
       .signin(email, password, DataConstants.ROLE_DATA.CANDIDATE)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          AuthHelper.setTokens(
-            res.data.Data.tokens.accessToken,
-            res.data.Data.tokens.refreshToken
-          );
+          dispatch(CLEAR_CURRENT_EMPLOYER());
+          AuthHelper.setAuthenticaton(res.data.Data.tokens, res.data.Data.user);
           SwalHelper.MiniAlert(res.data.Message, "success", 1500);
           setTimeout(() => {
             window.location.reload();

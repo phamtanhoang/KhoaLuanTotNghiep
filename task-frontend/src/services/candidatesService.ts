@@ -35,5 +35,40 @@ const candidatesService = {
       headers: { "Content-Type": "application/json" },
     });
   },
+
+  async changeImage(image: File | null) {
+    const formData = new FormData();
+    if (image) formData.append("avatar", image);
+    return await axiosConfig.patch(CandidateAPI.changeImage, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+
+  async updateProfile(
+    firstName?: string,
+    lastName?: string,
+    address?: string,
+    phoneNumber?: string,
+    dateOfBirth?: string,
+    link?: string,
+    job?: string,
+    introduction?: string,
+    sex?: string
+  ) {
+    const body = {
+      firstName: firstName?.trim(),
+      lastName: lastName?.trim(),
+      address: address?.trim(),
+      phoneNumber: phoneNumber?.trim(),
+      dateOfBirth: new Date(dateOfBirth!),
+      link: link?.trim(),
+      job: job?.trim(),
+      introduction: introduction?.trim(),
+      sex: sex,
+    };
+    return await axiosConfig.patch(CandidateAPI.updateProfile, body, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
 };
 export default candidatesService;

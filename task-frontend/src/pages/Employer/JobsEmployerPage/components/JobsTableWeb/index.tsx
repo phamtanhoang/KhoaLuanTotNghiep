@@ -1,4 +1,4 @@
-import { StateHelper } from "@/utils/helpers/stateHelper";
+import { ConstantsHelper } from "@/utils/helpers/constantsHelper";
 import { AiFillDelete, AiFillEdit, AiFillEye } from "react-icons/ai";
 import { IoMdAddCircleOutline } from "react-icons/io";
 
@@ -22,7 +22,7 @@ const ItemTSX: React.FC<{
   _onClickDetail: () => void;
   _onClickEdit: () => void;
 }> = ({ item, index, _onClickDelete, _onClickDetail, _onClickEdit }) => {
-  let data = StateHelper.findJobStateById(item.state);
+  let data = ConstantsHelper.findJobStateById(item.state);
 
   return (
     <tr

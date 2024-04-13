@@ -14,17 +14,22 @@ import { LoadingContext } from "@/App";
 import candidatesService from "@/services/candidatesService";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { DateHelper } from "@/utils/helpers/dateHelper";
+import { useDispatch, useSelector } from "react-redux";
+import { ONCHANGE_CURRENT_CANDIDATE } from "@/store/reducers/candidateReducer";
 
 const ProfilePage = () => {
   const context = useContext(LoadingContext);
+  const dispatch = useDispatch();
+
+  const { currentCandidate } = useSelector(
+    (state: any) => state.candidateReducer
+  );
 
   const [open, setOpen] = useState(false);
   const [funcs, setFuncs] = useState<string>("");
   const [type, setType] = useState<string>("");
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
-  const [candidate, setCandidate] = useState<CandidateModel>();
 
   const _onClickChangeImage = () => {
     setFuncs(MODAL_KEYS.changeAvatar);
@@ -40,14 +45,13 @@ const ProfilePage = () => {
     setFuncs(MODAL_KEYS.changeExpSkillInfoCandidate);
     handleOpen();
   };
-
-  useEffect(() => {
+  const fetchData = () => {
     context.handleOpenLoading();
     candidatesService
       .profile()
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          setCandidate(res.data.Data);
+          dispatch(ONCHANGE_CURRENT_CANDIDATE(res.data.Data));
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -58,8 +62,10 @@ const ProfilePage = () => {
       .finally(() => {
         context.handleCloseLoading();
       });
+  };
+  useEffect(() => {
+    fetchData();
   }, []);
-  console.log("candidate, ", candidate);
 
   return (
     <>
@@ -68,6 +74,7 @@ const ProfilePage = () => {
         open={open}
         handleClose={handleClose}
         funcs={funcs}
+        fetchData={fetchData}
       />
       <Hero
         title="Thông tin tài khoản"
@@ -78,10 +85,10 @@ const ProfilePage = () => {
         <div className="w-full lg:w-[80%] px-5 lg:px-0 mx-auto flex flex-col lg:flex-row gap-5  rounded-md">
           <div className="w-full md:w-3/12 flex flex-col gap-5 ">
             <UserCard
-              image={candidate?.avatar}
-              name={`${candidate?.firstName} ${candidate?.lastName}`}
-              job={candidate?.job}
-              description={candidate?.introduction}
+              image={currentCandidate?.avatar}
+              name={`${currentCandidate?.firstName} ${currentCandidate?.lastName}`}
+              job={currentCandidate?.job}
+              description={currentCandidate?.introduction}
               _onClickChangeImage={_onClickChangeImage}
             />
           </div>
@@ -95,13 +102,16 @@ const ProfilePage = () => {
               </div>
 
               <Information
-                firstName={candidate?.firstName}
-                lastName={candidate?.lastName}
-                address={candidate?.address}
-                dateOfBirth={DateHelper.formatDate(candidate?.dateOfBirth)}
-                email={candidate?.email}
-                gender={candidate?.sex}
-                link={candidate?.link}
+                firstName={currentCandidate?.firstName}
+                lastName={currentCandidate?.lastName}
+                address={currentCandidate?.address}
+                dateOfBirth={DateHelper.formatDate(
+                  currentCandidate?.dateOfBirth
+                )}
+                email={currentCandidate?.email}
+                gender={currentCandidate?.sex}
+                link={currentCandidate?.link}
+                phoneNumber={currentCandidate?.phoneNumber}
               />
               <button
                 className="block w-full text-orangetext hover:text-orange-500 text-sm font-semibold rounded-lg hover:bg-gray-100 focus:outline-none focus:shadow-outline focus:bg-gray-100 hover:shadow-xs p-3 mt-4"

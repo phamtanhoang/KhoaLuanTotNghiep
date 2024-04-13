@@ -1,9 +1,7 @@
 import { RiVipCrown2Line } from "react-icons/ri";
-import { Tooltip } from "react-tooltip";
 import NON_USER from "@/assets/images/non-user.jpg";
 import NON_BG from "@/assets/images/image-background.png";
 import { IoCameraSharp } from "react-icons/io5";
-import { useRef, useState } from "react";
 
 interface BaseInfoProps {
   image?: string;
@@ -59,11 +57,11 @@ const BaseInfo: React.FC<BaseInfoProps> = ({
           </button>
         </div>
 
-        <div className="flex items-center space-x-2 mt-2">
+        <div className="flex items-center space-x-2 mt-2 font-medium">
           <p className="text-2xl">{name}</p>
           {isVip && (
             <p
-              className=" p-1.5 rounded-full  text-orangebackground bg-orangetext"
+              className=" p-2 rounded-full  text-orangebackground bg-orangetext"
               data-tooltip-id="tooltip"
               data-tooltip-content="Nhà tuyển dụng VIP"
             >

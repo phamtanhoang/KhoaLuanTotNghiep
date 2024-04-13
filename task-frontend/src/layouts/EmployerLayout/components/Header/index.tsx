@@ -10,10 +10,13 @@ import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import ModalBase from "@/components/modal";
 import { LoadingContext } from "@/App";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
-import { authsService } from "@/services";
 import { AuthHelper } from "@/utils/helpers/authHelper";
-import { useDispatch } from "react-redux";
-import { ONCHANGE_ROLE } from "@/store/reducers/authReducer";
+import { useDispatch, useSelector } from "react-redux";
+import employersService from "@/services/employersService";
+import {
+  CLEAR_CURRENT_EMPLOYER,
+  ONCHANGE_CURRENT_EMPLOYER,
+} from "@/store/reducers/employerReducer";
 
 const DropdownMessage = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -282,6 +285,11 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
+  const { currentEmployer } = useSelector(
+    (state: any) => state.employerReducer
+  );
+  const dispatch = useDispatch();
+  const context = useContext(LoadingContext);
 
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
@@ -307,6 +315,29 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
     return () => document.removeEventListener("keydown", keyHandler);
   });
 
+  const fetchData = () => {
+    context.handleOpenLoading();
+    employersService
+      .profile()
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          dispatch(ONCHANGE_CURRENT_EMPLOYER(res.data.Data));
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <div className="relative">
       <Link
@@ -317,13 +348,16 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black ">
-            Thomas Anree
+            {currentEmployer?.name}
           </span>
-          <span className="block text-xs">UX Designer</span>
+          <span className="block text-xs">{currentEmployer?.email}</span>
         </span>
 
         <span className="h-10 w-10 rounded-full">
-          <img src={NON_USER} alt="User" />
+          <img
+            src={currentEmployer?.image ? currentEmployer?.image : NON_USER}
+            alt="User"
+          />
         </span>
 
         <FaChevronDown
@@ -386,6 +420,7 @@ const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
 }) => {
+  const dispatch = useDispatch();
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [funcs, setFuncs] = useState<string>("");
   const handleOpen = () => setOpenModal(true);
@@ -393,7 +428,6 @@ const Header = (props: {
 
   const navigate = useNavigate();
   const context = useContext(LoadingContext);
-  const dispatch = useDispatch();
 
   const _onClickLogout = () => {
     SwalHelper.Confirm(
@@ -401,9 +435,8 @@ const Header = (props: {
       "question",
       () => {
         context.handleOpenLoading();
-
-        AuthHelper.removeTokens();
-        dispatch(ONCHANGE_ROLE(""));
+        dispatch(CLEAR_CURRENT_EMPLOYER());
+        AuthHelper.removeAuthenticaton();
         navigate(EMPLOYER_PATHS.signin);
         SwalHelper.MiniAlert("Đăng xuất thành công", "success");
         context.handleCloseLoading();
@@ -443,8 +476,6 @@ const Header = (props: {
 
         <div className="flex items-center gap-3 lg:gap-6">
           <ul className="flex items-center gap-2 lg:gap-3">
-            {/* <DarkModeSwitcher /> */}
-
             <DropdownNotification />
 
             <DropdownMessage />

@@ -1,43 +1,75 @@
-import { User } from "@/models/UserModel";
+import { DataConstants } from "../constants/dataConstants";
+import { SwalHelper } from "./swalHelper";
 
 const getAccessToken = () => {
-  const tokens = JSON.parse(localStorage.getItem("tokens")!);
-  return tokens ? tokens.accessToken : null;
+  const authentication = JSON.parse(localStorage.getItem("authentication")!);
+  return authentication ? authentication.tokens?.accessToken : null;
 };
 
 const getRefreshToken = () => {
-  const tokens = JSON.parse(localStorage.getItem("tokens")!);
-  return tokens ? tokens.refreshToken : null;
+  const authentication = JSON.parse(localStorage.getItem("authentication")!);
+  return authentication ? authentication.tokens?.refreshToken : null;
 };
 
 const setTokens = (accessToken: string, refreshToken: string) => {
-  const tokens = {
-    accessToken: accessToken,
-    refreshToken: refreshToken,
-  };
-  localStorage.setItem("tokens", JSON.stringify(tokens));
+  try {
+    const authenticationJSON = localStorage.getItem("authentication");
+
+    const authenticationData = JSON.parse(authenticationJSON!);
+
+    authenticationData.tokens.accessToken = accessToken;
+    authenticationData.tokens.refreshToken = refreshToken;
+
+    localStorage.setItem("authentication", JSON.stringify(authenticationData));
+  } catch (error) {
+    SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+  }
 };
 
-const removeTokens = () => {
-  localStorage.removeItem("tokens");
+const removeAuthenticaton = () => {
+  localStorage.removeItem("authentication");
 };
 
-// const getUser = (): User | null => {
-//   const userString = localStorage.getItem("user");
-//   return userString ? JSON.parse(userString) : null;
-// };
+const getUser = () => {
+  const authentication = JSON.parse(localStorage.getItem("authentication")!);
+  return authentication ? authentication.user : null;
+};
 
-// const setUser = (user: User): void => {
-//   localStorage.setItem("user", JSON.stringify(user));
-// };
+const setAuthenticaton = (tokens: any, user: any) => {
+  try {
+    const data = {
+      tokens: tokens,
+      user: user,
+    };
+    const dataJSON = JSON.stringify(data);
+    localStorage.setItem("authentication", dataJSON);
+  } catch (error) {
+    SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+  }
+};
+const isCandidate = () => {
+  const currentUser = getUser();
+  return currentUser && currentUser.role === DataConstants.ROLE_DATA.CANDIDATE;
+};
 
-// const removeUser = (): void => {
-//   localStorage.removeItem("user");
-// };
+const isEmployer = () => {
+  const currentUser = getUser();
+  return currentUser && currentUser.role === DataConstants.ROLE_DATA.EMPLOYER;
+};
+
+const isAdmin = () => {
+  const currentUser = getUser();
+  return currentUser && currentUser.role === DataConstants.ROLE_DATA.ADMIN;
+};
 
 export const AuthHelper = {
   getRefreshToken,
   getAccessToken,
   setTokens,
-  removeTokens,
+  removeAuthenticaton,
+  setAuthenticaton,
+  getUser,
+  isCandidate,
+  isEmployer,
+  isAdmin,
 };

@@ -65,7 +65,7 @@ const authsService = {
       currentPassword: currentPassword.trim(),
       newPassword: newPassword.trim(),
     };
-    return await axiosConfig.post(AuthAPI.changePassword, body, {
+    return await axiosConfig.patch(AuthAPI.changePassword, body, {
       headers: { "Content-Type": "application/json" },
     });
   },
