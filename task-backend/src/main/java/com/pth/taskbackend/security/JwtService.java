@@ -3,10 +3,7 @@ package com.pth.taskbackend.security;
 import com.google.api.client.util.Value;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,8 +19,8 @@ import java.util.function.Function;
 public class JwtService {
 
     public static final String SECRET = "Lu4byRqrMCp6OmPf3zyRUphe1NP0MZrZaB+2Kzay5OBb1Mfs6atzgSfwFCNVxpXhtQP5ToIzK1x1PgCFCpFY0Q==";
-    public static  int REFRESH_TOKEN_EXPIRATION_SECONDS = 6000 ;
-    public static  int ACCESS_TOKEN_EXPIRATION_SECONDS =3000;
+    public static  int REFRESH_TOKEN_EXPIRATION_SECONDS = 30 ;
+    public static  int ACCESS_TOKEN_EXPIRATION_SECONDS =60;
     private List<String> validTokens = new ArrayList<>();
     public String generateToken(String username, EStatus status, ERole role) {
         Map<String, Object> claims = new HashMap<>();
@@ -53,7 +50,12 @@ public class JwtService {
     }
 
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        try {
+            return extractClaim(token, Claims::getSubject);
+        } catch (ExpiredJwtException ex) {
+            System.out.println("JWT đã hết hạn khi cố gắng trích xuất tên người dùng từ JWT!");
+            return null;
+        }
     }
 
     public Date extractExpiration(String token) {

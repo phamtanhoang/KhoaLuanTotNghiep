@@ -1,6 +1,9 @@
 package com.pth.taskbackend.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pth.taskbackend.dto.request.EducationRequest;
+import com.pth.taskbackend.dto.request.ExperienceRequest;
+import com.pth.taskbackend.dto.request.SkillRequest;
 import com.pth.taskbackend.dto.request.UpdateCandidateRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.dto.response.CandidateResponse;
@@ -8,10 +11,7 @@ import com.pth.taskbackend.dto.response.EmployerResponse;
 import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
-import com.pth.taskbackend.model.meta.Candidate;
-import com.pth.taskbackend.model.meta.Employer;
-import com.pth.taskbackend.model.meta.HumanResource;
-import com.pth.taskbackend.model.meta.User;
+import com.pth.taskbackend.model.meta.*;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.CandidateService;
@@ -33,8 +33,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Map;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
@@ -447,6 +447,135 @@ public class CandidateController {
     }
 
 
+    @Operation(summary = "Create", description = "", tags = {})
+    @PostMapping("/saveSkills")
+    public ResponseEntity<BaseResponse> saveSkills(@RequestHeader("Authorization")String token,@RequestBody SkillRequest request) throws IOException {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Candidate candidate = optionalCandidate.get();
+            candidate.getSkills().clear();
+            candidate.getSkills().addAll(request.skills());
+            candidateService.update(candidate);
+
+            return ResponseEntity.ok(
+                    new BaseResponse( "Thêm danh sách kỹ năng thành công", HttpStatus.OK.value(),request)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "Create", description = "", tags = {})
+    @PostMapping("/saveEducations")
+    public ResponseEntity<BaseResponse> saveEducations(@RequestHeader("Authorization")String token,@RequestBody EducationRequest request) throws IOException {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Candidate candidate = optionalCandidate.get();
+            candidate.getEducations().clear();
+            candidate.getEducations().addAll(request.educationList());
+            candidateService.update(candidate);
+
+            return ResponseEntity.ok(
+                    new BaseResponse( "Thêm danh sách học vấn thành công", HttpStatus.OK.value(),request)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+
+    @Operation(summary = "Create", description = "", tags = {})
+    @PostMapping("/saveExperiences")
+    public ResponseEntity<BaseResponse> saveExperiences(@RequestHeader("Authorization")String token,@RequestBody ExperienceRequest request) throws IOException {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Candidate candidate = optionalCandidate.get();
+            candidate.getExperiences().clear();
+            candidate.getExperiences().addAll(request.experiences());
+            candidateService.update(candidate);
+
+            return ResponseEntity.ok(
+                    new BaseResponse( "Thêm danh sách kinh nghiệm thành công", HttpStatus.OK.value(),request)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+
+    @Operation(summary = "Get by id", description = "", tags = {})
+    @GetMapping("/extraProfile")
+    public ResponseEntity<BaseResponse> getCandidateExtraProfile(@RequestHeader("Authorization")String token) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Candidate candidate = optionalCandidate.get();
+            Map<String,Object>response= new HashMap<>();
+            response.put("skills",candidate.getSkills());
+            response.put("experiences",candidate.getExperiences());
+            response.put("educations",candidate.getEducations());
+
+            return ResponseEntity.ok(
+                    new BaseResponse( "Hiện thông tin thêm của ứng viên", HttpStatus.OK.value(), response)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 
 
 

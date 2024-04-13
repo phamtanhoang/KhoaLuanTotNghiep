@@ -21,7 +21,8 @@ public class Education  extends BaseEntity  {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-
+    @Column(nullable = false)
+    private int index;
     @Column(nullable = false)
     private String education;
 

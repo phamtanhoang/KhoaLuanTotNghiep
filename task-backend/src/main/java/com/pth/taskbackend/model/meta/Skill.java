@@ -18,6 +18,9 @@ public class Skill extends BaseEntity  {
     @Column(nullable = false)
     private String skill;
 
+    @Column(nullable = false)
+    private int index;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

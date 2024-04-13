@@ -22,9 +22,12 @@ public class Experience extends BaseEntity  {
 
 
     @Column(nullable = false)
-    private LocalDateTime fromDate;
+    private int index;
 
     @Column(nullable = false)
+    private LocalDateTime fromDate;
+
+
     private LocalDateTime toDate;
 
     @Column(columnDefinition = "TEXT")

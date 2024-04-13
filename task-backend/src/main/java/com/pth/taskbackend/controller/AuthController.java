@@ -91,17 +91,10 @@ public class AuthController {
             return ResponseEntity.ok(
                     new BaseResponse("Vui lòng đăng nhập với tài khoản ứng viên!", HttpStatus.FORBIDDEN.value(), null)
             );
-        if(authenticationRequest.role().equals(ERole.EMPLOYER)){
-
-            if(user.get().getRole().equals(ERole.EMPLOYER)||user.get().getRole().equals(ERole.HR)) {
-
-            }
-            else {
-                return ResponseEntity.ok(
-                        new BaseResponse("Vui lòng đăng nhập với tài khoản nhà tuyển dụng!", HttpStatus.FORBIDDEN.value(), null)
-                );
-            }
-        }
+        if(authenticationRequest.role().equals(ERole.EMPLOYER) && !user.get().getRole().equals(ERole.EMPLOYER)&& !user.get().getRole().equals(ERole.HR))
+            return ResponseEntity.ok(
+                    new BaseResponse("Vui lòng đăng nhập với tài khoản nhà tuyển dụng!", HttpStatus.FORBIDDEN.value(), null)
+            );
 
             if(!authenticationRequest.role().equals(ERole.ADMIN)) {
                 if (user.get().getStatus().equals(EStatus.DELETED)) {
