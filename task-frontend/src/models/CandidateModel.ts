@@ -1,14 +1,17 @@
 interface CandidateModel {
   id: string;
-  email: string;
+  created: Date;
+  updated: Date;
   firstName: string;
   lastName: string;
-  address: string;
   phoneNumber: string;
-  dateOfBirth: Date;
-  link: string;
-  job: string;
-  introduction: string;
-  avatar: string;
   sex: string;
+  avatar: string;
+  dateOfBirth: string;
+  introduction: string;
+  job: string;
+  link: string;
+  status: string;
+  email: string;
+  userId: string;
 }

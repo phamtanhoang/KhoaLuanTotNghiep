@@ -15,10 +15,38 @@ const UserAPI = {
 
 const CandidateAPI = {
   profile: "/candidates/profile",
+  getList: (
+    keyword?: string,
+    status?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/candidates/getCandidates-admin?keyword=${keyword}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
+  },
+
+  candidateById: (id?: string) => {
+    return `/candidates/${id}`;
+  },
 };
 
 const EmployerAPI = {
   profile: "/employers/profile",
+  getList: (
+    keyword?: string,
+    status?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/employers/getEmployers-admin?keyword=${keyword}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
+  },
+
+  employerById: (id?: string) => {
+    return `/employers/${id}`;
+  },
+
+  changeBackgroundImage: "/employers/updateBackgroundImage",
+  changeImage: "/employers/updateImage",
+  updateProfile: "/employers/updateProfile",
 };
 
 const TagAPI = {

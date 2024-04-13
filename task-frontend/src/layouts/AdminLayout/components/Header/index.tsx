@@ -1,11 +1,13 @@
 import { LoadingContext } from "@/App";
 import { authsService } from "@/services";
+import { ONCHANGE_ROLE } from "@/store/reducers/authReducer";
 import { ADMIN_PATHS } from "@/utils/constants/pathConstants";
 import { AuthHelper } from "@/utils/helpers/authHelper";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { useContext } from "react";
 import { BiLogOut } from "react-icons/bi";
 import { RiAdminFill } from "react-icons/ri";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 interface HeaderProps {
   openSideBar: boolean;
@@ -13,6 +15,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ openSideBar }) => {
   const navigate = useNavigate();
   const context = useContext(LoadingContext);
+  const dispatch = useDispatch();
 
   const _onClickLogout = () => {
     SwalHelper.Confirm(
@@ -20,29 +23,13 @@ const Header: React.FC<HeaderProps> = ({ openSideBar }) => {
       "question",
       () => {
         context.handleOpenLoading();
-        authsService
-          .signout()
-          .then((res) => {
-            if (res.status === 200 && res.data.Status === 200) {
-              AuthHelper.removeTokens();
-              navigate(ADMIN_PATHS.signin);
-              SwalHelper.MiniAlert(
-                res.data.Message || "Đăng xuất thành công",
-                "success"
-              );
-            } else {
-              SwalHelper.MiniAlert(
-                res.data.Message || "Đăng xuất không thành công!",
-                "error"
-              );
-            }
-          })
-          .catch(() => {
-            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-          })
-          .finally(() => {
-            context.handleCloseLoading();
-          });
+
+        AuthHelper.removeTokens();
+        dispatch(ONCHANGE_ROLE(""));
+        navigate(ADMIN_PATHS.signin);
+        SwalHelper.MiniAlert("Đăng xuất thành công", "success");
+
+        context.handleCloseLoading();
       },
       () => {}
     );

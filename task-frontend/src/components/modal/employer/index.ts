@@ -1,3 +1,4 @@
 import ChangeInfoEmployer from "./ChangeInfoEmployer";
+import EmployerUpdate from "./EmployerUpdate";
 
-export {ChangeInfoEmployer}
+export { ChangeInfoEmployer, EmployerUpdate };

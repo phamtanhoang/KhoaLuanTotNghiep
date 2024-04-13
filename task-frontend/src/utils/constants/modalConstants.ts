@@ -21,5 +21,7 @@ const MODAL_KEYS = {
   createCategory: "CreateCategory",
   updateCategory: "updateCategory",
   chooseImage: "ChooseImage",
+
+  updateEmployer: "updateEmployer",
 };
 export { MODAL_KEYS };

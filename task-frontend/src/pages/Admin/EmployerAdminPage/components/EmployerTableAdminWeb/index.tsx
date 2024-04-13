@@ -12,17 +12,17 @@ import { StateHelper } from "@/utils/helpers/stateHelper";
 import { DataConstants } from "@/utils/constants/dataConstants";
 import { ChangeEvent } from "react";
 
-interface CandidateTableAdminProps {
-  value: CandidateModel[];
-  _onClickDetail: (item: CandidateModel) => void;
-  _onClickDelete: (item: CandidateModel) => void;
+interface EmployerTableAdminProps {
+  value: EmployerModel[];
+  _onClickDetail: (item: EmployerModel) => void;
+  _onClickDelete: (item: EmployerModel) => void;
   _onChangeStatus: (e: ChangeEvent<HTMLSelectElement>) => void;
   status: string;
   isLoading: boolean;
   currentPage: number;
   itemPerpage: number;
 }
-const CandidateTableAdminWeb: React.FC<CandidateTableAdminProps> = ({
+const EmployerTableAdminWeb: React.FC<EmployerTableAdminProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,
@@ -48,11 +48,11 @@ const CandidateTableAdminWeb: React.FC<CandidateTableAdminProps> = ({
               scope="col"
               className="px-4 py-3.5 text-base font-semibold text-left text-gray-600 w-[40%]"
             >
-              Tài khoản ứng viên
+              Tài khoản nhà tuyển dụng
             </th>
             <th
               scope="col"
-              className="px-4 py-3.5 text-base font-semibold text-center  text-gray-600 w-[25%]"
+              className="px-4 py-3.5 text-base font-semibold text-center  text-gray-600 w-[25%] "
             >
               <span className="pr-2">Trạng thái:</span>
               <select
@@ -62,6 +62,12 @@ const CandidateTableAdminWeb: React.FC<CandidateTableAdminProps> = ({
               >
                 <option value="" className="p-2 text-sm">
                   Toàn bộ
+                </option>
+                <option
+                  value={DataConstants.USER_STATUS_DATA.PENDING}
+                  className="p-2 text-sm"
+                >
+                  Chờ duyệt
                 </option>
                 <option
                   value={DataConstants.USER_STATUS_DATA.ACTIVE}
@@ -106,7 +112,7 @@ const CandidateTableAdminWeb: React.FC<CandidateTableAdminProps> = ({
                   </td>
                 </tr>
               ) : (
-                value?.map((item: CandidateModel, index: number) => (
+                value?.map((item: EmployerModel, index: number) => (
                   <tr>
                     <td className="px-4 py-4 font-medium text-gray-700 ">
                       <span>
@@ -118,12 +124,12 @@ const CandidateTableAdminWeb: React.FC<CandidateTableAdminProps> = ({
                       <div className="flex items-center gap-3">
                         <img
                           className="object-cover w-10 h-10 rounded-full"
-                          src={item.avatar ? item.avatar : NON_USER}
+                          src={item.image ? item.image : NON_USER}
                           alt="logo"
                         />
                         <div>
                           <h2 className="text-base font-medium text-gray-800 line-clamp-2">
-                            {item.firstName} {item.lastName}
+                            {item.name}
                           </h2>
                           <p className="text-sm font-normal text-gray-600 line-clamp-1">
                             {item.email}
@@ -131,8 +137,15 @@ const CandidateTableAdminWeb: React.FC<CandidateTableAdminProps> = ({
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-left text-gray-600 ">
-                      {item.status === DataConstants.USER_STATUS_DATA.ACTIVE ? (
+                    <td className="px-4 py-4 text-center text-gray-600 ">
+                      {item.status ===
+                      DataConstants.USER_STATUS_DATA.PENDING ? (
+                        <div className="inline-flex items-center px-3 py-1 rounded-full gap-x-2 text-yellow-500 bg-yellow-500/10">
+                          <AiOutlineExclamation />
+                          <h2 className="text-sm font-normal">Chờ duyệt</h2>
+                        </div>
+                      ) : item.status ===
+                        DataConstants.USER_STATUS_DATA.ACTIVE ? (
                         <div className="inline-flex items-center px-3 py-1 rounded-full gap-x-2 text-green-500 bg-green-500/10">
                           <AiOutlineCheck />
                           <h2 className="text-sm font-normal">Hoạt động</h2>
@@ -172,4 +185,4 @@ const CandidateTableAdminWeb: React.FC<CandidateTableAdminProps> = ({
     </>
   );
 };
-export default CandidateTableAdminWeb;
+export default EmployerTableAdminWeb;

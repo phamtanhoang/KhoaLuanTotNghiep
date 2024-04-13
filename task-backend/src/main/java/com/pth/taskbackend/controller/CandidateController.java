@@ -94,7 +94,7 @@ public class CandidateController {
             ));
             if (candidates.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách ứng viên rỗng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Danh sách ứng viên rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 return ResponseEntity.ok(

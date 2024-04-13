@@ -6,7 +6,7 @@ import { ChangeAvatar, ChangeBackground, ChooseImage } from "./image";
 
 import { ChangeExpSkillInfoCandidate, ChangeInfoCandidate } from "./candidate";
 import { ApplicationDetail, ApplyJob } from "./application";
-import { ChangeInfoEmployer } from "./employer";
+import { ChangeInfoEmployer, EmployerUpdate } from "./employer";
 import { CreateTag, UpdateTag } from "./tag";
 import { CreateCategory, UpdateCategory } from "./category";
 
@@ -21,6 +21,8 @@ const ModalBase = (props: any) => {
   const image = props.image;
   const setCroppedImg = props.setCroppedImg;
   const fetchData = props.fetchData;
+  const data = props.data;
+  const setData = props.setData;
 
   const email = props.email;
   const password = props.password;
@@ -56,12 +58,18 @@ const ModalBase = (props: any) => {
     [MODAL_KEYS.createJob]: <CreateJob handleClose={handleClose} />,
     [MODAL_KEYS.filter]: <FilterModal handleClose={handleClose} />,
 
-    [MODAL_KEYS.changeAvatar]: <ChangeAvatar handleClose={handleClose} />,
+    [MODAL_KEYS.changeAvatar]: (
+      <ChangeAvatar fetchData={fetchData} handleClose={handleClose} />
+    ),
     [MODAL_KEYS.changeBackground]: (
-      <ChangeBackground handleClose={handleClose} />
+      <ChangeBackground fetchData={fetchData} handleClose={handleClose} />
     ),
     [MODAL_KEYS.changeInfoEmployer]: (
-      <ChangeInfoEmployer handleClose={handleClose} />
+      <ChangeInfoEmployer
+        data={data}
+        fetchData={fetchData}
+        handleClose={handleClose}
+      />
     ),
 
     [MODAL_KEYS.createTag]: (
@@ -83,6 +91,9 @@ const ModalBase = (props: any) => {
         setCroppedImg={setCroppedImg}
         handleClose={handleClose}
       />
+    ),
+    [MODAL_KEYS.updateEmployer]: (
+      <EmployerUpdate id={id} fetchData={fetchData} handleClose={handleClose} />
     ),
   };
 

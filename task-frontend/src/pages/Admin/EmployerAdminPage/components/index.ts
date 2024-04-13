@@ -1,3 +1,3 @@
-import EmployerTableAdminWeb from "./CandidateTableAdminWeb";
+import EmployerTableAdminWeb from "./EmployerTableAdminWeb";
 
 export { EmployerTableAdminWeb };

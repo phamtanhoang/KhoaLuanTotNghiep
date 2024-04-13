@@ -33,6 +33,7 @@ import {
 } from "@/pages/Employer";
 import ProfileEmployerPage from "@/pages/Employer/ProfileEmployerPage";
 import UpgradeAccountEmployer from "@/pages/Employer/UpgradeAccountEmployer";
+import { DataConstants } from "@/utils/constants/dataConstants";
 import {
   ADMIN_PATHS,
   CANDIDATE_PATHS,
@@ -41,14 +42,13 @@ import {
 } from "@/utils/constants/pathConstants";
 import { useSelector } from "react-redux";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { useEffect } from "react";
 
 const Routers = () => {
   const { role } = useSelector((state: any) => state.authReducer);
 
-  console.log("role, ", role);
-
-  const isAuthenticated = true;
+  const isCandidate = role === DataConstants.ROLE_DATA.CANDIDATE;
+  const isEmployer = role === DataConstants.ROLE_DATA.EMPLOYER;
+  const isAdmin = role === DataConstants.ROLE_DATA.ADMIN;
 
   return (
     <BrowserRouter>
@@ -81,7 +81,7 @@ const Routers = () => {
           <Route
             element={
               <ProtectedRoute
-                isAllowed={isAuthenticated}
+                isAllowed={isCandidate}
                 redirectTo={CANDIDATE_PATHS.home}
               />
             }
@@ -101,7 +101,7 @@ const Routers = () => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={!isAuthenticated}
+              isAllowed={!isEmployer}
               redirectTo={EMPLOYER_PATHS.dashboard}
             />
           }
@@ -115,8 +115,8 @@ const Routers = () => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={isAuthenticated}
-              redirectTo={EMPLOYER_PATHS.dashboard}
+              isAllowed={isEmployer}
+              redirectTo={EMPLOYER_PATHS.signin}
             />
           }
         >
@@ -158,7 +158,7 @@ const Routers = () => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={isAuthenticated}
+              isAllowed={!isAdmin}
               redirectTo={ADMIN_PATHS.dashboard}
             />
           }
@@ -168,12 +168,12 @@ const Routers = () => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={isAuthenticated}
+              isAllowed={isAdmin}
               redirectTo={ADMIN_PATHS.signin}
             />
           }
         >
-          <Route path={ADMIN_PATHS.default} element={<AdminLayout />}>
+          <Route element={<AdminLayout />}>
             <Route
               path={ADMIN_PATHS.dashboard}
               element={<DashboardAdminPage />}

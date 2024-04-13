@@ -1,7 +1,7 @@
 import { RiVipCrown2Line } from "react-icons/ri";
 import { Tooltip } from "react-tooltip";
 import NON_USER from "@/assets/images/non-user.jpg";
-import NON_BG from "@/assets/images/bg.jpg";
+import NON_BG from "@/assets/images/image-background.png";
 import { IoCameraSharp } from "react-icons/io5";
 import { useRef, useState } from "react";
 
@@ -26,10 +26,10 @@ const BaseInfo: React.FC<BaseInfoProps> = ({
   _onClickChangeBackgroundImage,
   isVip,
 }) => {
-  const [avatarUrl, setAvatarUrl] = useState(image);
-  const updateAvatar = (imgSrc: string) => {
-    setAvatarUrl(imgSrc);
-  };
+  // const [avatarUrl, setAvatarUrl] = useState(image);
+  // const updateAvatar = (imgSrc: string) => {
+  //   setAvatarUrl(imgSrc);
+  // };
   return (
     <>
       <div className="w-full relative">
@@ -48,7 +48,7 @@ const BaseInfo: React.FC<BaseInfoProps> = ({
       <div className="flex flex-col items-center -mt-20 relative">
         <div className="relative">
           <img
-            src={avatarUrl ? avatarUrl : NON_USER}
+            src={image ? image : NON_USER}
             className="w-40 border-4 border-white rounded-full"
           />
           <button

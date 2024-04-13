@@ -1,8 +1,12 @@
 import { LoadingContext } from "@/App";
 import ModalBase from "@/components/modal";
 import { PaginationCustom } from "@/components/ui";
+import candidatesService from "@/services/candidatesService";
+import { MODAL_KEYS } from "@/utils/constants/modalConstants";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
+import { CandidateTableAdminWeb } from "./components";
 
 const CandidateAdminPage = () => {
   const context = useContext(LoadingContext);
@@ -15,42 +19,81 @@ const CandidateAdminPage = () => {
   const [id, setId] = useState<string>("");
   const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
   const [keyWord, setKeyWord] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemPerpage = 10;
   const [totalElements, setTotalElements] = useState<number>(0);
   const [numberOfElements, setNumberOfElements] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
+  const [candidates, setCandidates] = useState<CandidateModel[]>([]);
+
+  const _onClickDelete = (item: CandidateModel) => {
+    SwalHelper.Confirm(
+      "Xác nhận xóa tài khoàn này?",
+      "question",
+      () => {
+        context.handleOpenLoading();
+        candidatesService
+          .delete(item.id)
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              SwalHelper.MiniAlert(res.data.Message, "success");
+              fetchListData();
+            } else {
+              SwalHelper.MiniAlert(res.data.Message, "error");
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
+      },
+      () => {}
+    );
+  };
+  const _onClickDetail = (item: CandidateModel) => {
+    setId(item.id);
+    setFuncs(MODAL_KEYS.updateEmployer);
+    handleOpen();
+  };
 
   const _onChangeKeyword = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value || "";
     setKeyWord(value);
   };
 
+  const _onChangeStatus = (e: ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value || "";
+    setStatus(value);
+  };
+
   const fetchListData = () => {
     setIsLoadingTable(true);
-    // categoriesService
-    //   .getList(keyWord, currentPage - 1, itemPerpage)
-    //   .then((res) => {
-    //     if (res.status === 200 && res.data.Status === 200) {
-    //       setCategories(res?.data?.Data?.content);
-    //       setTotalPages(res?.data?.Data?.totalPages);
-    //       setTotalElements(res?.data?.Data?.totalElements || 0);
-    //       setNumberOfElements(res?.data?.Data?.numberOfElements || 0);
-    //     } else {
-    //       SwalHelper.MiniAlert(res.data.Message, "error");
-    //     }
-    //   })
-    //   .catch(() => {
-    //     SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
-    //   })
-    //   .finally(() => {
-    //     setIsLoadingTable(false);
-    //   });
+    candidatesService
+      .getList(keyWord, status, currentPage - 1, itemPerpage)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          setCandidates(res?.data?.Data?.content);
+          setTotalPages(res?.data?.Data?.totalPages);
+          setTotalElements(res?.data?.Data?.totalElements || 0);
+          setNumberOfElements(res?.data?.Data?.numberOfElements || 0);
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+      })
+      .finally(() => {
+        setIsLoadingTable(false);
+      });
   };
 
   useEffect(() => {
     fetchListData();
-  }, [keyWord, currentPage]);
+  }, [keyWord, status, currentPage]);
 
   return (
     <>
@@ -91,16 +134,16 @@ const CandidateAdminPage = () => {
         </div>
       </section>
       <div className="overflow-auto border border-borderColor lg:rounded-lg  mt-2 lg:mt-4">
-
-        {/* <CategoryTableAdminWeb
-          value={categories}
+        <CandidateTableAdminWeb
+          value={candidates}
           _onClickDelete={_onClickDelete}
           _onClickDetail={_onClickDetail}
+          _onChangeStatus={_onChangeStatus}
+          status={status}
           isLoading={isLoadingTable}
           currentPage={currentPage}
           itemPerpage={itemPerpage}
-        /> */}
-        
+        />
       </div>
       <div className="w-max mx-auto mt-5">
         <PaginationCustom

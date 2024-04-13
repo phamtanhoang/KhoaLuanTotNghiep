@@ -76,7 +76,7 @@ const RegisterEmployer = (props: any) => {
         if (res.status === 200 && res.data.Status === 200) {
           handleClose();
           SwalHelper.MiniAlert(
-            "Đăng kí thành công, vui lòng đăng nhập!",
+            "Đăng kí thành công, hãy chờ quản trị viên xét duyệt!",
             "success"
           );
         } else {

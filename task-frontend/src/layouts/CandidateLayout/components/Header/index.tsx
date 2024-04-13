@@ -10,6 +10,8 @@ import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { authsService } from "@/services";
 import { AuthHelper } from "@/utils/helpers/authHelper";
 import { LoadingContext } from "@/App";
+import { ONCHANGE_ROLE } from "@/store/reducers/authReducer";
+import { useDispatch } from "react-redux";
 
 const Header = () => {
   const context = useContext(LoadingContext);
@@ -18,7 +20,7 @@ const Header = () => {
 
   const dropdownRef = useRef<any>(null);
   const menuRef = useRef<any>(null);
-
+  const dispatch = useDispatch();
   const [open, setOpen] = useState<boolean>(false);
 
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -78,28 +80,13 @@ const Header = () => {
       "question",
       () => {
         context.handleOpenLoading();
-        authsService
-          .signout()
-          .then((res) => {
-            if (res.status === 200 && res.data.Status === 200) {
-              AuthHelper.removeTokens();
-              SwalHelper.MiniAlert(res.data.Message, "success", 1500);
-              setTimeout(() => {
-                window.location.reload();
-              }, 1500);
-            } else {
-              SwalHelper.MiniAlert(
-                res.data.Message || "Đăng xuất không thành công!",
-                "error"
-              );
-            }
-          })
-          .catch(() => {
-            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-          })
-          .finally(() => {
-            context.handleCloseLoading();
-          });
+        AuthHelper.removeTokens();
+        dispatch(ONCHANGE_ROLE(""));
+        SwalHelper.MiniAlert("Đăng xuất thành công", "success", 1500);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+        context.handleCloseLoading();
       },
       () => {}
     );

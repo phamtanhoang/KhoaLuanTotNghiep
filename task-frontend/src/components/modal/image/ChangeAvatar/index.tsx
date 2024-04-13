@@ -1,23 +1,66 @@
 import ImageCropper from "@/components/ui/ImageCropper";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import UPLOAD_IMG from "@/assets/images/upload_image.avif";
 import { FaRegSave } from "react-icons/fa";
 import { GrClear } from "react-icons/gr";
+import { LoadingContext } from "@/App";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { ImageHelper } from "@/utils/helpers/imageHelper";
+import employersService from "@/services/employersService";
 
-const ChangeAvatar: React.FC<{ handleClose: () => void }> = (props) => {
-  const { handleClose } = props;
-  const [img, setImg] = useState<any>(null);
-  const [croppedImg, setCroppedImg] = useState<any>(null);
+const ChangeAvatar = (props: any) => {
+  const handleClose = props.handleClose;
+  const fetchData = props.fetchData;
+  const context = useContext(LoadingContext);
+  const [image, setImage] = useState<string | null>(null);
+  const [croppedImg, setCroppedImg] = useState<string | null>(null);
   const _onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files === null) return;
-    setImg(URL.createObjectURL(e.target.files[0]));
+    const file = e.target.files?.[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setCroppedImg(null);
+    }
   };
-  const _onClearImage = () => {
-    setImg(null);
-  };
+
   const handleDropAreaClick = () => {
     document.getElementById("fileInput")?.click();
+  };
+
+  const _onClearImage = () => {
+    setImage(null);
+  };
+
+  const _onSave = () => {
+    if (croppedImg === null || croppedImg === undefined) {
+      SwalHelper.MiniAlert("Vui lòng chọn hình ảnh!", "warning");
+      return;
+    }
+    context.handleOpenLoading();
+    let img: File = ImageHelper.dataURItoFile(croppedImg, "123");
+    employersService
+      .changeImage(img)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          SwalHelper.MiniAlert(res.data.Message, "success");
+          fetchData();
+          handleClose();
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
   };
   return (
     <div className="w-full sm:w-[400px] lg:w-[450px] max-lg:px-5 p-8 bg-white lg:rounded-xl max-h-[90vh] relative">
@@ -34,7 +77,7 @@ const ChangeAvatar: React.FC<{ handleClose: () => void }> = (props) => {
         </p>
       </div>
 
-      {!img && (
+      {!image && (
         <div className="mt-5 ">
           <div
             className="flex items-center justify-center w-full flex-col rounded-lg border-4 border-dashed group text-center p-8 cursor-pointer"
@@ -73,11 +116,11 @@ const ChangeAvatar: React.FC<{ handleClose: () => void }> = (props) => {
         </div>
       )}
 
-      {img && (
+      {image && (
         <>
           <div className="my-5 w-full overflow-auto border-2 border-borderColor border-dotted flex justify-center">
             <ImageCropper
-              img={img}
+              img={image}
               setCroppedImg={setCroppedImg}
               width={1}
               height={1}
@@ -92,7 +135,10 @@ const ChangeAvatar: React.FC<{ handleClose: () => void }> = (props) => {
               <GrClear className="text-base" />
               <p>Hủy bỏ</p>
             </button>
-            <button className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-600/85 font-medium">
+            <button
+              className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-600/85 font-medium"
+              onClick={_onSave}
+            >
               <FaRegSave className="text-lg" />
               <p>Lưu</p>
             </button>

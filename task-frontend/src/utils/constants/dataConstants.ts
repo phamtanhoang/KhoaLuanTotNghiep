@@ -4,10 +4,10 @@ const SEX_DATA = [
   { id: "OTHER", name: "Khác" },
 ];
 const ROLE_DATA = {
-  ADMIN: 'ADMIN',
-  CANDIDATE: 'CANDIDATE',
-  HUMANRESOURCE: 'HUMANRESOURCE',
-  EMPLOYER: 'EMPLOYER'
+  ADMIN: "ADMIN",
+  CANDIDATE: "CANDIDATE",
+  HUMANRESOURCE: "HUMANRESOURCE",
+  EMPLOYER: "EMPLOYER",
 };
 
 const APPLY_STATE_DATA = [
@@ -28,10 +28,18 @@ const HR_STATE_DATA = [
   { id: "PAUSE", name: "Tạm ngừng", color: "#FF0000" },
 ];
 
+const USER_STATUS_DATA = {
+  ACTIVE: "ACTIVE",
+  INACTIVE: "INACTIVE",
+  PENDING: "PENDING",
+  DELETED: "DELETED",
+};
+
 export const DataConstants = {
   SEX_DATA,
   APPLY_STATE_DATA,
   JOB_STATE_DATA,
   HR_STATE_DATA,
-  ROLE_DATA
+  ROLE_DATA,
+  USER_STATUS_DATA,
 };

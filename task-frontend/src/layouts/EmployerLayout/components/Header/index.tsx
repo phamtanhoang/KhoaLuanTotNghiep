@@ -4,9 +4,7 @@ import { AiOutlineMenu, AiOutlineMessage } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import NON_USER from "@/assets/images/non-user.jpg";
 import { IoNotificationsOutline } from "react-icons/io5";
-import {
-  EMPLOYER_PATHS,
-} from "@/utils/constants/pathConstants";
+import { EMPLOYER_PATHS } from "@/utils/constants/pathConstants";
 import { FaChevronDown } from "react-icons/fa6";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import ModalBase from "@/components/modal";
@@ -14,6 +12,8 @@ import { LoadingContext } from "@/App";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { authsService } from "@/services";
 import { AuthHelper } from "@/utils/helpers/authHelper";
+import { useDispatch } from "react-redux";
+import { ONCHANGE_ROLE } from "@/store/reducers/authReducer";
 
 const DropdownMessage = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -74,7 +74,7 @@ const DropdownMessage = () => {
           <h5 className="text-sm font-medium text-lightGray">Messages</h5>
         </div>
 
-        <ul className="flex h-max flex-col overflow-y-auto scrollbar-custom">
+        <ul className="flex h-max flex-col overflow-y-auto journal-scroll">
           <li>
             <Link
               className="flex gap-4 border-t px-4 py-3 hover:bg-body2"
@@ -393,6 +393,7 @@ const Header = (props: {
 
   const navigate = useNavigate();
   const context = useContext(LoadingContext);
+  const dispatch = useDispatch();
 
   const _onClickLogout = () => {
     SwalHelper.Confirm(
@@ -400,29 +401,12 @@ const Header = (props: {
       "question",
       () => {
         context.handleOpenLoading();
-        authsService
-          .signout()
-          .then((res) => {
-            if (res.status === 200 && res.data.Status === 200) {
-              AuthHelper.removeTokens();
-              navigate(EMPLOYER_PATHS.signin);
-              SwalHelper.MiniAlert(
-                res.data.Message || "Đăng xuất thành công",
-                "success"
-              );
-            } else {
-              SwalHelper.MiniAlert(
-                res.data.Message || "Đăng xuất không thành công!",
-                "error"
-              );
-            }
-          })
-          .catch(() => {
-            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-          })
-          .finally(() => {
-            context.handleCloseLoading();
-          });
+
+        AuthHelper.removeTokens();
+        dispatch(ONCHANGE_ROLE(""));
+        navigate(EMPLOYER_PATHS.signin);
+        SwalHelper.MiniAlert("Đăng xuất thành công", "success");
+        context.handleCloseLoading();
       },
       () => {}
     );

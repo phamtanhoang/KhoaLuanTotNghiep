@@ -1,114 +1,163 @@
+import { LoadingContext } from "@/App";
+import employersService from "@/services/employersService";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { ChangeEvent, useContext, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
-import { IoExitOutline } from "react-icons/io5";
+import { IoMdExit } from "react-icons/io";
 
 const ChangeInfoEmployer = (props: any) => {
+  const context = useContext(LoadingContext);
   const handleClose = props.handleClose;
+  const fetchData = props.fetchData;
+  const employer = props.data;
+  const [name, setName] = useState<string>(employer?.name);
+  const [phoneNumber, setPhoneNumber] = useState<string>(employer?.phoneNumber);
+  const [businessCode, setBusinessCode] = useState<string>(
+    employer?.businessCode
+  );
+  const [location, setLocation] = useState<string>(employer?.location);
+  const [description, setDescription] = useState<string>(employer?.description);
+  const _onChangeDescription = (e: ChangeEvent<HTMLTextAreaElement>): void => {
+    setDescription(e.target.value);
+  };
+
+  const _onChangeLocation = (e: ChangeEvent<HTMLInputElement>): void => {
+    setLocation(e.target.value);
+  };
+
+  const _onChangeBusinessCode = (e: ChangeEvent<HTMLInputElement>): void => {
+    setBusinessCode(e.target.value);
+  };
+
+  const _onChangePhoneNumber = (e: ChangeEvent<HTMLInputElement>): void => {
+    setPhoneNumber(e.target.value);
+  };
+
+  const _onChangeName = (e: ChangeEvent<HTMLInputElement>): void => {
+    setName(e.target.value);
+  };
+
+  const _onClickSave = () => {
+    context.handleOpenLoading();
+    employersService
+      .updateProfile(name, description, location, businessCode, phoneNumber)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          SwalHelper.MiniAlert(res.data.Message, "success");
+          fetchData();
+          handleClose();
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  };
+
   return (
-    <div className="lg:w-[50%] w-screen p-8 bg-white sm:rounded-xl relative max-h-[90%] overflow-auto">
-      <button
-        className="p-2 rounded-full absolute top-2 right-2 text-xl text-gray-800 hover:text-white hover:bg-gray-300"
-        onClick={handleClose}
-      >
-        <AiOutlineClose />
-      </button>
-      <div className="text-center">
-        <h2 className="mt-6 text-3xl font-bold text-gray-800 uppercase">
-          Sửa Thông tin nhà tuyển dụng
+    <div className="md:w-[60%] xl:w-[50%] w-screen bg-white relative lg:rounded">
+      <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-orangetext lg:rounded-t">
+        <h2 className="text-xl font-medium  line-clamp-1 my-auto">
+          Sửa thông tin
         </h2>
-        <p className="mt-2 text-base text-gray-600">
-          Hãy diền đầy đủ thông tin nhà tuyển dụng
-        </p>
+        <button
+          className="p-1 rounded-md text-lg hover:text-orangetext hover:bg-white"
+          onClick={handleClose}
+        >
+          <AiOutlineClose />
+        </button>
       </div>
 
-      <div className="flex items-center justify-center mt-2 gap-3">
-        <span className="h-px w-32 bg-gray-300"></span>
+      <div className="overflow-auto scrollbar-custom h-max max-h-[75vh] my-4  mx-2">
+        <div className="mx-2 text-gray-700 flex flex-col gap-2">
+          <div className="flex flex-col lg:flex-row justify-between gap-2 lg:gap-4">
+            <div className="content-center w-full">
+              <label className="font-medium tracking-wide text-sm">Email</label>
+              <input
+                className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
+                type="text"
+                value={employer?.email}
+                disabled
+              />
+            </div>
+          </div>
+          <div className="content-center">
+            <label className="font-medium tracking-wide text-sm">
+              Tên công ty
+            </label>
+            <input
+              className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
+              type="text"
+              value={name}
+              onChange={_onChangeName}
+            />
+          </div>
+
+          <div className="flex flex-col lg:flex-row justify-between gap-2 lg:gap-4">
+            <div className="content-center w-full">
+              <label className="font-medium tracking-wide text-sm">
+                Số điện thoại
+              </label>
+              <input
+                className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
+                type="text"
+                value={phoneNumber}
+                onChange={_onChangePhoneNumber}
+              />
+            </div>
+            <div className="content-center w-full">
+              <label className="font-medium tracking-wide text-sm">
+                Mã số kinh doanh
+              </label>
+              <input
+                className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
+                type="text"
+                value={businessCode}
+                onChange={_onChangeBusinessCode}
+              />
+            </div>
+          </div>
+          <div className="content-center">
+            <label className="font-medium tracking-wide text-sm">Địa chỉ</label>
+            <input
+              className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
+              type="text"
+              value={location}
+              onChange={_onChangeLocation}
+            />
+          </div>
+          <div className="content-center">
+            <label className="font-medium tracking-wide text-sm">Mô tả</label>
+            <textarea
+              className="w-full  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext min-h-24"
+              value={description}
+              onChange={_onChangeDescription}
+            />
+          </div>
+        </div>
       </div>
-      <div className="mt-6">
-        <div className="mt-4 content-center">
-          <label className="text-sm font-bold text-gray-700 tracking-wide">
-            Tên doanh nghiệp <span className="text-red-500">*</span>
-          </label>
-          <input
-            className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
-            type="text"
-            placeholder="Nhập tên doanh nghiệp..."
-            value=""
-          />
-        </div>
-        <div className="mt-4 content-center lg:flex gap-5">
-          <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
-              Mã số kinh doanh <span className="text-red-500">*</span>
-            </label>
-            <input
-              className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
-              type="text"
-              placeholder="Nhập MSKD doanh nghiệp..."
-              value=""
-            />
-          </div>
-          <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
-              Số điện thoại <span className="text-red-500">*</span>
-            </label>
-            <input
-              className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
-              type="password"
-              placeholder="Nhập số điện thoại doanh nghiệp..."
-              value=""
-            />
-          </div>
-        </div>
-        <div className="mt-4 content-center lg:flex gap-5">
-          <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
-              Địa chỉ doanh nghiệp (theo ĐKKD){" "}
-              <span className="text-red-500">*</span>
-            </label>
-            <input
-              className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
-              type="text"
-              placeholder="Nhập địa chỉ theo giấy tờ đăng kí..."
-              value=""
-            />
-          </div>
-          <div className="w-1/2">
-            <label className="text-sm font-bold text-gray-700 tracking-wide">
-              Quy mô doanh nghiệp
-            </label>
-            <input
-              className="w-full content-center text-base py-2  border-b  border-gray-300 focus:outline-none focus:border-orangetext"
-              type="password"
-              placeholder="Nhập quy mô doanh nghiệp..."
-              value=""
-            />
-          </div>
-        </div>
-        <div className="mt-4 content-center">
-          <label className="text-sm font-bold text-gray-700 tracking-wide">
-            Mô tả ngắn gọn về doanh nghiệp{" "}
-            <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            className="w-full content-center text-base p-2 mt-2 border rounded-lg border-gray-300 focus:outline-none focus:border-orangetext h-24"
-            placeholder="Nhập mô tả ngắn gọn về doanh nghiệp..."
-            value=""
-          />
-        </div>
-        <div className="flex justify-end items-center gap-5 text-lg font-medium mt-8">
-          <button
-            className="flex items-center gap-2.5 w-max h-max px-5 py-2 bg-gray-300 text-white rounded-md hover:bg-gray-300/85 font-base"
-            onClick={handleClose}
-          >
-            <IoExitOutline className="text-xl" />
-            <p>Đóng</p>
-          </button>
-          <button className="flex items-center gap-2.5 w-max h-max px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-600/85 font-base">
-            <FaRegSave className="text-lg" />
-            <p>Lưu</p>
-          </button>
-        </div>
+
+      <div className="flex justify-end gap-4 px-4 py-3 border-t">
+        <button
+          className="flex items-center gap-2 w-max h-max px-4 py-2  text-white rounded-md bg-blue-600 hover:bg-blue-600/90 font-[450]"
+          onClick={_onClickSave}
+        >
+          <FaRegSave className="text-base" />
+          <p>Lưu</p>
+        </button>
+
+        <button
+          className="flex items-center gap-2 w-max h-max px-4 py-2 bg-slate-300 text-white rounded-md hover:bg-slate-300/80 font-[450]"
+          onClick={handleClose}
+        >
+          <IoMdExit className="text-lg" />
+          <p>Đóng</p>
+        </button>
       </div>
     </div>
   );
