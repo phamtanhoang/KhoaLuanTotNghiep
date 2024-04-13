@@ -19,8 +19,8 @@ import java.util.function.Function;
 public class JwtService {
 
     public static final String SECRET = "Lu4byRqrMCp6OmPf3zyRUphe1NP0MZrZaB+2Kzay5OBb1Mfs6atzgSfwFCNVxpXhtQP5ToIzK1x1PgCFCpFY0Q==";
-    public static  int REFRESH_TOKEN_EXPIRATION_SECONDS = 30 ;
-    public static  int ACCESS_TOKEN_EXPIRATION_SECONDS =60;
+    public static  int REFRESH_TOKEN_EXPIRATION_SECONDS = 60 ;
+    public static  int ACCESS_TOKEN_EXPIRATION_SECONDS =30;
     private List<String> validTokens = new ArrayList<>();
     public String generateToken(String username, EStatus status, ERole role) {
         Map<String, Object> claims = new HashMap<>();
@@ -105,7 +105,7 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(Date.from(now.plus(ACCESS_TOKEN_EXPIRATION_SECONDS, ChronoUnit.SECONDS)))
+                .setExpiration(Date.from(now.plus(REFRESH_TOKEN_EXPIRATION_SECONDS, ChronoUnit.SECONDS)))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
         validTokens.add(token);
         return token;
