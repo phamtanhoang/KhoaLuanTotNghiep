@@ -155,18 +155,18 @@ public class AuthController {
 
         @Operation(summary = "RefreshToken", description = "", tags = {})
         @PostMapping("refresh")
-        public ResponseEntity<BaseResponse> refreshToken(@RequestPart RefreshTokenRequest refreshToken) {
+        public ResponseEntity<BaseResponse> refreshToken(@RequestPart String refreshToken) {
 
             try {
 
-                String email = jwtService.extractUsername(refreshToken.refreshToken());
+                String email = jwtService.extractUsername(refreshToken);
                 System.out.println(email);
                 Optional<User> optionalUser = userRepository.findByEmail(email);
                 if (optionalUser.isPresent()) {
-                   String accessToken= jwtService.refreshToken(refreshToken.refreshToken(), optionalUser.get().getStatus(), optionalUser.get().getRole());
+                   String accessToken= jwtService.refreshToken(refreshToken, optionalUser.get().getStatus(), optionalUser.get().getRole());
                     Map<String, String>tokens= new HashMap<>();
                     tokens.put("accessToken",accessToken);
-                    tokens.put("refreshToken",refreshToken.refreshToken());
+                    tokens.put("refreshToken",refreshToken);
                     return ResponseEntity.ok(
                             new BaseResponse("Tạo mới token thành công", HttpStatus.OK.value(), tokens)
                     );
