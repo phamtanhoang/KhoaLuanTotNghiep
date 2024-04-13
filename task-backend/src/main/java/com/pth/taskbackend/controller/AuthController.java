@@ -155,25 +155,25 @@ public class AuthController {
 
         @Operation(summary = "RefreshToken", description = "", tags = {})
         @PostMapping("refresh")
-        public ResponseEntity<BaseResponse> refreshToken(@RequestPart String refreshToken) {
+        public ResponseEntity<BaseResponse> refreshToken(@RequestBody RefreshTokenRequest refreshToken) {
 
             try {
 
-                String email = jwtService.extractUsername(refreshToken);
+                String email = jwtService.extractUsername(refreshToken.refreshToken());
                 System.out.println(email);
                 Optional<User> optionalUser = userRepository.findByEmail(email);
                 if (optionalUser.isPresent()) {
-                   String accessToken= jwtService.refreshToken(refreshToken, optionalUser.get().getStatus(), optionalUser.get().getRole());
+                   String accessToken= jwtService.refreshToken(refreshToken.refreshToken(), optionalUser.get().getStatus(), optionalUser.get().getRole());
                     Map<String, String>tokens= new HashMap<>();
                     tokens.put("accessToken",accessToken);
-                    tokens.put("refreshToken",refreshToken);
+                    tokens.put("refreshToken",refreshToken.refreshToken());
                     return ResponseEntity.ok(
                             new BaseResponse("Tạo mới token thành công", HttpStatus.OK.value(), tokens)
                     );
                 }
 
                 return ResponseEntity.ok(
-                        new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null)
+                        new BaseResponse("Phiên bản đăng nhập hiện tại đã hết hạn. Vui lòng đăng nhập lại!", HttpStatus.UNAUTHORIZED.value(), null)
                 );
 
 

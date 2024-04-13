@@ -65,13 +65,18 @@ axiosInstance.interceptors.response.use(
 
       originalRequest._retry = true;
       isRefreshing = true;
-      const refreshToken = AuthHelper.getRefreshToken();
 
+      const body = {
+        refreshToken: AuthHelper.getRefreshToken(),
+      };
       return new Promise(function (resolve, reject) {
         axios
-          .post(AuthAPI.refreshToken, refreshToken)
+          .post(BASE_URL + AuthAPI.refreshToken, body)
           .then((res) => {
-            AuthHelper.setTokens(res.data.Data.accessToken, refreshToken);
+            AuthHelper.setTokens(
+              res.data.Data.accessToken,
+              res.data.Data.refreshToken
+            );
             originalRequest.headers.Authorization = `Bearer ${res.data.Data.accessToken}`;
             resolve(axios(originalRequest));
             processQueue(null, res.data.Data.accessToken);
