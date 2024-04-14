@@ -9,6 +9,7 @@ import com.pth.taskbackend.dto.response.CandidateResponse;
 import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
 import com.pth.taskbackend.dto.response.HumanResourceResponse;
 import com.pth.taskbackend.enums.ERole;
+import com.pth.taskbackend.enums.ESex;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.*;
 import com.pth.taskbackend.repository.UserRepository;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
@@ -242,7 +244,13 @@ public class HumanResourceController {
 
     @Operation(summary = "Create", description = "", tags = {})
     @PostMapping("")
-    public ResponseEntity<BaseResponse> createHumanResource(@RequestHeader("Authorization")String token, @RequestPart CreateHumanResourceRequest request,@RequestPart(required = false) MultipartFile avatar
+    public ResponseEntity<BaseResponse> createHumanResource(@RequestHeader("Authorization")String token, @RequestParam String username,
+                                                            @RequestParam String password,
+                                                            @RequestParam String firstName,
+                                                            @RequestParam String lastName,
+                                                            @RequestParam ESex sex,
+                                                            @RequestParam String phoneNumber,
+                                                            @RequestParam LocalDateTime dateOfBirth, @RequestParam(required = false) MultipartFile avatar
                                                        )  {
         try {
 
@@ -258,26 +266,26 @@ public class HumanResourceController {
         }
 
 
-            if (userRepository.findByEmail(request.username()).isPresent())
+            if (userRepository.findByEmail(username).isPresent())
                 return ResponseEntity.ok(
                         new BaseResponse("Tên người dùng đã tồn tại!", 400, null)
                 );
 
-            if( request.username()==null||request.password()==null)
+            if( username==null||password==null)
                 return ResponseEntity.ok(
                         new BaseResponse("Thiếu tên đăng nhập hoặc mật khẩu!", 400, null)
                 );
             Optional<User> user = authService.register(
-                    request.username(),
-                    request.password(),
+                    username,
+                    password,
                     ERole.HR);
 
             HumanResource hr = new HumanResource();
-            hr.setFirstName(request.firstName());
-            hr.setLastName(request.lastName());
-            hr.setSex(request.sex());
-            hr.setDateOfBirth(request.dateOfBirth());
-            hr.setPhoneNumber(request.phoneNumber());
+            hr.setFirstName(firstName);
+            hr.setLastName(lastName);
+            hr.setSex(sex);
+            hr.setDateOfBirth(dateOfBirth);
+            hr.setPhoneNumber(phoneNumber);
             hr.setUser(user.get());
             hr.setEmployer(optionalEmployer.get());
             humanResourceService.create(hr,avatar);
@@ -455,7 +463,13 @@ public class HumanResourceController {
     }
     @Operation(summary = "update ", description = "", tags = {})
     @PatchMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateHumanResource(@PathVariable("id")String id,@RequestHeader("Authorization")String token,@RequestPart  CreateHumanResourceRequest request,@RequestPart(required = false) MultipartFile avatar) {
+    public ResponseEntity<BaseResponse> updateHumanResource(@PathVariable("id")String id,@RequestHeader("Authorization")String token,@RequestParam(required = false) String password,
+                                                            @RequestParam String firstName,
+                                                            @RequestParam String lastName,
+                                                            @RequestParam ESex sex,
+                                                            @RequestParam String phoneNumber,
+                                                            @RequestParam LocalDateTime dateOfBirth,
+                                                            @RequestParam(required = false) MultipartFile avatar) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
@@ -464,25 +478,31 @@ public class HumanResourceController {
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
 
+            Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+            if (optionalEmployer.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng ", HttpStatus.NOT_FOUND.value(), null)
+                );
+
             Optional<HumanResource> optionalHumanResource = humanResourceService.findById(id);
             if (optionalHumanResource.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng ", HttpStatus.NOT_FOUND.value(), null)
                 );
 
 
             HumanResource hr = optionalHumanResource.get();
-            if(!passwordEncoder.matches(request.password(),optionalHumanResource.get().getUser().getPassword())&&!request.password().isEmpty())
-                hr.getUser().setPassword(passwordEncoder.encode(request.password()));
-            hr.setFirstName(request.firstName());
-            hr.setLastName(request.lastName());
+            if(!passwordEncoder.matches(password,optionalHumanResource.get().getUser().getPassword())&&!password.isEmpty())
+                hr.getUser().setPassword(passwordEncoder.encode(password));
+            hr.setFirstName(firstName);
+            hr.setLastName(lastName);
 
-            if(request.sex()!=null)
-               hr.setSex(request.sex());
-            if(request.dateOfBirth()!=null)
-               hr.setDateOfBirth(request.dateOfBirth());
-            if(request.phoneNumber()!=null)
-               hr.setPhoneNumber(request.phoneNumber());
+            if(sex!=null)
+               hr.setSex(sex);
+            if(dateOfBirth!=null)
+               hr.setDateOfBirth(dateOfBirth);
+            if(phoneNumber!=null)
+               hr.setPhoneNumber(phoneNumber);
             humanResourceService.update(hr,avatar);
             return ResponseEntity.ok(
                     new BaseResponse( "Cập nhật thông tin HR thành công", HttpStatus.OK.value(), hr)
@@ -500,7 +520,13 @@ public class HumanResourceController {
 
     @Operation(summary = "update by token", description = "", tags = {})
     @PatchMapping("/updateProfile")
-    public ResponseEntity<BaseResponse> updateHumanResourceProfile(@RequestHeader("Authorization")String token,@RequestPart CreateHumanResourceRequest request,@RequestPart(required = false) MultipartFile avatar) {
+    public ResponseEntity<BaseResponse> updateHumanResourceProfile(@RequestHeader("Authorization")String token, @RequestParam(required = false) String password,
+                                                                   @RequestParam String firstName,
+                                                                   @RequestParam String lastName,
+                                                                   @RequestParam ESex sex,
+                                                                   @RequestParam LocalDateTime dateOfBirth,
+                                                                   @RequestParam String phoneNumber,
+                                                                   @RequestParam(required = false) MultipartFile avatar) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
@@ -515,17 +541,17 @@ public class HumanResourceController {
                         new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)
                 );
             HumanResource hr = optionalHumanResource.get();
-            if(!passwordEncoder.matches(request.password(),optionalHumanResource.get().getUser().getPassword())&&!request.password().isEmpty())
-                hr.getUser().setPassword(passwordEncoder.encode(request.password()));
-            hr.setFirstName(request.firstName());
-            hr.setLastName(request.lastName());
+            if(!passwordEncoder.matches(password,optionalHumanResource.get().getUser().getPassword())&&!password.isEmpty())
+                hr.getUser().setPassword(passwordEncoder.encode(password));
+            hr.setFirstName(firstName);
+            hr.setLastName(lastName);
 
-            if(request.sex()!=null)
-                hr.setSex(request.sex());
-            if(request.dateOfBirth()!=null)
-                hr.setDateOfBirth(request.dateOfBirth());
-            if(request.phoneNumber()!=null)
-                hr.setPhoneNumber(request.phoneNumber());
+            if(sex!=null)
+                hr.setSex(sex);
+            if(dateOfBirth!=null)
+                hr.setDateOfBirth(dateOfBirth);
+            if(phoneNumber!=null)
+                hr.setPhoneNumber(phoneNumber);
             humanResourceService.update(hr,avatar);
             return ResponseEntity.ok(
                     new BaseResponse( "Cập nhật thông tin HR thành công", HttpStatus.OK.value(), hr)
