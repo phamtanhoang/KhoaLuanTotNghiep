@@ -55,4 +55,9 @@ public class ProcessServiceImpl implements ProcessService
     public Optional<Process> findById(String id) {
         return processRepository.findById(id);
     }
+
+    @Override
+    public Page<Process> findByNameContaining(String name, Pageable pageable) {
+        return processRepository.findByNameContaining(name,pageable);
+    }
 }

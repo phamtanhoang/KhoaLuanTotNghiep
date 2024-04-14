@@ -15,8 +15,8 @@ public interface HumanResourceService {
     Page<HumanResource>findByEmployerId(String id, Pageable pageable)throws IOException;
     Page<HumanResource>findByKeywordAndStatus(String keyword, EStatus status,Pageable pageable)throws IOException;
     Page<HumanResource>findByKeywordAndStatusAndEmployerId(String keyword,EStatus status,String employerId, Pageable pageable)throws IOException;
-    HumanResource create(HumanResource humanResource)throws IOException;
-    HumanResource update(HumanResource humanResource)throws IOException;
+    HumanResource create(HumanResource humanResource,MultipartFile avatar)throws IOException;
+    HumanResource update(HumanResource humanResource, MultipartFile avatar)throws IOException;
     HumanResource updateAvatar(HumanResource humanResource, MultipartFile avatar) throws IOException;
     void deleteById(String id)throws IOException;
     void delete(HumanResource humanResource)throws IOException;

@@ -47,15 +47,25 @@ public class HumanResourceServiceImpl implements HumanResourceService {
     }
 
     @Override
-    public HumanResource create(HumanResource humanResource) {
+    public HumanResource create(HumanResource humanResource,MultipartFile avatar) {
+        if(avatar!=null) {
+            String uploadImage = fileUploadFunc.uploadImage(avatar);
+            uploadImage=fileUploadFunc.getFullImagePath(uploadImage);
+            humanResource.setAvatar(uploadImage);
 
+        }
         humanResourceRepository.save(humanResource);
         return humanResource;
     }
 
     @Override
-    public HumanResource update(HumanResource humanResource) {
+    public HumanResource update(HumanResource humanResource, MultipartFile avatar) {
+        if(avatar!=null) {
+            String uploadImage = fileUploadFunc.uploadImage(avatar);
+            uploadImage=fileUploadFunc.getFullImagePath(uploadImage);
+            humanResource.setAvatar(uploadImage);
 
+        }
         humanResourceRepository.save(humanResource);
         return humanResource;
     }

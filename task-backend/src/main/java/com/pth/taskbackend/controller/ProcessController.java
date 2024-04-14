@@ -1,12 +1,14 @@
 package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.request.ProcessRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
+import com.pth.taskbackend.dto.response.HumanResourceResponse;
+import com.pth.taskbackend.dto.response.ProcessResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
-import com.pth.taskbackend.model.meta.Employer;
+import com.pth.taskbackend.model.meta.*;
 import com.pth.taskbackend.model.meta.Process;
-import com.pth.taskbackend.model.meta.Step;
 import com.pth.taskbackend.repository.JobRepository;
+import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.*;
 import com.pth.taskbackend.util.func.CheckPermission;
@@ -17,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +49,8 @@ public class ProcessController {
     @Autowired
     JwtService jwtService;
 
+    @Autowired
+    UserRepository userRepository;
     @Autowired
     private EmployerService employerService;
     private final CheckPermission checkPermission;
@@ -138,4 +143,47 @@ public class ProcessController {
         }
     }
 
+
+    @Operation(summary = "Get list", description = "", tags = {})
+    @GetMapping("")
+    public ResponseEntity<BaseResponse> getProcess(@RequestHeader("Authorization") String token,@RequestParam(required = false) String name, Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER)||checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+
+            Page<Process> processes = processService.findByNameContaining(name,pageable);
+            Page<ProcessResponse> responseList = processes.map(process -> new ProcessResponse(
+                    process.getId(),
+                    process.getCreated(),
+                    process.getUpdated(),
+                    process.getName(),
+                    process.getDescription(),
+                    process.getSteps().stream().toList()
+            ));
+
+            if (responseList.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách quy trình rỗng", HttpStatus.NO_CONTENT.value(), null)
+                );
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách quy trình", HttpStatus.OK.value(), responseList)
+                );
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 }

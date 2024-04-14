@@ -29,6 +29,8 @@ public class HumanResource extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ESex sex;
 
+    LocalDateTime dateOfBirth;
+
     String phoneNumber;
     @ManyToOne
     @JoinColumn(name = "employer_id")

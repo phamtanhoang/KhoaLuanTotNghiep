@@ -17,4 +17,5 @@ public interface ProcessService {
     Page<Process>findByEmployerId(String employerId, Pageable pageable)throws IOException;
     Optional<Process>findByName(String name)throws IOException;
     Optional<Process>findById(String id)throws IOException;
+    Page<Process>findByNameContaining(String name, Pageable pageable);
 }

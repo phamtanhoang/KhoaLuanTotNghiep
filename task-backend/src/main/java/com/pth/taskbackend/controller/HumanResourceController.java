@@ -18,6 +18,7 @@ import com.pth.taskbackend.service.EmployerService;
 import com.pth.taskbackend.service.HumanResourceService;
 import com.pth.taskbackend.util.func.CheckPermission;
 import com.pth.taskbackend.util.func.ImageFunc;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +32,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,7 +64,7 @@ public class HumanResourceController {
     CheckPermission checkPermission;
     @Autowired
     ObjectMapper objectMapper;
-
+    private final PasswordEncoder passwordEncoder;
 
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("getHumanResource-admin")
@@ -91,6 +93,7 @@ public class HumanResourceController {
                     humanResource.getId(),
                     humanResource.getCreated(),
                     humanResource.getUpdated(),
+                    humanResource.getDateOfBirth(),
                     humanResource.getFirstName(),
                     humanResource.getLastName(),
                     humanResource.getPhoneNumber(),
@@ -112,7 +115,11 @@ public class HumanResourceController {
                         new BaseResponse("Danh sách HR", HttpStatus.OK.value(), responseList)
                 );
             }
-        } catch (Exception e) {
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }
+            catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
@@ -144,6 +151,7 @@ public class HumanResourceController {
                     humanResource.getId(),
                     humanResource.getCreated(),
                     humanResource.getUpdated(),
+                    humanResource.getDateOfBirth(),
                     humanResource.getFirstName(),
                     humanResource.getLastName(),
                     humanResource.getPhoneNumber(),
@@ -158,13 +166,16 @@ public class HumanResourceController {
 
             if (humanResources.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách HR rỗng", HttpStatus.NO_CONTENT.value(), null)
+                        new BaseResponse("Danh sách HR rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách HR", HttpStatus.OK.value(), responseList)
                 );
             }
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -176,7 +187,7 @@ public class HumanResourceController {
     public ResponseEntity<BaseResponse> getHumanResourceByAdmin(@RequestHeader("Authorization")String token, @PathVariable() String id) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
             if (!permission)
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
@@ -197,7 +208,7 @@ public class HumanResourceController {
                 );
             if (optionalHumanResource.get().getUser().getStatus().equals(EStatus.DELETED))
                 return ResponseEntity.ok(
-                        new BaseResponse("Không thể truy cập thông tin HR đã xóa", HttpStatus.NO_CONTENT.value(), null)
+                        new BaseResponse("Không thể truy cập thông tin HR đã xóa", HttpStatus.FORBIDDEN.value(), null)
                 );
             HumanResource hr = optionalHumanResource.get();
 
@@ -205,6 +216,7 @@ public class HumanResourceController {
                     hr.getId(),
                     hr.getCreated(),
                     hr.getUpdated(),
+                    hr.getDateOfBirth(),
                     hr.getFirstName(),
                     hr.getLastName(),
                     hr.getPhoneNumber(),
@@ -218,7 +230,10 @@ public class HumanResourceController {
             return ResponseEntity.ok(
                     new BaseResponse("Chi tiết HR", HttpStatus.OK.value(), response)
             );
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
@@ -227,7 +242,7 @@ public class HumanResourceController {
 
     @Operation(summary = "Create", description = "", tags = {})
     @PostMapping("")
-    public ResponseEntity<BaseResponse> createHumanResource(@RequestHeader("Authorization")String token, @RequestBody CreateHumanResourceRequest request
+    public ResponseEntity<BaseResponse> createHumanResource(@RequestHeader("Authorization")String token, @RequestPart CreateHumanResourceRequest request,@RequestPart(required = false) MultipartFile avatar
                                                        )  {
         try {
 
@@ -239,7 +254,7 @@ public class HumanResourceController {
 
         Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
         if (optionalEmployer.isEmpty()) {
-            return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng ", HttpStatus.NOT_FOUND.value(), null));
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng ", HttpStatus.OK.value(), null));
         }
 
 
@@ -248,7 +263,10 @@ public class HumanResourceController {
                         new BaseResponse("Tên người dùng đã tồn tại!", 400, null)
                 );
 
-
+            if( request.username()==null||request.password()==null)
+                return ResponseEntity.ok(
+                        new BaseResponse("Thiếu tên đăng nhập hoặc mật khẩu!", 400, null)
+                );
             Optional<User> user = authService.register(
                     request.username(),
                     request.password(),
@@ -258,14 +276,18 @@ public class HumanResourceController {
             hr.setFirstName(request.firstName());
             hr.setLastName(request.lastName());
             hr.setSex(request.sex());
+            hr.setDateOfBirth(request.dateOfBirth());
             hr.setPhoneNumber(request.phoneNumber());
             hr.setUser(user.get());
             hr.setEmployer(optionalEmployer.get());
-            humanResourceService.create(hr);
+            humanResourceService.create(hr,avatar);
 
             return ResponseEntity.ok(
                     new BaseResponse("Tạo nhà tuyển dụng thành công", HttpStatus.OK.value(), hr)
             );
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(
                     new BaseResponse("Tên nhà tuyển dụng đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
@@ -276,7 +298,7 @@ public class HumanResourceController {
         }
     }
     @Operation(summary = "update status", description = "", tags = {})
-    @PatchMapping("/{id}")
+    @PatchMapping("/updateStatus/{id}")
     public ResponseEntity<BaseResponse> updateHR(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody String status) {
         try {
 
@@ -336,6 +358,9 @@ public class HumanResourceController {
                             .body(new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
             }
 
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (EmptyResultDataAccessException e) {
             return ResponseEntity.ok(new BaseResponse("Không tìm thấy HR cần xóa!", HttpStatus.NOT_FOUND.value(), null));
         } catch (Exception e) {
@@ -373,6 +398,9 @@ public class HumanResourceController {
             hr.setStatus(EStatus.DELETED);
             userRepository.save(hr);
             return ResponseEntity.ok(new BaseResponse("Xóa HR thành công", HttpStatus.OK.value(), null));
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (EmptyResultDataAccessException e) {
             return ResponseEntity.ok(new BaseResponse("Không tìm thấy HR cần xóa!", HttpStatus.NOT_FOUND.value(), null));
         } catch (Exception e) {
@@ -402,6 +430,7 @@ public class HumanResourceController {
                     hr.getId(),
                     hr.getCreated(),
                     hr.getUpdated(),
+                    hr.getDateOfBirth(),
                     hr.getFirstName(),
                     hr.getLastName(),
                     hr.getPhoneNumber(),
@@ -416,15 +445,62 @@ public class HumanResourceController {
                     new BaseResponse( "Hiện thông tin HR", HttpStatus.OK.value(), profile)
             );
 
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "update ", description = "", tags = {})
+    @PatchMapping("/{id}")
+    public ResponseEntity<BaseResponse> updateHumanResource(@PathVariable("id")String id,@RequestHeader("Authorization")String token,@RequestPart  CreateHumanResourceRequest request,@RequestPart(required = false) MultipartFile avatar) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findById(id);
+            if (optionalHumanResource.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+
+            HumanResource hr = optionalHumanResource.get();
+            if(!passwordEncoder.matches(request.password(),optionalHumanResource.get().getUser().getPassword())&&!request.password().isEmpty())
+                hr.getUser().setPassword(passwordEncoder.encode(request.password()));
+            hr.setFirstName(request.firstName());
+            hr.setLastName(request.lastName());
+
+            if(request.sex()!=null)
+               hr.setSex(request.sex());
+            if(request.dateOfBirth()!=null)
+               hr.setDateOfBirth(request.dateOfBirth());
+            if(request.phoneNumber()!=null)
+               hr.setPhoneNumber(request.phoneNumber());
+            humanResourceService.update(hr,avatar);
+            return ResponseEntity.ok(
+                    new BaseResponse( "Cập nhật thông tin HR thành công", HttpStatus.OK.value(), hr)
+            );
+
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 
+
     @Operation(summary = "update by token", description = "", tags = {})
     @PatchMapping("/updateProfile")
-    public ResponseEntity<BaseResponse> updateHumanResourceProfile(@RequestHeader("Authorization")String token,@RequestBody UpdateCandidateRequest request) {
+    public ResponseEntity<BaseResponse> updateHumanResourceProfile(@RequestHeader("Authorization")String token,@RequestPart CreateHumanResourceRequest request,@RequestPart(required = false) MultipartFile avatar) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
@@ -439,15 +515,25 @@ public class HumanResourceController {
                         new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)
                 );
             HumanResource hr = optionalHumanResource.get();
+            if(!passwordEncoder.matches(request.password(),optionalHumanResource.get().getUser().getPassword())&&!request.password().isEmpty())
+                hr.getUser().setPassword(passwordEncoder.encode(request.password()));
             hr.setFirstName(request.firstName());
             hr.setLastName(request.lastName());
-            hr.setSex(request.sex());
-            hr.setPhoneNumber(request.phoneNumber());
-            humanResourceService.update(hr);
+
+            if(request.sex()!=null)
+                hr.setSex(request.sex());
+            if(request.dateOfBirth()!=null)
+                hr.setDateOfBirth(request.dateOfBirth());
+            if(request.phoneNumber()!=null)
+                hr.setPhoneNumber(request.phoneNumber());
+            humanResourceService.update(hr,avatar);
             return ResponseEntity.ok(
                     new BaseResponse( "Cập nhật thông tin HR thành công", HttpStatus.OK.value(), hr)
             );
 
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -479,7 +565,10 @@ public class HumanResourceController {
                     new BaseResponse( "Cập nhật ảnh đại diện HR thành công", HttpStatus.OK.value(), humanResource)
             );
 
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }

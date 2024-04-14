@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public record HumanResourceResponse (String id,
                                     LocalDateTime created,
                                     LocalDateTime updated,
+                                    LocalDateTime dateOfBirth,
                                     String firstName,
                                     String lastName,
                                     String phoneNumber,
