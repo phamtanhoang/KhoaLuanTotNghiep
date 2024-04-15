@@ -463,7 +463,8 @@ public class HumanResourceController {
     }
     @Operation(summary = "update ", description = "", tags = {})
     @PatchMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateHumanResource(@PathVariable("id")String id,@RequestHeader("Authorization")String token,@RequestParam(required = false) String password,
+    public ResponseEntity<BaseResponse> updateHumanResource(@PathVariable("id")String id,@RequestHeader("Authorization")String token,
+                                                            @RequestParam(required = false) String password,
                                                             @RequestParam String firstName,
                                                             @RequestParam String lastName,
                                                             @RequestParam ESex sex,
