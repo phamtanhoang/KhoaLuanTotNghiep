@@ -1,5 +1,5 @@
 import axiosConfig from "@/configs/axiosConfig";
-import { UserAPI } from "@/configs/helper";
+import { UserAPI } from "@/configs/apis";
 
 const usersService = {
   async getByEmail(email: string) {

@@ -1,5 +1,5 @@
 import axiosConfig from "@/configs/axiosConfig";
-import { TagAPI } from "@/configs/helper";
+import { TagAPI } from "@/configs/apis";
 
 const tagsService = {
   async getById(id: string) {

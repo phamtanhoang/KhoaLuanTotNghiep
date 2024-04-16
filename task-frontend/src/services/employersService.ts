@@ -1,6 +1,6 @@
 import { ChangeBackground } from "@/components/modal/image";
 import axiosConfig from "@/configs/axiosConfig";
-import { EmployerAPI } from "@/configs/helper";
+import { EmployerAPI } from "@/configs/apis";
 
 const employersService = {
   async profile() {
@@ -19,9 +19,10 @@ const employersService = {
     );
   },
   async update(id: string, status: string) {
-    const formData = new FormData();
-    formData.append("status", status);
-    return await axiosConfig.patch(EmployerAPI.employerById(id), formData, {
+    const body = {
+      status: status,
+    };
+    return await axiosConfig.patch(EmployerAPI.employerById(id), body, {
       headers: { "Content-Type": "application/octet-stream" },
     });
   },

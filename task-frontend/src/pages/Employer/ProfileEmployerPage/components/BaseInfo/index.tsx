@@ -24,10 +24,6 @@ const BaseInfo: React.FC<BaseInfoProps> = ({
   _onClickChangeBackgroundImage,
   isVip,
 }) => {
-  // const [avatarUrl, setAvatarUrl] = useState(image);
-  // const updateAvatar = (imgSrc: string) => {
-  //   setAvatarUrl(imgSrc);
-  // };
   return (
     <>
       <div className="w-full relative">
@@ -47,7 +43,7 @@ const BaseInfo: React.FC<BaseInfoProps> = ({
         <div className="relative">
           <img
             src={image ? image : NON_USER}
-            className="w-40 border-4 border-white rounded-full"
+            className="w-40 h-40 border-4 border-white rounded-full"
           />
           <button
             className="absolute bottom-2 right-2 text-2xl p-2 rounded-full bg-body hover:bg-body/90 text-black/90 hover:text-black ring-2 ring-white"

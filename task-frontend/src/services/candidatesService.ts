@@ -1,5 +1,5 @@
 import axiosConfig from "@/configs/axiosConfig";
-import { CandidateAPI } from "@/configs/helper";
+import { CandidateAPI } from "@/configs/apis";
 
 const candidatesService = {
   async profile() {

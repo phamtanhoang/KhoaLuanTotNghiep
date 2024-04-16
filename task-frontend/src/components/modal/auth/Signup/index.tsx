@@ -57,11 +57,11 @@ const Signup = (props: any) => {
       !dob ||
       !setSex
     ) {
-      SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "error");
+      SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "warning");
       return;
     }
     if (password !== confirmPassword) {
-      SwalHelper.MiniAlert("Mật khẩu không khớp!", "error");
+      SwalHelper.MiniAlert("Mật khẩu không khớp!", "warning");
       return;
     }
 

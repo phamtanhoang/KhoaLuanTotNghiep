@@ -76,4 +76,32 @@ const CategoryAPI = {
     return `/categories/${id}`;
   },
 };
-export { AuthAPI, TagAPI, CategoryAPI, UserAPI, CandidateAPI, EmployerAPI };
+
+const HumanResourceAPI = {
+  create: "/hr",
+  getList: (
+    keyword?: string,
+    status?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/hr/getHumanResource-employer?keyword=${keyword}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
+  },
+  HRById: (id: string) => {
+    return `/hr/${id}`;
+  },
+
+  updateAvatar: "/hr/updateAvatar",
+  updateProfile: "/hr/updateProfile",
+
+  profile: "/hr/profile",
+};
+export {
+  AuthAPI,
+  TagAPI,
+  CategoryAPI,
+  UserAPI,
+  CandidateAPI,
+  EmployerAPI,
+  HumanResourceAPI,
+};

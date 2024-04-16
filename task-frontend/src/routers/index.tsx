@@ -33,7 +33,7 @@ import {
 } from "@/pages/Employer";
 import ProfileEmployerPage from "@/pages/Employer/ProfileEmployerPage";
 import UpgradeAccountEmployer from "@/pages/Employer/UpgradeAccountEmployer";
-import { DataConstants } from "@/utils/constants/dataConstants";
+
 import {
   ADMIN_PATHS,
   CANDIDATE_PATHS,

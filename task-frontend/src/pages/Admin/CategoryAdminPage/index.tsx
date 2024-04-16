@@ -166,7 +166,7 @@ const CategoryAdminPage = () => {
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
           totalPages={totalPages}
-          type={true}
+          type={false}
         />
       </div>
     </>

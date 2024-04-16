@@ -9,6 +9,7 @@ import { ApplicationDetail, ApplyJob } from "./application";
 import { ChangeInfoEmployer, EmployerUpdate } from "./employer";
 import { CreateTag, UpdateTag } from "./tag";
 import { CreateCategory, UpdateCategory } from "./category";
+import { CreateHumanResource, UpdateHumanResource } from "./humanResource";
 
 const ModalBase = (props: any) => {
   // take props
@@ -96,6 +97,17 @@ const ModalBase = (props: any) => {
     ),
     [MODAL_KEYS.updateEmployer]: (
       <EmployerUpdate id={id} fetchData={fetchData} handleClose={handleClose} />
+    ),
+
+    [MODAL_KEYS.createHumanResource]: (
+      <CreateHumanResource fetchData={fetchData} handleClose={handleClose} />
+    ),
+    [MODAL_KEYS.updateHumanResource]: (
+      <UpdateHumanResource
+        id={id}
+        fetchData={fetchData}
+        handleClose={handleClose}
+      />
     ),
   };
 

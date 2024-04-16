@@ -1,6 +1,7 @@
 import { AuthHelper } from "@/utils/helpers/authHelper";
 import axios from "axios";
-import { AuthAPI } from "./helper";
+import { AuthAPI } from "./apis";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
 
 const VERSION = "v1";
 const BASE_URL = "http://localhost:8080/api/" + VERSION;

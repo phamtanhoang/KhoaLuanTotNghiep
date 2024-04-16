@@ -23,5 +23,7 @@ const MODAL_KEYS = {
   chooseImage: "ChooseImage",
 
   updateEmployer: "updateEmployer",
+  createHumanResource: "CreateHumanResource",
+  updateHumanResource: "UpdateHumanResource",
 };
 export { MODAL_KEYS };

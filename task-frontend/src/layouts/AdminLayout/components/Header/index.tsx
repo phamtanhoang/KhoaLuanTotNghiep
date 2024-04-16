@@ -5,15 +5,12 @@ import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { useContext } from "react";
 import { BiLogOut } from "react-icons/bi";
 import { RiAdminFill } from "react-icons/ri";
-import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 interface HeaderProps {
   openSideBar: boolean;
 }
 const Header: React.FC<HeaderProps> = ({ openSideBar }) => {
-  const navigate = useNavigate();
   const context = useContext(LoadingContext);
-  const dispatch = useDispatch();
 
   const _onClickLogout = () => {
     SwalHelper.Confirm(
@@ -22,8 +19,10 @@ const Header: React.FC<HeaderProps> = ({ openSideBar }) => {
       () => {
         context.handleOpenLoading();
         AuthHelper.removeAuthenticaton();
-        navigate(ADMIN_PATHS.signin);
-        SwalHelper.MiniAlert("Đăng xuất thành công", "success");
+        SwalHelper.MiniAlert("Đăng xuất thành công", "success", 1500);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
         context.handleCloseLoading();
       },
       () => {}
@@ -51,14 +50,13 @@ const Header: React.FC<HeaderProps> = ({ openSideBar }) => {
       </Link>
 
       <div className="flex justify-between items-center h-16 header-right">
-        <a
-          href="#"
+        <button
           className="flex items-center mr-5 hover:text-bgBlue "
           onClick={_onClickLogout}
         >
           <BiLogOut className="text-lg mr-1" />
           Đăng xuất
-        </a>
+        </button>
       </div>
     </header>
   );

@@ -1,5 +1,5 @@
 import axiosConfig from "@/configs/axiosConfig";
-import { AuthAPI } from "@/configs/helper";
+import { AuthAPI } from "@/configs/apis";
 
 const authsService = {
   async signin(email: string, password: string, role: string) {

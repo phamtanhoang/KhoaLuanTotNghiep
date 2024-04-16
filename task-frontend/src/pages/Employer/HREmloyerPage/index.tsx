@@ -1,81 +1,111 @@
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { HRTableMobile, HRTableWeb } from "./components";
-import { Pagination } from "@/components/ui";
+import { Pagination, PaginationCustom } from "@/components/ui";
 import { FiFilter } from "react-icons/fi";
 
 import Swal from "sweetalert2";
+import { MODAL_KEYS } from "@/utils/constants/modalConstants";
+import { useContext, useEffect, useState } from "react";
+import { LoadingContext } from "@/App";
+import humanResourcesService from "@/services/humanResourcesService";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
+import ModalBase from "@/components/modal";
 
-const sampleData = [
-  {
-    image: "",
-    personName: "Phạm Tấn Hoàng",
-    email: "phamtanhoang3202@gmail.com",
-    permissions: ["Thêm", "Sửa", "Xóa"],
-    createDate: "2024-03-01",
-    state: "ACTIVE",
-  },
-  {
-    image: "",
-    personName: "Phạm Tấn Hoàng2",
-    email: "phamtanhoang3202@gmail.com2",
-    permissions: ["Thêm", "Sửa", "Xóa"],
-    createDate: "2024-03-01",
-    state: "PAUSE",
-  },
-  {
-    image: "",
-    personName: "Phạm Tấn Hoàng3",
-    email: "phamtanhoang3202@gmail.com3",
-    permissions: ["Thêm", "Sửa", "Xóa"],
-    createDate: "2024-03-01",
-    state: "PAUSE",
-  },
-  {
-    image: "",
-    personName: "Phạm Tấn Hoàng2",
-    email: "phamtanhoang3202@gmail.com2",
-    permissions: ["Thêm", "Sửa", "Xóa"],
-    createDate: "2024-03-01",
-    state: "PAUSE",
-  },
-  {
-    image: "",
-    personName: "Phạm Tấn Hoàng3",
-    email: "phamtanhoang3202@gmail.com3",
-    permissions: ["Thêm", "Sửa", "Xóa"],
-    createDate: "2024-03-01",
-    state: "ACTIVE",
-  },
-];
 const HREmployerPage = () => {
+  const context = useContext(LoadingContext);
+  const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
 
+  const [open, setOpen] = useState(false);
+  const [funcs, setFuncs] = useState<string>("");
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const [id, setId] = useState<string>("");
+  const [keyWord, setKeyWord] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemPerpage = 10;
+
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [humanResources, setHumanResources] = useState<HumanResourceModel[]>(
+    []
+  );
 
   const _onClickFilter = () => {
-    // context.setFuncs(MODAL_KEYS.filter);
-    // context.handleOpen();
+    setFuncs(MODAL_KEYS.filter);
+    handleOpen();
   };
-  const _onClickDelete = () => {
-    Swal.fire({
-      icon: "warning",
-      title: "Xóa nhân sự này?",
-      showCancelButton: true,
-      cancelButtonText: "Hủy bỏ",
-      confirmButtonText: "Đồng ý",
-
-      customClass: {
-        confirmButton: "confirm-button-class",
+  const _onClickDelete = (item: HumanResourceModel) => {
+    SwalHelper.Confirm(
+      "Xác nhận xóa tài khoản này?",
+      "question",
+      () => {
+        context.handleOpenLoading();
+        humanResourcesService
+          .delete(item.id)
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              SwalHelper.MiniAlert(res.data.Message, "success");
+              fetchListData();
+            } else {
+              SwalHelper.MiniAlert(res.data.Message, "error");
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
       },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire("Deleted!", "Your item has been deleted.", "success");
-      } else if (result.isDismissed) {
-      }
-    });
+      () => {}
+    );
   };
-  const _onClickDetail = () => {};
-  const _onClickAdd = () => {};
+
+  const _onClickDetail = (item: HumanResourceModel) => {
+    setId(item.id);
+    setFuncs(MODAL_KEYS.updateHumanResource);
+    handleOpen();
+  };
+
+  const _onClickAdd = () => {
+    setFuncs(MODAL_KEYS.createHumanResource);
+    handleOpen();
+  };
+
+  const fetchListData = () => {
+    setIsLoadingTable(true);
+    humanResourcesService
+      .getList(keyWord, status, currentPage - 1, itemPerpage)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          setHumanResources(res?.data?.Data?.content);
+          setTotalPages(res?.data?.Data?.totalPages);
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+      })
+      .finally(() => {
+        setIsLoadingTable(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchListData();
+  }, [keyWord, status, currentPage]);
   return (
     <>
+      <ModalBase
+        id={id}
+        open={open}
+        handleClose={handleClose}
+        funcs={funcs}
+        setFuncs={setFuncs}
+        fetchData={fetchListData}
+      />
       <div className="bg-white p-4 rounded relative w-full mt-8">
         <div className="-mt-12 flex justify-between relative p-4 lg:py-4 lg:px-8 place-items-center rounded-xl bg-orangetext bg-clip-border text-white shadow-md shadow-orange-500/40">
           <div className="items-center text-lg lg:text-2xl font-bold text-white">
@@ -102,22 +132,33 @@ const HREmployerPage = () => {
         <div className="bg-white lg:px-4 rounded relative w-full  mt-2 lg:mt-5">
           <div className="max-lg:hidden">
             <HRTableWeb
-              value={sampleData}
+              value={humanResources}
               _onClickDelete={_onClickDelete}
               _onClickDetail={_onClickDetail}
+              isLoading={isLoadingTable}
+              currentPage={currentPage}
+              itemPerpage={itemPerpage}
             />
           </div>
           <div className="lg:hidden">
             <HRTableMobile
-              value={sampleData}
+              value={humanResources}
               _onClickDelete={_onClickDelete}
               _onClickDetail={_onClickDetail}
+              isLoading={isLoadingTable}
+              currentPage={currentPage}
+              itemPerpage={itemPerpage}
             />
           </div>
         </div>
 
         <div className="w-max mx-auto mt-5">
-          <Pagination />
+          <PaginationCustom
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+            type={true}
+          />
         </div>
       </div>
     </>

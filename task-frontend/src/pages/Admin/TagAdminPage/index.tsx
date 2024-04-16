@@ -32,7 +32,7 @@ const TagsAdminPage = () => {
     setFuncs(MODAL_KEYS.createTag);
     handleOpen();
   };
-  
+
   const _onClickDelete = (item: TagModel) => {
     SwalHelper.Confirm(
       "Xác nhận xóa nhãn này?",
@@ -166,7 +166,7 @@ const TagsAdminPage = () => {
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
           totalPages={totalPages}
-          type={true}
+          type={false}
         />
       </div>
     </>

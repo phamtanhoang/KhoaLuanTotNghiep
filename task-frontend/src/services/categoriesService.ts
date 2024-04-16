@@ -1,5 +1,5 @@
 import axiosConfig from "@/configs/axiosConfig";
-import { CategoryAPI } from "@/configs/helper";
+import { CategoryAPI } from "@/configs/apis";
 
 const categoriesService = {
   async getById(id: string) {

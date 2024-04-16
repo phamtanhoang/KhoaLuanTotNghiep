@@ -209,7 +209,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           </div>
         </nav>
       </div>
-      <p className="px-2 py-3 text-center text-xs my-auto border-t border-borderColor">
+      <p className="px-2 py-3 text-center text-xs mt-auto border-t border-borderColor">
         Copyright &copy; {new Date().getFullYear()}, by{" "}
         <a
           href="https://github.com/phamtanhoang"

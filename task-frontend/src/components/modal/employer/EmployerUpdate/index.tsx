@@ -23,6 +23,7 @@ const EmployerUpdate = (props: any) => {
       .update(id, state)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
+          handleClose();
           fetchListData();
           SwalHelper.MiniAlert(res.data.Message, "success");
         } else {
@@ -90,7 +91,7 @@ const EmployerUpdate = (props: any) => {
               <div className="flex flex-col items-center -mt-20 relative">
                 <img
                   src={employer?.image ? employer?.image : NON_USER}
-                  className="w-40 border-4 border-white rounded-full"
+                  className="w-40 h-40 border-4 border-white rounded-full"
                 />
               </div>
             </div>

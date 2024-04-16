@@ -10,11 +10,25 @@
   position: relative;
   display: block;
   text-align: center;
-  color: #4d4dff;
   text-decoration: none;
 }
 
-.page-item.active .page-link {
+.pagination1 .page-item .page-link {
+  color: #f2994a;
+}
+
+.pagination2 .page-item .page-link {
+  color: #4d4dff;
+}
+
+.pagination1 .page-item.active .page-link {
+  background-color: #f2994a;
+  border: 0px;
   color: #ffffff;
+}
+
+.pagination2 .page-item.active .page-link {
   background-color: #4d4dff;
+  border: 0px;
+  color: #ffffff;
 }
