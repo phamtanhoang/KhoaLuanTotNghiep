@@ -26,7 +26,6 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "job_index")
 public class Job  extends BaseEntity {
     @Column(nullable = false)
     private String name;

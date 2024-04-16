@@ -9,8 +9,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @EnableJpaAuditing
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "com.pth.taskbackend.repository")
-@EnableElasticsearchRepositories(basePackages = "com.pth.taskbackend.elasticsearchRepository")
 public class Application {
 
     public static void main(String[] args) {

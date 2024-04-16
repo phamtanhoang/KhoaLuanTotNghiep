@@ -20,7 +20,6 @@ public interface JobService {
     void delete(Job job)throws IOException;
     Optional<Job> findById(String jobId)throws IOException;
     Page<Job>findByProcessId(String id, Pageable pageable)throws IOException;
-    Page<Job>findNear(String keyword, Pageable pageable);
     Page<Job>findByNameContainingAndCategoryIdAndStatus(String name,String categoryId,EStatus status,Pageable pageable)throws IOException;
     Page<Job>findByStatusOrderByCreatedDesc(EStatus status, Pageable pageable)throws IOException;
 

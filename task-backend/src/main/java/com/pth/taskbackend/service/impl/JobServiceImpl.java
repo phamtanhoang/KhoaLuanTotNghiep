@@ -1,6 +1,5 @@
 package com.pth.taskbackend.service.impl;
 
-import com.pth.taskbackend.elasticsearchRepository.JobElasticsearchRepository;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Job;
 import com.pth.taskbackend.repository.JobRepository;
@@ -17,12 +16,9 @@ import java.util.Optional;
 public class JobServiceImpl implements JobService {
     @Autowired
     JobRepository jobRepository;
-    @Autowired
-    JobElasticsearchRepository jobElasticsearchRepository;
     @Override
     public Job create(Job job){
-        jobRepository.save(job);
-        return jobElasticsearchRepository.save(job);
+        return jobRepository.save(job);
     }
 
 
@@ -53,18 +49,7 @@ public class JobServiceImpl implements JobService {
         return jobRepository.findByProcessId(id,pageable);
     }
 
-    @Override
-    public Page<Job> findNear(String keyword,Pageable pageable) {
-        if(keyword==null)
-            return  jobRepository.findAll(pageable);
 
-        Page<Job>jobs =jobElasticsearchRepository.searchByNameOrExperienceOrDescription(keyword,pageable);
-        if(jobs.isEmpty()){
-            return jobRepository.findAll(pageable);
-        }
-
-        return jobs;
-    }
 
     @Override
     public Page<Job> findByNameContainingAndCategoryIdAndStatus(String name, String categoryId,EStatus status, Pageable pageable) throws IOException {
