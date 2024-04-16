@@ -67,7 +67,8 @@ public class Job  extends BaseEntity {
     )
     private Set<Tag> tags = new HashSet<>();
 
-    @OneToOne
-    @JoinColumn(name = "procedure_id")
+    @ManyToOne
+    @JoinColumn(name = "process_id", nullable = false)
     private Process process;
+
 }

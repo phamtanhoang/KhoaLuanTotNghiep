@@ -11,6 +11,6 @@ public record ProcessResponse(
         LocalDateTime updated,
         String name,
         String description,
-        List<Step> step
+        List<StepResponse> step
 ) {
 }

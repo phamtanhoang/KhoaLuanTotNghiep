@@ -14,4 +14,7 @@ public interface TagService {
     Tag createTag(String name, String color) throws IOException;
     Tag updateTag(Tag tag, String name, String color) throws IOException;
     void deleteTag(Tag tag) throws IOException;
+
+    void deleteTagByJobId(String jobId)throws  IOException;
+    void saveTag(String jobId, String tagId);
 }

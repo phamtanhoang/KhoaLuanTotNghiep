@@ -5,6 +5,7 @@ import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Application;
 import com.pth.taskbackend.repository.ApplicationRepository;
 import com.pth.taskbackend.service.ApplicationService;
+import io.jsonwebtoken.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +47,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    public Optional<Application> findByIdAndCandidateId(String id, String candidateId) throws IOException {
+        return applicationRepository.findByIdAndCandidateId(id,candidateId);
+    }
+
+    @Override
     public Page<Application> findByCandidateId(String candidateId, Pageable pageable) {
         return applicationRepository.findByCandidateId(candidateId,pageable);
     }
@@ -63,6 +69,17 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public Page<Application> findByJobId(String jobId, Pageable pageable) {
         return null;
+    }
+
+    @Override
+    public Optional<Application> findByIdAndJobHumanResourceId(String id, String humanResourceId) throws IOException {
+        return applicationRepository.findByIdAndJobHumanResourceId(id,humanResourceId);
+    }
+
+    @Override
+    public Optional<Application> findByIdAndJobHumanResourceEmployerId(String id, String employerId) throws IOException {
+        return applicationRepository.findByIdAndJobHumanResourceEmployerId(id,employerId);
+
     }
 
     @Override

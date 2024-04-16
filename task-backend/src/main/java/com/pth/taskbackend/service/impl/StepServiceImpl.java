@@ -18,7 +18,7 @@ public class StepServiceImpl implements StepService {
     StepRepository stepRepository;
     @Override
     public Step create(Step step) {
-        return null;
+        return stepRepository.save(step);
     }
 
     @Override
@@ -34,6 +34,11 @@ public class StepServiceImpl implements StepService {
     @Override
     public void delete(Step step) {
 
+    }
+
+    @Override
+    public void deleteAllByProcessId(String processId) {
+        stepRepository.deleteAllByProcessId(processId);
     }
 
     @Override
@@ -53,6 +58,6 @@ public class StepServiceImpl implements StepService {
 
     @Override
     public Page<Step> findByProcessId(String id, Pageable pageable) {
-        return stepRepository.findByProcessId(id,pageable);
+        return stepRepository.findByProcessIdOrderByNumberAsc(id,pageable);
     }
 }

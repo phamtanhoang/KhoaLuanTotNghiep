@@ -2,12 +2,14 @@ package com.pth.taskbackend.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pth.taskbackend.dto.request.ApplicationRequest;
+import com.pth.taskbackend.dto.response.ApplicationDetailResponse;
 import com.pth.taskbackend.dto.response.ApplicationResponse;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.*;
+import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.*;
 import com.pth.taskbackend.util.func.CheckPermission;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -65,36 +68,46 @@ public class ApplicationController {
     @Autowired ApplicationStepService applicationStepService;
 
     @Autowired StepService stepService;
+
+    @Autowired
+    UserRepository userRepository;
     FileUploadFunc fileUploadFunc = new FileUploadFunc();
-    @PostMapping("/apply")
+
+    @Autowired HumanResourceService humanResourceService;
+    @PostMapping("/{id}")
     public ResponseEntity<BaseResponse> applyJob(
             @RequestHeader("Authorization") String token,
-            @RequestPart("cVFile") MultipartFile cVFile,
-            @RequestPart("application") ApplicationRequest applicationRequest
+            @RequestParam("cVFile") MultipartFile cVFile,
+            @RequestParam String fullName,
+            @RequestParam String email,
+            @RequestParam String phoneNumber,
+            @RequestParam String letter,
+            @RequestParam String collectionId,
+            @PathVariable("id")String id
 
     ) {
 
         try {
 
-            String email = jwtService.extractUsername(token.substring(7));
+            String username = jwtService.extractUsername(token.substring(7));
             boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
             if (!hasPermission) {
                 return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
             }
 
-            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(username);
             if (optionalCandidate.isEmpty()) {
                 return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null));
             }
 
-            Job job = jobService.findById(applicationRequest.jobId()).orElse(null);
+            Job job = jobService.findById(id).orElse(null);
 
             if (cVFile.isEmpty() || Objects.equals(cVFile.getContentType(), "application/pdf"))
                 return ResponseEntity.ok(
                         new BaseResponse("Chưa có nhập file hoặc định dạng file sai!!!", HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), null)
                 );
 
-            if (applicationService.findByJobIdAndCandidateId(applicationRequest.jobId(), optionalCandidate.get().getId()).isPresent())
+            if (applicationService.findByJobIdAndCandidateId(id, optionalCandidate.get().getId()).isPresent())
                 return ResponseEntity.ok(
                         new BaseResponse("Đã ứng tuyển vào công việc này!!!", HttpStatus.OK.value(), null)
                 );
@@ -102,27 +115,27 @@ public class ApplicationController {
             String cvPath = fileUploadFunc.uploadCV(cVFile);
             Application application = new Application();
             application.setCV(cvPath);
-            application.setPhoneNumber(applicationRequest.phoneNumber());
+            application.setPhoneNumber(phoneNumber);
             application.setCandidate(optionalCandidate.get());
             application.setEmail(email);
-            application.setLetter(applicationRequest.letter());
+            application.setLetter(letter);
             application.setStatus(EApplyStatus.PENDING);
             application.setJob(job);
-            application.setFullName(applicationRequest.fullName());
+            application.setFullName(fullName);
             application.setCurrentStep(0);
             applicationService.create(application);
 
             Collection collection = new Collection();
             collection.setCV(cvPath);
             collection.setEmail(email);
-            collection.setLetter(applicationRequest.letter());
-            collection.setPhoneNumber(applicationRequest.phoneNumber());
-            collection.setFullName(applicationRequest.fullName());
+            collection.setLetter(letter);
+            collection.setPhoneNumber(phoneNumber);
+            collection.setFullName(fullName);
             collection.setCandidate(optionalCandidate.get());
 
 
-            if (applicationRequest.collectionId() != null)
-                collection.setId(applicationRequest.collectionId());
+            if (collectionId != null)
+                collection.setId(collectionId);
 
             collectionService.create(collection);
             return ResponseEntity.ok(
@@ -238,8 +251,6 @@ public class ApplicationController {
         }
     }
 
-//    @PutMapping("/updateApplication/{id}")
-//    public ResponseEntity<BaseResponse>updateApplication(@RequestHeader("Authorization")String token,@PathVariable String id, )
 
     @GetMapping("/candidateApplications")
     public ResponseEntity<?> getCandidateApplications(
@@ -315,7 +326,7 @@ public class ApplicationController {
     }
 
     @Operation(summary = "update step", description = "", tags = {})
-    @PutMapping("/updateStep/{id}")
+    @PatchMapping("/updateStep/{id}")
     public ResponseEntity<BaseResponse> updateApplicationStep(@RequestHeader("Authorization") String token,
                                                               @PathVariable("id") String id,
                                                               @RequestBody String result) {
@@ -376,8 +387,8 @@ public class ApplicationController {
         }
     }
 
-    @Operation(summary = "update step", description = "", tags = {})
-    @PutMapping("/updateStatus/{id}")
+    @Operation(summary = "update status", description = "", tags = {})
+    @PatchMapping("/updateStatus/{id}")
     public ResponseEntity<BaseResponse> updateApplicationStatus(@RequestHeader("Authorization") String token,
                                                               @PathVariable("id") String id,
                                                              @RequestBody String status) {
@@ -453,62 +464,186 @@ public class ApplicationController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-//
-//
-//    @GetMapping("/applicationDetails")
-//    public ResponseEntity<?> getApplicationDetails(
-//            @RequestHeader("Authorization") String token,
-//            @RequestParam String applicationId
-//    ) {
-//        try {
-//            String employerName = jwtService.extractUsername(token.substring(7));
-//            Employer employer = employerService.findByAccountUsername(employerName);
-//            if (employer != null) {
-//
-//                Optional<Application> applicationOptional = applicationService.findByIdAndEmployerId(applicationId,employer.getId());
-//
-//                if (applicationOptional.isEmpty())
-//                    return ResponseEntity.badRequest().body("Không tìm thấy application tương ứng");
-//
-//                Application application = applicationOptional.get();
-//
-//                return ResponseEntity.ok(application);
-//            }
-//
-//            else
-//                return ResponseEntity.badRequest().body("Không tìm thấy employer");
-//        }
-//        catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
-//    @GetMapping("/applicationDetailsByCandidateId")
-//    public ResponseEntity<?> getApplicationDetailsByCandidateId(
-//            @RequestHeader("Authorization") String token,
-//            @RequestParam String applicationId
-//    ) {
-//        try {
-//            String candidateName = jwtService.extractUsername(token.substring(7));
-//            Candidate candidate = candidateService.findCandidateByAccountUsername(candidateName).get();
-//            if (candidate != null) {
-//
-//                Optional<Application> applicationOptional = applicationService.findByIdAndCandidateId(applicationId,candidate.getId());
-//
-//                if (applicationOptional.isEmpty())
-//                    return ResponseEntity.badRequest().body("Không tìm thấy application tương ứng");
-//
-//                Application application = applicationOptional.get();
-//
-//                return ResponseEntity.ok(application);
-//            }
-//
-//            else
-//                return ResponseEntity.badRequest().body("Không tìm thấy employer");
-//        }
-//        catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
+
+
+    @GetMapping("/getApplication-candidate/{id}")
+    public ResponseEntity<?> getApplicationDetails(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") String id
+    ) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE) ;
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Application> optionalApplication = applicationService.findByIdAndCandidateId(id,optionalCandidate.get().getId());
+            if (optionalApplication.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Application application = optionalApplication.get();
+            ApplicationDetailResponse response = new ApplicationDetailResponse(
+                    application.getJob().getName(), // jobName
+                    application.getEmail(),
+                    application.getFullName(), // firstName
+                    application.getCandidate().getAvatar(),
+                    application.getCandidate().getDateOfBirth(),
+                    application.getCandidate().getSex(),
+                    application.getCreated(),
+                    application.getCV(),
+                    application.getLetter(),
+                    application.getStatus()
+            );
+            return ResponseEntity.ok(
+                    new BaseResponse("Chi tiết đơn ứng tuyển", HttpStatus.OK.value(), response)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @GetMapping("/getApplication-employer/{id}")
+    public ResponseEntity<?> getApplicationDetailsEmployer(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") String id
+    ) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            Application application;
+            switch (optionalUser.get().getRole()) {
+                case HR: {
+                    Optional<HumanResource> humanResource = humanResourceService.findByEmail(email);
+                    if (humanResource.isEmpty()) {
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                    }
+                    Optional<Application> optionalApplication = applicationService.findByIdAndJobHumanResourceId(id, humanResource.get().getId());
+                    if (optionalApplication.isEmpty()) {
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                    }
+                    application = optionalApplication.get();
+                    break;
+                }
+                case EMPLOYER: {
+                    Optional<Employer> employer = employerService.findByUserEmail(email);
+                    if (employer.isEmpty()) {
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                    }
+
+                    Optional<Application> optionalApplication = applicationService.findByIdAndJobHumanResourceEmployerId(id, employer.get().getId());
+
+                    if (optionalApplication.isEmpty()) {
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                    }
+                    application = optionalApplication.get();
+                    break;
+                }
+                default:
+                    return ResponseEntity.ok(
+                            new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                    );
+            }
+
+            ApplicationDetailResponse response = new ApplicationDetailResponse(
+                    application.getJob().getName(), // jobName
+                    application.getEmail(),
+                    application.getFullName(), // firstName
+                    application.getCandidate().getAvatar(),
+                    application.getCandidate().getDateOfBirth(),
+                    application.getCandidate().getSex(),
+                    application.getCreated(),
+                    application.getCV(),
+                    application.getLetter(),
+                    application.getStatus()
+            );
+            return ResponseEntity.ok(
+                    new BaseResponse("Chi tiết đơn ứng tuyển", HttpStatus.OK.value(), response)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+}
+@GetMapping("/getApplication-admin/{id}")
+    public ResponseEntity<?> getApplicationDetailsAdmin(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") String id
+    ) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN) ;
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Application> optionalApplication = applicationService.findById(id);
+            if (optionalApplication.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Application application = optionalApplication.get();
+            ApplicationDetailResponse response = new ApplicationDetailResponse(
+                    application.getJob().getName(), // jobName
+                    application.getEmail(),
+                    application.getFullName(), // firstName
+                    application.getCandidate().getAvatar(),
+                    application.getCandidate().getDateOfBirth(),
+                    application.getCandidate().getSex(),
+                    application.getCreated(),
+                    application.getCV(),
+                    application.getLetter(),
+                    application.getStatus()
+            );
+            return ResponseEntity.ok(
+                    new BaseResponse("Chi tiết đơn ứng tuyển", HttpStatus.OK.value(), response)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+}
+
 //
 //
 //    @GetMapping("/applicatonsJob")
@@ -626,4 +761,4 @@ public class ApplicationController {
 //        }
 //    }
 
-    }
+

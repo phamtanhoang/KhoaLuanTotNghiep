@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(uniqueConstraints={
-        @UniqueConstraint(columnNames = {"number", "procedure_id"})
+        @UniqueConstraint(columnNames = {"number", "process_id"})
 })
 public class Step extends BaseEntity {
     @Column(nullable = false)
@@ -24,7 +24,7 @@ public class Step extends BaseEntity {
     private int number;
 
     @ManyToOne
-    @JoinColumn(name = "procedure_id")
+    @JoinColumn(name = "process_id")
     private Process process;
 }
 

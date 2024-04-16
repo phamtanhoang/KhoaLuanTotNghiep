@@ -127,18 +127,7 @@ public class AuthController {
         tokens.put("accessToken",token);
         tokens.put("refreshToken",refreshToken);
         response.put("tokens",tokens);
-//        switch (authenticationRequest.role()) {
-//            case CANDIDATE:
-//                response.put("candidate", candidateService.findByUserEmail(authenticationRequest.username()));
-//                break;
-//            case EMPLOYER:
-//                response.put("employer", employerService.findByUserEmail(authenticationRequest.username()));
-//                break;
-//            case ADMIN:
-//                response.put("admin", userRepository.findByEmail(authenticationRequest.username()));break;
-//            case HR:
-//                break;
-//            }
+
 
 
         return ResponseEntity.ok(

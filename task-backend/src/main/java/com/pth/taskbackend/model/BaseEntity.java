@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
@@ -22,5 +23,8 @@ public class BaseEntity {
 
     @LastModifiedDate
     private LocalDateTime updated;
+    public BaseEntity() {
+        this.id = UUID.randomUUID().toString();
+    }
 }
 

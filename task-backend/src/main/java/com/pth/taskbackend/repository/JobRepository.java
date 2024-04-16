@@ -78,6 +78,11 @@ public interface JobRepository extends JpaRepository<Job, String> {
 
     Page<Job>findByProcessId(String id, Pageable pageable);
 
+    @Query("SELECT j, (SELECT COUNT(a) FROM Application a WHERE a.job.id = j.id) AS applicationCount " +
+            "FROM Job j " +
+            "WHERE j.status = 'ACTIVE' " +
+            "ORDER BY j.created DESC")
+    Page<Object[]> findActiveJobsWithApplicationCount(Pageable pageable);
     @Query("SELECT COUNT(e) FROM Job e")
     Long countAll();
 }

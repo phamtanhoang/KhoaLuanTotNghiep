@@ -42,6 +42,11 @@ public class HumanResourceServiceImpl implements HumanResourceService {
     }
 
     @Override
+    public Optional<HumanResource> findByIdAndEmployerId(String id, String employerId) throws IOException {
+        return  humanResourceRepository.findByIdAndEmployerId(id,employerId);
+    }
+
+    @Override
     public Page<HumanResource> findByKeywordAndStatusAndEmployerId(String keyword, EStatus status, String employerId, Pageable pageable) throws IOException {
         return humanResourceRepository.findByKeywordAndStatusAndEmployerId(keyword,status,employerId,pageable);
     }

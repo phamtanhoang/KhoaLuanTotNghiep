@@ -1,14 +1,10 @@
 package com.pth.taskbackend.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pth.taskbackend.dto.request.CreateEmployerRequest;
-import com.pth.taskbackend.dto.request.UpdateCandidateRequest;
 import com.pth.taskbackend.dto.request.UpdateEmployerRequest;
 import com.pth.taskbackend.dto.response.*;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
-import com.pth.taskbackend.model.meta.Candidate;
-import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
@@ -17,29 +13,22 @@ import com.pth.taskbackend.service.AuthService;
 import com.pth.taskbackend.service.EmployerService;
 import com.pth.taskbackend.service.VipEmployerService;
 import com.pth.taskbackend.util.func.CheckPermission;
-import com.pth.taskbackend.util.func.ImageFunc;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
-
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
 @CrossOrigin(origins = "*")
@@ -52,8 +41,6 @@ public class EmployerController {
 
     @Autowired
     private EmployerService employerService;
-    @Autowired
-    private AuthService authService;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -88,6 +75,46 @@ public class EmployerController {
                 );
 
             Page<Employer> employers = employerService.findByKeywordAndStatus(keyword,status,pageable);
+
+            Page<EmployerResponse> responseList = employers.map(employer -> new EmployerResponse(
+                    employer.getId(),
+                    employer.getCreated(),
+                    employer.getUpdated(),
+                    employer.getImage(),
+                    employer.getBackgroundImage(),
+                    employer.getName(),
+                    employer.getLocation(),
+                    employer.getPhoneNumber(),
+                    employer.getBusinessCode(),
+                    employer.getDescription(),
+                    employer.getUser().getEmail(),
+                    employer.getUser().getStatus(),
+                    employer.getUser().getId()
+            ));
+            if (employers.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách nhà tuyển dụng rỗng", HttpStatus.OK.value(), null)
+                );
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách nhà tuyển dụng ", HttpStatus.OK.value(), responseList)
+                );
+            }
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "Get list", description = "", tags = {})
+    @GetMapping("getVipEmployers")
+    public ResponseEntity<BaseResponse> getVipEmployers( Pageable pageable) {
+        try {
+
+
+            Page<Employer> employers = employerService.findVipEmployers(pageable);
 
             Page<EmployerResponse> responseList = employers.map(employer -> new EmployerResponse(
                     employer.getId(),

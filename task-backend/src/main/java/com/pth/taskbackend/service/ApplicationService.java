@@ -18,6 +18,7 @@ public interface ApplicationService {
     void delete(Application application)throws IOException;
     Optional<Application>findById(String id);
     Optional<Application> findByJobIdAndCandidateId(String jobId, String candidateId)throws IOException;
+    Optional<Application> findByIdAndCandidateId(String id, String candidateId)throws IOException;
 
     Page<Application> findByCandidateId(String candidateId, Pageable pageable)throws IOException;
 
@@ -26,7 +27,8 @@ public interface ApplicationService {
     Page<Application> findByHrId(String hrId, Pageable pageable)throws IOException;
 
     Page<Application> findByJobId(String jobId, Pageable pageable)throws IOException;
-
+    Optional<Application>findByIdAndJobHumanResourceId(String id, String humanResourceId)throws IOException;
+    Optional<Application>findByIdAndJobHumanResourceEmployerId(String id, String employerId)throws IOException;
 
     Page<Application> findByEmployerIdAndStatusAndNameContaining(String employerId, EApplyStatus status, String keyword, Pageable pageable)throws IOException;
 

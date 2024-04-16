@@ -26,7 +26,4 @@
         @JoinColumn(name = "employer_id")
         private Employer employer;
 
-        @OneToMany(mappedBy = "process", cascade = CascadeType.ALL, orphanRemoval = true)
-        private Set<Step> steps = new HashSet<>();
-
     }

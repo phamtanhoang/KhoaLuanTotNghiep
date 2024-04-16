@@ -33,6 +33,8 @@ public interface JobService {
 
     Page<Job>findByCategoryId(String id,Pageable pageable)throws IOException;
     Page<Job>findByEmployerId(String id)throws IOException;
+    Page<Object[]>findActiveJobsWithApplicationCount(Pageable pageable);
+
 
     Long countAll()throws IOException;
 

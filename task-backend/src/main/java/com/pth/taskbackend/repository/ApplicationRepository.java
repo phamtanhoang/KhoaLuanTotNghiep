@@ -67,5 +67,9 @@ public interface ApplicationRepository extends JpaRepository<Application, String
             "ORDER BY app.created DESC")
     Page<Application> findByHrIdAndStatus(Long hrId, EStatus status, Pageable pageable);
 
+    Optional<Application>findByIdAndJobHumanResourceId(String id, String humanResourceId);
+    Optional<Application>findByIdAndCandidateId(String id, String candidateId);
+    Optional<Application>findByIdAndJobHumanResourceEmployerId(String id, String employerId);
+
 
 }

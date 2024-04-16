@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StepRepository extends JpaRepository<Step,String> {
-    Page<Step> findByProcessId(String processId, Pageable pageable);
+    Page<Step> findByProcessIdOrderByNumberAsc(String processId, Pageable pageable);
     Optional<Step>findByProcessIdAndNumber(String processId,int number);
     Long countAllByProcessId(String processId);
+    void deleteAllByProcessId(String processId);
 }

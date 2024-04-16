@@ -33,4 +33,5 @@ public interface HumanResourceRepository extends JpaRepository<HumanResource, St
             "AND hr.employer.id = :employerId")
     Page<HumanResource> findByKeywordAndStatusAndEmployerId(String keyword, EStatus status, String employerId, Pageable pageable);
 
+    Optional<HumanResource>findByIdAndEmployerId(String id, String employerId);
 }

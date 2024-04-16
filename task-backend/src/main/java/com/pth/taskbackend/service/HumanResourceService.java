@@ -14,6 +14,8 @@ public interface HumanResourceService {
     Optional<HumanResource>findById(String id)throws IOException;
     Page<HumanResource>findByEmployerId(String id, Pageable pageable)throws IOException;
     Page<HumanResource>findByKeywordAndStatus(String keyword, EStatus status,Pageable pageable)throws IOException;
+    Optional<HumanResource>findByIdAndEmployerId(String id, String employerId)throws IOException;
+
     Page<HumanResource>findByKeywordAndStatusAndEmployerId(String keyword,EStatus status,String employerId, Pageable pageable)throws IOException;
     HumanResource create(HumanResource humanResource,MultipartFile avatar)throws IOException;
     HumanResource update(HumanResource humanResource, MultipartFile avatar)throws IOException;

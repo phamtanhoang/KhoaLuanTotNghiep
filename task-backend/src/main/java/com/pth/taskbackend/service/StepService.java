@@ -12,6 +12,7 @@ public interface StepService {
     Step update(Step step)throws IOException;
     void  deleteById(String id)throws IOException;
     void delete(Step step)throws IOException;
+    void deleteAllByProcessId(String processId);
     Optional<Step>findById(String id)throws IOException;
     Page<Step> findByProcessId(String id, Pageable pageable)throws IOException;
     Optional<Step>findByProcessIdAndNumber(String processId,int number);

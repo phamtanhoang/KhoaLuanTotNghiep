@@ -7,6 +7,8 @@ import com.pth.taskbackend.repository.CategoryRepository;
 import com.pth.taskbackend.repository.TagRepository;
 import com.pth.taskbackend.service.TagService;
 import com.pth.taskbackend.util.func.ImageFunc;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,8 @@ import java.util.Optional;
 public class TagServiceImpl implements TagService {
     @Autowired
     private TagRepository tagRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     @Override
     public Optional<Tag> findById(String id) throws IOException {
@@ -66,5 +70,17 @@ public class TagServiceImpl implements TagService {
     @Override
     public void deleteTag(Tag tag) throws IOException {
         tagRepository.delete(tag);
+    }
+
+    @Transactional
+    @Override
+    public void deleteTagByJobId(String jobId) throws IOException {
+        tagRepository.deleteJobTagsByJobId(jobId);
+    }
+    @Transactional
+
+    @Override
+    public void saveTag(String jobId, String tagId) {
+         tagRepository.saveTag(jobId,tagId);
     }
 }

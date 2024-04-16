@@ -98,6 +98,11 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public Page<Object[]> findActiveJobsWithApplicationCount(Pageable pageable) {
+        return jobRepository.findActiveJobsWithApplicationCount(pageable);
+    }
+
+    @Override
     public Long countAll() throws IOException {
         return jobRepository.countAll();
     }

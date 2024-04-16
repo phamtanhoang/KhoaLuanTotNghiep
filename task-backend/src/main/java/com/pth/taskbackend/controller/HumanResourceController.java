@@ -488,14 +488,14 @@ public class HumanResourceController {
                         new BaseResponse("Không tìm thấy nhà tuyển dụng ", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            Optional<HumanResource> optionalHumanResource = humanResourceService.findById(id);
-            if (optionalHumanResource.isEmpty())
+            Optional<HumanResource> optionalHumanResource1 = humanResourceService.findByIdAndEmployerId(id,optionalEmployer.get().getId());
+            if (optionalHumanResource1.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy nhà tuyển dụng ", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-             optionalHumanResource = humanResourceService.findByEmail(username);
-            if (optionalHumanResource.isPresent())
+              Optional<HumanResource> optionalHumanResource2 = humanResourceService.findByEmail(username);
+            if (optionalHumanResource2.isPresent()&&!optionalHumanResource1.get().getUser().getEmail().equals(optionalHumanResource2.get().getUser().getEmail()))
                 return ResponseEntity.ok(
                         new BaseResponse("Email đã tồn tại ", HttpStatus.BAD_REQUEST.value(), null)
                 );
@@ -504,18 +504,18 @@ public class HumanResourceController {
                         new BaseResponse("Không được dùng trạng thái này ", HttpStatus.BAD_REQUEST.value(), null)
                 );
 
-            HumanResource hr = optionalHumanResource.get();
-            if(!passwordEncoder.matches(password,optionalHumanResource.get().getUser().getPassword())&&!password.isEmpty())
-                hr.getUser().setPassword(passwordEncoder.encode(password));
+            HumanResource hr = optionalHumanResource1.get();
+            if(password!=null)
+                if(!passwordEncoder.matches(password,optionalHumanResource1.get().getUser().getPassword())&&!password.isEmpty())
+                    hr.getUser().setPassword(passwordEncoder.encode(password));
+
             hr.setFirstName(firstName);
             hr.setLastName(lastName);
             hr.getUser().setEmail(username);
-            if(sex!=null)
-               hr.setSex(sex);
-            if(dateOfBirth!=null)
-               hr.setDateOfBirth(dateOfBirth);
-            if(phoneNumber!=null)
-               hr.setPhoneNumber(phoneNumber);
+
+            hr.setSex(sex);
+            hr.setDateOfBirth(dateOfBirth);
+            hr.setPhoneNumber(phoneNumber);
             humanResourceService.update(hr,avatar);
             return ResponseEntity.ok(
                     new BaseResponse( "Cập nhật thông tin HR thành công", HttpStatus.OK.value(), hr)
@@ -525,6 +525,7 @@ public class HumanResourceController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         }catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
@@ -555,17 +556,15 @@ public class HumanResourceController {
                         new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)
                 );
             HumanResource hr = optionalHumanResource.get();
-            if(!passwordEncoder.matches(password,optionalHumanResource.get().getUser().getPassword())&&!password.isEmpty())
-                hr.getUser().setPassword(passwordEncoder.encode(password));
+            if(password!=null)
+                if(!passwordEncoder.matches(password,hr.getUser().getPassword())&&!password.isEmpty())
+                    hr.getUser().setPassword(passwordEncoder.encode(password));
             hr.setFirstName(firstName);
             hr.setLastName(lastName);
 
-            if(sex!=null)
-                hr.setSex(sex);
-            if(dateOfBirth!=null)
-                hr.setDateOfBirth(dateOfBirth);
-            if(phoneNumber!=null)
-                hr.setPhoneNumber(phoneNumber);
+            hr.setSex(sex);
+            hr.setDateOfBirth(dateOfBirth);
+            hr.setPhoneNumber(phoneNumber);
             humanResourceService.update(hr,avatar);
             return ResponseEntity.ok(
                     new BaseResponse( "Cập nhật thông tin HR thành công", HttpStatus.OK.value(), hr)

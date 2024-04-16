@@ -3,6 +3,7 @@ package com.pth.taskbackend.service.impl;
 import com.pth.taskbackend.model.meta.Process;
 import com.pth.taskbackend.repository.ProcessRepository;
 import com.pth.taskbackend.service.ProcessService;
+import io.jsonwebtoken.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,5 +60,10 @@ public class ProcessServiceImpl implements ProcessService
     @Override
     public Page<Process> findByNameContaining(String name, Pageable pageable) {
         return processRepository.findByNameContaining(name,pageable);
+    }
+
+    @Override
+    public Optional<Process> findByNameAndEmployerId(String name, String employerId ) throws IOException {
+        return processRepository.findByNameAndEmployerId(name,employerId);
     }
 }

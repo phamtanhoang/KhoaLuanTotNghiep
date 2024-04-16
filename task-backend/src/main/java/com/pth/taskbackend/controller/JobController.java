@@ -1,11 +1,10 @@
 package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.request.JobRequest;
-import com.pth.taskbackend.dto.response.BaseResponse;
-import com.pth.taskbackend.dto.response.JobResponse;
-import com.pth.taskbackend.dto.response.StepResponse;
+import com.pth.taskbackend.dto.response.*;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.*;
+import com.pth.taskbackend.model.meta.Process;
 import com.pth.taskbackend.repository.JobRepository;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
@@ -14,7 +13,6 @@ import com.pth.taskbackend.util.func.CheckPermission;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,11 +26,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
-
+import io.swagger.v3.oas.annotations.tags.Tag;
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
 @CrossOrigin(origins = "*")
@@ -60,7 +56,8 @@ public class JobController {
     @Autowired UserRepository userRepository;
     @Autowired
     ProcessService processService;
-
+    @Autowired StepService stepService;
+    @Autowired TagService tagService;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("")
     public ResponseEntity<BaseResponse> getJobs(@RequestParam(required = false) String keyword,
@@ -71,7 +68,6 @@ public class JobController {
                                                 Pageable pageable) {
         try {
             Page<Job> jobs = jobService.searchJobs(keyword, location, fromSalary, toSalary, categoryId, pageable);
-            System.out.println("da vao day");
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách công việc rỗng", HttpStatus.NOT_FOUND.value(), null)
@@ -79,8 +75,12 @@ public class JobController {
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
                     List<StepResponse> stepResponses;
+                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+
+                    List<Step> stepList = steps.getContent();
+
                     if (job.getProcess() != null) {
-                        stepResponses = job.getProcess().getSteps().stream()
+                        stepResponses = stepList.stream()
                                 .map(step -> new StepResponse(
                                         step.getId(),
                                         step.getName(),
@@ -112,7 +112,9 @@ public class JobController {
                             job.getHumanResource().getEmployer().getId(),
                             job.getHumanResource().getEmployer().getUser().getEmail(),
                             job.getProcess() != null ? job.getProcess().getId() : null,
-                            stepResponses
+                            job.getProcess() != null ? job.getProcess().getName() : null,
+                            stepResponses,
+                            job.getTags().stream().toList()
                     );
                 }).collect(Collectors.toList());
 
@@ -122,12 +124,47 @@ public class JobController {
                 );
 
             }
+
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
 
     }
+    @Operation(summary = "Get top Jobs", description = "", tags = {})
+    @GetMapping("/topJobs")
+    public ResponseEntity<BaseResponse> getTopJobs(Pageable pageable) {
+        try {
+            Page<Object[]> objects = jobService.findActiveJobsWithApplicationCount(pageable);
+            if (objects.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.NOT_FOUND.value(), null)
+                );
+            } else {
+                List<TopJobResponse> topJobResponses = objects.stream().map(result -> {
+                    Job job = (Job) result[0];
+                    Long count = (Long) result[1];
+                    return new TopJobResponse(
+                            job.getId(),
+                            job.getName(),
+                            job.getHumanResource().getEmployer().getId(),
+                            job.getHumanResource().getEmployer().getName(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            count
+                    );
+                }).collect(Collectors.toList());
+
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), topJobResponses)
+                );
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
 
     @GetMapping("/getJobs-admin")
     public ResponseEntity<?> getJobsByAdmin(@RequestHeader("Authorization") String token,
@@ -161,8 +198,11 @@ public class JobController {
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
                     List<StepResponse> stepResponses;
+                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+
+                    List<Step> stepList = steps.getContent();
                     if (job.getProcess() != null) {
-                        stepResponses = job.getProcess().getSteps().stream()
+                        stepResponses = stepList.stream()
                                 .map(step -> new StepResponse(
                                         step.getId(),
                                         step.getName(),
@@ -194,7 +234,9 @@ public class JobController {
                             job.getHumanResource().getEmployer().getId(),
                             job.getHumanResource().getEmployer().getUser().getEmail(),
                             job.getProcess() != null ? job.getProcess().getId() : null,
-                            stepResponses
+                            job.getProcess() != null ? job.getProcess().getName() : null,
+                            stepResponses,
+                            job.getTags().stream().toList()
                     );
                 }).collect(Collectors.toList());
 
@@ -268,9 +310,12 @@ public class JobController {
                 );
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
+                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+
+                    List<Step> stepList = steps.getContent();
                     List<StepResponse> stepResponses;
                     if (job.getProcess() != null) {
-                        stepResponses = job.getProcess().getSteps().stream()
+                        stepResponses = stepList.stream()
                                 .map(step -> new StepResponse(
                                         step.getId(),
                                         step.getName(),
@@ -302,7 +347,9 @@ public class JobController {
                             job.getHumanResource().getEmployer().getId(),
                             job.getHumanResource().getEmployer().getUser().getEmail(),
                             job.getProcess() != null ? job.getProcess().getId() : null,
-                            stepResponses
+                            job.getProcess() != null ? job.getProcess().getName() : null,
+                            stepResponses,
+                            job.getTags().stream().toList()
                     );
                 }).collect(Collectors.toList());
 
@@ -353,8 +400,11 @@ public class JobController {
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
                     List<StepResponse> stepResponses;
+                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+
+                    List<Step> stepList = steps.getContent();
                     if (job.getProcess() != null) {
-                        stepResponses = job.getProcess().getSteps().stream()
+                        stepResponses = stepList.stream()
                                 .map(step -> new StepResponse(
                                         step.getId(),
                                         step.getName(),
@@ -386,7 +436,9 @@ public class JobController {
                             job.getHumanResource().getEmployer().getId(),
                             job.getHumanResource().getEmployer().getUser().getEmail(),
                             job.getProcess() != null ? job.getProcess().getId() : null,
-                            stepResponses
+                            job.getProcess() != null ? job.getProcess().getName() : null,
+                            stepResponses,
+                            job.getTags().stream().toList()
                     );
                 }).collect(Collectors.toList());
 
@@ -439,8 +491,11 @@ public class JobController {
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
                     List<StepResponse> stepResponses;
+                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+
+                    List<Step> stepList = steps.getContent();
                     if (job.getProcess() != null) {
-                        stepResponses = job.getProcess().getSteps().stream()
+                        stepResponses = stepList.stream()
                                 .map(step -> new StepResponse(
                                         step.getId(),
                                         step.getName(),
@@ -472,7 +527,9 @@ public class JobController {
                             job.getHumanResource().getEmployer().getId(),
                             job.getHumanResource().getEmployer().getUser().getEmail(),
                             job.getProcess() != null ? job.getProcess().getId() : null,
-                            stepResponses
+                            job.getProcess() != null ? job.getProcess().getName() : null,
+                            stepResponses,
+                            job.getTags().stream().toList()
                     );
                 }).collect(Collectors.toList());
 
@@ -491,7 +548,7 @@ public class JobController {
         }
 
     }
-    @Operation(summary = "Get list", description = "", tags = {})
+    @Operation(summary = "Get detail", description = "", tags = {})
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getJob(@PathVariable String id) {
         try {
@@ -505,8 +562,11 @@ public class JobController {
             } else {
                 Job job = optionalJob.get();
                 List<StepResponse> stepResponses;
+                Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+
+                List<Step> stepList = steps.getContent();
                 if (job.getProcess() != null) {
-                    stepResponses = job.getProcess().getSteps().stream()
+                    stepResponses = stepList.stream()
                             .map(step -> new StepResponse(
                                     step.getId(),
                                     step.getName(),
@@ -538,7 +598,9 @@ public class JobController {
                         job.getHumanResource().getEmployer().getId(),
                         job.getHumanResource().getEmployer().getUser().getEmail(),
                         job.getProcess() != null ? job.getProcess().getId() : null,
-                        stepResponses
+                        job.getProcess() != null ? job.getProcess().getName() : null,
+                        stepResponses,
+                        job.getTags().stream().toList()
                 );
 
                 return ResponseEntity.ok(
@@ -586,7 +648,15 @@ public class JobController {
             job.setLocation(request.location());
             job.setHumanResource(optionalHumanResource.get());
 
-            job.setTags(request.tags());
+            if(request.tags()!=null) {
+                tagService.deleteTagByJobId(job.getId());
+                Set< com.pth.taskbackend.model.meta.Tag>tags =new HashSet<>();
+                for (com.pth.taskbackend.model.meta.Tag tag : request.tags()) {
+                    tags.add(tagService.findById(tag.getId()).get());
+                    tagService.saveTag(job.getId(),tag.getId());
+                }
+                job.setTags(tags);
+            }
             jobService.create(job);
 
             return ResponseEntity.ok(
@@ -608,7 +678,7 @@ public class JobController {
 
     @Operation(summary = "update", description = "", tags = {})
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateJob(@RequestHeader("Authorization")String token,@PathVariable("id") String id, @RequestBody JobRequest request) {
+    public ResponseEntity<BaseResponse> updateJob(@RequestHeader("Authorization")String token,@PathVariable("id") String id, @RequestBody JobRequest request) throws IOException {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
@@ -629,6 +699,12 @@ public class JobController {
                         .body(new BaseResponse("Không tìm thấy công việc", HttpStatus.NOT_FOUND.value(), null));
             }
 
+            Optional<Process>optionalProcess= processService.findById(request.processId());
+            if (optionalProcess.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new BaseResponse("Không tìm thấy quy trình", HttpStatus.NOT_FOUND.value(), null));
+            }
+            System.out.println(optionalProcess.get());
             Job job = optionalJob.get();
             job.setStatus(EStatus.PENDING);
             job.setName(request.name());
@@ -639,9 +715,18 @@ public class JobController {
             job.setToDate(request.toDate());
             job.setExperience(request.experience());
             job.setHumanResource(optionalHumanResource.get());
-            job.setProcess(processService.findById(request.processId()).get());
-            job.getTags().clear();
-            job.getTags().addAll(request.tags());
+            if(request.tags()!=null) {
+                tagService.deleteTagByJobId(job.getId());
+                Set< com.pth.taskbackend.model.meta.Tag>tags =new HashSet<>();
+                for (com.pth.taskbackend.model.meta.Tag tag : request.tags()) {
+                    tags.add(tagService.findById(tag.getId()).get());
+                    tagService.saveTag(job.getId(),tag.getId());
+                }
+                job.setTags(tags);
+            }
+            job.setProcess(optionalProcess.get());
+
+
             if (request.categoryId() != null) {
                 Optional<Category> optionalCategory = categoryService.findById(request.categoryId());
                 if (optionalCategory.isPresent()) {
@@ -653,17 +738,57 @@ public class JobController {
             }
 
 
-         jobService.update(job);
+            List<StepResponse> stepResponses;
+            Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
 
+            List<Step> stepList = steps.getContent();
+            if (job.getProcess() != null) {
+                stepResponses = stepList.stream()
+                        .map(step -> new StepResponse(
+                                step.getId(),
+                                step.getName(),
+                                step.getNumber(),
+                                step.getProcess() != null ? step.getProcess().getId() : null
+                        ))
+                        .collect(Collectors.toList());
+            } else {
+                stepResponses = Collections.emptyList();
+            }
+
+            JobResponse jobResponse = new JobResponse(
+                    job.getId(),
+                    job.getCreated(),
+                    job.getUpdated(),
+                    job.getToDate(),
+                    job.getName(),
+                    job.getDescription(),
+                    job.getExperience(),
+                    job.getFromSalary(),
+                    job.getToSalary(),
+                    job.getLocation(),
+                    job.getStatus(),
+                    job.getCategory().getId(),
+                    job.getCategory().getName(),
+                    job.getHumanResource().getId(),
+                    job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
+                    job.getHumanResource().getEmployer().getName(),
+                    job.getHumanResource().getEmployer().getId(),
+                    job.getHumanResource().getEmployer().getUser().getEmail(),
+                    job.getProcess() != null ? job.getProcess().getId() : null,
+                    job.getProcess() != null ? job.getProcess().getName() : null,
+                    stepResponses,
+                    job.getTags().stream().toList()
+            );
 
             return ResponseEntity.ok(
-                    new BaseResponse("Cập nhật công việc thành công", HttpStatus.OK.value(), job)
+                    new BaseResponse("Cập nhật công việc thành công", HttpStatus.OK.value(), jobResponse)
             );
 
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         }catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
@@ -748,6 +873,7 @@ public class JobController {
         } catch (EmptyResultDataAccessException e) {
             return ResponseEntity.ok(new BaseResponse("Không tìm thấy công việc cần duyệt!", HttpStatus.NOT_FOUND.value(), null));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }

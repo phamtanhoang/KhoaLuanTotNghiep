@@ -19,10 +19,8 @@ import java.time.LocalDateTime;
 @Data
 public class Education  extends BaseEntity  {
 
-
-
-//    @Column(nullable = false)
-//    private int index;
+    @Column(nullable = false)
+    private int sequence;
     @Column(nullable = false)
     private String education;
 

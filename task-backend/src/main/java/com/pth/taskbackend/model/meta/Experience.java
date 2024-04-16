@@ -21,8 +21,8 @@ public class Experience extends BaseEntity  {
     private String experience;
 
 
-//    @Column(nullable = false)
-//    private int index;
+    @Column(nullable = false)
+    private int sequence;
 
     @Column(nullable = false)
     private LocalDateTime fromDate;

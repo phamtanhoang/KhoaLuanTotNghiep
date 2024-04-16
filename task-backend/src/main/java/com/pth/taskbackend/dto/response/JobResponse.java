@@ -1,6 +1,7 @@
 package com.pth.taskbackend.dto.response;
 
 import com.pth.taskbackend.enums.EStatus;
+import com.pth.taskbackend.model.meta.Tag;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,5 +26,7 @@ public record JobResponse (
         String employerId,
         String employerEmail,
         String processId,
-        List<StepResponse>steps){
+        String processName,
+        List<StepResponse>steps,
+        List<Tag>tags){
 }

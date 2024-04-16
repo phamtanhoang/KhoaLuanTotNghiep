@@ -33,4 +33,11 @@ public interface EmployerRepository extends JpaRepository<Employer, String> {
             "HAVING COUNT(j.id) > 0 " +
             "ORDER BY count DESC")
     Page<Object[]> findEmployerByJobCount(Pageable pageable);
+
+    @Query("SELECT distinct e FROM Employer e " +
+            "JOIN  User a on e.user.id=a.id "+
+            "JOIN VipEmployer v ON e.id = v.employer.id " +
+            "WHERE DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE()" +
+            "And a.status='ACTIVE'")
+    Page<Employer> findVipEmployers(Pageable pageable);
 }

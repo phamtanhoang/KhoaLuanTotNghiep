@@ -3,6 +3,7 @@ import com.pth.taskbackend.dto.request.ProcessRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.dto.response.HumanResourceResponse;
 import com.pth.taskbackend.dto.response.ProcessResponse;
+import com.pth.taskbackend.dto.response.StepResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.*;
@@ -26,7 +27,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
@@ -35,7 +40,7 @@ import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 @SecurityRequirement(name = "javainuseapi")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = {BASE_URL + "/procedures"})
+@RequestMapping(value = {BASE_URL + "/processes"})
 public class ProcessController {
 
     @Autowired
@@ -71,19 +76,23 @@ public class ProcessController {
                 return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
             }
 
-            Optional<Process> optionalProcedure = processService.findByName(processRequest.name());
+            Optional<Process> optionalProcedure = processService.findByNameAndEmployerId(processRequest.name(),optionalEmployer.get().getId());
             if (optionalProcedure.isPresent()) {
                 return ResponseEntity.ok(new BaseResponse("Tên quy trình đã tồn tại", HttpStatus.BAD_REQUEST.value(), null));
             }
-
             Employer employer = optionalEmployer.get();
             Process process = new Process();
+            System.out.println(process.getId());
             process.setEmployer(employer);
             process.setName(processRequest.name());
             process.setDescription(processRequest.description());
-            process.setSteps(processRequest.steps());
             Process createdProcess = processService.create(process);
-
+            for(Step step : processRequest.steps())
+            {
+                step.setProcess(createdProcess);
+                stepService.create(step);
+                System.out.println(step);
+            }
 
             return ResponseEntity.ok(new BaseResponse("Tạo quy trình thành công", HttpStatus.OK.value(), createdProcess));
         } catch (ExpiredJwtException e) {
@@ -92,6 +101,7 @@ public class ProcessController {
         }catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(new BaseResponse("Tên quy trình đã tồn tại", HttpStatus.BAD_REQUEST.value(), null));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
@@ -120,8 +130,12 @@ public class ProcessController {
                     Process process = optionalProcess.get();
                     process.setName(processRequest.name());
                     process.setDescription(processRequest.description());
-                    process.getSteps().clear();
-                    process.getSteps().addAll(processRequest.steps());
+                    stepService.deleteAllByProcessId(process.getId());
+                    for(Step step : processRequest.steps())
+                    {
+                        step.setProcess(process);
+                        stepService.create(step);
+                    }
                     processService.update(process);
                     return ResponseEntity.ok(new BaseResponse("Cập nhật quy trình thành công", HttpStatus.OK.value(), process));
 
@@ -146,7 +160,7 @@ public class ProcessController {
 
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("")
-    public ResponseEntity<BaseResponse> getProcess(@RequestHeader("Authorization") String token,@RequestParam(required = false) String name, Pageable pageable) {
+    public ResponseEntity<BaseResponse> getProcesses(@RequestHeader("Authorization") String token,@RequestParam(required = false) String name, Pageable pageable) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER)||checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
@@ -162,15 +176,29 @@ public class ProcessController {
                 );
 
 
-            Page<Process> processes = processService.findByNameContaining(name,pageable);
-            Page<ProcessResponse> responseList = processes.map(process -> new ProcessResponse(
-                    process.getId(),
-                    process.getCreated(),
-                    process.getUpdated(),
-                    process.getName(),
-                    process.getDescription(),
-                    process.getSteps().stream().toList()
-            ));
+            Page<Process> processes = processService.findByNameContaining(name, pageable);
+            Page<ProcessResponse> responseList = processes.map(process -> {
+                Page<Step> steps = stepService.findByProcessId(process.getId(), pageable);
+
+                List<StepResponse> stepList = steps.getContent().stream()
+                        .map(step -> new StepResponse(
+                                step.getId(),
+                                step.getName(),
+                                step.getNumber(),
+                                step.getProcess().getId() // Đây là giả sử rằng bạn muốn lấy ID của quy trình từ mỗi bước
+                        ))
+                        .collect(Collectors.toList());
+
+
+                return new ProcessResponse(
+                        process.getId(),
+                        process.getCreated(),
+                        process.getUpdated(),
+                        process.getName(),
+                        process.getDescription(),
+                        stepList
+                );
+            });
 
             if (responseList.isEmpty()) {
                 return ResponseEntity.ok(
@@ -181,6 +209,59 @@ public class ProcessController {
                         new BaseResponse("Danh sách quy trình", HttpStatus.OK.value(), responseList)
                 );
             }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "Get list", description = "", tags = {})
+    @GetMapping("{id}")
+    public ResponseEntity<BaseResponse> getProcess(@RequestHeader("Authorization") String token,@PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+
+            Optional<Process> optionalProcess = processService.findById(id);
+            if (optionalProcess.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy quy trình", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Process process = optionalProcess.get();
+            Page<Step> steps = stepService.findByProcessId(process.getId(), Pageable.unpaged());
+
+            List<StepResponse> stepList = steps.getContent().stream()
+                    .map(step -> new StepResponse(
+                            step.getId(),
+                            step.getName(),
+                            step.getNumber(),
+                            step.getProcess().getId() // Đây là giả sử rằng bạn muốn lấy ID của quy trình từ mỗi bước
+                    ))
+                    .collect(Collectors.toList());
+
+
+            ProcessResponse response = new ProcessResponse(
+                    process.getId(),
+                    process.getCreated(),
+                    process.getUpdated(),
+                    process.getName(),
+                    process.getDescription(),
+                    stepList
+            );
+
+
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách quy trình", HttpStatus.OK.value(), response));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
