@@ -24,7 +24,7 @@ public class FileUploadFunc {
 
     public String uploadCV(MultipartFile multipartFile) {
         try {
-            String fileName = UUID.randomUUID().toString()+ LocalDateTime.now();
+            String fileName = UUID.randomUUID().toString();
 
             File file = convertToFile(multipartFile, fileName);
             String uploadedFileName = uploadFile(file, fileName);

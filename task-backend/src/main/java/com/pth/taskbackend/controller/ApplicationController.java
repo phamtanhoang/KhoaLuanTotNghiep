@@ -81,8 +81,8 @@ public class ApplicationController {
             @RequestParam String fullName,
             @RequestParam String email,
             @RequestParam String phoneNumber,
-            @RequestParam String letter,
-            @RequestParam String collectionId,
+            @RequestParam(required = false) String letter,
+            @RequestParam(required = false) String collectionId,
             @PathVariable("id")String id
 
     ) {
@@ -102,7 +102,7 @@ public class ApplicationController {
 
             Job job = jobService.findById(id).orElse(null);
 
-            if (cVFile.isEmpty() || Objects.equals(cVFile.getContentType(), "application/pdf"))
+            if (cVFile.isEmpty() || !Objects.equals(cVFile.getContentType(), "application/pdf"))
                 return ResponseEntity.ok(
                         new BaseResponse("Chưa có nhập file hoặc định dạng file sai!!!", HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), null)
                 );
