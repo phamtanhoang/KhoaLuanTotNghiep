@@ -19,12 +19,10 @@ import java.time.LocalDateTime;
 @Data
 public class Education  extends BaseEntity  {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
 
-    @Column(nullable = false)
-    private int index;
+
+//    @Column(nullable = false)
+//    private int index;
     @Column(nullable = false)
     private String education;
 

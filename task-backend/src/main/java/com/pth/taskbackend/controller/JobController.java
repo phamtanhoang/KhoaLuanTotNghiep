@@ -70,8 +70,9 @@ public class JobController {
                                                 @RequestParam(required = false) String categoryId,
                                                 Pageable pageable) {
         try {
-            Page<Job> jobs = jobService.searchJobs(keyword, location, fromSalary, toSalary, categoryId, pageable);
-
+//            Page<Job> jobs = jobService.searchJobs(keyword, location, fromSalary, toSalary, categoryId, pageable);
+            Page<Job> jobs = jobService.findNear(keyword,pageable);
+            System.out.println("da vao day");
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách công việc rỗng", HttpStatus.NOT_FOUND.value(), null)
