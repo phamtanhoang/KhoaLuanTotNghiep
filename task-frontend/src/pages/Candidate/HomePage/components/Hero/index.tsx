@@ -14,7 +14,7 @@ const Hero = () => {
             className="leading-tight text-3xl sm:text-4xl md:text-5xl
         font-bold text-gray-900"
           >
-            Tìm kiếm những công việc{" "}
+            Tìm kiếm công việc{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-br from-orange-600 from-20% via-orange-500 via-30% to-orange-400">
               trong mơ
             </span>{" "}

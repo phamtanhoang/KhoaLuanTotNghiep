@@ -46,14 +46,17 @@ const SigninEmployerPage = () => {
 
   const _onClickSubmit = () => {
     if (!email) {
+      reloadCaptcha();
       SwalHelper.MiniAlert("Vui lòng nhập email!", "error");
       return;
     }
     if (!password) {
+      reloadCaptcha();
       SwalHelper.MiniAlert("Vui lòng nhập mật khẩu!", "error");
       return;
     }
     if (captcha !== captchaText) {
+      reloadCaptcha();
       SwalHelper.MiniAlert("Captcha không trùng khớp!", "error");
       return;
     }
@@ -68,6 +71,7 @@ const SigninEmployerPage = () => {
           navigate(EMPLOYER_PATHS.dashboard);
           SwalHelper.MiniAlert(res.data.Message, "success");
         } else {
+          reloadCaptcha();
           SwalHelper.MiniAlert(
             res.data.Message || "Đăng nhập không thành công!",
             "error"
@@ -75,6 +79,7 @@ const SigninEmployerPage = () => {
         }
       })
       .catch(() => {
+        reloadCaptcha();
         SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {

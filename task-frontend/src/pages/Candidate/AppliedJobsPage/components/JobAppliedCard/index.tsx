@@ -37,7 +37,7 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
 }) => {
   const urlLink = window.location.pathname;
   return (
-    <div className="w-full cursor-pointer bg-white transition-all duration-300 rounded-l-md p-5 border-2 hover:shadow-md hover:border-orangetext border-[#D9D9D9]">
+    <div className="w-full cursor-pointer bg-white transition-all duration-300 rounded-l-md p-5 border-2 hover:shadow-md hover:border-orangetext border-borderColor">
       <div className=" flex w-full gap-3">
         <img
           className="w-20 h-20 border-2  border-gray-200 p-2 shadow-sm rounded"
@@ -56,7 +56,7 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
           >
             {name}
           </h1>
-          
+
           <div className="mt-1 relative">
             <FaBuilding className="text-gray-600 absolute top-0 left-0 text-lg " />
             <a className="text-gray-600 text-base font-medium hover:text-gray-800  line-clamp-1">
@@ -88,7 +88,6 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
               data-tooltip-content="Tin tuyển dụng VIP"
             >
               <RiVipCrown2Line />
-              
             </p>
           )}
           <button

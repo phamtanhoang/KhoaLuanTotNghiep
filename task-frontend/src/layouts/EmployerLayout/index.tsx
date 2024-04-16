@@ -4,6 +4,7 @@ import { Outlet } from "react-router-dom";
 import { Breadcumbs } from "@/components/ui";
 
 const EmployerLayout = () => {
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (

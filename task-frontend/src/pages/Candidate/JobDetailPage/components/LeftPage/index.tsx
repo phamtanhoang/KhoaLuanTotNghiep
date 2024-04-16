@@ -43,7 +43,7 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
   return (
     <>
       <div className="bg-white rounded-sm">
-        <div className="w-full border-b-2 border-[#D9D9D9] px-5 lg:px-8 py-5 ">
+        <div className="w-full border-b-2 border-borderColor px-5 lg:px-8 py-5 ">
           <div className="w-full flex gap-3 lg:gap-5 justify-between">
             <div className="flex gap-3 lg:gap-5">
               <img
@@ -126,7 +126,6 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
               <RiVipCrown2Line />
             </div>
           </div>
-          
         </div>
         <div className="w-full">
           <div className="border-2 border-dotted border-orangetext bg-orange-50 rounded-md m-2 lg:m-5 p-4 lg:p-3 flex flex-col gap-3">

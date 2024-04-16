@@ -1,13 +1,16 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { LoadingSpiner } from "./components/ui";
 import Routers from "./routers";
 import { Tooltip } from "react-tooltip";
+import { useLocation } from "react-router-dom";
 
 export const LoadingContext = createContext<any>(null);
+
 const App = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const handleOpenLoading = () => setIsLoading(true);
   const handleCloseLoading = () => setIsLoading(false);
+
   return (
     <LoadingContext.Provider value={{ handleOpenLoading, handleCloseLoading }}>
       {isLoading && <LoadingSpiner />}

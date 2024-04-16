@@ -37,7 +37,7 @@ const JobsPage: React.FC = () => {
       <SearchJob />
       <section className="pb-10 pt-8 ">
         <div className="w-full lg:w-[85%] px-5 lg:px-0 mx-auto">
-          <div className="hidden lg:w-[55%] lg:inline-block sticky top-[74px] mr-[12px]">
+          <div className="hidden lg:w-[55%] lg:inline-block sticky top-[77px] mr-[12px]">
             <JobDetailCard
               name="[HCM] WEB DESIGNER[HCM]"
               employer="Công ty dược phẩm Phúc Long"
@@ -108,7 +108,8 @@ const JobsPage: React.FC = () => {
                 isVip
                 isHighlighted
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -120,7 +121,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -132,7 +134,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -144,7 +147,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -156,7 +160,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -168,7 +173,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -180,7 +186,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -192,7 +199,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -204,7 +212,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -216,7 +225,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -228,7 +238,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -240,7 +251,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -252,7 +264,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -264,7 +277,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -276,7 +290,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -288,7 +303,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -300,7 +316,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -312,7 +329,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -324,7 +342,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -336,7 +355,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -348,7 +368,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -360,7 +381,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="mb-[12px]">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
@@ -372,67 +394,8 @@ const JobsPage: React.FC = () => {
                 salary="Từ 30 - 50 triệu"
                 isVip
               />
-            </div><div className="mb-[12px]">
-              <JobCard
-                image="https://source.unsplash.com/random/400x400"
-                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
-                    Web Designer[HCM] Web Designer."
-                dateline="Còn 30 ngày"
-                employer="Công ty dược phẩm Phúc
-                    Long Công ty dược phẩm Phúc Long"
-                location="Thành phố Hồ Chí Minh"
-                salary="Từ 30 - 50 triệu"
-                isVip
-              />
-            </div><div className="mb-[12px]">
-              <JobCard
-                image="https://source.unsplash.com/random/400x400"
-                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
-                    Web Designer[HCM] Web Designer."
-                dateline="Còn 30 ngày"
-                employer="Công ty dược phẩm Phúc
-                    Long Công ty dược phẩm Phúc Long"
-                location="Thành phố Hồ Chí Minh"
-                salary="Từ 30 - 50 triệu"
-                isVip
-              />
-            </div><div className="mb-[12px]">
-              <JobCard
-                image="https://source.unsplash.com/random/400x400"
-                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
-                    Web Designer[HCM] Web Designer."
-                dateline="Còn 30 ngày"
-                employer="Công ty dược phẩm Phúc
-                    Long Công ty dược phẩm Phúc Long"
-                location="Thành phố Hồ Chí Minh"
-                salary="Từ 30 - 50 triệu"
-                isVip
-              />
-            </div><div className="mb-[12px]">
-              <JobCard
-                image="https://source.unsplash.com/random/400x400"
-                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
-                    Web Designer[HCM] Web Designer."
-                dateline="Còn 30 ngày"
-                employer="Công ty dược phẩm Phúc
-                    Long Công ty dược phẩm Phúc Long"
-                location="Thành phố Hồ Chí Minh"
-                salary="Từ 30 - 50 triệu"
-                isVip
-              />
-            </div><div className="mb-[12px]">
-              <JobCard
-                image="https://source.unsplash.com/random/400x400"
-                name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
-                    Web Designer[HCM] Web Designer."
-                dateline="Còn 30 ngày"
-                employer="Công ty dược phẩm Phúc
-                    Long Công ty dược phẩm Phúc Long"
-                location="Thành phố Hồ Chí Minh"
-                salary="Từ 30 - 50 triệu"
-                isVip
-              />
-            </div><div className="mb-[12px]">
+            </div>
+            <div className="">
               <JobCard
                 image="https://source.unsplash.com/random/400x400"
                 name="[HCM] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]

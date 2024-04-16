@@ -40,14 +40,17 @@ const Signin = (props: any) => {
   };
   const _onClickSubmit = () => {
     if (!email) {
+      reloadCaptcha();
       SwalHelper.MiniAlert("Vui lòng nhập email!", "error");
       return;
     }
     if (!password) {
+      reloadCaptcha();
       SwalHelper.MiniAlert("Vui lòng nhập mật khẩu!", "error");
       return;
     }
     if (captcha !== captchaText) {
+      reloadCaptcha();
       SwalHelper.MiniAlert("Captcha không trùng khớp!", "error");
       return;
     }
@@ -64,6 +67,7 @@ const Signin = (props: any) => {
             window.location.reload();
           }, 1500);
         } else {
+          reloadCaptcha();
           SwalHelper.MiniAlert(
             res.data.Message || "Đăng nhập không thành công!",
             "error"
@@ -71,6 +75,7 @@ const Signin = (props: any) => {
         }
       })
       .catch(() => {
+        reloadCaptcha();
         SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {

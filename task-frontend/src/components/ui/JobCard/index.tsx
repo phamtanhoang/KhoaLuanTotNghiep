@@ -35,7 +35,7 @@ const JobCard: React.FC<JobCardProps> = ({
       className={`w-full cursor-pointer bg-white transition-all duration-300 rounded-l-md p-5 border-2 hover:shadow-md hover:border-orangetext ${
         isHighlighted
           ? "border-orange-500 border-[3px]  border-r-[10px]"
-          : "border-[#D9D9D9]"
+          : "border-borderColor"
       } `}
     >
       <div className=" flex w-full gap-3">
@@ -52,7 +52,7 @@ const JobCard: React.FC<JobCardProps> = ({
           >
             {name}
           </h1>
-          
+
           <div className="mt-1 relative">
             <FaBuilding className="text-gray-600 absolute top-0 left-0 text-lg " />
             <a className="text-gray-600 text-base font-medium hover:text-gray-800  line-clamp-2">
@@ -83,7 +83,6 @@ const JobCard: React.FC<JobCardProps> = ({
               data-tooltip-content="Tin tuyển dụng VIP"
             >
               <RiVipCrown2Line />
-              
             </p>
           )}
 
