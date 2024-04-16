@@ -464,13 +464,16 @@ public class HumanResourceController {
     @Operation(summary = "update ", description = "", tags = {})
     @PatchMapping("/{id}")
     public ResponseEntity<BaseResponse> updateHumanResource(@PathVariable("id")String id,@RequestHeader("Authorization")String token,
-                                                            @RequestParam(required = false) String password,
+                                                            @RequestParam String username,
                                                             @RequestParam String firstName,
                                                             @RequestParam String lastName,
                                                             @RequestParam ESex sex,
                                                             @RequestParam String phoneNumber,
                                                             @RequestParam LocalDateTime dateOfBirth,
-                                                            @RequestParam(required = false) MultipartFile avatar) {
+                                                            @RequestParam(required = false) MultipartFile avatar,
+                                                            @RequestParam(required = false) String password,
+
+                                                            @RequestParam EStatus status) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
@@ -491,13 +494,22 @@ public class HumanResourceController {
                         new BaseResponse("Không tìm thấy nhà tuyển dụng ", HttpStatus.NOT_FOUND.value(), null)
                 );
 
+             optionalHumanResource = humanResourceService.findByEmail(username);
+            if (optionalHumanResource.isPresent())
+                return ResponseEntity.ok(
+                        new BaseResponse("Email đã tồn tại ", HttpStatus.BAD_REQUEST.value(), null)
+                );
+            if(status==EStatus.DELETED)
+                return ResponseEntity.ok(
+                        new BaseResponse("Không được dùng trạng thái này ", HttpStatus.BAD_REQUEST.value(), null)
+                );
 
             HumanResource hr = optionalHumanResource.get();
             if(!passwordEncoder.matches(password,optionalHumanResource.get().getUser().getPassword())&&!password.isEmpty())
                 hr.getUser().setPassword(passwordEncoder.encode(password));
             hr.setFirstName(firstName);
             hr.setLastName(lastName);
-
+            hr.getUser().setEmail(username);
             if(sex!=null)
                hr.setSex(sex);
             if(dateOfBirth!=null)
@@ -521,7 +533,8 @@ public class HumanResourceController {
 
     @Operation(summary = "update by token", description = "", tags = {})
     @PatchMapping("/updateProfile")
-    public ResponseEntity<BaseResponse> updateHumanResourceProfile(@RequestHeader("Authorization")String token, @RequestParam(required = false) String password,
+    public ResponseEntity<BaseResponse> updateHumanResourceProfile(@RequestHeader("Authorization")String token,
+                                                                   @RequestParam(required = false) String password,
                                                                    @RequestParam String firstName,
                                                                    @RequestParam String lastName,
                                                                    @RequestParam ESex sex,

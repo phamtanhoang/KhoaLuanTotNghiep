@@ -10,6 +10,7 @@ import com.pth.taskbackend.dto.response.CandidateResponse;
 import com.pth.taskbackend.dto.response.EmployerResponse;
 import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
 import com.pth.taskbackend.enums.ERole;
+import com.pth.taskbackend.enums.ESex;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.*;
 import com.pth.taskbackend.repository.UserRepository;
@@ -30,10 +31,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
@@ -61,6 +64,9 @@ public class CandidateController {
     ObjectMapper objectMapper;
     @Autowired
     VipCandidateService vipCandidateService;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("getCandidates-admin")
     public ResponseEntity<BaseResponse> getCandidatesByAdmin(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword,@RequestParam(required = false)EStatus status, Pageable pageable) {
@@ -371,8 +377,18 @@ public class CandidateController {
 
 
     @Operation(summary = "update by token", description = "", tags = {})
-    @PatchMapping("/updateProfile")
-    public ResponseEntity<BaseResponse> updateCandidateProfile(@RequestHeader("Authorization")String token,@RequestBody UpdateCandidateRequest request) {
+    @PatchMapping("/updateProfile/")
+    public ResponseEntity<BaseResponse> updateCandidateProfile(@RequestHeader("Authorization")String token, @RequestParam String firstName,
+                                                               @RequestParam String lastName,
+                                                               @RequestParam String address,
+                                                               @RequestParam String phoneNumber,
+                                                               @RequestParam LocalDateTime dateOfBirth,
+                                                               @RequestParam String link,
+                                                               @RequestParam String job,
+                                                               @RequestParam String introduction,
+                                                               @RequestParam ESex sex,
+                                                               @RequestParam(required = false) String password,
+                                                               @RequestParam(value = "avatar",required = false) MultipartFile avatar) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
@@ -388,16 +404,18 @@ public class CandidateController {
                 );
 
             Candidate update = optionalCandidate.get();
-            update.setFirstName(request.firstName());
-            update.setLastName(request.lastName());
-            update.setAddress(request.address());
-            update.setPhoneNumber(request.phoneNumber());
-            update.setDateOfBirth(request.dateOfBirth());
-            update.setLink(request.link());
-            update.setJob(request.job());
-            update.setIntroduction(request.introduction());
-            update.setSex(request.sex());
-            candidateService.update(update);
+            update.setFirstName(firstName);
+            update.setLastName(lastName);
+            update.setAddress(address);
+            update.setPhoneNumber(phoneNumber);
+            update.setDateOfBirth(dateOfBirth);
+            update.setLink(link);
+            update.setJob(job);
+            update.setIntroduction(introduction);
+            update.setSex(sex);
+            if(!passwordEncoder.matches(password,optionalCandidate.get().getUser().getPassword())&&!password.isEmpty())
+                optionalCandidate.get().getUser().setPassword(passwordEncoder.encode(password));
+            candidateService.create(update,avatar);
             return ResponseEntity.ok(
                     new BaseResponse( "Cập nhật thông tin ứng viên thành công", HttpStatus.OK.value(), update)
             );
