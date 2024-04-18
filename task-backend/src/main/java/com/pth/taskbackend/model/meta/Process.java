@@ -26,4 +26,7 @@
         @JoinColumn(name = "employer_id")
         private Employer employer;
 
+        @OneToMany(mappedBy = "process")
+        private Set<Step> steps;
+
     }

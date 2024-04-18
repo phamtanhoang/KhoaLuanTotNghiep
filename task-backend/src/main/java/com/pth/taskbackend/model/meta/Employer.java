@@ -46,5 +46,6 @@ public class Employer extends BaseEntity {
     @OneToMany(mappedBy = "employer", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<VipEmployer> vipEmployers = new HashSet<>();
 
+
 }
 

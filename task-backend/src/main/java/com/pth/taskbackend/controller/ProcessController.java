@@ -1,5 +1,6 @@
 package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.request.ProcessRequest;
+import com.pth.taskbackend.dto.request.StepRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.dto.response.HumanResourceResponse;
 import com.pth.taskbackend.dto.response.ProcessResponse;
@@ -76,29 +77,33 @@ public class ProcessController {
                 return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
             }
 
-            Optional<Process> optionalProcedure = processService.findByNameAndEmployerId(processRequest.name(),optionalEmployer.get().getId());
-            if (optionalProcedure.isPresent()) {
+            Optional<Process> optionalProcess = processService.findByNameAndEmployerId(processRequest.name(), optionalEmployer.get().getId());
+            if (optionalProcess.isPresent()) {
                 return ResponseEntity.ok(new BaseResponse("Tên quy trình đã tồn tại", HttpStatus.BAD_REQUEST.value(), null));
             }
+
             Employer employer = optionalEmployer.get();
             Process process = new Process();
-            System.out.println(process.getId());
             process.setEmployer(employer);
             process.setName(processRequest.name());
             process.setDescription(processRequest.description());
             Process createdProcess = processService.create(process);
-            for(Step step : processRequest.steps())
-            {
+
+            for (StepRequest stepRequest : processRequest.steps()) {
+                Step step = new Step();
+                step.setName(stepRequest.name());
+                step.setNumber(stepRequest.number());
                 step.setProcess(createdProcess);
-                stepService.create(step);
-                System.out.println(step);
+                 stepService.create(step);
             }
 
-            return ResponseEntity.ok(new BaseResponse("Tạo quy trình thành công", HttpStatus.OK.value(), createdProcess));
+            Process finalProcess = processService.findById(process.getId()).get();
+
+            return ResponseEntity.ok(new BaseResponse("Tạo quy trình thành công", HttpStatus.OK.value(), finalProcess));
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        }catch (DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(new BaseResponse("Tên quy trình đã tồn tại", HttpStatus.BAD_REQUEST.value(), null));
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,11 +112,13 @@ public class ProcessController {
         }
     }
 
+
+
     @Operation(summary = "Update", description = "", tags = {})
     @PatchMapping("/{id}")
     public ResponseEntity<BaseResponse> updateProcess(@PathVariable("id") String id, @RequestBody ProcessRequest processRequest, @RequestHeader("Authorization") String token) throws IOException {
         try {
-            String email = jwtService.extractUsername(token.substring(7));
+                    String email = jwtService.extractUsername(token.substring(7));
             boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
             if (!hasPermission) {
                 return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
@@ -122,36 +129,36 @@ public class ProcessController {
                 return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
             }
 
-            Optional<Process> optionalProcess = processService.findById(id);
-            if (optionalProcess.isPresent()) {
-                if (!jobService.findByProcessId(optionalEmployer.get().getId(), Pageable.unpaged()).isEmpty())
-                    return ResponseEntity.ok(new BaseResponse("Đang có công việc sử dụng quy trình này", HttpStatus.BAD_REQUEST.value(), null));
-                else {
-                    Process process = optionalProcess.get();
-                    process.setName(processRequest.name());
-                    process.setDescription(processRequest.description());
-                    stepService.deleteAllByProcessId(process.getId());
-                    for(Step step : processRequest.steps())
-                    {
-                        step.setProcess(process);
-                        stepService.create(step);
-                    }
-                    processService.update(process);
-                    return ResponseEntity.ok(new BaseResponse("Cập nhật quy trình thành công", HttpStatus.OK.value(), process));
-
-                }
+            Optional<Process> optionalProcess = processService.findByIdAndEmployerId(id,optionalEmployer.get().getId());
+            if (optionalProcess.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy quy trình", HttpStatus.BAD_REQUEST.value(), null));
             }
-            return ResponseEntity.ok(new BaseResponse("Không tìm thấy quy trình này", HttpStatus.NOT_FOUND.value(), null));
 
+            Process process = optionalProcess.get();
+            process.setName(processRequest.name());
+            process.setDescription(processRequest.description());
+            Process createdProcess = processService.create(process);
+            List<Step>steps = stepService.findByProcessId(id);
+            for(Step step:steps)
+                stepService.delete(step);
+            for (StepRequest stepRequest : processRequest.steps()) {
+                Step step = new Step();
+                step.setName(stepRequest.name());
+                step.setNumber(stepRequest.number());
+                step.setProcess(createdProcess);
+                 stepService.create(step);
+            }
 
-        }catch (ExpiredJwtException e) {
+            processService.update(createdProcess);
+
+            return ResponseEntity.ok(new BaseResponse("Cập nhật quy trình thành công", HttpStatus.OK.value(), createdProcess));
+        } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(new BaseResponse("Tên quy trình đã tồn tại", HttpStatus.BAD_REQUEST.value(), null));
         } catch (Exception e) {
             e.printStackTrace();
-
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
@@ -214,7 +221,7 @@ public class ProcessController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-    @Operation(summary = "Get list", description = "", tags = {})
+    @Operation(summary = "Get process ", description = "", tags = {})
     @GetMapping("{id}")
     public ResponseEntity<BaseResponse> getProcess(@RequestHeader("Authorization") String token,@PathVariable("id") String id) {
         try {
@@ -262,6 +269,51 @@ public class ProcessController {
 
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách quy trình", HttpStatus.OK.value(), response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "delete process", description = "", tags = {})
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BaseResponse> deleterocess(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+            if (optionalEmployer.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Employer employer = optionalEmployer.get();
+
+            Optional<Process> optionalProcess = processService.findByIdAndEmployerId(id,employer.getId());
+            if (optionalProcess.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy quy trình", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            List<Process> process = processService.findProcessesWithIdInJob(id);
+            if (!process.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Quy trình đang được sử dụng", HttpStatus.OK.value(), null)
+                );
+
+            processService.delete(optionalProcess.get());
+            return ResponseEntity.ok(
+                    new BaseResponse("Xóa quy trình thành công", HttpStatus.OK.value(), null)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,12 +34,12 @@ public class StepServiceImpl implements StepService {
 
     @Override
     public void delete(Step step) {
-
+        stepRepository.delete(step);
     }
 
     @Override
     public void deleteAllByProcessId(String processId) {
-        stepRepository.deleteAllByProcessId(processId);
+        ;
     }
 
     @Override
@@ -54,6 +55,11 @@ public class StepServiceImpl implements StepService {
     @Override
     public Long countAllByProcessId(String processId) {
         return stepRepository.countAllByProcessId(processId);
+    }
+
+    @Override
+    public List<Step> findByProcessId(String processId) {
+        return stepRepository.findByProcessId(processId);
     }
 
     @Override

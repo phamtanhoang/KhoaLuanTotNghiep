@@ -17,14 +17,12 @@ import lombok.NoArgsConstructor;
         @UniqueConstraint(columnNames = {"number", "process_id"})
 })
 public class Step extends BaseEntity {
-    @Column(nullable = false)
+
     private String name;
-
-    @Column(nullable = false)
     private int number;
-
     @ManyToOne
     @JoinColumn(name = "process_id")
     private Process process;
+
 }
 

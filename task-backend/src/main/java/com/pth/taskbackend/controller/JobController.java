@@ -647,16 +647,13 @@ public class JobController {
             job.setToDate(request.toDate());
             job.setLocation(request.location());
             job.setHumanResource(optionalHumanResource.get());
-
-            if(request.tags()!=null) {
-                tagService.deleteTagByJobId(job.getId());
-                Set< com.pth.taskbackend.model.meta.Tag>tags =new HashSet<>();
-                for (com.pth.taskbackend.model.meta.Tag tag : request.tags()) {
-                    tags.add(tagService.findById(tag.getId()).get());
-                    tagService.saveTag(job.getId(),tag.getId());
-                }
-                job.setTags(tags);
+            Set<com.pth.taskbackend.model.meta.Tag>tags= new HashSet<>();
+            for (com.pth.taskbackend.model.meta.Tag tag:request.tags()) {
+                Optional<com.pth.taskbackend.model.meta.Tag> optional = tagService.findById(tag.getId());
+                System.out.println(optional.get());
+                tags.add(optional.get());
             }
+            job.setTags(tags);
             jobService.create(job);
 
             return ResponseEntity.ok(
@@ -665,10 +662,11 @@ public class JobController {
         }catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new BaseResponse("Tên công việc đã tồn tại", HttpStatus.BAD_REQUEST.value(), null));
-        } catch (Exception e) {
+//        } catch (DataIntegrityViolationException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                    .body(new BaseResponse("Tên công việc đã tồn tại", HttpStatus.BAD_REQUEST.value(), null));
+        }
+        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
@@ -716,12 +714,13 @@ public class JobController {
             job.setExperience(request.experience());
             job.setHumanResource(optionalHumanResource.get());
             if(request.tags()!=null) {
-                tagService.deleteTagByJobId(job.getId());
-                Set< com.pth.taskbackend.model.meta.Tag>tags =new HashSet<>();
-                for (com.pth.taskbackend.model.meta.Tag tag : request.tags()) {
-                    tags.add(tagService.findById(tag.getId()).get());
-                    tagService.saveTag(job.getId(),tag.getId());
+                Set<com.pth.taskbackend.model.meta.Tag>tags= new HashSet<>();
+                for (com.pth.taskbackend.model.meta.Tag tag:request.tags()) {
+                    Optional<com.pth.taskbackend.model.meta.Tag> optional = tagService.findById(tag.getId());
+                    System.out.println(optional.get());
+                    tags.add(optional.get());
                 }
+                job.getTags().clear();
                 job.setTags(tags);
             }
             job.setProcess(optionalProcess.get());

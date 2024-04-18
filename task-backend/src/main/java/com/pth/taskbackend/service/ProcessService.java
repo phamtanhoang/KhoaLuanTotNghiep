@@ -5,6 +5,7 @@ import io.jsonwebtoken.io.IOException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProcessService {
@@ -19,4 +20,6 @@ public interface ProcessService {
     Optional<Process>findById(String id)throws IOException;
     Page<Process>findByNameContaining(String name, Pageable pageable);
     Optional<Process>findByNameAndEmployerId(String name, String employerId )throws  IOException;
+     Optional<Process> findByIdAndEmployerId(String id, String employerId ) throws  IOException;
+    List<Process> findProcessesWithIdInJob(String id) throws  IOException;
 }

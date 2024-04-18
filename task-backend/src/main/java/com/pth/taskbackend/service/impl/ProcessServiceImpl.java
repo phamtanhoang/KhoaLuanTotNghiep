@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,7 +35,7 @@ public class ProcessServiceImpl implements ProcessService
 
     @Override
     public void delete(Process process) {
-
+        processRepository.delete(process);
     }
 
     @Override
@@ -65,5 +66,14 @@ public class ProcessServiceImpl implements ProcessService
     @Override
     public Optional<Process> findByNameAndEmployerId(String name, String employerId ) throws IOException {
         return processRepository.findByNameAndEmployerId(name,employerId);
+    }
+    @Override
+    public Optional<Process> findByIdAndEmployerId(String id, String employerId ) throws IOException {
+        return processRepository.findByIdAndEmployerId(id,employerId);
+    }
+
+    @Override
+    public List<Process> findProcessesWithIdInJob(String id ) throws IOException {
+        return processRepository.findProcessesWithIdInJob(id);
     }
 }

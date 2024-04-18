@@ -5,6 +5,7 @@ import io.jsonwebtoken.io.IOException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface StepService {
@@ -18,5 +19,6 @@ public interface StepService {
     Optional<Step>findByProcessIdAndNumber(String processId,int number);
 
     Long countAllByProcessId(String processId);
+    List<Step> findByProcessId(String processId);
 
 }
