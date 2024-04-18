@@ -2,14 +2,13 @@ package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.request.ProcessRequest;
 import com.pth.taskbackend.dto.request.StepRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
-import com.pth.taskbackend.dto.response.HumanResourceResponse;
 import com.pth.taskbackend.dto.response.ProcessResponse;
 import com.pth.taskbackend.dto.response.StepResponse;
+import com.pth.taskbackend.dto.response.TopJobResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.*;
 import com.pth.taskbackend.model.meta.Process;
-import com.pth.taskbackend.repository.JobRepository;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.*;
@@ -22,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +60,7 @@ public class ProcessController {
     @Autowired
     private EmployerService employerService;
     private final CheckPermission checkPermission;
-
+    @Autowired HumanResourceService humanResourceService;
 
     @Operation(summary = "Create", description = "", tags = {})
     @PostMapping("/create")
@@ -164,63 +164,85 @@ public class ProcessController {
         }
     }
 
+        @GetMapping("")
+        public ResponseEntity<BaseResponse> getProcesses(@RequestHeader("Authorization") String token, @RequestParam(required = false) String name, Pageable pageable) {
+            try {
+                String email = jwtService.extractUsername(token.substring(7));
+                boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+                if (!permission)
+                    return ResponseEntity.ok(
+                            new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                    );
 
-    @Operation(summary = "Get list", description = "", tags = {})
-    @GetMapping("")
-    public ResponseEntity<BaseResponse> getProcesses(@RequestHeader("Authorization") String token,@RequestParam(required = false) String name, Pageable pageable) {
-        try {
-            String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER)||checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
-            if (!permission)
-                return ResponseEntity.ok(
-                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-                );
+                Optional<User> optionalUser = userRepository.findByEmail(email);
+                if (optionalUser.isEmpty())
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                    );
 
-            Optional<User> optionalUser = userRepository.findByEmail(email);
-            if (optionalUser.isEmpty())
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
-                );
+                Page<ProcessResponse> responseList;
+                if (optionalUser.get().getRole().equals(ERole.EMPLOYER)) {
+                    Employer employer = employerService.findByUserEmail(email).get();
+                    Page<Object[]> objects = processService.findProcessWithStepCountByNameContainingAndEmployerId(name, employer.getId(), pageable);
+                    List<ProcessResponse> processes = objects.getContent().stream().map(result -> {
+                        Process process = (Process) result[0];
+                        long count = (Long) result[1];
+                        return createProcessResponse(process, count, pageable);
+                    }).collect(Collectors.toList());
+                    responseList = new PageImpl<>(processes, pageable, objects.getTotalElements());
+                } else if (optionalUser.get().getRole().equals(ERole.HR)) {
+                    HumanResource hr = humanResourceService.findByEmail(email).get();
+                    Page<Object[]> objects = processService.findProcessWithStepCountByNameContainingAndEmployerId(name, hr.getEmployer().getId(), pageable);
+                    List<ProcessResponse> processes = objects.getContent().stream().map(result -> {
+                        Process process = (Process) result[0];
+                        Long count = (Long) result[1];
+                        return createProcessResponse(process, count, pageable);
+                    }).collect(Collectors.toList());
+                    responseList = new PageImpl<>(processes, pageable, objects.getTotalElements());
+                } else {
+                    return ResponseEntity.ok(
+                            new BaseResponse("Vai trò người dùng không hợp lệ", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+                }
 
-
-            Page<Process> processes = processService.findByNameContaining(name, pageable);
-            Page<ProcessResponse> responseList = processes.map(process -> {
-                Page<Step> steps = stepService.findByProcessId(process.getId(), pageable);
-
-                List<StepResponse> stepList = steps.getContent().stream()
-                        .map(step -> new StepResponse(
-                                step.getId(),
-                                step.getName(),
-                                step.getNumber(),
-                                step.getProcess().getId() // Đây là giả sử rằng bạn muốn lấy ID của quy trình từ mỗi bước
-                        ))
-                        .collect(Collectors.toList());
-
-
-                return new ProcessResponse(
-                        process.getId(),
-                        process.getCreated(),
-                        process.getUpdated(),
-                        process.getName(),
-                        process.getDescription(),
-                        stepList
-                );
-            });
-
-            if (responseList.isEmpty()) {
-                return ResponseEntity.ok(
-                        new BaseResponse("Danh sách quy trình rỗng", HttpStatus.NO_CONTENT.value(), null)
-                );
-            } else {
-                return ResponseEntity.ok(
-                        new BaseResponse("Danh sách quy trình", HttpStatus.OK.value(), responseList)
-                );
+                if (responseList.isEmpty()) {
+                    return ResponseEntity.ok(
+                            new BaseResponse("Danh sách quy trình rỗng", HttpStatus.NO_CONTENT.value(), null)
+                    );
+                } else {
+                    return ResponseEntity.ok(
+                            new BaseResponse("Danh sách quy trình", HttpStatus.OK.value(), responseList)
+                    );
+                }
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
             }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
-    }
+
+        private ProcessResponse createProcessResponse(Process process, Long stepCount, Pageable pageable) {
+            Page<Step> steps = stepService.findByProcessId(process.getId(), pageable);
+
+            List<StepResponse> stepList = steps.getContent().stream()
+                    .map(step -> new StepResponse(
+                            step.getId(),
+                            step.getName(),
+                            step.getNumber(),
+                            step.getProcess().getId()
+                    ))
+                    .collect(Collectors.toList());
+
+            return new ProcessResponse(
+                    process.getId(),
+                    process.getCreated(),
+                    process.getUpdated(),
+                    process.getName(),
+                    process.getDescription(),
+                    stepCount,
+                    stepList
+            );
+        }
+
     @Operation(summary = "Get process ", description = "", tags = {})
     @GetMapping("{id}")
     public ResponseEntity<BaseResponse> getProcess(@RequestHeader("Authorization") String token,@PathVariable("id") String id) {
@@ -263,6 +285,7 @@ public class ProcessController {
                     process.getUpdated(),
                     process.getName(),
                     process.getDescription(),
+                    stepService.countAllByProcessId(process.getId()),
                     stepList
             );
 

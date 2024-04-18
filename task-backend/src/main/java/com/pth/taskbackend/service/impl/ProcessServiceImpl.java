@@ -76,4 +76,12 @@ public class ProcessServiceImpl implements ProcessService
     public List<Process> findProcessesWithIdInJob(String id ) throws IOException {
         return processRepository.findProcessesWithIdInJob(id);
     }
+
+    @Override
+    public Page<Object[]> findProcessWithStepCountByNameContainingAndEmployerId(String name, String employerId, Pageable pageable) {
+        return processRepository.findProcessWithStepCountByNameContainingAndEmployerId(name,employerId,pageable);
+
+    }
+
+
 }

@@ -29,7 +29,12 @@ public interface ProcessRepository extends JpaRepository<Process,String> {
     List<Process> findProcessesWithIdInJob(@Param("processId") String processId);
 
 
-}
+        @Query("SELECT p, (SELECT COUNT(s) FROM Step s WHERE s.process.id = p.id) " +
+                "FROM Process p " +
+                "WHERE p.name LIKE %:name% AND p.employer.id = :employerId")
+        Page<Object[]> findProcessWithStepCountByNameContainingAndEmployerId(String name, String employerId, Pageable pageable);
+    }
+
 
 
 

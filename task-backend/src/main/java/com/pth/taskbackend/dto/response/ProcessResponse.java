@@ -11,6 +11,8 @@ public record ProcessResponse(
         LocalDateTime updated,
         String name,
         String description,
+        Long totalStep,
         List<StepResponse> step
+
 ) {
 }

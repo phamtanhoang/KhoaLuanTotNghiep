@@ -4,6 +4,7 @@ import com.pth.taskbackend.model.meta.Process;
 import io.jsonwebtoken.io.IOException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,4 +23,6 @@ public interface ProcessService {
     Optional<Process>findByNameAndEmployerId(String name, String employerId )throws  IOException;
      Optional<Process> findByIdAndEmployerId(String id, String employerId ) throws  IOException;
     List<Process> findProcessesWithIdInJob(String id) throws  IOException;
+
+    Page<Object[]>findProcessWithStepCountByNameContainingAndEmployerId(String name, String employerId, Pageable pageable);
 }
