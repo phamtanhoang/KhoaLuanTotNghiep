@@ -16,5 +16,7 @@ public interface SkillService {
     Page<Skill>findByCandidateId(String id, Pageable pageable)throws IOException;
     void delete (Skill Skill) throws IOException;
     void deleteById(String id) throws IOException;
+    void deleteAllByCandidateId(String candidateId) throws IOException;
+
 
 }

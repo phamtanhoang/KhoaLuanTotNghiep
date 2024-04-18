@@ -13,6 +13,7 @@ public record UpdateCandidateRequest (String id,
                                       String link,
                                       String job,
                                       String introduction,
-                                      ESex sex
+                                      ESex sex,
+                                      String password
 ){
 }

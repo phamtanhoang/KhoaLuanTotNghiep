@@ -27,7 +27,7 @@ public class ResourceController {
     @GetMapping("send-mail")
     public ResponseEntity<BaseResponse> SendMail() {
         try {
-            mailService.sendEmail("phamtanhoang3202@gmail.com", "",
+            mailService.sendEmail("datlequang1717@gmail.com", "",
                     "", "", "", "EMAIL_TEMPLATE");
             return ResponseEntity.ok(new BaseResponse("Gửi mail thành công", 200, null));
         }
@@ -35,6 +35,7 @@ public class ResourceController {
             return ResponseEntity.ok(new BaseResponse("Tên mail không hợp lệ!", 500, null));
         }
         catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.ok(new BaseResponse("Có lỗi xảy ra trong quá trình gửi mail!", 500, null));
         }
     }

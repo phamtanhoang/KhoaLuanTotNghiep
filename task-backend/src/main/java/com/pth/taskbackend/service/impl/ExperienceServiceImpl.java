@@ -42,4 +42,8 @@ public class ExperienceServiceImpl implements ExperienceService {
     public void deleteById(String id) throws IOException {
         experienceRepository.deleteById(id);
     }
+    @Override
+    public void deleteAllByCandidateId(String candidateId){
+        experienceRepository.deleteAllByCandidateId(candidateId);
+    }
 }

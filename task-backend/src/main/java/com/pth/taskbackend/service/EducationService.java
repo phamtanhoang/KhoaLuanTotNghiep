@@ -15,4 +15,6 @@ public interface EducationService {
     Page<Education> findByCandidateId(String id, Pageable pageable)throws IOException;
     void delete (Education education) throws IOException;
     void deleteById(String id) throws IOException;
+    void deleteAllByCandidateId(String candidateId) throws IOException;
+
 }

@@ -255,8 +255,7 @@ public class ApplicationController {
     @GetMapping("/candidateApplications")
     public ResponseEntity<?> getCandidateApplications(
             Pageable pageable,
-            @RequestHeader("Authorization") String token,
-            @RequestParam String state
+            @RequestHeader("Authorization") String token
     ) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
@@ -275,7 +274,7 @@ public class ApplicationController {
                         application.getId(),
                         application.getCandidate().getId(),
                         application.getCandidate().getUser().getEmail(),
-                        application.getCandidate().getFirstName()+application.getCandidate().getLastName() ,
+                        application.getFullName(),
                         application.getCandidate().getAvatar(),
                         application.getCreated(),
                         application.getStatus(),
@@ -576,9 +575,9 @@ public class ApplicationController {
             }
 
             ApplicationDetailResponse response = new ApplicationDetailResponse(
-                    application.getJob().getName(), // jobName
+                    application.getJob().getName(),
                     application.getEmail(),
-                    application.getFullName(), // firstName
+                    application.getFullName(),
                     application.getCandidate().getAvatar(),
                     application.getCandidate().getDateOfBirth(),
                     application.getCandidate().getSex(),
@@ -731,34 +730,7 @@ public class ApplicationController {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 //                    .body("Failed to check application status: " + e.getMessage());
 //        }
-//    }
-//
-//    @GetMapping("/candidateApplicationDetails")
-//    public ResponseEntity<?> getCandidateApplicationDetails(
-//            @RequestHeader("Authorization") String token,
-//            @RequestParam String applicationId
-//    ) {
-//        try {
-//            String candidateEmail = jwtService.extractUsername(token.substring(7));
-//            Candidate candidate = candidateService.findCandidateByAccountUsername(candidateEmail).get();
-//            if (candidate != null) {
-//
-//                Optional<Application> applicationOptional = applicationService.findByIdAndCandidateId(applicationId,candidate.getId());
-//
-//                if (applicationOptional.isEmpty())
-//                    return ResponseEntity.badRequest().body("Không tìm thấy application tương ứng");
-//
-//                Application application = applicationOptional.get();
-//
-//                return ResponseEntity.ok(application);
-//            }
-//
-//            else
-//                return ResponseEntity.badRequest().body("Không tìm thấy employer");
-//        }
-//        catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
+
 //    }
 
 

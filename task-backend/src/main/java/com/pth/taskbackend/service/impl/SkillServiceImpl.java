@@ -40,5 +40,9 @@ public class SkillServiceImpl implements SkillService {
         skillRepository.deleteById(id);
     }
 
+    @Override
+    public void deleteAllByCandidateId(String candidateId){
+        skillRepository.deleteAllByCandidateId(candidateId);
+    }
 
 }

@@ -45,41 +45,6 @@ public class ExperienceController {
     @Autowired
     CandidateService candidateService;
 
-    @Operation(summary = "Create", description = "", tags = {})
-    @PostMapping("/save")
-    public ResponseEntity<BaseResponse> saveExperiences(@RequestBody ExperienceRequest request) throws IOException {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (authentication == null && !authentication.isAuthenticated())
-                return ResponseEntity.ok(
-                        new BaseResponse("xác thực không hợp lệ", HttpStatus.FORBIDDEN.value(), null)
-                );
-
-            String email = authentication.getName();
-            System.out.println(email);
-            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
-            if (!optionalCandidate.isPresent())
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
-                );
-            List<Experience>experienceList = request.experiences();
-            for (Experience experience : experienceList) {
-                if (experience.getId() == null)
-                    experience.setId(UUID.randomUUID().toString());
-                experience.setCandidate(optionalCandidate.get());
-            }
-            experienceService.save(experienceList);
-
-            return ResponseEntity.ok(
-                    new BaseResponse( "Thêm danh sách kinh nghiệm thành công", HttpStatus.OK.value(),experienceList)
-            );
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
 
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("")

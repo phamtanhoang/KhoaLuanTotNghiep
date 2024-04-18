@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EducationRepository extends JpaRepository<Education,String> {
     Page<Education> findByCandidateId(String id, Pageable pageable);
+    void deleteAllByCandidateId(String candidateId);
 
 }

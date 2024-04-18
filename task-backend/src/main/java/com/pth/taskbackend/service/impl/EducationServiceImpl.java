@@ -42,4 +42,8 @@ public class EducationServiceImpl implements EducationService {
     public void deleteById(String id) throws IOException {
         educationRepository.deleteById(id);
     }
+     public void deleteAllByCandidateId(String candidateId){
+        educationRepository.deleteAllByCandidateId(candidateId);
+    }
+
 }

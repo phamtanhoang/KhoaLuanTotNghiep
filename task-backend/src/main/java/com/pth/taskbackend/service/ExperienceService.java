@@ -15,4 +15,6 @@ public interface ExperienceService {
     Page<Experience> findByCandidateId(String id, Pageable pageable)throws IOException;
     void delete (Experience experience) throws IOException;
     void deleteById(String id) throws IOException;
+    void deleteAllByCandidateId(String candidateId) throws IOException;
+
 }
