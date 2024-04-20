@@ -30,7 +30,7 @@ public class EducationServiceImpl implements EducationService {
 
     @Override
     public Page<Education> findByCandidateId(String id, Pageable pageable) {
-        return educationRepository.findByCandidateId(id, pageable);
+        return educationRepository.findByCandidateIdOrderBySequenceAsc(id, pageable);
     }
 
     @Override

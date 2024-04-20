@@ -30,7 +30,7 @@ public class ExperienceServiceImpl implements ExperienceService {
 
     @Override
     public Page<Experience> findByCandidateId(String id, Pageable pageable) {
-        return experienceRepository.findByCandidateId(id, pageable);
+        return experienceRepository.findByCandidateIdOrderBySequenceAsc(id, pageable);
     }
 
     @Override

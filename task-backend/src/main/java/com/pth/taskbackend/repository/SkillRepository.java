@@ -6,6 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SkillRepository extends JpaRepository<Skill,String> {
-    Page<Skill>findByCandidateId(String id, Pageable pageable);
+    Page<Skill>findByCandidateIdOrderBySequenceAsc(String id, Pageable pageable);
     void deleteAllByCandidateId(String candidateId);
 }

@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EducationRepository extends JpaRepository<Education,String> {
-    Page<Education> findByCandidateId(String id, Pageable pageable);
+    Page<Education> findByCandidateIdOrderBySequenceAsc(String id, Pageable pageable);
     void deleteAllByCandidateId(String candidateId);
 
 }

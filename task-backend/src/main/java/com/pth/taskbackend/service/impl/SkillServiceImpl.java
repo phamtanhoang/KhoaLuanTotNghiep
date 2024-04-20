@@ -27,7 +27,7 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     public Page<Skill> findByCandidateId(String id, Pageable pageable) {
-        return skillRepository.findByCandidateId(id, pageable);
+        return skillRepository.findByCandidateIdOrderBySequenceAsc(id, pageable);
     }
 
     @Override

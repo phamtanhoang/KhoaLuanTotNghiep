@@ -5,10 +5,7 @@ import com.pth.taskbackend.dto.request.EducationRequest;
 import com.pth.taskbackend.dto.request.ExperienceRequest;
 import com.pth.taskbackend.dto.request.SkillRequest;
 import com.pth.taskbackend.dto.request.UpdateCandidateRequest;
-import com.pth.taskbackend.dto.response.BaseResponse;
-import com.pth.taskbackend.dto.response.CandidateResponse;
-import com.pth.taskbackend.dto.response.EmployerResponse;
-import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
+import com.pth.taskbackend.dto.response.*;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.ESex;
 import com.pth.taskbackend.enums.EStatus;
@@ -37,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
@@ -480,11 +478,56 @@ public class CandidateController {
                         new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            Candidate candidate = optionalCandidate.get();
+            List<Education>educationList = educationService.findByCandidateId(optionalCandidate.get().getId(),Pageable.unpaged()).stream().toList();
+            List<EducationResponse> educationResponses = educationList.stream()
+                    .map(education -> new EducationResponse(
+                            education.getId(),
+                            education.getCreated(),
+                            education.getUpdated(),
+                            education.getFromDate(),
+                            education.getToDate(),
+                            education.getEducation(),
+                            education.getSequence(),
+                            education.getDescription(),
+                            education.getCandidate().getId()
+                    ))
+                    .toList();
+
+            List<Experience>experiences = experienceService.findByCandidateId(optionalCandidate.get().getId(),Pageable.unpaged()).stream().toList();
+
+            List<ExperienceResponse> experienceResponses = experiences.stream()
+                    .map(experience -> new ExperienceResponse(
+                            experience.getId(),
+                            experience.getCreated(),
+                            experience.getUpdated(),
+                            experience.getFromDate(),
+                            experience.getToDate(),
+                            experience.getExperience(),
+                            experience.getSequence(),
+                            experience.getDescription(),
+                            experience.getCandidate().getId()
+                    ))
+                    .collect(Collectors.toList());
+
+
+            List<Skill>skills = skillService.findByCandidateId(optionalCandidate.get().getId(),Pageable.unpaged()).stream().toList();
+
+            List<SkillResponse> skillResponses = skills.stream()
+                    .map(skill -> new SkillResponse(
+                            skill.getId(),
+                            skill.getCreated(),
+                            skill.getUpdated(),
+                            skill.getSkill(),
+                            skill.getSequence(),
+                            skill.getDescription(),
+                            skill.getCandidate().getId()
+                    ))
+                    .collect(Collectors.toList());
+
             Map<String,Object>response= new HashMap<>();
-            response.put("skills",candidate.getSkills());
-            response.put("experiences",candidate.getExperiences());
-            response.put("educations",candidate.getEducations());
+            response.put("skills",skillResponses);
+            response.put("experiences",experienceResponses);
+            response.put("educations",educationResponses);
 
             return ResponseEntity.ok(
                     new BaseResponse( "Hiện thông tin thêm của ứng viên", HttpStatus.OK.value(), response)
