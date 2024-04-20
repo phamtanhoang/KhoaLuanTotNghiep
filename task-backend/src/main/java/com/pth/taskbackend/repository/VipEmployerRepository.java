@@ -32,4 +32,11 @@ public interface VipEmployerRepository extends JpaRepository<VipEmployer, String
     @Query("SELECT COALESCE(SUM(e.price), 0) FROM VipEmployer e ")
     float sumPrice();
 
+    @Query("SELECT COUNT(v) FROM VipEmployer v " +
+            "WHERE v.id IN (" +
+            "   SELECT MAX(v2.id) FROM VipEmployer v2 " +
+            "   WHERE v2.employer = v.employer AND v2.toDate > CURRENT_DATE()" +
+            "   GROUP BY v2.employer" +
+            ")")
+    Long countValidVipEmployers();
 }

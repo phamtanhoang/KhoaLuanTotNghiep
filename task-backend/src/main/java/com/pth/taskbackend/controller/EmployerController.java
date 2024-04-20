@@ -595,7 +595,4 @@ public class EmployerController {
 
 
 
-
-
-
 }

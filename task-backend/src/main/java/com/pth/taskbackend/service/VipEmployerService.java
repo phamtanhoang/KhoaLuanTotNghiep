@@ -29,5 +29,6 @@ public interface VipEmployerService {
     public void delete(String employerVipId)throws IOException;
 
     public float sumPrice()throws IOException;
+    Long countValidVipEmployers() throws  IOException;
 
 }

@@ -79,4 +79,9 @@ public class CandidateServiceImpl implements CandidateService {
     public Optional<Candidate> findByUserEmail(String email) {
         return candidateRepository.findByUserEmail(email);
     }
+
+    @Override
+    public Long count() throws IOException {
+        return candidateRepository.count();
+    }
 }

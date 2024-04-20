@@ -7,7 +7,6 @@ import com.pth.taskbackend.repository.EmployerRepository;
 import com.pth.taskbackend.service.EmployerService;
 import com.pth.taskbackend.util.func.FileUploadFunc;
 import com.pth.taskbackend.util.func.ImageFunc;
-import io.jsonwebtoken.io.IOException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -114,5 +114,10 @@ public class EmployerServiceImpl implements EmployerService {
     @Override
     public void deleteById(String id) {
         employerRepository.deleteById(id);
+    }
+
+    @Override
+    public Long countAll() throws IOException {
+        return employerRepository.count();
     }
 }

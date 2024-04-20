@@ -72,4 +72,9 @@ public class VipEmployerServiceImpl implements VipEmployerService {
     public float sumPrice() throws IOException {
         return 0;
     }
+
+    @Override
+    public Long countValidVipEmployers() throws IOException {
+        return  vipEmployerRepository.countValidVipEmployers();
+    }
 }

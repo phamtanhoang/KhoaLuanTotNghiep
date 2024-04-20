@@ -18,4 +18,5 @@ public interface CandidateRepository extends JpaRepository<Candidate, String> {
     Page<Candidate> findByKeywordAndUserStatus(String keyword, EStatus status, Pageable pageable);
 
     Optional<Candidate>findByUserEmail(String email);
+
 }

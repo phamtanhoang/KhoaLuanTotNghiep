@@ -11,4 +11,7 @@ public interface VipCandidateService {
     public Optional<VipCandidate> findByCandidateIdAndAvailable(String candidateId)throws IOException;
 
     VipCandidate create(VipCandidate vipCandidate)throws IOException;
+    float sum()throws  IOException;
+
+    Long countValidVipCandidates()throws IOException;
 }

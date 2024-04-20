@@ -2,11 +2,11 @@ package com.pth.taskbackend.service;
 
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
-import io.jsonwebtoken.io.IOException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 public interface CandidateService {
@@ -21,5 +21,7 @@ public interface CandidateService {
     void deleteById(String id) throws IOException;
 
     Optional<Candidate>findByUserEmail(String email)throws IOException;
+
+    Long count()throws IOException;
 
 }

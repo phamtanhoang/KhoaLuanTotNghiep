@@ -27,4 +27,14 @@ public class VipCandidateServiceImpl implements VipCandidateService {
     public VipCandidate create(VipCandidate vipCandidate) throws IOException {
         return vipCandidateRepository.save(vipCandidate);
     }
+
+    @Override
+    public float sum() throws IOException {
+        return  vipCandidateRepository.sumPrice();
+    }
+
+    @Override
+    public Long countValidVipCandidates() throws IOException {
+        return  vipCandidateRepository.countValidVipCandidates();
+    }
 }
