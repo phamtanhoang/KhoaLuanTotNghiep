@@ -85,6 +85,7 @@ public class JobController {
                                         step.getId(),
                                         step.getName(),
                                         step.getNumber(),
+                                        step.getDescription(),
                                         step.getProcess() != null ? step.getProcess().getId() : null
                                 ))
                                 .collect(Collectors.toList());
@@ -207,6 +208,7 @@ public class JobController {
                                         step.getId(),
                                         step.getName(),
                                         step.getNumber(),
+                                        step.getDescription(),
                                         step.getProcess() != null ? step.getProcess().getId() : null
                                 ))
                                 .collect(Collectors.toList());
@@ -320,6 +322,7 @@ public class JobController {
                                         step.getId(),
                                         step.getName(),
                                         step.getNumber(),
+                                        step.getDescription(),
                                         step.getProcess() != null ? step.getProcess().getId() : null
                                 ))
                                 .collect(Collectors.toList());
@@ -400,6 +403,7 @@ public class JobController {
                                         step.getId(),
                                         step.getName(),
                                         step.getNumber(),
+                                        step.getDescription(),
                                         step.getProcess() != null ? step.getProcess().getId() : null
                                 ))
                                 .collect(Collectors.toList());
@@ -489,6 +493,7 @@ public class JobController {
                                         step.getId(),
                                         step.getName(),
                                         step.getNumber(),
+                                        step.getDescription(),
                                         step.getProcess() != null ? step.getProcess().getId() : null
                                 ))
                                 .collect(Collectors.toList());
@@ -580,6 +585,7 @@ public class JobController {
                                         step.getId(),
                                         step.getName(),
                                         step.getNumber(),
+                                        step.getDescription(),
                                         step.getProcess() != null ? step.getProcess().getId() : null
                                 ))
                                 .collect(Collectors.toList());
@@ -653,6 +659,7 @@ public class JobController {
                                         step.getId(),
                                         step.getName(),
                                         step.getNumber(),
+                                        step.getDescription(),
                                         step.getProcess() != null ? step.getProcess().getId() : null
                                 ))
                                 .collect(Collectors.toList());
@@ -724,6 +731,7 @@ public class JobController {
                                     step.getId(),
                                     step.getName(),
                                     step.getNumber(),
+                                    step.getDescription(),
                                     step.getProcess() != null ? step.getProcess().getId() : null
                             ))
                             .collect(Collectors.toList());
@@ -914,6 +922,7 @@ public class JobController {
                                 step.getId(),
                                 step.getName(),
                                 step.getNumber(),
+                                step.getDescription(),
                                 step.getProcess() != null ? step.getProcess().getId() : null
                         ))
                         .collect(Collectors.toList());

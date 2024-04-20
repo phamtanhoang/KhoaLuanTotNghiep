@@ -2,6 +2,7 @@ package com.pth.taskbackend.controller;
 import com.pth.taskbackend.dto.request.UpdateVipRequest;
 import com.pth.taskbackend.dto.request.VipRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
+import com.pth.taskbackend.dto.response.VipCandidateResponse;
 import com.pth.taskbackend.dto.response.VipResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
@@ -10,7 +11,7 @@ import com.pth.taskbackend.enums.EVipStatus;
 import com.pth.taskbackend.model.meta.*;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
-import com.pth.taskbackend.service.VipService;
+import com.pth.taskbackend.service.*;
 import com.pth.taskbackend.util.func.CheckPermission;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
@@ -48,6 +50,10 @@ public class VipController {
     @Autowired
     JwtService jwtService;
 
+    @Autowired
+    CandidateService candidateService;
+    @Autowired
+    EmployerService employerService;
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getVipById(@RequestHeader("Authorization")String token, @PathVariable String id) {
@@ -213,6 +219,103 @@ public class VipController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
+    @Operation(summary = "Get lists vip candidate", description = "", tags = {})
+    @GetMapping("getVipCandidates")
+    public ResponseEntity<BaseResponse> getVipCandidates(@RequestHeader("Authorization")String token, Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng ", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Page<Candidate> vipCandidates = candidateService.findVipCandidates(pageable);
+
+            if (vipCandidates.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách ứng viên Vip rỗng", HttpStatus.OK.value(), null)
+                );
+            Page<VipCandidateResponse> vipResponses = vipCandidates.map(vip -> new VipCandidateResponse(
+                    vip.getUser().getId(),
+                    vip.getUser().getCreated(),
+                    vip.getUser().getUpdated(),
+                    vip.getUser().getEmail(),
+                    vip.getUser().getStatus(),
+                    vip.getUser().getRole(),
+                    vip.getFirstName(),
+                    vip.getLastName(),
+                    vip.getAvatar(),
+                    vip.getAddress(),
+                    vip.getDateOfBirth(),
+                    vip.getIntroduction(),
+                    vip.getJob(),
+                    vip.getLink(),
+                    vip.getPhoneNumber(),
+                    vip.getSex()
+            ));
+
+            return  ResponseEntity.ok(
+                    new BaseResponse("Danh sách các ứng viên Vip", HttpStatus.OK.value(), vipResponses)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+//    @Operation(summary = "Get list vip employers", description = "", tags = {})
+//    @GetMapping("getVipEmployers")
+//    public ResponseEntity<BaseResponse> getVipsEmployers(@RequestHeader("Authorization")String token, Pageable pageable) {
+//        try {
+//            String email = jwtService.extractUsername(token.substring(7));
+//            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+//            if (!permission)
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+//                );
+//
+//            Optional<User> optionalUser = userRepository.findByEmail(email);
+//            if (optionalUser.isEmpty())
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Không tìm thấy người dùng ", HttpStatus.NOT_FOUND.value(), null)
+//                );
+//            Page<Vip> vips = vipService.findByStatusAndType(EType.CANDIDATE,EVipStatus.ACTIVE,pageable);
+//
+//            if (vips.isEmpty())
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Danh sách Vip rỗng", HttpStatus.OK.value(), null)
+//                );
+//            Page<VipResponse> vipResponses = vips
+//                    .map(vip -> new VipResponse(
+//                            vip.getId(),
+//                            vip.getCreated(),
+//                            vip.getUpdated(),
+//                            vip.getColor(),
+//                            vip.getMonth(),
+//                            vip.getName(),
+//                            vip.getPrice(),
+//                            vip.getStatus(),
+//                            vip.getType()
+//                    ));
+//
+//            return  ResponseEntity.ok(
+//                    new BaseResponse("Vip được tìm thấy", HttpStatus.OK.value(), vipResponses)
+//            );
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+//        }
+//    }
+
+
+
+
 
 
     @Operation(summary = "Create", description = "", tags = {})

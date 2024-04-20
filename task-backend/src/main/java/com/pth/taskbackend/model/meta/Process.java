@@ -19,7 +19,7 @@
         @Column(nullable = false)
         private String name;
 
-        @Column
+        @Column(columnDefinition = "TEXT")
         private String description;
 
         @ManyToOne

@@ -2,6 +2,7 @@ package com.pth.taskbackend.service;
 
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
+import com.pth.taskbackend.model.meta.Employer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,9 @@ public interface CandidateService {
 
     Optional<Candidate>findByUserEmail(String email)throws IOException;
 
+    Page<Candidate> findVipCandidates(Pageable pageable)throws IOException;
+
     Long count()throws IOException;
+
 
 }

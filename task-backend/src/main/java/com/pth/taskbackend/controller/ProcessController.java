@@ -62,7 +62,7 @@ public class ProcessController {
     @Autowired HumanResourceService humanResourceService;
 
     @Operation(summary = "Create", description = "", tags = {})
-    @PostMapping("/create")
+    @PostMapping("")
     public ResponseEntity<BaseResponse> createProcess(@RequestBody ProcessRequest processRequest, @RequestHeader("Authorization") String token) throws IOException {
         try {
             String email = jwtService.extractUsername(token.substring(7));
@@ -93,6 +93,7 @@ public class ProcessController {
                 step.setName(stepRequest.name());
                 step.setNumber(stepRequest.number());
                 step.setProcess(createdProcess);
+                step.setDescription(stepRequest.description());
                  stepService.create(step);
             }
 
@@ -103,6 +104,7 @@ public class ProcessController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (DataIntegrityViolationException e) {
+            e.printStackTrace();
             return ResponseEntity.ok(new BaseResponse("Tên quy trình đã tồn tại", HttpStatus.BAD_REQUEST.value(), null));
         } catch (Exception e) {
             e.printStackTrace();
@@ -132,7 +134,10 @@ public class ProcessController {
             if (optionalProcess.isEmpty()) {
                 return ResponseEntity.ok(new BaseResponse("Không tìm thấy quy trình", HttpStatus.BAD_REQUEST.value(), null));
             }
-
+            Optional<Process>existsProcess = processService.findByNameAndEmployerId(processRequest.name(), optionalEmployer.get().getId());
+            if(existsProcess.isPresent())
+                if(!existsProcess.get().getId().equals(optionalProcess.get().getId()))
+                    return ResponseEntity.ok(new BaseResponse("Đã có quy trình tên này ", HttpStatus.BAD_REQUEST.value(), null));
             Process process = optionalProcess.get();
             process.setName(processRequest.name());
             process.setDescription(processRequest.description());
@@ -145,6 +150,7 @@ public class ProcessController {
                 step.setName(stepRequest.name());
                 step.setNumber(stepRequest.number());
                 step.setProcess(createdProcess);
+                step.setDescription(stepRequest.description());
                  stepService.create(step);
             }
 
@@ -155,6 +161,7 @@ public class ProcessController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (DataIntegrityViolationException e) {
+            e.printStackTrace();
             return ResponseEntity.ok(new BaseResponse("Tên quy trình đã tồn tại", HttpStatus.BAD_REQUEST.value(), null));
         } catch (Exception e) {
             e.printStackTrace();
@@ -162,18 +169,18 @@ public class ProcessController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+    @Operation(summary = "Get list", description = "", tags = {})
+    @GetMapping("")
+    public ResponseEntity<BaseResponse> getProcesses(@RequestHeader("Authorization") String token, @RequestParam(required = false) String name, Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
 
-        @GetMapping("")
-        public ResponseEntity<BaseResponse> getProcesses(@RequestHeader("Authorization") String token, @RequestParam(required = false) String name, Pageable pageable) {
-            try {
-                String email = jwtService.extractUsername(token.substring(7));
-                boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
-                if (!permission)
-                    return ResponseEntity.ok(
-                            new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-                    );
-
-                Optional<User> optionalUser = userRepository.findByEmail(email);
+            Optional<User> optionalUser = userRepository.findByEmail(email);
                 if (optionalUser.isEmpty())
                     return ResponseEntity.ok(
                             new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
@@ -206,7 +213,7 @@ public class ProcessController {
 
                 if (responseList.isEmpty()) {
                     return ResponseEntity.ok(
-                            new BaseResponse("Danh sách quy trình rỗng", HttpStatus.NO_CONTENT.value(), null)
+                            new BaseResponse("Danh sách quy trình rỗng", HttpStatus.OK.value(), null)
                     );
                 } else {
                     return ResponseEntity.ok(
@@ -227,6 +234,7 @@ public class ProcessController {
                             step.getId(),
                             step.getName(),
                             step.getNumber(),
+                            step.getDescription(),
                             step.getProcess().getId()
                     ))
                     .collect(Collectors.toList());
@@ -273,7 +281,8 @@ public class ProcessController {
                             step.getId(),
                             step.getName(),
                             step.getNumber(),
-                            step.getProcess().getId() // Đây là giả sử rằng bạn muốn lấy ID của quy trình từ mỗi bước
+                            step.getDescription(),
+                            step.getProcess().getId()
                     ))
                     .collect(Collectors.toList());
 

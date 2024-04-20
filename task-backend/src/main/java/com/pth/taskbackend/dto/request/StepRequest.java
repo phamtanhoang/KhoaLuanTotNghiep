@@ -1,4 +1,4 @@
 package com.pth.taskbackend.dto.request;
 
-public record StepRequest(String id,String name, int number) {
+public record StepRequest(String id,String name,String description, int number) {
 }
