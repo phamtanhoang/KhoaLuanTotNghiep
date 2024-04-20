@@ -1,23 +1,31 @@
+import { ListEmpty, Loading } from "@/components/ui";
+import { DateHelper } from "@/utils/helpers/dateHelper";
 import { AiFillDelete, AiFillEye } from "react-icons/ai";
 
-interface ApplicationProps {
-  name?: string;
-  createBy?: string;
-  createDate?: string;
-  totalStep?: number;
-}
 interface ProceduresTableWebProps {
-  value: ApplicationProps[];
-  _onClickDelete: () => void;
-  _onClickDetail: () => void;
+  value: ProcedureModel[];
+  _onClickDelete: (item: ProcedureModel) => void;
+  _onClickDetail: (item: ProcedureModel) => void;
+  isLoading: boolean;
+  currentPage: number;
+  itemPerpage: number;
 }
 
 const ItemTSX: React.FC<{
-  item: ApplicationProps;
+  item: ProcedureModel;
   index: number;
-  _onClickDelete: () => void;
-  _onClickDetail: () => void;
-}> = ({ item, index, _onClickDelete, _onClickDetail }) => {
+  _onClickDelete: (item: ProcedureModel) => void;
+  _onClickDetail: (item: ProcedureModel) => void;
+  currentPage: number;
+  itemPerpage: number;
+}> = ({
+  item,
+  index,
+  _onClickDelete,
+  _onClickDetail,
+  currentPage,
+  itemPerpage,
+}) => {
   return (
     <tr
       key={index}
@@ -26,7 +34,7 @@ const ItemTSX: React.FC<{
       <td className="table-cell">
         <div className="flex items-center w-full gap-2 justify-center">
           <p className="text-base font-medium leading-none text-gray-700">
-            {index}
+            {currentPage * itemPerpage - itemPerpage + index}
           </p>
         </div>
       </td>
@@ -38,15 +46,13 @@ const ItemTSX: React.FC<{
         </div>
       </td>
       <td className="table-cell">
-        <div className="flex items-center px-5 w-full gap-2 justify-start">
-          <p className="text-base font-semibold text-gray-700 line-clamp-3">
-            {item.createBy}
-          </p>
+        <div className="flex items-center px-5 w-full gap-2 justify-center">
+          {DateHelper.formatDateTime(new Date(item.created))}
         </div>
       </td>
       <td className="table-cell">
         <div className="flex items-center px-5 w-full gap-2  justify-center">
-          {item.createDate}
+          {DateHelper.formatDateTime(new Date(item.updated))}
         </div>
       </td>
       <td className="table-cell">
@@ -58,11 +64,11 @@ const ItemTSX: React.FC<{
         <div className="flex items-center gap-5 text-2xl text-gray-600 justify-end px-4">
           <AiFillEye
             className=" cursor-pointer hover:text-orangetext"
-            onClick={_onClickDetail}
+            onClick={() => _onClickDetail(item)}
           />
           <AiFillDelete
             className=" cursor-pointer hover:text-red-500"
-            onClick={_onClickDelete}
+            onClick={() => _onClickDelete(item)}
           />
         </div>
       </td>
@@ -74,30 +80,55 @@ const ProceduresTableWeb: React.FC<ProceduresTableWebProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,
+  isLoading,
+  currentPage,
+  itemPerpage,
 }) => {
   return (
     <>
       <table className="w-full text-gray-600 table-fixed">
-        <thead>
-          <th className="px-5 w-[5%]">STT</th>
-          <th className="px-5 w-[30%] text-left">Tên quy trình</th>
-          <th className="px-5 w-[25%] text-left">Người tạo</th>
-          <th className="px-5 w-[15%]">Ngày tạo</th>
-          <th className="px-5 w-[10%]">Sô bước</th>
+        <thead className="">
+          <th className="px-5 w-[10%]">STT</th>
+          <th className="px-5 w-[25%] text-left">Tên quy trình</th>
+          <th className="px-5 w-[20%]">Ngày tạo</th>
+          <th className="px-5 w-[20%]">Cập nhật gần đây</th>
+          <th className="px-5 w-[10%]">Số bước</th>
           <th className="px-5 w-[15%]"></th>
         </thead>
         <tbody>
-          {value.map((item, index) => (
+          {isLoading ? (
+            <tr className="bg-white">
+              <td className="pt-6 whitespace-no-wrap" colSpan={6}>
+                <Loading />
+              </td>
+            </tr>
+          ) : (
             <>
-              <tr className="h-3 w-full"></tr>
-              <ItemTSX
-                item={item}
-                index={index}
-                _onClickDelete={_onClickDelete}
-                _onClickDetail={_onClickDetail}
-              />
+              {value.length === 0 ? (
+                <tr className="bg-white">
+                  <td className="pt-6 whitespace-no-wrap" colSpan={6}>
+                    <ListEmpty />
+                  </td>
+                </tr>
+              ) : (
+                <>
+                  {value.map((item, index) => (
+                    <>
+                      <tr className="h-3 w-full"></tr>
+                      <ItemTSX
+                        item={item}
+                        index={index}
+                        _onClickDelete={_onClickDelete}
+                        _onClickDetail={_onClickDetail}
+                        currentPage={currentPage}
+                        itemPerpage={itemPerpage}
+                      />
+                    </>
+                  ))}
+                </>
+              )}
             </>
-          ))}
+          )}
         </tbody>
       </table>
     </>

@@ -9,6 +9,7 @@ import { FaUsersCog } from "react-icons/fa";
 import { RiUserSearchFill } from "react-icons/ri";
 import { AiFillMessage, AiFillSchedule } from "react-icons/ai";
 import { MdTimeline } from "react-icons/md";
+import { AuthHelper } from "@/utils/helpers/authHelper";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -165,14 +166,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   setSidebarOpen={setSidebarOpen}
                 />
               </li>
-              <li>
-                <SidebarLink
-                  link={EMPLOYER_PATHS.hr}
-                  name="Bộ phận nhân sự"
-                  icon={<FaUsers className="text-lg" />}
-                  setSidebarOpen={setSidebarOpen}
-                />
-              </li>
+              {AuthHelper.isEmployer() && (
+                <li>
+                  <SidebarLink
+                    link={EMPLOYER_PATHS.hr}
+                    name="Bộ phận nhân sự"
+                    icon={<FaUsers className="text-lg" />}
+                    setSidebarOpen={setSidebarOpen}
+                  />
+                </li>
+              )}
             </ul>
           </div>
 
@@ -197,14 +200,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 />
               </li>
 
-              <li>
+              {/* <li>
                 <SidebarLink
                   link={EMPLOYER_PATHS.setting}
                   name="Phân quyền"
                   icon={<FaUsersCog className="text-xl" />}
                   setSidebarOpen={setSidebarOpen}
                 />
-              </li>
+              </li> */}
             </ul>
           </div>
         </nav>

@@ -6,7 +6,7 @@ const SEX_DATA = [
 const ROLE_DATA = {
   ADMIN: "ADMIN",
   CANDIDATE: "CANDIDATE",
-  HUMANRESOURCE: "HUMANRESOURCE",
+  HR: "HR",
   EMPLOYER: "EMPLOYER",
 };
 
@@ -25,7 +25,7 @@ const JOB_STATE_DATA = [
 ];
 const HR_STATE_DATA = [
   { id: "ACTIVE", name: "Hoạt động", color: "#0000FF" },
-  { id: "PAUSE", name: "Tạm ngừng", color: "#FF0000" },
+  { id: "INACTIVE", name: "Không hoạt động", color: "#FF0000" },
 ];
 
 const USER_STATUS_DATA = {

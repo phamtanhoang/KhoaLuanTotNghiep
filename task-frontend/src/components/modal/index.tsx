@@ -10,6 +10,7 @@ import { ChangeInfoEmployer, EmployerUpdate } from "./employer";
 import { CreateTag, UpdateTag } from "./tag";
 import { CreateCategory, UpdateCategory } from "./category";
 import { CreateHumanResource, UpdateHumanResource } from "./humanResource";
+import { CreateProcedure, UpdateProcedure } from "./procedure";
 
 const ModalBase = (props: any) => {
   // take props
@@ -104,6 +105,17 @@ const ModalBase = (props: any) => {
     ),
     [MODAL_KEYS.updateHumanResource]: (
       <UpdateHumanResource
+        id={id}
+        fetchData={fetchData}
+        handleClose={handleClose}
+      />
+    ),
+
+    [MODAL_KEYS.createProcedure]: (
+      <CreateProcedure fetchData={fetchData} handleClose={handleClose} />
+    ),
+    [MODAL_KEYS.updateProcedure]: (
+      <UpdateProcedure
         id={id}
         fetchData={fetchData}
         handleClose={handleClose}

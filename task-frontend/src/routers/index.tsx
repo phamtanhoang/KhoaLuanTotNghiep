@@ -65,6 +65,8 @@ const ScrollToTop = () => {
 };
 
 const Routers = () => {
+  console.log("AuthHelper.isHR(), ", AuthHelper.isHR());
+
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -117,7 +119,7 @@ const Routers = () => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={!AuthHelper.isEmployer()}
+              isAllowed={!AuthHelper.isEmployer() && !AuthHelper.isHR()}
               redirectTo={EMPLOYER_PATHS.dashboard}
             />
           }
@@ -131,7 +133,7 @@ const Routers = () => {
         <Route
           element={
             <ProtectedRoute
-              isAllowed={AuthHelper.isEmployer()}
+              isAllowed={AuthHelper.isEmployer() || AuthHelper.isHR()}
               redirectTo={EMPLOYER_PATHS.signin}
             />
           }

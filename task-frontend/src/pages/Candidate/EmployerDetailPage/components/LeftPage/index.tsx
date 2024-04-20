@@ -1,7 +1,6 @@
 import { ShareCard } from "@/components/ui";
 import NON_USER from "@/assets/images/non-user.jpg";
 import { RiVipCrown2Line } from "react-icons/ri";
-import { Tooltip } from "react-tooltip";
 interface LeftPageCardProps {
   image?: string;
   name?: string;
@@ -26,7 +25,7 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
       <div>
         <div className="bg-orangetext h-[1vh]"></div>
         <div className="bg-white p-5 rounded-sm flex flex-col gap-5">
-          <div className="relative w-[200px] h-[200px] mx-auto ">
+          <div className="relative w-[180px] h-[180px] mx-auto ">
             <img
               className="rounded-lg"
               src={image ? image : NON_USER}
@@ -41,25 +40,24 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
                 >
                   <RiVipCrown2Line />
                 </div>
-                
               </>
             )}
           </div>
 
-          <h1 className="text-xl font-bold uppercase leading-tight tracking-wide antialiased hover:underline cursor-pointer text-center">
+          <h1 className="text-lg font-medium uppercase leading-tight tracking-wide antialiased hover:underline cursor-pointer text-center">
             {name}
           </h1>
         </div>
       </div>
       <div className="w-full bg-white rounded-sm">
-        <h3 className="font-bold text-xl leading-8 bg-orangetext text-white px-5 py-3">
+        <h3 className="font-semibold text-base uppercase leading-8 border-b-2 border-body  text-gray-600 px-5 py-1.5">
           Giới thiệu
         </h3>
 
         <p className="text-sm text-gray-500 p-5">{description}</p>
       </div>
       <div className="w-full bg-white rounded-sm">
-        <h3 className="font-bold text-xl leading-8 bg-orangetext text-white px-5 py-3">
+        <h3 className="font-semibold text-base uppercase leading-8 border-b-2 border-body  text-gray-600 px-5 py-1.5">
           Thông tin liên hệ
         </h3>
         <div className="p-5 flex flex-col gap-3 text-sm text-gray-500">
@@ -83,7 +81,7 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
         </div>
       </div>
       <div className="w-full bg-white rounded-sm">
-        <h3 className="font-bold text-xl leading-8 bg-orangetext text-white px-5 py-3">
+        <h3 className="font-semibold text-base uppercase leading-8 border-b-2 border-body  text-gray-600 px-5 py-1.5">
           Chia sẻ nhà tuyển dụng
         </h3>
 

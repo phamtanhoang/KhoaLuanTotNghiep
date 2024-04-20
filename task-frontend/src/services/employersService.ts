@@ -18,6 +18,17 @@ const employersService = {
       EmployerAPI.getList(name, status, currentPage, itemPerPage)
     );
   },
+
+  async getListPublic(
+    name?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) {
+    return await axiosConfig.get(
+      EmployerAPI.getListPublic(name, currentPage, itemPerPage)
+    );
+  },
+  
   async update(id: string, status: string) {
     const body = {
       status: status,

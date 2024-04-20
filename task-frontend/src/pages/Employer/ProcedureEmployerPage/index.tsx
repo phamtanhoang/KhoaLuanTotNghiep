@@ -1,60 +1,112 @@
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { ProceduresTableMobile, ProceduresTableWeb } from "./components";
-import { Pagination } from "@/components/ui";
+import { Pagination, PaginationCustom } from "@/components/ui";
 import { FiFilter } from "react-icons/fi";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
+import { LoadingContext } from "@/App";
+import ModalBase from "@/components/modal";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { useDispatch, useSelector } from "react-redux";
+import { proceduresService } from "@/services";
+import { ONCLEAR_FILTER } from "@/store/reducers/searchReducer";
+import { useLocation } from "react-router-dom";
 
-import Swal from "sweetalert2";
-
-const sampleData = [
-  {
-    name: "Quy trình 1",
-    createBy: "Phạm Tấn Hoàng",
-    createDate: "03/02/2002",
-    totalStep: 1,
-  },
-  {
-    name: "Quy trình 2",
-    createBy: "Phạm Tấn Hoàng",
-    createDate: "03/02/2002",
-    totalStep: 2,
-  },
-  {
-    name: "Quy trình 3",
-    createBy: "Phạm Tấn Hoàng",
-    createDate: "03/02/2002",
-    totalStep: 3,
-  },
-];
 const ProceduresEmployerPage = () => {
+  const searchReducer = useSelector((state: any) => state.searchReducer);
+  const context = useContext(LoadingContext);
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
 
+  const [open, setOpen] = useState(false);
+  const [funcs, setFuncs] = useState<string>("");
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
+  const [id, setId] = useState<string>("");
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemPerpage = 10;
+
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [procedures, setProcedures] = useState<ProcedureModel[]>([]);
   const _onClickFilter = () => {
-
+    setFuncs(MODAL_KEYS.filter);
+    handleOpen();
   };
-  const _onClickDelete = () => {
-    Swal.fire({
-      icon: "warning",
-      title: "Xóa quy trình này?",
-      showCancelButton: true,
-      cancelButtonText: "Hủy bỏ",
-      confirmButtonText: "Đồng ý",
+  useEffect(() => {
+    dispatch(ONCLEAR_FILTER());
+  }, [location]);
 
-      customClass: {
-        confirmButton: "confirm-button-class",
+  const _onClickDelete = (item: ProcedureModel) => {
+    SwalHelper.Confirm(
+      "Xác nhận xóa quy trình này?",
+      "question",
+      () => {
+        context.handleOpenLoading();
+        proceduresService
+          .delete(item.id)
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              SwalHelper.MiniAlert(res.data.Message, "success");
+              fetchListData();
+            } else {
+              SwalHelper.MiniAlert(res.data.Message, "error");
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
       },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire("Deleted!", "Your item has been deleted.", "success");
-      } else if (result.isDismissed) {
-      }
-    });
+      () => {}
+    );
   };
-  const _onClickDetail = () => {};
-  const _onClickAdd = () => {};
+  const _onClickDetail = (item: ProcedureModel) => {
+    setId(item.id);
+    setFuncs(MODAL_KEYS.updateProcedure);
+    handleOpen();
+  };
+  const _onClickAdd = () => {
+    setFuncs(MODAL_KEYS.createProcedure);
+    handleOpen();
+  };
+  const fetchListData = () => {
+    setIsLoadingTable(true);
+    proceduresService
+      .getList(searchReducer.keyword, currentPage - 1, itemPerpage)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          setProcedures(res?.data?.Data?.content);
+          setTotalPages(res?.data?.Data?.totalPages);
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+      })
+      .finally(() => {
+        setIsLoadingTable(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchListData();
+  }, [searchReducer.keyword, currentPage]);
   return (
     <>
+      <ModalBase
+        id={id}
+        open={open}
+        handleClose={handleClose}
+        funcs={funcs}
+        setFuncs={setFuncs}
+        fetchData={fetchListData}
+      />
       <div className="bg-white p-4 rounded relative w-full mt-8">
         <div className="-mt-12 flex justify-between relative p-4 lg:py-4 lg:px-8 place-items-center rounded-xl bg-orangetext bg-clip-border text-white shadow-md shadow-orange-500/40">
           <div className="items-center text-lg lg:text-2xl font-bold text-white">
@@ -81,22 +133,33 @@ const ProceduresEmployerPage = () => {
         <div className="bg-white lg:px-4 rounded relative w-full  mt-2 lg:mt-5">
           <div className="max-lg:hidden">
             <ProceduresTableWeb
-              value={sampleData}
+              value={procedures}
               _onClickDelete={_onClickDelete}
               _onClickDetail={_onClickDetail}
+              isLoading={isLoadingTable}
+              currentPage={currentPage}
+              itemPerpage={itemPerpage}
             />
           </div>
           <div className="lg:hidden">
             <ProceduresTableMobile
-              value={sampleData}
+              value={procedures}
               _onClickDelete={_onClickDelete}
               _onClickDetail={_onClickDetail}
+              isLoading={isLoadingTable}
+              currentPage={currentPage}
+              itemPerpage={itemPerpage}
             />
           </div>
         </div>
 
         <div className="w-max mx-auto mt-5">
-          <Pagination />
+          <PaginationCustom
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+            type={true}
+          />
         </div>
       </div>
     </>

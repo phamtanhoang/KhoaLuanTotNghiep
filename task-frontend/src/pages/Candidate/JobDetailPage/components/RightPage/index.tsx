@@ -35,8 +35,8 @@ const RightPage: React.FC<RightPageProps> = ({
           )}
         </div>
       </div>
-      <div className="w-full bg-white rounded-sm max-lg:mt-5">
-        <h3 className="font-bold text-xl leading-8  bg-orangetext text-white px-5 py-3">
+      <div className="w-full bg-white rounded-sm max-lg:mt-3">
+        <h3 className="font-semibold text-base uppercase leading-8 border-b-2 border-body  text-gray-600 px-5 py-1.5">
           Quy trình ứng tuyển
         </h3>
         <div className="p-5">
@@ -62,18 +62,17 @@ const RightPage: React.FC<RightPageProps> = ({
           </div>
         </div>
       </div>
-      <div className="w-full bg-white rounded-sm max-lg:mt-5">
-        <h3 className="font-bold text-xl leading-8 bg-orangetext text-white px-5 py-3">
+      <div className="w-full bg-white rounded-sm max-lg:mt-3">
+        <h3 className="font-semibold text-base uppercase leading-8 border-b-2 border-body  text-gray-600 px-5 py-1.5">
           Thông tin khác
         </h3>
         <div className="flex gap-1.5 flex-wrap p-5">
           {tags &&
             tags.map((tag: any, index: number) => (
               <span
-                className="bg-gray-50 text-base font-[500] px-4 py-1 rounded-full"
+                className="text-base font-medium px-4 py-1 rounded text-white"
                 style={{
-                  color: tag.color,
-
+                  backgroundColor: tag.color,
                   borderWidth: "2px",
                   borderColor: tag.color,
                 }}
@@ -84,8 +83,8 @@ const RightPage: React.FC<RightPageProps> = ({
             ))}
         </div>
       </div>
-      <div className="w-full bg-white rounded-sm max-lg:mt-5 pb-0.5">
-        <h3 className="font-bold text-xl leading-8 bg-orangetext text-white px-5 py-3">
+      <div className="w-full bg-white rounded-sm max-lg:mt-3 pb-0.5">
+        <h3 className="font-semibold text-base uppercase leading-8 border-b-2 border-body  text-gray-600 px-5 py-1.5">
           Chia sẻ nhà tuyển dụng
         </h3>
 

@@ -12,9 +12,9 @@ const EmployerDetailPage = () => {
         linkSearch={CANDIDATE_PATHS.employers}
         titleSearch="Nhà tuyển dụng khác"
       />
-      <section className="pb-10 pt-8 bg-gray-100 ">
-        <div className="w-full lg:w-[80%] px-5 lg:px-0 mx-auto flex lg:flex-row flex-col gap-5">
-          <div className="w-full lg:w-4/12 flex flex-col gap-5">
+      <section className="pb-10 pt-5 lg:pt-8 bg-gray-100 ">
+        <div className="w-full lg:w-[80%] px-2 lg:px-0 mx-auto flex lg:flex-row flex-col gap-5">
+          <div className="w-full lg:w-4/12 flex flex-col gap-3 lg:gap-5">
             <LeftPage
               name="Công ty dược phẩm Phúc Long"
               description="Công ty dược phẩm Phúc LongCông ty dược phẩm Phúc LongCông ty dược phẩm Phúc LongCông ty dược phẩm Phúc LongCông ty dược phẩm Phúc Long"

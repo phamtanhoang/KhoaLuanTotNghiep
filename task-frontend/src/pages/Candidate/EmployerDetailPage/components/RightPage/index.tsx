@@ -9,7 +9,7 @@ const RightPage: React.FC<RightPageProps> = ({ image }) => {
     <>
       {image && (
         <img
-          className="md:w-[700px] md:h-[350px] mx-auto rounded-lg object-fill p-3 lg:p-5 pb-0 lg:pb-0"
+          className="w-full mx-auto rounded-lg object-fill p-3 lg:p-5 pb-0 lg:pb-0"
           src={image}
           alt="image background"
         />

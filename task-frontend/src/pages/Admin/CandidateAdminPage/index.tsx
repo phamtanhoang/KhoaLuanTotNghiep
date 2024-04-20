@@ -55,7 +55,7 @@ const CandidateAdminPage = () => {
   };
   const _onClickDetail = (item: CandidateModel) => {
     setId(item.id);
-    setFuncs(MODAL_KEYS.updateEmployer);
+    setFuncs("");
     handleOpen();
   };
 

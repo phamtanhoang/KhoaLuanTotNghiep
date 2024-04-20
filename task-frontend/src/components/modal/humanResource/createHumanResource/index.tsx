@@ -77,7 +77,15 @@ const CreateHumanResource = (props: any) => {
   };
 
   const _onClickSave = () => {
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+    if (
+      !firstName ||
+      !lastName ||
+      !sex ||
+      !dateOfBirth ||
+      !email ||
+      !password ||
+      !confirmPassword
+    ) {
       SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "warning");
       return;
     }
@@ -193,7 +201,7 @@ const CreateHumanResource = (props: any) => {
             <div className="flex justify-between gap-3 lg:gap-4 content-center">
               <div className="content-center w-full">
                 <label className="font-medium tracking-wide text-sm">
-                  Giới tính
+                  Giới tính<span className="text-red-500">*</span>
                 </label>
                 <select
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
@@ -209,7 +217,7 @@ const CreateHumanResource = (props: any) => {
               </div>
               <div className="content-center w-full">
                 <label className="font-medium tracking-wide text-sm">
-                  Ngày sinh
+                  Ngày sinh<span className="text-red-500">*</span>
                 </label>
                 <input
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"

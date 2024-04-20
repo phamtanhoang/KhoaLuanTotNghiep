@@ -14,6 +14,12 @@ const TextEditor: React.FC<EditorInterface> = ({
   onChange,
 }) => {
   const editorRef = useRef<any>(null);
+  const handleEditorChange = (content: string) => {
+    const modifiedContent = content.startsWith("Your characters here")
+      ? content.substring("Your characters here".length)
+      : content;
+    onChange(modifiedContent);
+  };
   return (
     <>
       <Editor
@@ -55,7 +61,7 @@ const TextEditor: React.FC<EditorInterface> = ({
 
           setup: (editor) => {
             editor.on("keyup", () => {
-              onChange(editor.getContent());
+              handleEditorChange(editor.getContent());
             });
           },
         }}
