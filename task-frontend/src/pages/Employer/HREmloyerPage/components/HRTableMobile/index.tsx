@@ -171,16 +171,16 @@ const HRTableMobile: React.FC<HRTableMobileProps> = ({
       <table className="w-full text-gray-600">
         <tbody className="flex flex-col gap-2">
           {isLoading ? (
-            <tr className="bg-white">
-              <td className="py-3 whitespace-no-wrap" colSpan={6}>
+            <tr className="bg-white flex align-center justify-center">
+              <td className="p-6 whitespace-no-wrap">
                 <Loading />
               </td>
             </tr>
           ) : (
             <>
               {!value ? (
-                <tr className="bg-white">
-                  <td className="py-3 whitespace-no-wrap" colSpan={6}>
+                <tr className="bg-white flex align-center justify-center">
+                  <td className="pt-6 whitespace-no-wrap">
                     <ListEmpty />
                   </td>
                 </tr>

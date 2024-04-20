@@ -27,8 +27,8 @@ const JobDetailPage = () => {
         linkSearch={CANDIDATE_PATHS.jobs}
         titleSearch="Tuyển dụng khác"
       />
-      <section className="pb-10 pt-8 bg-gray-100">
-        <div className="w-full lg:w-[80%] px-5 lg:px-0 mx-auto flex lg:flex-row flex-col lg:gap-5">
+      <section className="pb-10 pt-5 lg:pt-8 bg-gray-100">
+        <div className="w-full lg:w-[80%] px-2 lg:px-0 mx-auto flex lg:flex-row flex-col lg:gap-5">
           <div className="w-full lg:w-8/12 flex flex-col mx-auto">
             <LeftPage
               image=""

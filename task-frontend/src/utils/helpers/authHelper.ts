@@ -61,6 +61,10 @@ const isAdmin = () => {
   const currentUser = getUser();
   return currentUser && currentUser.role === DataConstants.ROLE_DATA.ADMIN;
 };
+const isHR = () => {
+  const currentUser = getUser();
+  return currentUser && currentUser.role === DataConstants.ROLE_DATA.HR;
+};
 
 export const AuthHelper = {
   getRefreshToken,
@@ -72,4 +76,5 @@ export const AuthHelper = {
   isCandidate,
   isEmployer,
   isAdmin,
+  isHR,
 };

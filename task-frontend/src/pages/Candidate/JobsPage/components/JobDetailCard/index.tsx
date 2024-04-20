@@ -39,10 +39,10 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
     <>
       <div className="bg-orangetext h-1.5"></div>
       <div
-        className="bg-white border-2 border-t-0 border-borderColor rounded-md rounded-t-none"
-        style={{ height: "calc(100vh - 90px)" }}
+        className="bg-white border-2 border-t-0 border-borderColor"
+        style={{ height: "calc(100vh - 78px)" }}
       >
-        <div className="w-full h-max border-b-2 border-borderColor p-5 flex gap-5 justify-between">
+        <div className="w-full h-max border-b-2 border-borderColor p-5 flex gap-5 justify-between ">
           <div className="w-full relative">
             <h1
               className="text-xl uppercase font-bold text-gray-700 line-clamp-2"
@@ -98,10 +98,10 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
         </div>
 
         <div
-          className="scrollbar-custom overflow-y-scroll text-sm  my-2.5 mx-1 flex flex-col gap-3"
-          style={{ height: "calc(100vh - 280px)", width: "calc(100%-8px)" }}
+          className="scrollbar-custom overflow-y-scroll text-sm flex flex-col gap-3"
+          style={{ height: "calc(100vh - 260px)", width: "calc(100%-8px)" }}
         >
-          <div className="mx-4 flex flex-col gap-2">
+          <div className="mx-5 flex flex-col gap-2 mt-3">
             <div className="flex w-full font-lato gap-5 text-gray-800 font-semibold">
               <p className="w-1/2">
                 <span className="font-normal text-gray-600">
@@ -169,9 +169,11 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
                 ))}
             </div>
           </div>
-          <div className="mx-4 border-b-2 border-borderColor border-dashed"></div>
-          <div className="mx-4 flex flex-col gap-3 uppercase">
-            <label className="text-base font-semibold">Mô tả công việc</label>
+          <div className="mx-5 border-b-2 border-borderColor border-dashed"></div>
+          <div className="mx-5 flex flex-col gap-3">
+            <label className="text-base font-semibold uppercase">
+              Mô tả công việc
+            </label>
             <div
               className=""
               dangerouslySetInnerHTML={{

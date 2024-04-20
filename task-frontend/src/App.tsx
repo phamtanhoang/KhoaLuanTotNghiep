@@ -1,8 +1,7 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 import { LoadingSpiner } from "./components/ui";
 import Routers from "./routers";
 import { Tooltip } from "react-tooltip";
-import { useLocation } from "react-router-dom";
 
 export const LoadingContext = createContext<any>(null);
 

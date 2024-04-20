@@ -384,14 +384,16 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
               Quản lý tài khoản
             </Link>
           </li>
-          <li>
-            <Link
-              to={EMPLOYER_PATHS.upgrade}
-              className="block px-5 py-2.5 text-base font-medium hover:bg-gray-500/10 hover:text-orangetext"
-            >
-              Nâng cấp tài khoản
-            </Link>
-          </li>
+          {AuthHelper.isEmployer() && (
+            <li>
+              <Link
+                to={EMPLOYER_PATHS.upgrade}
+                className="block px-5 py-2.5 text-base font-medium hover:bg-gray-500/10 hover:text-orangetext"
+              >
+                Nâng cấp tài khoản
+              </Link>
+            </li>
+          )}
         </ul>
         <ul className="flex flex-col border-borderColor w-[200px]">
           <li>

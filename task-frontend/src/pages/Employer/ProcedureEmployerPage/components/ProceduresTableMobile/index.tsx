@@ -1,25 +1,33 @@
 import { useEffect, useRef, useState } from "react";
 import { IoMdMore } from "react-icons/io";
 import { AiFillDelete, AiFillEye } from "react-icons/ai";
+import { ListEmpty, Loading } from "@/components/ui";
+import { DateHelper } from "@/utils/helpers/dateHelper";
 
-interface ApplicationProps {
-  name?: string;
-  createBy?: string;
-  createDate?: string;
-  totalStep?: number;
-}
 interface ProceduresTableMobileProps {
-  value: ApplicationProps[];
-  _onClickDelete: () => void;
-  _onClickDetail: () => void;
+  value: ProcedureModel[];
+  _onClickDelete: (item: ProcedureModel) => void;
+  _onClickDetail: (item: ProcedureModel) => void;
+  isLoading: boolean;
+  currentPage: number;
+  itemPerpage: number;
 }
 
 const ItemTSX: React.FC<{
-  item: ApplicationProps;
+  item: ProcedureModel;
   index: number;
-  _onClickDelete: () => void;
-  _onClickDetail: () => void;
-}> = ({ item, index, _onClickDelete, _onClickDetail }) => {
+  _onClickDelete: (item: ProcedureModel) => void;
+  _onClickDetail: (item: ProcedureModel) => void;
+  currentPage: number;
+  itemPerpage: number;
+}> = ({
+  item,
+  index,
+  _onClickDelete,
+  _onClickDetail,
+  currentPage,
+  itemPerpage,
+}) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const trigger = useRef<any>(null);
@@ -55,24 +63,28 @@ const ItemTSX: React.FC<{
     >
       <div className="w-full flex flex-col gap-1.5">
         <div className="flex items-center w-full justify-start text-lg leading-8 font-semibold text-gray-800">
-          <span className="mt-auto">{index}.&nbsp;&nbsp;&nbsp;</span>
+          <span className="mt-auto">
+            {currentPage * itemPerpage - itemPerpage + index}.&nbsp;&nbsp;&nbsp;
+          </span>
           <div className="flex items-center w-full gap-2 justify-start">
             {item.name}
           </div>
         </div>
 
-        <div className="flex items-center w-full justify-start text-base leading-8 font-medium text-gray-800 gap-2">
-          <p className="font-normal text-base text-gray-600 w-max mb-auto mt-1">
-            Người tạo:&nbsp;&nbsp;
-          </p>
-          <p className="">{item.createBy}</p>
-        </div>
         <div className="flex items-center w-full justify-start ">
-          <p className="text-base leading-8 font-medium text-gray-800">
+          <p className="text-base leading-8 ">
             <span className="font-normal text-base text-gray-600">
               Ngày tạo:&nbsp;&nbsp;
             </span>
-            {item.createDate}
+            {DateHelper.formatDateTime(new Date(item.created))}
+          </p>
+        </div>
+        <div className="flex items-center w-full justify-start ">
+          <p className="text-base leading-8 ">
+            <span className="font-normal text-base text-gray-600">
+              Cập nhật gần nhất:&nbsp;&nbsp;
+            </span>
+            {DateHelper.formatDateTime(new Date(item.updated))}
           </p>
         </div>
         <div className="flex justify-between gap-4">
@@ -98,22 +110,16 @@ const ItemTSX: React.FC<{
             >
               <a
                 className="flex px-6 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2"
-                onClick={_onClickDetail}
+                onClick={() => _onClickDetail(item)}
               >
-                <AiFillEye
-                  className="text-orangetext text-lg"
-                  onClick={_onClickDetail}
-                />
+                <AiFillEye className="text-orangetext text-lg" />
                 Chi tiết
               </a>
               <a
                 className="flex px-6 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2"
-                onClick={_onClickDelete}
+                onClick={() => _onClickDelete(item)}
               >
-                <AiFillDelete
-                  className="text-red-500 text-lg"
-                  onClick={_onClickDelete}
-                />
+                <AiFillDelete className="text-red-500 text-lg" />
                 Xóa
               </a>
             </div>
@@ -128,21 +134,46 @@ const ProceduresTableMobile: React.FC<ProceduresTableMobileProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,
+  isLoading,
+  currentPage,
+  itemPerpage,
 }) => {
   return (
     <>
       <table className="w-full text-gray-600">
         <tbody className="flex flex-col gap-2">
-          {value.map((item, index) => (
+          {isLoading ? (
+            <tr className="bg-white flex align-center justify-center">
+              <td className="pt-6 whitespace-no-wrap w-full">
+                <Loading />
+              </td>
+            </tr>
+          ) : (
             <>
-              <ItemTSX
-                item={item}
-                index={index}
-                _onClickDelete={_onClickDelete}
-                _onClickDetail={_onClickDetail}
-              />
+              {!value ? (
+                <tr className="bg-white flex align-center justify-center">
+                  <td className="pt-6 whitespace-no-wrap text-center flex justify-center">
+                    <ListEmpty />
+                  </td>
+                </tr>
+              ) : (
+                <>
+                  {value.map((item, index) => (
+                    <>
+                      <ItemTSX
+                        item={item}
+                        index={index}
+                        _onClickDelete={_onClickDelete}
+                        _onClickDetail={_onClickDetail}
+                        currentPage={currentPage}
+                        itemPerpage={itemPerpage}
+                      />
+                    </>
+                  ))}
+                </>
+              )}
             </>
-          ))}
+          )}
         </tbody>
       </table>
     </>

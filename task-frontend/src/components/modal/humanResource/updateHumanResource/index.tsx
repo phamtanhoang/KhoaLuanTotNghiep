@@ -14,6 +14,7 @@ import { ImageHelper } from "@/utils/helpers/imageHelper";
 const UpdateHumanResource = (props: any) => {
   const context = useContext(LoadingContext);
   const handleClose = props.handleClose;
+  const fetchListData = props.fetchData;
   const id = props.id;
 
   const [openSub, setOpenSub] = useState(false);
@@ -30,6 +31,7 @@ const UpdateHumanResource = (props: any) => {
   const [sex, setSex] = useState<string>(DataConstants.SEX_DATA[0].id);
   const [avatar, setAvatar] = useState<string>("");
   const [image, setImage] = useState<string | null>(null);
+  const [newImage, setNewImage] = useState<string | null>(null);
   const [croppedImg, setCroppedImg] = useState<string | null>(null);
   const [dateOfBirth, setDateOfBirth] = useState<string>("");
   const [created, setCreated] = useState<Date | null>(null);
@@ -69,7 +71,7 @@ const UpdateHumanResource = (props: any) => {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setImage(reader.result as string);
+        setNewImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     } else {
@@ -89,7 +91,7 @@ const UpdateHumanResource = (props: any) => {
   };
 
   const _onClickSave = () => {
-    if (!firstName || !lastName || !email) {
+    if (!firstName || !lastName || !sex || !dateOfBirth || !email) {
       SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "warning");
       return;
     }
@@ -97,10 +99,14 @@ const UpdateHumanResource = (props: any) => {
       SwalHelper.MiniAlert("Mật khẩu không khớp!", "warning");
       return;
     }
-
+    let img: File | null = null;
+    if (croppedImg !== null && croppedImg !== undefined) {
+      img = ImageHelper.dataURItoFile(croppedImg, email);
+    }
     context.handleOpenLoading();
     humanResourcesService
       .update(
+        id,
         firstName,
         lastName,
         email,
@@ -108,12 +114,13 @@ const UpdateHumanResource = (props: any) => {
         sex,
         phoneNumber,
         dateOfBirth,
-        img
+        img || null,
+        status
       )
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           SwalHelper.MiniAlert(res.data.Message, "success");
-          fetchData();
+          fetchListData();
           handleClose();
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
@@ -163,14 +170,13 @@ const UpdateHumanResource = (props: any) => {
     fetchData();
   }, []);
 
-  console.log("status, ", status);
   return (
     <>
       <ModalBase
         open={openSub}
         handleClose={handleCloseSub}
         funcs={funcsSub}
-        image={image}
+        image={newImage}
         setCroppedImg={setCroppedImg}
       />
       <div className="lg:w-[45%] w-screen bg-white relative rounded">
@@ -191,10 +197,19 @@ const UpdateHumanResource = (props: any) => {
             <div className="flex justify-between gap-3 lg:gap-4 content-center">
               <div className="content-center w-full">
                 <div className="relative  w-max mx-auto">
-                  <img
-                    src={avatar ? avatar : NON_USER}
-                    className="w-40 h-40 border-2 border-borderColor rounded-full"
-                  />
+                  {croppedImg ? (
+                    <img
+                      className="w-40 h-40 border-2 border-borderColor rounded-full"
+                      src={croppedImg}
+                      alt="avatar Image"
+                    />
+                  ) : (
+                    <img
+                      src={avatar ? avatar : NON_USER}
+                      className="w-40 h-40 border-2 border-borderColor rounded-full"
+                      alt="avatar Image"
+                    />
+                  )}
                   <input
                     id="fileInput"
                     type="file"
@@ -238,7 +253,7 @@ const UpdateHumanResource = (props: any) => {
             <div className="flex justify-between gap-3 lg:gap-4 content-center">
               <div className="content-center w-full">
                 <label className="font-medium tracking-wide text-sm">
-                  Giới tính
+                  Giới tính<span className="text-red-500">*</span>
                 </label>
                 <select
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
@@ -254,7 +269,7 @@ const UpdateHumanResource = (props: any) => {
               </div>
               <div className="content-center w-full">
                 <label className="font-medium tracking-wide text-sm">
-                  Ngày sinh
+                  Ngày sinh<span className="text-red-500">*</span>
                 </label>
                 <input
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
@@ -298,7 +313,7 @@ const UpdateHumanResource = (props: any) => {
                 </label>
                 <input
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
-                  type="text"
+                  type="password"
                   value={password}
                   onChange={_onChangePassword}
                 />
@@ -309,7 +324,7 @@ const UpdateHumanResource = (props: any) => {
                 </label>
                 <input
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
-                  type="text"
+                  type="password"
                   value={confirmPassword}
                   onChange={_onChangeConfirmPassword}
                 />

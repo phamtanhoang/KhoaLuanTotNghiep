@@ -25,5 +25,8 @@ const MODAL_KEYS = {
   updateEmployer: "updateEmployer",
   createHumanResource: "CreateHumanResource",
   updateHumanResource: "UpdateHumanResource",
+
+  createProcedure: "CreateProcedure",
+  updateProcedure: "UpdateProcedure",
 };
 export { MODAL_KEYS };

@@ -20,7 +20,10 @@ const humanResourcesService = {
     if (avatar) formData.append("avatar", avatar);
     formData.append("sex", sex);
     formData.append("phoneNumber", phoneNumber.trim());
-    formData.append("dateOfBirth", `${dateOfBirth}T00:00:00`);
+    formData.append(
+      "dateOfBirth",
+      dateOfBirth ? `${dateOfBirth}T00:00:00` : ""
+    );
     return await axiosConfig.post(HumanResourceAPI.create, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -58,7 +61,7 @@ const humanResourcesService = {
     formData.append("lastName", lastName.trim());
     formData.append("sex", sex);
     formData.append("phoneNumber", phoneNumber.trim());
-    formData.append("dateOfBirth", `${dateOfBirth}T00:00:00`);
+    formData.append("dateOfBirth", dateOfBirth);
     formData.append("status", status);
     if (password) formData.append("password", password.trim());
     if (avatar) formData.append("avatar", avatar);

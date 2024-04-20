@@ -10,9 +10,15 @@ import { LoadingContext } from "@/App";
 import humanResourcesService from "@/services/humanResourcesService";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import ModalBase from "@/components/modal";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { ONCLEAR_FILTER } from "@/store/reducers/searchReducer";
 
 const HREmployerPage = () => {
   const context = useContext(LoadingContext);
+  const searchReducer = useSelector((state: any) => state.searchReducer);
+  const dispatch = useDispatch();
+  const location = useLocation();
   const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
 
   const [open, setOpen] = useState(false);
@@ -21,8 +27,7 @@ const HREmployerPage = () => {
   const handleClose = () => setOpen(false);
 
   const [id, setId] = useState<string>("");
-  const [keyWord, setKeyWord] = useState<string>("");
-  const [status, setStatus] = useState<string>("");
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemPerpage = 10;
 
@@ -30,6 +35,10 @@ const HREmployerPage = () => {
   const [humanResources, setHumanResources] = useState<HumanResourceModel[]>(
     []
   );
+
+  useEffect(() => {
+    dispatch(ONCLEAR_FILTER());
+  }, [location]);
 
   const _onClickFilter = () => {
     setFuncs(MODAL_KEYS.filter);
@@ -76,7 +85,12 @@ const HREmployerPage = () => {
   const fetchListData = () => {
     setIsLoadingTable(true);
     humanResourcesService
-      .getList(keyWord, status, currentPage - 1, itemPerpage)
+      .getList(
+        searchReducer.keyword,
+        searchReducer.status,
+        currentPage - 1,
+        itemPerpage
+      )
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           setHumanResources(res?.data?.Data?.content);
@@ -95,7 +109,7 @@ const HREmployerPage = () => {
 
   useEffect(() => {
     fetchListData();
-  }, [keyWord, status, currentPage]);
+  }, [searchReducer.keyword, searchReducer.status, currentPage]);
   return (
     <>
       <ModalBase
@@ -103,8 +117,8 @@ const HREmployerPage = () => {
         open={open}
         handleClose={handleClose}
         funcs={funcs}
-        setFuncs={setFuncs}
         fetchData={fetchListData}
+        setFuncs={setFuncs}
       />
       <div className="bg-white p-4 rounded relative w-full mt-8">
         <div className="-mt-12 flex justify-between relative p-4 lg:py-4 lg:px-8 place-items-center rounded-xl bg-orangetext bg-clip-border text-white shadow-md shadow-orange-500/40">

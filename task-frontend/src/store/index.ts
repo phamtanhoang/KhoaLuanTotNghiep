@@ -13,6 +13,7 @@ import storage from "redux-persist/lib/storage";
 import scheduleReducer from "./reducers/scheduleReducer";
 import candidateReducer from "./reducers/candidateReducer";
 import employerReducer from "./reducers/employerReducer";
+import searchReducer from "./reducers/searchReducer";
 
 const persistConfig = {
   key: "root",
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   scheduleReducer: scheduleReducer,
   candidateReducer: candidateReducer,
   employerReducer: employerReducer,
+  searchReducer: searchReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -3,11 +3,15 @@ import { AiOutlineClose } from "react-icons/ai";
 import { IoMdExit } from "react-icons/io";
 import { IoSend } from "react-icons/io5";
 import { TextEditor } from "@/components/form";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
 
 const ApplyJob = (props: any) => {
   const handleClose = props.handleClose;
   const [checked, setChecked] = useState<boolean>(true);
   const [cvFile, setCVFile] = useState<File | null>(null);
+  const [name, setName] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [coverLetter, setCoverLetter] = useState<string>("");
 
   const _onClickCVType = (type: boolean) => {
     setChecked(type);
@@ -25,6 +29,14 @@ const ApplyJob = (props: any) => {
     setCVFile(null);
   };
 
+  const _onClickApply = () => {
+    if (!name) SwalHelper.MiniAlert("Vui lòng nhập tên!", "warning");
+    if (!phoneNumber)
+      SwalHelper.MiniAlert("Vui lòng nhập số điện thoại!", "warning");
+    if (!cvFile) SwalHelper.MiniAlert("Vui lòng chọn CV!", "warning");
+    
+  };
+
   return (
     <div className="lg:w-[45%] w-screen bg-white relative rounded">
       <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-orangetext rounded-t">
@@ -39,28 +51,20 @@ const ApplyJob = (props: any) => {
         </button>
       </div>
 
-      <div className="overflow-auto scrollbar-custom h-max max-h-[75vh]">
-        <div className="my-4 mx-4 text-gray-700 flex flex-col gap-4">
+      <div className="overflow-auto scrollbar-custom h-max max-h-[75vh] my-2 mx-1">
+        <div className="my-2 mx-3 text-gray-700 flex flex-col gap-4">
           <div className="p-4 border border-orangetext border-dotted rounded-lg flex flex-col gap-2 text-sm ">
-            <div className="content-center">
-              <label className="font-medium tracking-wide text-sm">
-                Họ và tên <span className="text-red-500">*</span>
-              </label>
-              <input
-                className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
-                type="text"
-                placeholder="Nguyễn Văn A"
-              />
-            </div>
             <div className="lg:flex justify-between gap-4 content-center">
               <div className="content-center w-full">
                 <label className="font-medium tracking-wide text-sm">
-                  Email <span className="text-red-500">*</span>
+                  Họ và tên <span className="text-red-500">*</span>
                 </label>
                 <input
-                  className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
                   type="text"
-                  placeholder="nguyenvana@example.com"
+                  placeholder="Nguyễn Văn A"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
               <div className="content-center w-full">
@@ -70,7 +74,9 @@ const ApplyJob = (props: any) => {
                 <input
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
                   type="text"
-                  placeholder="0123456789"
+                  placeholder="(+84) 111111"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
                 />
               </div>
             </div>
@@ -164,24 +170,28 @@ const ApplyJob = (props: any) => {
           </div>
 
           <div className="content-center">
-            <label className="font-medium tracking-wide text-sm text-lg">
+            <label className="font-medium tracking-wide text-lg">
               Thư giới thiệu:&nbsp;
             </label>
             <p className="text-gray-600 font-normal text-sm pb-1">
               Một thư giới thiệu ngắn gọn, chỉn chu sẽ giúp bạn trở nên chuyên
               nghiệp và gây ấn tượng hơn với nhà tuyển dụng.
             </p>
-            {/* <textarea
-              className="w-full content-center text-sm p-2 mt-1 border rounded focus:outline-none focus:border-orangetext h-24"
+
+            <TextEditor
               placeholder="Viết giới thiệu ngắn gọn về bản thân (điểm mạnh, điểm yếu) và nêu rõ mong muốn, lý do bạn muốn ứng tuyển vị trí này."
-            /> */}
-            <TextEditor placeholder="Viết giới thiệu ngắn gọn về bản thân (điểm mạnh, điểm yếu) và nêu rõ mong muốn, lý do bạn muốn ứng tuyển vị trí này." />
+              value={coverLetter}
+              onChange={(e: any) => setCoverLetter(e)}
+            />
           </div>
         </div>
       </div>
 
       <div className="flex justify-end gap-4 px-4 py-3 border-t  ">
-        <button className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-600/90 font-medium">
+        <button
+          className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-600/90 font-medium"
+          onClick={_onClickApply}
+        >
           <IoSend className="text-base" />
           <p>Ứng tuyển</p>
         </button>

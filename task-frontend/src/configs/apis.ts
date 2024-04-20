@@ -34,6 +34,7 @@ const CandidateAPI = {
 
 const EmployerAPI = {
   profile: "/employers/profile",
+
   getList: (
     keyword?: string,
     status?: string,
@@ -41,6 +42,13 @@ const EmployerAPI = {
     itemPerPage?: number
   ) => {
     return `/employers/getEmployers-admin?keyword=${keyword}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
+  },
+  getListPublic: (
+    keyword?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/employers?keyword=${keyword}&page=${currentPage}&size=${itemPerPage}`;
   },
 
   employerById: (id?: string) => {
@@ -96,6 +104,16 @@ const HumanResourceAPI = {
 
   profile: "/hr/profile",
 };
+
+const ProcedureAPI = {
+  getList: (name?: string, currentPage?: number, itemPerPage?: number) => {
+    return `/processes?name=${name}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
+  },
+  procedureById: (id: string) => {
+    return `/processes/${id}`;
+  },
+  create: "/processes/create",
+};
 export {
   AuthAPI,
   TagAPI,
@@ -104,4 +122,5 @@ export {
   CandidateAPI,
   EmployerAPI,
   HumanResourceAPI,
+  ProcedureAPI,
 };

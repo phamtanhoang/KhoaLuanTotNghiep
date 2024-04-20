@@ -311,6 +311,7 @@ public class EmployerController {
 
             Page<Employer> employers = employerService.findByKeywordAndStatus(keyword,EStatus.ACTIVE,pageable);
             if (employers.isEmpty()) {
+                System.out.println("123");
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách nhà tuyển dụng rỗng", HttpStatus.OK.value(), null)
                 );

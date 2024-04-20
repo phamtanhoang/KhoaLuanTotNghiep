@@ -11,7 +11,7 @@ const categoriesService = {
     const formData = new FormData();
     formData.append("name", name.trim());
     if (image) formData.append("image", image);
-    return await axiosConfig.put(CategoryAPI.categoryById(id), formData, {
+    return await axiosConfig.patch(CategoryAPI.categoryById(id), formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },

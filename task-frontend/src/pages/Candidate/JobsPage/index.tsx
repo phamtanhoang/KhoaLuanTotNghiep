@@ -36,8 +36,8 @@ const JobsPage: React.FC = () => {
       <ModalBase open={open} handleClose={handleClose} funcs={funcs} />
       <SearchJob />
       <section className="pb-10 pt-8 ">
-        <div className="w-full lg:w-[85%] px-5 lg:px-0 mx-auto">
-          <div className="hidden lg:w-[55%] lg:inline-block sticky top-[77px] mr-[12px]">
+        <div className="w-full lg:w-[85%] px-2 lg:px-0 mx-auto">
+          <div className="hidden lg:inline-block sticky top-[72px] mr-[12px]" style={{ width: "calc(55% - 12px)" }}>
             <JobDetailCard
               name="[HCM] WEB DESIGNER[HCM]"
               employer="Công ty dược phẩm Phúc Long"
@@ -92,8 +92,8 @@ const JobsPage: React.FC = () => {
             />
           </div>
           <div
-            className="w-full inline-block align-top"
-            style={{ width: "calc(45% - 12px)" }}
+            className="w-full inline-block align-top lg:w-[45%]"
+            // style={{ width: "calc(45% - 12px)" }}
           >
             <div className="mb-[12px]">
               <JobCard

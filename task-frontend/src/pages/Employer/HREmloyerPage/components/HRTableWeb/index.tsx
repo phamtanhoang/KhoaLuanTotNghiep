@@ -131,7 +131,7 @@ const HRTableWeb: React.FC<HRTableWebProps> = ({
         <tbody>
           {isLoading ? (
             <tr className="bg-white">
-              <td className="py-3 whitespace-no-wrap" colSpan={6}>
+              <td className="pt-6 whitespace-no-wrap" colSpan={6}>
                 <Loading />
               </td>
             </tr>
@@ -139,7 +139,7 @@ const HRTableWeb: React.FC<HRTableWebProps> = ({
             <>
               {!value ? (
                 <tr className="bg-white">
-                  <td className="py-3 whitespace-no-wrap" colSpan={6}>
+                  <td className="pt-6 whitespace-no-wrap" colSpan={6}>
                     <ListEmpty />
                   </td>
                 </tr>
