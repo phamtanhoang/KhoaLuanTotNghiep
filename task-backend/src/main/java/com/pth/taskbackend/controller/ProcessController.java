@@ -189,7 +189,7 @@ public class ProcessController {
                 Page<ProcessResponse> responseList;
                 if (optionalUser.get().getRole().equals(ERole.EMPLOYER)) {
                     Employer employer = employerService.findByUserEmail(email).get();
-                    Page<Object[]> objects = processService.findProcessWithStepCountByNameContainingAndEmployerId(name, employer.getId(), pageable);
+                    Page<Object[]> objects = processService.findProcessWithStepCountByNameContainingAndEmployerId((name != null) ? name :"", employer.getId(), pageable);
                     List<ProcessResponse> processes = objects.getContent().stream().map(result -> {
                         Process process = (Process) result[0];
                         long count = (Long) result[1];
@@ -220,7 +220,10 @@ public class ProcessController {
                             new BaseResponse("Danh sách quy trình", HttpStatus.OK.value(), responseList)
                     );
                 }
-            } catch (Exception e) {
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
             }
