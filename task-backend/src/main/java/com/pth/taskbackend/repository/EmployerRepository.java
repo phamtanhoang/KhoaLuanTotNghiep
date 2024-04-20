@@ -16,7 +16,7 @@ public interface EmployerRepository extends JpaRepository<Employer, String> {
     Page<Employer> findByKeyword(String keyword, Pageable pageable);
     Optional<Employer> findByUserEmail(String email);
 
-
+    Optional<Employer>findByIdAndUserStatus(String id, EStatus status);
     @Query("SELECT e FROM Employer e, User u " +
             "WHERE (e.user = u) " + // Điều kiện để nối hai bảng
             "AND (:keyword IS NULL OR e.name LIKE %:keyword% OR u.email LIKE %:keyword%) " +

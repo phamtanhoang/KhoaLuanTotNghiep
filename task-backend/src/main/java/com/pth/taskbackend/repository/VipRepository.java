@@ -12,7 +12,8 @@ import org.springframework.data.repository.query.Param;
 public interface VipRepository extends JpaRepository<Vip,String> {
     @Query("SELECT v FROM Vip v WHERE " +
             "(:type IS NULL OR v.type = :type) AND " +
-            "(:status IS NULL OR v.status = :status)")
+            "(:status IS NULL OR v.status = :status) AND " +
+            "v.status != 'DELETED'")
     Page<Vip> findByStatusAndType(@Param("type") EType type, @Param("status") EVipStatus status, Pageable pageable);
 
 }

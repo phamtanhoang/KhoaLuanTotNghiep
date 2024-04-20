@@ -8,14 +8,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Data
-public class Skill extends BaseEntity  {
+public class Skill extends BaseEntity {
 
     @Column(nullable = false)
     private String skill;
@@ -26,10 +25,8 @@ public class Skill extends BaseEntity  {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "candidate_id")
     private Candidate candidate;
 
-
 }
-

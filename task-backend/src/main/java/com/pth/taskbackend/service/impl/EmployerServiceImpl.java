@@ -42,6 +42,11 @@ public class EmployerServiceImpl implements EmployerService {
     }
 
     @Override
+    public Optional<Employer> findByIdAndStatus(String id, EStatus status) throws IOException {
+        return employerRepository.findByIdAndUserStatus(id,status);
+    }
+
+    @Override
     public Page<Employer> findByKeywordAndStatus(String keyword, EStatus status, Pageable pageable)  {
 
         return employerRepository.findByKeywordAndUserStatus(keyword,status,pageable);

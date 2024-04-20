@@ -515,18 +515,20 @@ public class CandidateController {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
                 );
-            experienceService.deleteAllByCandidateId(optionalCandidate.get().getId());
-            List<Experience>experienceList = request.experiences();
 
-            for (Experience experience : experienceList) {
-                if (experience.getId() == null)
-                    experience.setId(UUID.randomUUID().toString());
+            List<Experience>deleteExperiences = experienceService.findByCandidateId(optionalCandidate.get().getId(),Pageable.unpaged()).stream().toList();
+            for (Experience experience : deleteExperiences)
+                experienceService.delete(experience);
+
+            List<Experience>experiences = request.experiences();
+
+            for (Experience experience : experiences) {
                 experience.setCandidate(optionalCandidate.get());
             }
-            experienceService.save(experienceList);
+            experienceService.save(experiences);
 
             return ResponseEntity.ok(
-                    new BaseResponse( "Thêm danh sách kinh nghiệm thành công", HttpStatus.OK.value(),experienceList)
+                    new BaseResponse( "Thêm danh sách kinh nghiệm thành công", HttpStatus.OK.value(),experiences)
             );
 
         } catch (Exception e) {
@@ -550,12 +552,13 @@ public class CandidateController {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
                 );
-            skillService.deleteAllByCandidateId(optionalCandidate.get().getId());
+            List<Skill>deleteSKills = skillService.findByCandidateId(optionalCandidate.get().getId(),Pageable.unpaged()).stream().toList();
+            for (Skill skill : deleteSKills)
+                skillService.delete(skill);
+
             List<Skill>skills = request.skills();
 
             for (Skill skill : skills) {
-                if (skill.getId() == null)
-                    skill.setId(UUID.randomUUID().toString());
                 skill.setCandidate(optionalCandidate.get());
             }
             skillService.save(skills);
@@ -586,18 +589,21 @@ public class CandidateController {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
                 );
-            educationService.deleteAllByCandidateId(optionalCandidate.get().getId());
-            List<Education>educationList = request.educationList();
 
-            for (Education education : educationList) {
-                if (education.getId() == null)
-                    education.setId(UUID.randomUUID().toString());
+            List<Education>deleteEducations = educationService.findByCandidateId(optionalCandidate.get().getId(),Pageable.unpaged()).stream().toList();
+
+            for (Education education : deleteEducations)
+                educationService.delete(education);
+
+            List<Education>experiences = request.educationList();
+
+            for (Education education : experiences) {
                 education.setCandidate(optionalCandidate.get());
             }
-            educationService.save(educationList);
+            educationService.save(experiences);
 
             return ResponseEntity.ok(
-                    new BaseResponse( "Thêm danh sách học vấn thành công", HttpStatus.OK.value(),educationList)
+                    new BaseResponse( "Thêm danh sách học vấn thành công", HttpStatus.OK.value(),experiences)
             );
 
         } catch (Exception e) {

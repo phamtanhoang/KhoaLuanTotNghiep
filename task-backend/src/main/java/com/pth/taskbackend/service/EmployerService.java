@@ -17,6 +17,7 @@ public interface EmployerService {
     Page<Employer>findByKeyword(String keyword, Pageable pageable) throws IOException;
     Optional<Employer>findByUserEmail(String email)throws IOException;
     Optional<Employer>findById(String id) throws IOException;
+    Optional<Employer>findByIdAndStatus(String id ,EStatus status)throws IOException;
     Page<Employer>findByKeywordAndStatus(String keyword, EStatus status, Pageable pageable) throws IOException;
     Page<Employer> findVipEmployers(Pageable pageable)throws  IOException;
     Employer create(Employer employer, MultipartFile image, MultipartFile backgroundImage) throws IOException;

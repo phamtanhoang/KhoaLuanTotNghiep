@@ -16,5 +16,6 @@ public record EmployerResponse(String id,
                                String description,
                                String email,
                                EStatus status,
-                               String userId) {
+                               String userId,
+                                Boolean isVip) {
 }

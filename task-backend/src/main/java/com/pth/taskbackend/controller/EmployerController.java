@@ -89,7 +89,9 @@ public class EmployerController {
                     employer.getDescription(),
                     employer.getUser().getEmail(),
                     employer.getUser().getStatus(),
-                    employer.getUser().getId()
+                    employer.getUser().getId(),
+                    vipEmployerService.isVip(employer.getId())
+
             ));
             if (employers.isEmpty()) {
                 return ResponseEntity.ok(
@@ -129,7 +131,8 @@ public class EmployerController {
                     employer.getDescription(),
                     employer.getUser().getEmail(),
                     employer.getUser().getStatus(),
-                    employer.getUser().getId()
+                    employer.getUser().getId(),
+                    vipEmployerService.isVip(employer.getId())
             ));
             if (employers.isEmpty()) {
                 return ResponseEntity.ok(
@@ -266,6 +269,56 @@ public class EmployerController {
     public ResponseEntity<BaseResponse> getEmployerById(@PathVariable("id") String id) {
         try {
 
+            Optional<Employer> optionalEmployer = employerService.findByIdAndStatus(id,EStatus.ACTIVE);
+            if (optionalEmployer.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+
+            Employer employer = optionalEmployer.get();
+            EmployerResponse employerResponse =  new EmployerResponse(
+                    employer.getId(),
+                    employer.getCreated(),
+                    employer.getUpdated(),
+                    employer.getImage(),
+                    employer.getBackgroundImage(),
+                    employer.getName(),
+                    employer.getLocation(),
+                    employer.getPhoneNumber(),
+                    employer.getBusinessCode(),
+                    employer.getDescription(),
+                    employer.getUser().getEmail(),
+                    employer.getUser().getStatus(),
+                    employer.getUser().getId(),
+                    vipEmployerService.isVip(employer.getId())
+            );
+
+                return ResponseEntity.ok(
+                        new BaseResponse("Chi tiết nhà tuyển dụng ", HttpStatus.OK.value(), employerResponse)
+                );
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "Get by id", description = "", tags = {})
+    @GetMapping("/getEmployer-admin/{id}")
+    public ResponseEntity<BaseResponse> getEmployerByAdmin(@RequestHeader("Authorization")String token,@PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
             Optional<Employer> optionalEmployer = employerService.findById(id);
             if (optionalEmployer.isEmpty())
                 return ResponseEntity.ok(
@@ -290,10 +343,13 @@ public class EmployerController {
                     employer.getDescription(),
                     employer.getUser().getEmail(),
                     employer.getUser().getStatus(),
-                    employer.getUser().getId());
-                return ResponseEntity.ok(
-                        new BaseResponse("Danh sách nhà tuyển dụng ", HttpStatus.OK.value(), employerResponse)
-                );
+                    employer.getUser().getId(),
+                    vipEmployerService.isVip(employer.getId())
+            );
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Chi tiết nhà tuyển dụng ", HttpStatus.OK.value(), employerResponse)
+            );
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
@@ -309,15 +365,33 @@ public class EmployerController {
     public ResponseEntity<BaseResponse> getEmployer( @RequestParam(required = false)String keyword, Pageable pageable) {
         try {
 
-            Page<Employer> employers = employerService.findByKeywordAndStatus(keyword,EStatus.ACTIVE,pageable);
+            Page<Employer> employers = employerService.findByKeywordAndStatus(keyword, EStatus.ACTIVE, pageable);
+
+            Page<EmployerResponse> employerResponses = employers.map(employer ->
+                    new EmployerResponse(
+                            employer.getId(),
+                            employer.getCreated(),
+                            employer.getUpdated(),
+                            employer.getImage(),
+                            employer.getBackgroundImage(),
+                            employer.getName(),
+                            employer.getLocation(),
+                            employer.getPhoneNumber(),
+                            employer.getBusinessCode(),
+                            employer.getDescription(),
+                            employer.getUser().getEmail(),
+                            employer.getUser().getStatus(),
+                            employer.getUser().getId(),
+                            vipEmployerService.isVip(employer.getId())
+                    )
+            );
             if (employers.isEmpty()) {
-                System.out.println("123");
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách nhà tuyển dụng rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách nhà tuyển dụng", HttpStatus.OK.value(), employers)
+                        new BaseResponse("Danh sách nhà tuyển dụng", HttpStatus.OK.value(), employerResponses)
                 );
             }
         } catch (Exception e) {
@@ -450,7 +524,7 @@ public class EmployerController {
         }
     }
 
-    @Operation(summary = "Get by id", description = "", tags = {})
+    @Operation(summary = "update image", description = "", tags = {})
     @PatchMapping("/updateImage")
     public ResponseEntity<BaseResponse> updateEmployerImage(@RequestHeader("Authorization")String token,@RequestPart MultipartFile image) {
         try {
@@ -484,7 +558,7 @@ public class EmployerController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-    @Operation(summary = "Get by id", description = "", tags = {})
+    @Operation(summary = "update background image", description = "", tags = {})
     @PatchMapping("/updateBackgroundImage")
     public ResponseEntity<BaseResponse> updateEmployerBackgroundImage(@RequestHeader("Authorization")String token,@RequestPart MultipartFile backgroundImage) {
         try {
