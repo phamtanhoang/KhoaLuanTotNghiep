@@ -151,7 +151,7 @@ public class ApplicationController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-    @GetMapping("/pendingApplications")
+    @GetMapping("/pendingApplications-employer")
     public ResponseEntity<BaseResponse> pendingApplications(Pageable pageable,
             @RequestHeader("Authorization") String token) {
         try {

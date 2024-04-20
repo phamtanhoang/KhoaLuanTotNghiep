@@ -60,9 +60,14 @@ public class CategoryServiceImpl implements CategoryService {
         if (name != null && !name.isEmpty()) {
             category.setName(name);
         }
-        FileUploadFunc fileUploadFunc = new FileUploadFunc();
-        String path = fileUploadFunc.uploadImage(file);
-        category.setImage(fileUploadFunc.getFullImagePath(path));
+        if(file!=null)
+        {
+            FileUploadFunc fileUploadFunc = new FileUploadFunc();
+            String path = fileUploadFunc.uploadImage(file);
+            category.setImage(fileUploadFunc.getFullImagePath(path));
+
+        }
+
         categoryRepository.save(category);
         return category;
     }

@@ -36,6 +36,14 @@ public interface JobRepository extends JpaRepository<Job, String> {
             Pageable pageable);
 
     Page<Job>findByNameContainingAndCategoryIdAndStatus(String name,String categoryId,EStatus status,Pageable pageable);
+
+
+    @Query("SELECT j FROM Job j " +
+            "WHERE (:status IS NULL OR j.status = :status) " +
+
+            "And j.humanResource.employer.id=:employerId " +
+            "ORDER BY j.created DESC")
+    Page<Job>findByEmployerIdAndStatus(String employerId,EStatus status,Pageable pageable);
     Page<Job>findByStatusOrderByCreatedDesc(EStatus status, Pageable pageable);
 
     @Query("SELECT j FROM Job j " +

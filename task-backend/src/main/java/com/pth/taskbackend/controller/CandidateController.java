@@ -383,7 +383,7 @@ public class CandidateController {
 
 
     @Operation(summary = "update by token", description = "", tags = {})
-    @PatchMapping("/updateProfile/")
+    @PatchMapping("/updateProfile")
     public ResponseEntity<BaseResponse> updateCandidateProfile(@RequestHeader("Authorization")String token, @RequestBody UpdateCandidateRequest request
                                                              ) {
         try {
@@ -410,8 +410,7 @@ public class CandidateController {
             update.setJob(request.job());
             update.setIntroduction(request.introduction());
             update.setSex(request.sex());
-            if(!passwordEncoder.matches(request.password(), optionalCandidate.get().getUser().getPassword())&&!request.password().isEmpty())
-                optionalCandidate.get().getUser().setPassword(passwordEncoder.encode(request.password()));
+
             candidateService.update(update );
             return ResponseEntity.ok(
                     new BaseResponse( "Cập nhật thông tin ứng viên thành công", HttpStatus.OK.value(), update)
@@ -421,13 +420,12 @@ public class CandidateController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 
-    @Operation(summary = "Get by id", description = "", tags = {})
+    @Operation(summary = "Update Avatar", description = "", tags = {})
     @PatchMapping("/updateAvatar")
     public ResponseEntity<BaseResponse> updateCandidateAvatar(@RequestHeader("Authorization")String token,@RequestPart MultipartFile avatar) {
         try {

@@ -153,7 +153,7 @@ public class CategoryController {
     @Operation(summary = "update", description = "", tags = {})
     @PatchMapping("/{id}")
 public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization")String token, @PathVariable("id") String id, @RequestPart String name,
-                                                   @RequestPart MultipartFile image) {
+                                                   @RequestPart(required = false) MultipartFile image) {
         try {
 
             String email = jwtService.extractUsername(token.substring(7));
@@ -176,11 +176,7 @@ public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization
                 );
             }
 
-            if (image == null) {
-                    return ResponseEntity.ok(
-                            new BaseResponse("Vui lòng chọn hình ảnh!", HttpStatus.BAD_REQUEST.value(), null)
-                    );
-            }
+
             Category  category = categoryService.updateCategory(optionalCategory.get(), name, image);
             return ResponseEntity.ok(
                     new BaseResponse("Cập nhật danh mục thành công", HttpStatus.OK.value(), category)

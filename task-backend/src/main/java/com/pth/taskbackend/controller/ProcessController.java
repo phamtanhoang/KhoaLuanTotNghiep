@@ -4,7 +4,6 @@ import com.pth.taskbackend.dto.request.StepRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.dto.response.ProcessResponse;
 import com.pth.taskbackend.dto.response.StepResponse;
-import com.pth.taskbackend.dto.response.TopJobResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.*;
