@@ -20,7 +20,7 @@ public interface ProcessRepository extends JpaRepository<Process,String> {
 
     Optional<Process> findByNameAndEmployerId(String name, String employerId);
 
-    @Query("SELECT p FROM Process p WHERE (:name IS NULL OR :NAME IS EMPTY or p.name LIKE %:name%)")
+    @Query("SELECT p FROM Process p WHERE (:name IS NULL OR p.name LIKE %:name%)")
     Page<Process> findByNameContaining(String name, Pageable pageable);
 
     Optional<Process> findByIdAndEmployerId(String id, String employerId);
