@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
@@ -87,6 +88,27 @@ public class TagController {
             } else {
                 tags = tagService.findAll(pageable);
             }
+            if (tags.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách nhãn rỗng", HttpStatus.OK.value(), null)
+                );
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách nhãn", HttpStatus.OK.value(), tags)
+                );
+            }
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "Get list by name", description = "", tags = {})
+    @GetMapping(" /getTags_Dropdown")
+    public ResponseEntity<BaseResponse> getTagsDropdown() {
+        try {
+
+            List<Tag> tags = tagService.findAll(Pageable.unpaged()).toList();
+
             if (tags.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách nhãn rỗng", HttpStatus.OK.value(), null)

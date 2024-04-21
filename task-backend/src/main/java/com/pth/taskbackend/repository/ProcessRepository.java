@@ -33,6 +33,15 @@ public interface ProcessRepository extends JpaRepository<Process,String> {
                 "FROM Process p " +
                 "WHERE p.name LIKE %:name% AND p.employer.id = :employerId")
         Page<Object[]> findProcessWithStepCountByNameContainingAndEmployerId(String name, String employerId, Pageable pageable);
+
+    @Query("SELECT p, (SELECT COUNT(s) FROM Step s WHERE s.process.id = p.id) " +
+            "FROM Process p " +
+            "WHERE p.employer.id = :employerId")
+    List<Object[]> findByEmployerId( String employerId);
+    @Query("SELECT p, (SELECT COUNT(s) FROM Step s WHERE s.process.id = p.id) " +
+            "FROM Process p,HumanResource hr " +
+            "WHERE p.employer.id = :employerId and p.employer.id=hr.employer.id and hr.id=:hrId ")
+    List<Object[]> findByHrId( String hrId);
     }
 
 

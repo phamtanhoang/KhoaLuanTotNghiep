@@ -78,6 +78,16 @@ public class ProcessServiceImpl implements ProcessService
     }
 
     @Override
+    public List<Object[]> findByEmployerId(String employerId) throws IOException {
+        return processRepository.findByEmployerId(employerId);
+    }
+
+    @Override
+    public List<Object[]> findByHrId(String hrId) throws IOException {
+        return processRepository.findByHrId(hrId);
+    }
+
+    @Override
     public Page<Object[]> findProcessWithStepCountByNameContainingAndEmployerId(String name, String employerId, Pageable pageable) {
         return processRepository.findProcessWithStepCountByNameContainingAndEmployerId(name,employerId,pageable);
 

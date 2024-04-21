@@ -24,5 +24,8 @@ public interface ProcessService {
      Optional<Process> findByIdAndEmployerId(String id, String employerId ) throws  IOException;
     List<Process> findProcessesWithIdInJob(String id) throws  IOException;
 
+    List<Object[]> findByEmployerId( String employerId)throws IOException;
+    List<Object[]> findByHrId( String hrId)throws IOException;
+
     Page<Object[]>findProcessWithStepCountByNameContainingAndEmployerId(String name, String employerId, Pageable pageable);
 }

@@ -229,7 +229,67 @@ public class ProcessController {
             }
         }
 
-        private ProcessResponse createProcessResponse(Process process, Long stepCount, Pageable pageable) {
+    @Operation(summary = "Get list", description = "", tags = {})
+    @GetMapping("/getProcesses_Dropdown")
+    public ResponseEntity<BaseResponse> getProcessesDropDown(@RequestHeader("Authorization") String token) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            List<ProcessResponse> responseList;
+            if (optionalUser.get().getRole().equals(ERole.EMPLOYER)) {
+                Employer employer = employerService.findByUserEmail(email).get();
+                List<Object[]> objects = processService.findByEmployerId(employer.getId());
+                responseList = objects.stream().map(result -> {
+                    Process process = (Process) result[0];
+                    long count = (Long) result[1];
+                    return createProcessResponse(process, count, null);
+                }).collect(Collectors.toList());
+            } else if (optionalUser.get().getRole().equals(ERole.HR)) {
+                HumanResource hr = humanResourceService.findByEmail(email).get();
+                List<Object[]> objects = processService.findByHrId(hr.getEmployer().getId());
+                responseList = objects.stream().map(result -> {
+                    Process process = (Process) result[0];
+                    Long count = (Long) result[1];
+                    return createProcessResponse(process, count, null);
+                }).collect(Collectors.toList());
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Vai trò người dùng không hợp lệ", HttpStatus.BAD_REQUEST.value(), null)
+                );
+            }
+
+            if (responseList.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách quy trình rỗng", HttpStatus.OK.value(), null)
+                );
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách quy trình", HttpStatus.OK.value(), responseList)
+                );
+            }
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+
+    private ProcessResponse createProcessResponse(Process process, Long stepCount, Pageable pageable) {
             Page<Step> steps = stepService.findByProcessId(process.getId(), pageable);
 
             List<StepResponse> stepList = steps.getContent().stream()

@@ -39,8 +39,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
@@ -183,6 +185,60 @@ public class HumanResourceController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
+    @Operation(summary = "Get list", description = "", tags = {})
+    @GetMapping("/getHumanResources_Dropdown")
+    public ResponseEntity<BaseResponse> getHumanResourceDropDown(@RequestHeader("Authorization") String token) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+            if (optionalEmployer.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            List<HumanResource> humanResources = humanResourceService.findByEmployerId(optionalEmployer.get().getId(), null).toList();
+            List<HumanResourceResponse> responseList = humanResources.stream().map(humanResource -> new HumanResourceResponse(
+                    humanResource.getId(),
+                    humanResource.getCreated(),
+                    humanResource.getUpdated(),
+                    humanResource.getDateOfBirth(),
+                    humanResource.getFirstName(),
+                    humanResource.getLastName(),
+                    humanResource.getPhoneNumber(),
+                    humanResource.getSex(),
+                    humanResource.getAvatar(),
+                    humanResource.getEmployer().getName(),
+                    humanResource.getEmployer().getId(),
+                    humanResource.getUser().getId(),
+                    humanResource.getUser().getStatus().toString(),
+                    humanResource.getUser().getEmail()
+            )).collect(Collectors.toList());
+
+            if (responseList.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách HR rỗng", HttpStatus.OK.value(), null)
+                );
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách HR", HttpStatus.OK.value(), responseList)
+                );
+            }
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
 
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")

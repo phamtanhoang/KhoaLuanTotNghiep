@@ -113,6 +113,26 @@ public class CategoryController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+    @Operation(summary = "Get list top down", description = "", tags = {})
+    @GetMapping("/getCategories_Dropdown")
+    public ResponseEntity<BaseResponse> getCategoriesDropDown(@RequestParam(required = false) String name ) throws IOException {
+        try {
+            List<Category> categories = categoryService.findAll(Pageable.unpaged()).toList();
+
+            if (categories.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách danh mục rỗng", HttpStatus.OK.value(), null)
+                );
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách danh mục", HttpStatus.OK.value(), categories)
+                );
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 
 
     @Operation(summary = "Create", description = "", tags = {})

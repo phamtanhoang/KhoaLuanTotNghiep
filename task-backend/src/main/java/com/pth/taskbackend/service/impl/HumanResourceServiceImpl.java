@@ -33,7 +33,7 @@ public class HumanResourceServiceImpl implements HumanResourceService {
 
     @Override
     public Page<HumanResource> findByEmployerId(String id, Pageable pageable) {
-        return null;
+        return humanResourceRepository.findByEmployerId(id,pageable);
     }
 
     @Override
