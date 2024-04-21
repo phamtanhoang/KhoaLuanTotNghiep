@@ -370,7 +370,7 @@ public class ProcessController {
     }
     @Operation(summary = "delete process", description = "", tags = {})
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleterocess(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+    public ResponseEntity<BaseResponse> deleteProcess(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
@@ -399,7 +399,9 @@ public class ProcessController {
                 return ResponseEntity.ok(
                         new BaseResponse("Quy trình đang được sử dụng", HttpStatus.OK.value(), null)
                 );
-
+//            List<Step>steps = stepService.findByProcessId(id);
+//            for(Step step:steps)
+//                stepService.delete(step);
             processService.delete(optionalProcess.get());
             return ResponseEntity.ok(
                     new BaseResponse("Xóa quy trình thành công", HttpStatus.OK.value(), null)
@@ -409,6 +411,7 @@ public class ProcessController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }

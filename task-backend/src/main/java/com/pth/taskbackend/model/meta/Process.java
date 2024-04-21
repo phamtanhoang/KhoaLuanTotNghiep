@@ -8,6 +8,7 @@
     import lombok.NoArgsConstructor;
 
     import java.util.HashSet;
+    import java.util.List;
     import java.util.Set;
 
     @Entity
@@ -25,6 +26,9 @@
         @ManyToOne
         @JoinColumn(name = "employer_id")
         private Employer employer;
+
+        @OneToMany(mappedBy = "process", cascade = CascadeType.ALL, orphanRemoval = true)
+        private List<Step> steps;
 
 
     }
