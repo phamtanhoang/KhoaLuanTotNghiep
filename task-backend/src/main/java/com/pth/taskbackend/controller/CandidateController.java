@@ -71,6 +71,13 @@ public class CandidateController {
     EducationService educationService;
     @Autowired
     SkillService skillService;
+
+    @Autowired VipEmployerService vipEmployerService;
+
+
+    @Autowired
+    EmployerService employerService;
+    @Autowired HumanResourceService humanResourceService;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("getCandidates-admin")
     public ResponseEntity<BaseResponse> getCandidatesByAdmin(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword,@RequestParam(required = false)EStatus status, Pageable pageable) {
@@ -303,26 +310,59 @@ public class CandidateController {
     public ResponseEntity<BaseResponse> getCandidates(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword, Pageable pageable) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER)||checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
             if (!permission)
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
+            Optional<User> user = userRepository.findByEmail(email);
 
-            Optional<User> optionalUser = userRepository.findByEmail(email);
-            if (optionalUser.isEmpty())
+            if (user.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
+            Optional<Employer>optionalEmployer = Optional.empty();
+            if(user.get().getRole().equals(ERole.EMPLOYER))
+            {
+                optionalEmployer= employerService.findByUserEmail(email);
+            }
+            if(user.get().getRole().equals(ERole.HR))
+            {
+                optionalEmployer= employerService.findById(humanResourceService.findByEmail(email).get().getEmployer().getId());
+            }
+            boolean isVip = vipEmployerService.isVip(optionalEmployer.get().getId());
 
-            Page<Candidate> candidates = candidateService.findByKeywordAndStatus(keyword,EStatus.ACTIVE,pageable);
-            if (candidates.isEmpty()) {
+            if(isVip==false)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép sử dụng chức năng này", HttpStatus.FORBIDDEN.value(), null)
+                );
+            Page<Candidate> candidates = candidateService.findVipCandidateByKeyword(keyword, pageable);
+
+            Page<CandidateResponse> responses = candidates.map(candidate -> new CandidateResponse(
+                    candidate.getId(),
+                    candidate.getCreated(),
+                    candidate.getUpdated(),
+                    candidate.getFirstName(),
+                    candidate.getLastName(),
+                    candidate.getPhoneNumber(),
+                    candidate.getSex(),
+                    candidate.getAvatar(),
+                    candidate.getDateOfBirth(),
+                    candidate.getIntroduction(),
+                    candidate.getJob(),
+                    candidate.getLink(),
+                    candidate.getUser().getStatus(),
+                    candidate.getUser().getEmail(),
+                    candidate.getUser().getId()
+            ));
+
+            if (responses.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách ứng viên rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách ứng viên", HttpStatus.OK.value(), candidates)
+                        new BaseResponse("Danh sách ứng viên", HttpStatus.OK.value(), responses)
                 );
             }
         }catch (ExpiredJwtException e) {

@@ -855,16 +855,16 @@ public class JobController {
     public ResponseEntity<BaseResponse> updateJob(@RequestHeader("Authorization")String token,@PathVariable("id") String id, @RequestBody JobRequest request) throws IOException {
         try {
             String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR)|| checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
             if (!permission)
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
 
-            Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
-            if (optionalHumanResource.isEmpty())
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy người dùng  ", HttpStatus.NOT_FOUND.value(), null)
                 );
 
             Optional<Job> optionalJob = jobService.findById(id);
@@ -888,7 +888,21 @@ public class JobController {
             job.setToSalary(request.toSalary());
             job.setToDate(request.toDate());
             job.setExperience(request.experience());
-            job.setHumanResource(optionalHumanResource.get());
+            if(optionalUser.get().getRole().equals(ERole.EMPLOYER))
+            {
+                Optional<HumanResource> optionalHumanResource = humanResourceService.findById(request.humanResourceId());
+                if(optionalHumanResource.isEmpty())
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
+
+                job.setHumanResource(optionalHumanResource.get());
+
+            }
+            else
+            {
+                job.setHumanResource(humanResourceService.findByEmail(email).get());
+
+            }
             if(request.tags()!=null) {
                 Set<com.pth.taskbackend.model.meta.Tag>tags= new HashSet<>();
                 for (com.pth.taskbackend.model.meta.Tag tag:request.tags()) {

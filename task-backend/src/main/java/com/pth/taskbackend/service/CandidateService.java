@@ -25,6 +25,8 @@ public interface CandidateService {
 
     Page<Candidate> findVipCandidates(Pageable pageable)throws IOException;
 
+    Page<Candidate>findVipCandidateByKeyword(String keyword, Pageable pageable)throws IOException;
+
     Long count()throws IOException;
 
 

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -19,6 +20,20 @@ public interface CandidateRepository extends JpaRepository<Candidate, String> {
             "AND (:status IS NULL OR u.status = :status) " +
             "AND u.status <> 'DELETED'")
     Page<Candidate> findByKeywordAndUserStatus(String keyword, EStatus status, Pageable pageable);
+
+    @Query("SELECT DISTINCT c " +
+            "FROM Candidate c " +
+            "JOIN User a ON c.user.id = a.id " +
+            "JOIN VipCandidate v ON c.id = v.candidate.id " +
+            "JOIN c.skills s " +
+            "WHERE (DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE()) " +
+            "AND a.status = 'ACTIVE' " +
+            "AND a.status != 'DELETE' " +
+            "AND (:keyword IS NULL OR " +
+            "     LOWER(c.job) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "     OR LOWER(s.skill) LIKE LOWER(CONCAT('%', :keyword, '%'))) ")
+    Page<Candidate> findVipCandidateByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
 
     Optional<Candidate>findByUserEmail(String email);
     @Query("SELECT distinct c FROM Candidate c " +
