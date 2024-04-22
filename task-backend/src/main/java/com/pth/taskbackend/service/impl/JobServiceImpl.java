@@ -83,6 +83,16 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public Page<Job> findByKeywordAndCategoryIdAndEmployerId(String keyword, String categoryId, String employerId, Pageable pageable) throws IOException {
+        return jobRepository.findByKeywordAndCategoryIdAndEmployerId(keyword,categoryId,employerId,pageable);
+    }
+
+    @Override
+    public Page<Job> findByKeywordAndCategoryIdAndHRId(String keyword, String categoryId, String hrId, Pageable pageable) throws IOException {
+        return jobRepository.findByKeywordAndCategoryIdAndHRId(keyword,categoryId,hrId,pageable);
+    }
+
+    @Override
     public Page<Job> findByEmployerId(String employerId, Pageable pageable) {
         return null;
     }

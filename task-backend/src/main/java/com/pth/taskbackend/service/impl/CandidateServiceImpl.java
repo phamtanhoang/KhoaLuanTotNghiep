@@ -91,6 +91,11 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
+    public Page<Candidate> findCandidateByKeyword(String keyword, Pageable pageable) throws IOException {
+        return candidateRepository.findCandidateByKeyword(keyword,pageable);
+    }
+
+    @Override
     public Long count() throws IOException {
         return candidateRepository.count();
     }

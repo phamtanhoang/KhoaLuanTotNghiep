@@ -34,6 +34,18 @@ public interface CandidateRepository extends JpaRepository<Candidate, String> {
             "     OR LOWER(s.skill) LIKE LOWER(CONCAT('%', :keyword, '%'))) ")
     Page<Candidate> findVipCandidateByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
+    @Query("SELECT DISTINCT c " +
+            "FROM Candidate c " +
+            "JOIN User a ON c.user.id = a.id " +
+            "JOIN c.skills s " +
+            "WHERE a.status = 'ACTIVE' " +
+            "AND a.status != 'DELETE' " +
+            "AND (:keyword IS NULL OR " +
+            "     LOWER(c.job) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "     OR LOWER(s.skill) LIKE LOWER(CONCAT('%', :keyword, '%'))) ")
+    Page<Candidate> findCandidateByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+
 
     Optional<Candidate>findByUserEmail(String email);
     @Query("SELECT distinct c FROM Candidate c " +

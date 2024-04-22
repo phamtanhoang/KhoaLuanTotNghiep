@@ -29,6 +29,9 @@ public interface JobService {
 
     Page<Job>findByKeywordAndStatusAndCategoryIdAndHRId(String keyword, EStatus status,String categoryId,String hRId,Pageable pageable)throws IOException;
     Page<Job>findByKeywordAndStatusAndCategoryIdAndEmployerId(String keyword, EStatus status,String categoryId,String employerId,Pageable pageable)throws IOException;
+    Page<Job>findByKeywordAndCategoryIdAndEmployerId(String keyword,String categoryId,String employerId,Pageable pageable)throws IOException;
+    Page<Job>findByKeywordAndCategoryIdAndHRId(String keyword,String categoryId,String hrId,Pageable pageable)throws IOException;
+
     Page<Job> findByEmployerId(String employerId, Pageable pageable)throws IOException;
     Page<Job>findByEmployerIdAndStatus(String employerId,EStatus status,Pageable pageable)throws  IOException;
     Page<Job>findByCategoryId(String id,Pageable pageable)throws IOException;

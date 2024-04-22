@@ -459,7 +459,7 @@ public class JobController {
     public ResponseEntity<BaseResponse> getJobsByHR(@RequestHeader("Authorization")String token,
                                                     @RequestParam(required = false) String keyword,
                                                     @RequestParam(required = false) String categoryId,
-                                                    @RequestParam(required = false)EStatus status,
+                                                    @RequestParam(required = false)String status,
                                                     Pageable pageable) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
@@ -475,11 +475,27 @@ public class JobController {
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            if(status==EStatus.DELETED)
-                return ResponseEntity.ok(
-                        new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
-                );
-            Page<Job> jobs = jobService.findByKeywordAndStatusAndCategoryIdAndHRId(keyword, status, categoryId, optionalHumanResource.get().getId(),pageable);
+            EStatus statusValue = null;
+            if (status != null && !status.isEmpty()) {
+                try {
+                    statusValue = EStatus.valueOf(status);
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.ok(
+                            new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+                }
+                if (statusValue == EStatus.DELETED)
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+            }
+
+            Page<Job> jobs;
+            if (statusValue == null || status.isEmpty()) {
+                jobs = jobService.findByKeywordAndCategoryIdAndHRId(keyword, categoryId, optionalHumanResource.get().getId(), pageable);
+            } else {
+                jobs = jobService.findByKeywordAndStatusAndCategoryIdAndHRId(keyword, statusValue, categoryId, optionalHumanResource.get().getId(), pageable);
+            }
 
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
@@ -505,7 +521,6 @@ public class JobController {
                     } else {
                         stepResponses = Collections.emptyList();
                     }
-
                     return new JobResponse(
                             job.getId(),
                             job.getCreated(),
@@ -549,11 +564,11 @@ public class JobController {
     }
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("/getJobs-employer")
-    public ResponseEntity<BaseResponse> getJobsByEmployer(@RequestHeader("Authorization")String token,
-                                                    @RequestParam(required = false) String keyword,
-                                                    @RequestParam(required = false) String categoryId,
-                                                    @RequestParam(required = false)EStatus status,
-                                                    Pageable pageable) {
+    public ResponseEntity<BaseResponse> getJobsByEmployer(@RequestHeader("Authorization") String token,
+                                                          @RequestParam(required = false) String keyword,
+                                                          @RequestParam(required = false) String categoryId,
+                                                          @RequestParam(required = false) String status,
+                                                          Pageable pageable) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
@@ -568,11 +583,27 @@ public class JobController {
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            if(status==EStatus.DELETED)
-                return ResponseEntity.ok(
-                        new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
-                );
-            Page<Job> jobs = jobService.findByKeywordAndStatusAndCategoryIdAndEmployerId(keyword, status, categoryId, optionalEmployer.get().getId(),pageable);
+            EStatus statusValue = null;
+            if (status != null && !status.isEmpty()) {
+                try {
+                    statusValue = EStatus.valueOf(status);
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.ok(
+                            new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+                }
+                if (statusValue == EStatus.DELETED)
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+            }
+
+            Page<Job> jobs;
+            if (statusValue == null || status.isEmpty()) {
+                jobs = jobService.findByKeywordAndCategoryIdAndEmployerId(keyword, categoryId, optionalEmployer.get().getId(), pageable);
+            } else {
+                jobs = jobService.findByKeywordAndStatusAndCategoryIdAndEmployerId(keyword, statusValue, categoryId, optionalEmployer.get().getId(), pageable);
+            }
 
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
@@ -630,90 +661,17 @@ public class JobController {
                 );
 
             }
-        }catch (ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
 
     }
-    @Operation(summary = "Get list", description = "", tags = {})
-    @GetMapping("/getJobs-employerId/{id}")
-    public ResponseEntity<BaseResponse> getJobsByEmployerId(
-                                                          @PathVariable("id")String id,
-                                                          Pageable pageable) {
-        try {
 
-            Page<Job> jobs = jobService.findByEmployerIdAndStatus(id,EStatus.ACTIVE,pageable);
-
-            if (jobs.isEmpty()) {
-                return ResponseEntity.ok(
-                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
-                );
-            } else {
-                List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
-
-                    List<StepResponse> stepResponses;
-
-                    if (job.getProcess() != null) {
-                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
-                        List<Step> stepList = steps.getContent();
-                        stepResponses = stepList.stream()
-                                .map(step -> new StepResponse(
-                                        step.getId(),
-                                        step.getName(),
-                                        step.getNumber(),
-                                        step.getDescription(),
-                                        step.getProcess() != null ? step.getProcess().getId() : null
-                                ))
-                                .collect(Collectors.toList());
-                    } else {
-                        stepResponses = Collections.emptyList();
-                    }
-
-                    return new JobResponse(
-                            job.getId(),
-                            job.getCreated(),
-                            job.getUpdated(),
-                            job.getToDate(),
-                            job.getName(),
-                            job.getDescription(),
-                            job.getExperience(),
-                            job.getFromSalary(),
-                            job.getToSalary(),
-                            job.getLocation(),
-                            job.getStatus(),
-                            job.getCategory().getId(),
-                            job.getCategory().getName(),
-                            job.getHumanResource().getId(),
-                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
-                            job.getHumanResource().getEmployer().getName(),
-                            job.getHumanResource().getEmployer().getId(),
-                            job.getHumanResource().getEmployer().getUser().getEmail(),
-                            job.getProcess() != null ? job.getProcess().getId() : null,
-                            job.getProcess() != null ? job.getProcess().getName() : null,
-                            stepResponses,
-                            job.getTags().stream().toList()
-                    );
-                }).collect(Collectors.toList());
-
-                Page<JobResponse> jobResponsePage = new PageImpl<>(jobResponses, jobs.getPageable(), jobs.getTotalElements());
-                return ResponseEntity.ok(
-                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobResponsePage)
-                );
-
-            }
-        }catch (ExpiredJwtException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-
-    }
     @Operation(summary = "Get detail", description = "", tags = {})
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getJob(@PathVariable String id) {

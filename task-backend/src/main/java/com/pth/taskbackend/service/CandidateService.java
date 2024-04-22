@@ -5,6 +5,7 @@ import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Employer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ public interface CandidateService {
     Page<Candidate> findVipCandidates(Pageable pageable)throws IOException;
 
     Page<Candidate>findVipCandidateByKeyword(String keyword, Pageable pageable)throws IOException;
-
+    Page<Candidate> findCandidateByKeyword(String keyword, Pageable pageable)throws  IOException;
     Long count()throws IOException;
 
 

@@ -332,11 +332,11 @@ public class CandidateController {
             }
             boolean isVip = vipEmployerService.isVip(optionalEmployer.get().getId());
 
-            if(isVip==false)
+            if(!isVip)
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép sử dụng chức năng này", HttpStatus.FORBIDDEN.value(), null)
                 );
-            Page<Candidate> candidates = candidateService.findVipCandidateByKeyword(keyword, pageable);
+            Page<Candidate> candidates = candidateService.findCandidateByKeyword(keyword, pageable);
 
             Page<CandidateResponse> responses = candidates.map(candidate -> new CandidateResponse(
                     candidate.getId(),

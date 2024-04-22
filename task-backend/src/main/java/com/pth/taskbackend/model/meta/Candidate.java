@@ -45,7 +45,7 @@ public class Candidate extends BaseEntity {
     @Column
     private String link;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String job;
 
     @Column(columnDefinition = "TEXT")

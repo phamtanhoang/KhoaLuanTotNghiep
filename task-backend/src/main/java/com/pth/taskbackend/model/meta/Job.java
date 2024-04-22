@@ -26,7 +26,7 @@ public class Job  extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column
@@ -44,7 +44,7 @@ public class Job  extends BaseEntity {
     @Column
     private String toSalary;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String experience;
 
     @ManyToOne
