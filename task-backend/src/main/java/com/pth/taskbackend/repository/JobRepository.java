@@ -73,7 +73,7 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "       OR LOWER(j.description) LIKE %:keyword% " +
             "       OR LOWER(j.experience) LIKE %:keyword% " +
             "       OR LOWER(c.name) LIKE %:keyword%)) " +
-            "AND (:categoryId IS NULL OR j.category.id = :categoryId) " +
+            "AND (:categoryId IS NULL or (:categoryId = '') OR j.category.id = :categoryId) " +
             "And j.humanResource.id=:hRId " +
             "AND  j.status !='DELETED' " +
             "ORDER BY j.created DESC")
@@ -89,10 +89,10 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "       OR LOWER(j.description) LIKE %:keyword% " +
             "       OR LOWER(j.experience) LIKE %:keyword% " +
             "       OR LOWER(j.category.name) LIKE %:keyword%)) " +
-            "AND j.status = :status " +
-            "AND (:categoryId IS NULL OR j.category.id = :categoryId) " +
+            "AND (:status IS NULL OR :status = '' OR j.status = :status) " +
+            "AND (:categoryId IS NULL OR :categoryId = '' OR j.category.id = :categoryId) " +
             "AND j.humanResource.employer.id = :employerId " +
-            "AND  j.status !='DELETED' " +
+            "AND  j.status != 'DELETED' " +
             "ORDER BY j.created DESC")
     Page<Job> findByKeywordAndStatusAndCategoryIdAndEmployerId(
             @Param("keyword") String keyword,
@@ -108,7 +108,7 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "       OR LOWER(j.description) LIKE %:keyword% " +
             "       OR LOWER(j.experience) LIKE %:keyword% " +
             "       OR LOWER(j.category.name) LIKE %:keyword%)) " +
-            "AND (:categoryId IS NULL OR j.category.id = :categoryId) " +
+            "AND (:categoryId IS NULL or (:categoryId = '')  OR j.category.id = :categoryId) " +
             "AND j.humanResource.employer.id = :employerId " +
             "AND  j.status !='DELETED' " +
             "ORDER BY j.created DESC")

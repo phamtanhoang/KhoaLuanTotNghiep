@@ -459,7 +459,7 @@ public class JobController {
     public ResponseEntity<BaseResponse> getJobsByHR(@RequestHeader("Authorization")String token,
                                                     @RequestParam(required = false) String keyword,
                                                     @RequestParam(required = false) String categoryId,
-                                                    @RequestParam(required = false)String status,
+                                                    @RequestParam(required = false)EStatus status,
                                                     Pageable pageable) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
@@ -475,27 +475,14 @@ public class JobController {
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            EStatus statusValue = null;
-            if (status != null && !status.isEmpty()) {
-                try {
-                    statusValue = EStatus.valueOf(status);
-                } catch (IllegalArgumentException e) {
-                    return ResponseEntity.ok(
-                            new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null)
-                    );
-                }
-                if (statusValue == EStatus.DELETED)
+
+                if (status == EStatus.DELETED)
                     return ResponseEntity.ok(
                             new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
                     );
-            }
 
             Page<Job> jobs;
-            if (statusValue == null || status.isEmpty()) {
-                jobs = jobService.findByKeywordAndCategoryIdAndHRId(keyword, categoryId, optionalHumanResource.get().getId(), pageable);
-            } else {
-                jobs = jobService.findByKeywordAndStatusAndCategoryIdAndHRId(keyword, statusValue, categoryId, optionalHumanResource.get().getId(), pageable);
-            }
+                jobs = jobService.findByKeywordAndStatusAndCategoryIdAndHRId(keyword, status, categoryId, optionalHumanResource.get().getId(), pageable);
 
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
@@ -567,7 +554,7 @@ public class JobController {
     public ResponseEntity<BaseResponse> getJobsByEmployer(@RequestHeader("Authorization") String token,
                                                           @RequestParam(required = false) String keyword,
                                                           @RequestParam(required = false) String categoryId,
-                                                          @RequestParam(required = false) String status,
+                                                          @RequestParam(required = false) EStatus status,
                                                           Pageable pageable) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
@@ -583,27 +570,14 @@ public class JobController {
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            EStatus statusValue = null;
-            if (status != null && !status.isEmpty()) {
-                try {
-                    statusValue = EStatus.valueOf(status);
-                } catch (IllegalArgumentException e) {
-                    return ResponseEntity.ok(
-                            new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null)
-                    );
-                }
-                if (statusValue == EStatus.DELETED)
+                if (status == EStatus.DELETED)
                     return ResponseEntity.ok(
                             new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
                     );
-            }
+
 
             Page<Job> jobs;
-            if (statusValue == null || status.isEmpty()) {
-                jobs = jobService.findByKeywordAndCategoryIdAndEmployerId(keyword, categoryId, optionalEmployer.get().getId(), pageable);
-            } else {
-                jobs = jobService.findByKeywordAndStatusAndCategoryIdAndEmployerId(keyword, statusValue, categoryId, optionalEmployer.get().getId(), pageable);
-            }
+                jobs = jobService.findByKeywordAndStatusAndCategoryIdAndEmployerId(keyword, status, categoryId, optionalEmployer.get().getId(), pageable);
 
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
@@ -794,6 +768,12 @@ public class JobController {
                 tags.add(optional.get());
             }
             job.setTags(tags);
+
+            Optional<Process>optionalProcess= processService.findById(request.processId());
+            if(optionalProcess.isEmpty())
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new BaseResponse("Không tìm thấy quy trình", HttpStatus.NOT_FOUND.value(), null));
+            job.setProcess(optionalProcess.get());
             jobService.create(job);
 
             return ResponseEntity.ok(

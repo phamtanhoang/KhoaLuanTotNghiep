@@ -78,12 +78,15 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Page<Job> findByKeywordAndStatusAndCategoryIdAndEmployerId(String keyword, EStatus status, String categoryId, String employerId, Pageable pageable) throws IOException {
+        System.out.println("hihi"+categoryId);
+
         return jobRepository.findByKeywordAndStatusAndCategoryIdAndEmployerId(keyword,status,categoryId,employerId,pageable);
 
     }
 
     @Override
     public Page<Job> findByKeywordAndCategoryIdAndEmployerId(String keyword, String categoryId, String employerId, Pageable pageable) throws IOException {
+        System.out.println("hihi"+categoryId);
         return jobRepository.findByKeywordAndCategoryIdAndEmployerId(keyword,categoryId,employerId,pageable);
     }
 
