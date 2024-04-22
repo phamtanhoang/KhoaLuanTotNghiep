@@ -1,70 +1,33 @@
-import { Editor } from "@tinymce/tinymce-react";
 import React from "react";
-import { useRef } from "react";
+
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import "./index.css";
 
 interface EditorInterface {
   value?: string;
-  placeholder?: string;
-  onChange?: any;
+  onChange?: (event: any, editor: any) => void;
+  onReady?: (editor: any) => void;
+  onBlur?: (event: any, editor: any) => void;
+  onFocus?: (event: any, editor: any) => void;
 }
 
 const TextEditor: React.FC<EditorInterface> = ({
   value,
-  placeholder,
   onChange,
+  onReady,
+  onBlur,
+  onFocus,
 }) => {
-  const editorRef = useRef<any>(null);
-  const handleEditorChange = (content: string) => {
-    const modifiedContent = content.startsWith("Your characters here")
-      ? content.substring("Your characters here".length)
-      : content;
-    onChange(modifiedContent);
-  };
   return (
     <>
-      <Editor
-        apiKey="0rzlxi2ly7dyfurhu9kcyk5gwq6t2z2iypfq0o16xnyzn6e0"
-        onInit={(_evt, editor) => (editorRef.current = editor)}
-        initialValue={value}
-        init={{
-          placeholder: placeholder,
-          language: "vi",
-          menubar: false,
-          entity_encoding: "raw",
-          plugins: [
-            "advlist",
-            "autolink",
-            "lists",
-            "link",
-            "image",
-            "charmap",
-            "preview",
-            "anchor",
-            "searchreplace",
-            "visualblocks",
-            "code",
-            "fullscreen",
-            "insertdatetime",
-            "media",
-            "table",
-            "code",
-            "wordcount",
-          ],
-          toolbar_mode: "wrap",
-          toolbar:
-            "undo redo | fontfamily | fontsize | table | language | " +
-            "bold italic forecolor | alignleft aligncenter " +
-            "alignright alignjustify | bullist numlist outdent indent | " +
-            "removeformat",
-          content_style:
-            "body { font-family:Times New Roman,Arial,sans-serif;font-size: 12pt }",
-
-          setup: (editor) => {
-            editor.on("keyup", () => {
-              handleEditorChange(editor.getContent());
-            });
-          },
-        }}
+      <CKEditor
+        editor={ClassicEditor}
+        data={value}
+        onReady={onReady}
+        onChange={onChange}
+        onBlur={onBlur}
+        onFocus={onFocus}
       />
     </>
   );

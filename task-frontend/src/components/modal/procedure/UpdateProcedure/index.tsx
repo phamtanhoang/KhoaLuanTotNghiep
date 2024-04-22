@@ -96,7 +96,7 @@ const UpdateProcedure = (props: any) => {
 
     context.handleOpenLoading();
     proceduresService
-      .create(name, description, steps)
+      .updateById(id, name, description, steps)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           SwalHelper.MiniAlert(res.data.Message, "success");

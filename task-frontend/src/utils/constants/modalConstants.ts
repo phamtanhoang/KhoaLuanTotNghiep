@@ -23,6 +23,9 @@ const MODAL_KEYS = {
   chooseImage: "ChooseImage",
 
   updateEmployer: "updateEmployer",
+
+  updateCandidate: "updateCandidate",
+
   createHumanResource: "CreateHumanResource",
   updateHumanResource: "UpdateHumanResource",
 

@@ -11,6 +11,7 @@ import { CreateTag, UpdateTag } from "./tag";
 import { CreateCategory, UpdateCategory } from "./category";
 import { CreateHumanResource, UpdateHumanResource } from "./humanResource";
 import { CreateProcedure, UpdateProcedure } from "./procedure";
+import CandidateUpdate from "./candidate/CandidateUpdate";
 
 const ModalBase = (props: any) => {
   // take props
@@ -59,9 +60,8 @@ const ModalBase = (props: any) => {
     ),
 
     [MODAL_KEYS.filter]: <FilterModal handleClose={handleClose} />,
-    [MODAL_KEYS.createJob]: <CreateJob handleClose={handleClose} />,
-    [MODAL_KEYS.filter]: <FilterModal handleClose={handleClose} />,
-
+    [MODAL_KEYS.createJob]: <CreateJob fetchData={fetchData} handleClose={handleClose} />,
+    
     [MODAL_KEYS.changeAvatar]: (
       <ChangeAvatar fetchData={fetchData} handleClose={handleClose} />
     ),
@@ -98,6 +98,13 @@ const ModalBase = (props: any) => {
     ),
     [MODAL_KEYS.updateEmployer]: (
       <EmployerUpdate id={id} fetchData={fetchData} handleClose={handleClose} />
+    ),
+    [MODAL_KEYS.updateCandidate]: (
+      <CandidateUpdate
+        id={id}
+        fetchData={fetchData}
+        handleClose={handleClose}
+      />
     ),
 
     [MODAL_KEYS.createHumanResource]: (

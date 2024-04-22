@@ -63,8 +63,27 @@ const ProfilePage = () => {
         context.handleCloseLoading();
       });
   };
+
+  const fetchExtraProfile = () => {
+    context.handleOpenLoading();
+    candidatesService
+      .extraProfile()
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  };
   useEffect(() => {
     fetchData();
+    fetchExtraProfile();
   }, []);
 
   return (

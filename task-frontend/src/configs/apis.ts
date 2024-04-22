@@ -30,6 +30,8 @@ const CandidateAPI = {
 
   changeImage: "/candidates/updateAvatar",
   updateProfile: "/candidates/updateProfile",
+
+  extraProfile: "/candidates/extraProfile",
 };
 
 const EmployerAPI = {
@@ -58,6 +60,10 @@ const EmployerAPI = {
   changeBackgroundImage: "/employers/updateBackgroundImage",
   changeImage: "/employers/updateImage",
   updateProfile: "/employers/updateProfile",
+
+  employerById_admin: (id?: string) => {
+    return `/employers/getEmployer-admin/${id}`;
+  },
 };
 
 const TagAPI = {
@@ -71,6 +77,8 @@ const TagAPI = {
   tagById: (id: string) => {
     return `/tags/${id}`;
   },
+
+  getList_Dropdown: "/tags/getTags_Dropdown",
 };
 const CategoryAPI = {
   categories: "/categories",
@@ -83,6 +91,8 @@ const CategoryAPI = {
   categoryById: (id: string) => {
     return `/categories/${id}`;
   },
+
+  getList_Dropdown: "/categories/getCategories_Dropdown",
 };
 
 const HumanResourceAPI = {
@@ -103,6 +113,8 @@ const HumanResourceAPI = {
   updateProfile: "/hr/updateProfile",
 
   profile: "/hr/profile",
+
+  getList_Dropdown: "/hr/getHumanResources_Dropdown",
 };
 
 const ProcedureAPI = {
@@ -112,7 +124,21 @@ const ProcedureAPI = {
   procedureById: (id: string) => {
     return `/processes/${id}`;
   },
-  create: "/processes/create",
+  create: "/processes",
+  getList_Dropdown: "/processes/getProcesses_Dropdown",
+};
+const JobAPI = {
+  getList_Employer: (
+    keyword?: string,
+    category?: string,
+    status?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/jobs/getJobs-employer?keyword=${keyword}&categoryId=${category}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
+  },
+
+  createJob: "/jobs/create",
 };
 export {
   AuthAPI,
@@ -123,4 +149,5 @@ export {
   EmployerAPI,
   HumanResourceAPI,
   ProcedureAPI,
+  JobAPI,
 };

@@ -439,8 +439,10 @@ const Header = (props: {
         context.handleOpenLoading();
         dispatch(CLEAR_CURRENT_EMPLOYER());
         AuthHelper.removeAuthenticaton();
-        navigate(EMPLOYER_PATHS.signin);
-        SwalHelper.MiniAlert("Đăng xuất thành công", "success");
+        SwalHelper.MiniAlert("Đăng xuất thành công", "success", 1500);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
         context.handleCloseLoading();
       },
       () => {}
