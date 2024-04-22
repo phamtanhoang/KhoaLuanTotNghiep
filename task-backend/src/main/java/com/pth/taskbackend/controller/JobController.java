@@ -75,11 +75,12 @@ public class JobController {
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
                     List<StepResponse> stepResponses;
-                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
-
-                    List<Step> stepList = steps.getContent();
 
                     if (job.getProcess() != null) {
+                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+
+                        List<Step> stepList = steps.getContent();
+
                         stepResponses = stepList.stream()
                                 .map(step -> new StepResponse(
                                         step.getId(),
@@ -199,10 +200,11 @@ public class JobController {
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
                     List<StepResponse> stepResponses;
-                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
 
-                    List<Step> stepList = steps.getContent();
                     if (job.getProcess() != null) {
+                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+
+                        List<Step> stepList = steps.getContent();
                         stepResponses = stepList.stream()
                                 .map(step -> new StepResponse(
                                         step.getId(),
@@ -312,11 +314,12 @@ public class JobController {
                 );
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
-                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
 
-                    List<Step> stepList = steps.getContent();
                     List<StepResponse> stepResponses;
                     if (job.getProcess() != null) {
+                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+
+                        List<Step> stepList = steps.getContent();
                         stepResponses = stepList.stream()
                                 .map(step -> new StepResponse(
                                         step.getId(),
@@ -393,11 +396,12 @@ public class JobController {
                 );
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
-                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
 
-                    List<Step> stepList = steps.getContent();
                     List<StepResponse> stepResponses;
                     if (job.getProcess() != null) {
+                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+
+                        List<Step> stepList = steps.getContent();
                         stepResponses = stepList.stream()
                                 .map(step -> new StepResponse(
                                         step.getId(),
@@ -576,11 +580,12 @@ public class JobController {
                 );
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
-                    List<StepResponse> stepResponses;
-                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
 
-                    List<Step> stepList = steps.getContent();
+                    List<StepResponse> stepResponses;
+
                     if (job.getProcess() != null) {
+                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+                        List<Step> stepList = steps.getContent();
                         stepResponses = stepList.stream()
                                 .map(step -> new StepResponse(
                                         step.getId(),
@@ -593,7 +598,6 @@ public class JobController {
                     } else {
                         stepResponses = Collections.emptyList();
                     }
-
                     return new JobResponse(
                             job.getId(),
                             job.getCreated(),
@@ -650,11 +654,12 @@ public class JobController {
                 );
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
-                    List<StepResponse> stepResponses;
-                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
 
-                    List<Step> stepList = steps.getContent();
+                    List<StepResponse> stepResponses;
+
                     if (job.getProcess() != null) {
+                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+                        List<Step> stepList = steps.getContent();
                         stepResponses = stepList.stream()
                                 .map(step -> new StepResponse(
                                         step.getId(),
@@ -723,10 +728,11 @@ public class JobController {
             } else {
                 Job job = optionalJob.get();
                 List<StepResponse> stepResponses;
-                Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
 
-                List<Step> stepList = steps.getContent();
                 if (job.getProcess() != null) {
+                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+
+                    List<Step> stepList = steps.getContent();
                     stepResponses = stepList.stream()
                             .map(step -> new StepResponse(
                                     step.getId(),
