@@ -3,9 +3,10 @@ import { CandidateAPI } from "@/configs/apis";
 
 const candidatesService = {
   async profile() {
-    return await axiosConfig.get(CandidateAPI.profile, {
-      headers: { "Content-Type": "application/json" },
-    });
+    return await axiosConfig.get(CandidateAPI.profile);
+  },
+  async extraProfile() {
+    return await axiosConfig.get(CandidateAPI.extraProfile);
   },
   async getList(
     name?: string,

@@ -104,7 +104,7 @@ const ProceduresTableWeb: React.FC<ProceduresTableWebProps> = ({
             </tr>
           ) : (
             <>
-              {value.length === 0 ? (
+              {!value ? (
                 <tr className="bg-white">
                   <td className="pt-6 whitespace-no-wrap" colSpan={6}>
                     <ListEmpty />

@@ -8,6 +8,7 @@ import { EMPLOYER_PATHS } from "@/utils/constants/pathConstants";
 import { useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FiFilter } from "react-icons/fi";
+import { MdFilterAlt, MdFilterAltOff } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
@@ -44,10 +45,14 @@ const FilterModal = (props: any) => {
       dispatch(ONCHANGE_STATUS(status));
       dispatch(ONCHANGE_KEYWORD(keyword));
     }
-    if (location.pathname === EMPLOYER_PATHS.hr) {
+    if (location.pathname === EMPLOYER_PATHS.procedure) {
       dispatch(ONCHANGE_KEYWORD(keyword));
     }
     handleClose();
+  };
+  const _onClear = () => {
+    setKeyword("");
+    setStatus("");
   };
   return (
     <div className="absolute inset-y-0 right-0 w-[85%] lg:w-[30%] overflow-y-auto">
@@ -184,13 +189,20 @@ const FilterModal = (props: any) => {
           </div> */}
         </div>
 
-        <div className="flex justify-start items-center border-borderColor mt-10">
+        <div className="flex justify-between items-center border-borderColor mt-10">
           <button
-            className="flex items-center gap-2.5 w-max h-max px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-600/85 font-semibold"
+            className="flex items-center gap-2 w-max h-max px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-600/85 font-semibold"
             onClick={_onSearch}
           >
-            <FiFilter className="text-base" />
+            <MdFilterAlt className="text-lg" />
             <p>Lọc</p>
+          </button>
+          <button
+            className="flex items-center gap-2 w-max h-max px-5 py-2 bg-red-500 text-white rounded-md hover:bg-red-500/85 font-semibold"
+            onClick={_onClear}
+          >
+            <MdFilterAltOff className="text-lg" />
+            <p>Xóa</p>
           </button>
         </div>
       </div>

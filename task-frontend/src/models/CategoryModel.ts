@@ -3,5 +3,5 @@ interface CategoryModel {
   created: Date;
   updated: Date;
   name: string;
-  imgage: string;
+  image: string;
 }

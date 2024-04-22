@@ -12,4 +12,5 @@ interface HumanResourceModel {
   userId: string;
   status: string;
   email: string;
+  dateOfBirth: string;
 }

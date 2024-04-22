@@ -102,30 +102,30 @@ const ChangeExpSkillInfoCandidate = (props: any) => {
 
       <div
         ref={scrollRef}
-        className="overflow-auto scrollbar-custom h-max max-h-[75vh]"
+        className="overflow-auto scrollbar-custom h-max max-h-[75vh] my-2 mx-1"
       >
-        <div className="my-4 mx-4 text-gray-700 flex flex-col gap-2 lg:gap-4 text-sm">
+        <div className="my-2 mx-3 text-gray-700 flex flex-col gap-2 lg:gap-4 text-sm">
           {items.map((item, index) => (
             <div key={index}>
-              <div className="flex justify-between bg-gray-200  gap-2 px-4 py-2">
+              <div className="flex justify-between bg-gray-200  gap-2 p-2">
                 <div className="flex gap-2 w-full">
                   <label className="text-lg font-semibold my-auto">
                     {index + 1}.{" "}
                   </label>
                   <input
-                    className="w-full content-center text-base  p-2 border rounded focus:outline-none focus:border-orangetext"
+                    className="w-full content-center text-base  px-2 py-1 border rounded focus:outline-none focus:border-orangetext"
                     type="text"
                     value={item.name}
                   />
                 </div>
                 <button
-                  className="text-lg my-auto bg-red-500 hover:bg-red-500/90 text-white p-1.5 rounded"
+                  className="text-base my-auto bg-red-500 hover:bg-red-500/90 text-white p-2 rounded"
                   onClick={() => _onClickDelete(item)}
                 >
                   <FaTrashCan />
                 </button>
               </div>
-              <div className="border border-dashed border-t-0 rounded-b-lg px-4 py-2 flex flex-col gap-2">
+              <div className="border border-dashed border-t-0 rounded-b-lg p-2 flex flex-col gap-2">
                 {(type === "edu" || type === "exp") && (
                   <div className="flex lg:gap-4 gap-2 ">
                     <div className="content-center w-full">
@@ -173,9 +173,9 @@ const ChangeExpSkillInfoCandidate = (props: any) => {
                     Mô tả&nbsp;
                   </label>
                   <textarea
-                    className="w-full content-center text-sm p-2 mt-1 border rounded focus:outline-none focus:border-orangetext h-16"
-                    value={item.description}
-                    // placeholder="Viết giới thiệu ngắn gọn về bản thân (điểm mạnh, điểm yếu, sở thích...)."
+                    className="w-full text-sm p-2 mt-1 border rounded focus:outline-none focus:border-orangetext h-16"
+                    // value={item.description}
+                    placeholder="Viết giới thiệu ngắn gọn về bản thân (điểm mạnh, điểm yếu, sở thích...)."
                   />
                 </div>
               </div>

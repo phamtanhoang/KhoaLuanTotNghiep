@@ -37,15 +37,8 @@ const tagsService = {
       },
     });
   },
-  //   async updateById(id: string) {
-  //     return await axiosConfig.put(`${TagAPI.tagUrl}/${id}`, {
-  //       headers: { "Content-Type": "application/json" },
-  //     });
-  //   },
-  //   async deleteById(id: string) {
-  //     return await axiosConfig.delete(`${TagAPI.tagUrl}/${id}`, {
-  //       headers: { "Content-Type": "application/json" },
-  //     });
-  //   },
+  async getList_Dropdown() {
+    return await axiosConfig.get(TagAPI.getList_Dropdown);
+  },
 };
 export default tagsService;

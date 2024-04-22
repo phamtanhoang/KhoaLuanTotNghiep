@@ -28,7 +28,7 @@ const employersService = {
       EmployerAPI.getListPublic(name, currentPage, itemPerPage)
     );
   },
-  
+
   async update(id: string, status: string) {
     const body = {
       status: status,
@@ -42,6 +42,9 @@ const employersService = {
   },
   async getbyId(id: string) {
     return await axiosConfig.get(EmployerAPI.employerById(id));
+  },
+  async getbyId_admin(id: string) {
+    return await axiosConfig.get(EmployerAPI.employerById_admin(id));
   },
 
   async changeImage(image: File | null) {

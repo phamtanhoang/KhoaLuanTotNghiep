@@ -26,6 +26,10 @@ const categoriesService = {
       CategoryAPI.getList(name?.trim(), currentPage, itemPerPage)
     );
   },
+  
+  async getList_Dropdown() {
+    return await axiosConfig.get(CategoryAPI.getList_Dropdown);
+  },
 
   async create(name: string, image: File) {
     const formData = new FormData();

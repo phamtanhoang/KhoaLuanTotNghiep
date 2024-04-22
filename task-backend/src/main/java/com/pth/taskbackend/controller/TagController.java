@@ -103,7 +103,7 @@ public class TagController {
         }
     }
     @Operation(summary = "Get list by name", description = "", tags = {})
-    @GetMapping(" /getTags_Dropdown")
+    @GetMapping("/getTags_Dropdown")
     public ResponseEntity<BaseResponse> getTagsDropdown() {
         try {
 

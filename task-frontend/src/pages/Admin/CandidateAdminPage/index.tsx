@@ -2,11 +2,11 @@ import { LoadingContext } from "@/App";
 import ModalBase from "@/components/modal";
 import { PaginationCustom } from "@/components/ui";
 import candidatesService from "@/services/candidatesService";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { CandidateTableAdminWeb } from "./components";
+import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 
 const CandidateAdminPage = () => {
   const context = useContext(LoadingContext);
@@ -55,7 +55,7 @@ const CandidateAdminPage = () => {
   };
   const _onClickDetail = (item: CandidateModel) => {
     setId(item.id);
-    setFuncs("");
+    setFuncs(MODAL_KEYS.updateCandidate);
     handleOpen();
   };
 

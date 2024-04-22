@@ -114,5 +114,9 @@ const humanResourcesService = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+
+  async getList_Dropdown() {
+    return await axiosConfig.get(HumanResourceAPI.getList_Dropdown);
+  },
 };
 export default humanResourcesService;

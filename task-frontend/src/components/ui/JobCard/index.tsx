@@ -27,15 +27,14 @@ const JobCard: React.FC<JobCardProps> = ({
   salary,
   location,
   dateline,
-  isHighlighted,
   isVip,
 }) => {
   const urlLink = window.location.pathname;
   return (
     <div
       className={`w-full cursor-pointer bg-white transition-all duration-300 rounded-l-md p-4 border-2 hover:shadow-md hover:border-orangetext ${
-        isHighlighted
-          ? "border-orange-500 border-[3px]  border-r-[10px]"
+        isVip
+          ? "border-orange-500 border-[3px]  border-r-[8px]"
           : "border-borderColor"
       } `}
     >

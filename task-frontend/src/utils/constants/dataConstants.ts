@@ -23,9 +23,22 @@ const JOB_STATE_DATA = [
   { id: "ACTIVE", name: "Phê duyệt", color: "#169C46" },
   { id: "PAUSE", name: "Tạm ngừng", color: "#0000FF" },
 ];
+
 const HR_STATE_DATA = [
   { id: "ACTIVE", name: "Hoạt động", color: "#0000FF" },
   { id: "INACTIVE", name: "Không hoạt động", color: "#FF0000" },
+];
+
+const EMPLOYER_STATE_DROPDOWN = [
+  { id: "", name: "Toàn bộ" },
+  { id: "ACTIVE", name: "Hoạt động" },
+  { id: "INACTIVE", name: "Không hoạt động" },
+  { id: "PENDING", name: "Chờ duyệt" },
+];
+const CANDIDATE_STATE_DROPDOWN = [
+  { id: "", name: "Toàn bộ" },
+  { id: "ACTIVE", name: "Hoạt động" },
+  { id: "INACTIVE", name: "Không hoạt động" },
 ];
 
 const USER_STATUS_DATA = {
@@ -42,4 +55,6 @@ export const DataConstants = {
   HR_STATE_DATA,
   ROLE_DATA,
   USER_STATUS_DATA,
+  EMPLOYER_STATE_DROPDOWN,
+  CANDIDATE_STATE_DROPDOWN,
 };

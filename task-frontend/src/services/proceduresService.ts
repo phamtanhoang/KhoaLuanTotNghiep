@@ -24,6 +24,10 @@ const proceduresService = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+  async getList_Dropdown() {
+    return await axiosConfig.get(ProcedureAPI.getList_Dropdown);
+  },
+
   async updateById(
     id: string,
     name: string,
@@ -31,12 +35,12 @@ const proceduresService = {
     steps: StepModel[]
   ) {
     const body = {
-      name: name,
-      description: description,
+      name: name.trim(),
+      description: description.trim(),
       steps: steps,
     };
     return await axiosConfig.patch(ProcedureAPI.procedureById(id), body, {
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: { "Content-Type": "application/json" },
     });
   },
   async delete(id: string) {

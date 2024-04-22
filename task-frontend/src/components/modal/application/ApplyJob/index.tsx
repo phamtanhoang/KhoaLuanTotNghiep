@@ -34,7 +34,6 @@ const ApplyJob = (props: any) => {
     if (!phoneNumber)
       SwalHelper.MiniAlert("Vui lòng nhập số điện thoại!", "warning");
     if (!cvFile) SwalHelper.MiniAlert("Vui lòng chọn CV!", "warning");
-    
   };
 
   return (
@@ -91,9 +90,7 @@ const ApplyJob = (props: any) => {
                 >
                   <input
                     type="checkbox"
-                    className={`cursor-pointer relative h-4 w-4 rounded-md border transition-all appearance-none my-auto ${
-                      checked && "border-orangetext bg-orangetext"
-                    }`}
+                    className="cursor-pointer relative h-4 w-4 rounded-md border my-auto accent-bgBlue"
                     checked={checked == true ? true : false}
                   />
                   <label
@@ -109,9 +106,7 @@ const ApplyJob = (props: any) => {
                 >
                   <input
                     type="checkbox"
-                    className={`cursor-pointer relative h-4 w-4 rounded-md border transition-all appearance-none my-auto ${
-                      !checked && "border-orangetext bg-orangetext"
-                    }`}
+                    className="cursor-pointer relative h-4 w-4 rounded-md border my-auto accent-bgBlue"
                     checked={checked == false ? true : false}
                   />
                   <label
@@ -179,7 +174,6 @@ const ApplyJob = (props: any) => {
             </p>
 
             <TextEditor
-              placeholder="Viết giới thiệu ngắn gọn về bản thân (điểm mạnh, điểm yếu) và nêu rõ mong muốn, lý do bạn muốn ứng tuyển vị trí này."
               value={coverLetter}
               onChange={(e: any) => setCoverLetter(e)}
             />

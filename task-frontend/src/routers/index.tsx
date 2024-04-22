@@ -65,8 +65,6 @@ const ScrollToTop = () => {
 };
 
 const Routers = () => {
-  console.log("AuthHelper.isHR(), ", AuthHelper.isHR());
-
   return (
     <BrowserRouter>
       <ScrollToTop />

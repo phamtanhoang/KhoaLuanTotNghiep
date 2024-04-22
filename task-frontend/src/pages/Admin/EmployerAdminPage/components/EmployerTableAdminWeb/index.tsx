@@ -56,31 +56,15 @@ const EmployerTableAdminWeb: React.FC<EmployerTableAdminProps> = ({
             >
               <span className="pr-2">Trạng thái:</span>
               <select
-                className="bg-gray-50 border border-borderColor"
+                className="bg-gray-50 "
                 value={status}
                 onChange={_onChangeStatus}
               >
-                <option value="" className="p-2 text-sm">
-                  Toàn bộ
-                </option>
-                <option
-                  value={DataConstants.USER_STATUS_DATA.PENDING}
-                  className="p-2 text-sm"
-                >
-                  Chờ duyệt
-                </option>
-                <option
-                  value={DataConstants.USER_STATUS_DATA.ACTIVE}
-                  className="p-2 text-sm"
-                >
-                  Hoạt động
-                </option>
-                <option
-                  value={DataConstants.USER_STATUS_DATA.INACTIVE}
-                  className="p-2 text-sm"
-                >
-                  Không hoạt động
-                </option>
+                {DataConstants.EMPLOYER_STATE_DROPDOWN.map((item, index) => (
+                  <option key={index} value={item.id} className="p-2 text-sm">
+                    {item.name}
+                  </option>
+                ))}
               </select>
             </th>
             <th

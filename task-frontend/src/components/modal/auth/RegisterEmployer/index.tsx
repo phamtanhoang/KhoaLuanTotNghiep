@@ -111,8 +111,8 @@ const RegisterEmployer = (props: any) => {
         </p>
       </div>
 
-      <div className="my-2 mx-2 overflow-auto scrollbar-custom h-max max-h-[60vh]">
-        <div className="mx-2">
+      <div className="my-2 mx-1 overflow-auto scrollbar-custom h-max max-h-[70vh]">
+        <div className="mx-3">
           <div className="mt-2 content-center">
             <label className="text-sm font-semibold text-gray-700 tracking-wide">
               Email <span className="text-red-500">*</span>
@@ -182,7 +182,7 @@ const RegisterEmployer = (props: any) => {
               </label>
               <input
                 className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext mt-1 rounded"
-                type="password"
+                type="text"
                 placeholder="Nhập số điện thoại công ty..."
                 value={phoneNumber}
                 onChange={_onChangePhoneNumber}
