@@ -736,7 +736,7 @@ public class CandidateController {
             experienceService.save(experiences);
 
             return ResponseEntity.ok(
-                    new BaseResponse( "Thêm danh sách kinh nghiệm thành công", HttpStatus.OK.value(),experiences)
+                    new BaseResponse( "Thêm danh sách kinh nghiệm thành công", HttpStatus.OK.value(),null)
             );
 
         } catch (Exception e) {
@@ -772,7 +772,7 @@ public class CandidateController {
             skillService.save(skills);
 
             return ResponseEntity.ok(
-                    new BaseResponse( "Thêm danh sách kỹ năng thành công", HttpStatus.OK.value(),skills)
+                    new BaseResponse( "Thêm danh sách kỹ năng thành công", HttpStatus.OK.value(),null)
             );
 
         } catch (Exception e) {
@@ -811,7 +811,7 @@ public class CandidateController {
             educationService.save(experiences);
 
             return ResponseEntity.ok(
-                    new BaseResponse( "Thêm danh sách học vấn thành công", HttpStatus.OK.value(),experiences)
+                    new BaseResponse( "Thêm danh sách học vấn thành công", HttpStatus.OK.value(),null)
             );
 
         } catch (Exception e) {

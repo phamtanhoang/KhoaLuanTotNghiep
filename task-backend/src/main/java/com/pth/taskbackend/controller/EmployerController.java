@@ -462,7 +462,7 @@ public class EmployerController {
 
             Employer employer = optionalEmployer.get();
             boolean isVip = vipEmployerService.isVip(employer.getId());
-            GetEmployerProfileResponse profile = new GetEmployerProfileResponse(
+            EmployerProfileResponse profile = new EmployerProfileResponse(
                     employer.getId(),
                     employer.getUser().getEmail(),
                     employer.getName(),

@@ -19,7 +19,6 @@ public record JobRequest (
          String categoryId,
          String humanResourceId,
          String processId,
-         String hrId,
          Set<Tag> tags
 
 ){

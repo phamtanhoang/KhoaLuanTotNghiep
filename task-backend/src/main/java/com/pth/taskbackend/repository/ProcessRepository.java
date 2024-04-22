@@ -9,7 +9,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface ProcessRepository extends JpaRepository<Process,String> {
     @Query("SELECT p FROM Process p JOIN Job j WHERE j.process.id = :processId")
     Optional<Process> findByJobId(String processId);

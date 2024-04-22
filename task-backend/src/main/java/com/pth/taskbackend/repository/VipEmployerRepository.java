@@ -9,7 +9,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface VipEmployerRepository extends JpaRepository<VipEmployer, String> {
     @Query("SELECT CASE WHEN COUNT(v) > 0 THEN true ELSE false END FROM VipEmployer v WHERE v.employer.id = :employerId AND v.toDate > CURRENT_DATE()")
     boolean isVip(@Param("employerId") String employerId);

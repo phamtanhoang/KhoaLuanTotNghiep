@@ -10,7 +10,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDateTime;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface JobRepository extends JpaRepository<Job, String> {
     @Query("SELECT j FROM Job j " +
             "INNER JOIN j.humanResource hr " +

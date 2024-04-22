@@ -479,15 +479,16 @@ public class JobController {
 
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
-                    List<StepResponse> stepResponses;
-                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
 
-                    List<Step> stepList = steps.getContent();
+                    List<StepResponse> stepResponses;
+
                     if (job.getProcess() != null) {
+                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+                        List<Step> stepList = steps.getContent();
                         stepResponses = stepList.stream()
                                 .map(step -> new StepResponse(
                                         step.getId(),
@@ -571,7 +572,7 @@ public class JobController {
 
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {

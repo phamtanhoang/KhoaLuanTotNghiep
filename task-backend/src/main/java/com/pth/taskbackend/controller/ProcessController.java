@@ -258,7 +258,7 @@ public class ProcessController {
                 }).collect(Collectors.toList());
             } else if (optionalUser.get().getRole().equals(ERole.HR)) {
                 HumanResource hr = humanResourceService.findByEmail(email).get();
-                List<Object[]> objects = processService.findByHrId(hr.getEmployer().getId());
+                List<Object[]> objects = processService.findByHrId(hr.getId());
                 responseList = objects.stream().map(result -> {
                     Process process = (Process) result[0];
                     Long count = (Long) result[1];

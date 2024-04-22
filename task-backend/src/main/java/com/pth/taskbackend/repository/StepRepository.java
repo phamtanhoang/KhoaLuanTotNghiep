@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface StepRepository extends JpaRepository<Step,String> {
     Page<Step> findByProcessIdOrderByNumberAsc(String processId, Pageable pageable);
     Optional<Step>findByProcessIdAndNumber(String processId,int number);

@@ -2,7 +2,7 @@ package com.pth.taskbackend.dto.response;
 
 import java.time.LocalDateTime;
 
-public record GetEmployerProfileResponse(String id,
+public record EmployerProfileResponse(String id,
                                          String email,
                                          String name,
                                          String description,
