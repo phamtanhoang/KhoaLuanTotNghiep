@@ -866,10 +866,9 @@ public class JobController {
             Set<com.pth.taskbackend.model.meta.Tag>tags= new HashSet<>();
             for (com.pth.taskbackend.model.meta.Tag tag:request.tags()) {
                 Optional<com.pth.taskbackend.model.meta.Tag> optional = tagService.findById(tag.getId());
-                System.out.println(optional.get());
-                tags.add(optional.get());
+                optional.ifPresent(tags::add);
             }
-            job.setTags(tags);
+                job.setTags(tags);
 
             Optional<Process>optionalProcess= processService.findById(request.processId());
             if(optionalProcess.isEmpty())
