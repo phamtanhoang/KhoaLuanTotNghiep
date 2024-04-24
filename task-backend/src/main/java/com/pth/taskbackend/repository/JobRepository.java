@@ -57,8 +57,8 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "       OR LOWER(j.description) LIKE %:keyword% " +
             "       OR LOWER(j.experience) LIKE %:keyword% " +
             "       OR LOWER(c.name) LIKE %:keyword%)) " +
-            "AND  j.status = :status " +
-            "AND (:categoryId IS NULL OR j.category.id = :categoryId) " +
+            "AND (:status IS NULL OR :status = '' OR j.status = :status) " +
+            "AND (:categoryId IS NULL OR :categoryId = '' OR j.category.id = :categoryId) " +
             "And j.humanResource.id=:hRId " +
             "AND  j.status !='DELETED' " +
             "ORDER BY j.created DESC")
