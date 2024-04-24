@@ -575,7 +575,7 @@ public class HumanResourceController {
             hr.setPhoneNumber(phoneNumber);
             humanResourceService.update(hr,avatar);
             return ResponseEntity.ok(
-                    new BaseResponse( "Cập nhật thông tin HR thành công", HttpStatus.OK.value(), hr)
+                    new BaseResponse( "Cập nhật thành công", HttpStatus.OK.value(), hr)
             );
 
         } catch (ExpiredJwtException e) {
@@ -624,7 +624,7 @@ public class HumanResourceController {
             hr.setPhoneNumber(phoneNumber);
             humanResourceService.update(hr,avatar);
             return ResponseEntity.ok(
-                    new BaseResponse( "Cập nhật thông tin HR thành công", HttpStatus.OK.value(), hr)
+                    new BaseResponse( "Cập nhật thành công", HttpStatus.OK.value(), hr)
             );
 
         }catch (ExpiredJwtException e) {
@@ -638,7 +638,7 @@ public class HumanResourceController {
 
 
     @Operation(summary = "Get by id", description = "", tags = {})
-    @GetMapping("/updateAvatar")
+    @PatchMapping("/updateAvatar")
     public ResponseEntity<BaseResponse> updateHumanResourceProfile(@RequestHeader("Authorization")String token, @RequestPart MultipartFile avatar) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
@@ -653,12 +653,12 @@ public class HumanResourceController {
             }
             if(avatar.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Vui lòng chọn ảnh đại diện", HttpStatus.BAD_REQUEST.value(), null)
+                        new BaseResponse("Vui lòng chọn ảnh ", HttpStatus.BAD_REQUEST.value(), null)
                 );
             HumanResource humanResource = optionalHumanResource.get();
             humanResourceService.updateAvatar(humanResource,avatar);
             return ResponseEntity.ok(
-                    new BaseResponse( "Cập nhật ảnh đại diện HR thành công", HttpStatus.OK.value(), humanResource)
+                    new BaseResponse( "Cập nhật thành công", HttpStatus.OK.value(), humanResource)
             );
 
         } catch (ExpiredJwtException e) {
