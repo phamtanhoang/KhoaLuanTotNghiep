@@ -7,7 +7,8 @@ public enum EStatus {
     ACTIVE("ACTIVE"),
     PENDING("PENDING"),
     INACTIVE("INACTIVE"),
-    DELETED("DELETED");
+    DELETED("DELETED"),
+    PAUSED("PAUSED");
 
     private final String status;
 

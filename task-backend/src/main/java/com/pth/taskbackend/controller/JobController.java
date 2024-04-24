@@ -1082,15 +1082,31 @@ public class JobController {
                 );
             if(status==EStatus.DELETED)
                 return ResponseEntity.ok(
-                        new BaseResponse("Không được xóa", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không được xóa", HttpStatus.FORBIDDEN.value(), null)
                 );
             Job job = optionalJob.get();
             switch (status)
             {
+                case PAUSED:
+                if(job.getStatus().equals(EStatus.PAUSED))
+                    return ResponseEntity.ok(
+                            new BaseResponse("Đang dừng tuyển dụng công việc này", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+                if (optionalUser.get().getRole().equals(ERole.ADMIN))
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không được dừng công việc này", HttpStatus.FORBIDDEN.value(), null)
+                    );
+
+                job.setStatus(EStatus.PAUSED);
+                jobService.update(job);
+
+                return ResponseEntity.ok(
+                        new BaseResponse("Bật tuyển công việc thành công", HttpStatus.OK.value(), null)
+                );
                 case ACTIVE :
                     if(job.getStatus().equals(EStatus.ACTIVE))
                         return ResponseEntity.ok(
-                                new BaseResponse("Đã bật đang tuyển công việc này", HttpStatus.OK.value(), null)
+                                new BaseResponse("Đã bật tuyển dụng", HttpStatus.BAD_REQUEST.value(), null)
                         );
                     job.setStatus(EStatus.ACTIVE);
                     jobService.update(job);
@@ -1101,7 +1117,7 @@ public class JobController {
                 case INACTIVE:
                     if(job.getStatus().equals(EStatus.INACTIVE))
                         return ResponseEntity.ok(
-                                new BaseResponse("Đã tắt tuyển dụng công việc này", HttpStatus.OK.value(), null)
+                                new BaseResponse("Đã tắt tuyển dụng công việc này", HttpStatus.BAD_REQUEST.value(), null)
                         );
                     job.setStatus(EStatus.INACTIVE);
                     jobService.update(job);
@@ -1121,7 +1137,7 @@ public class JobController {
                     else
                     {
                         return ResponseEntity.ok(
-                                new BaseResponse("Không có quyền duyệt công việc này", HttpStatus.OK.value(), null)
+                                new BaseResponse("Không có quyền duyệt công việc này", HttpStatus.FORBIDDEN.value(), null)
                         );
                     }
                 default:
