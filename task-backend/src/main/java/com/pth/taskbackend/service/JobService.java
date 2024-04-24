@@ -7,6 +7,8 @@ import com.pth.taskbackend.model.meta.Job;
 import io.jsonwebtoken.io.IOException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -32,6 +34,12 @@ public interface JobService {
     Page<Job>findByKeywordAndCategoryIdAndEmployerId(String keyword,String categoryId,String employerId,Pageable pageable)throws IOException;
     Page<Job>findByKeywordAndCategoryIdAndHRId(String keyword,String categoryId,String hrId,Pageable pageable)throws IOException;
 
+
+    Optional<Job> findByIdAndEmployerId(String id,String employerId)throws  IOException;
+
+    Optional<Job>findByIdAndHRId(String id,String hrId)throws  IOException;
+
+    Optional<Job>findByIdAndStatus(String id,EStatus status)throws  IOException;
     Page<Job> findByEmployerId(String employerId, Pageable pageable)throws IOException;
     Page<Job>findByEmployerIdAndStatus(String employerId,EStatus status,Pageable pageable)throws  IOException;
     Page<Job>findByCategoryId(String id,Pageable pageable)throws IOException;

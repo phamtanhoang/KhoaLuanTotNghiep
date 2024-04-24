@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -101,7 +103,23 @@ public interface JobRepository extends JpaRepository<Job, String> {
             @Param("employerId") String employerId,
             Pageable pageable);
 
+    @Query("SELECT j FROM Job j " +
+            "WHERE j.id = :id " +
+            "AND j.humanResource.employer.id = :employerId " +
+            "AND j.status != 'DELETED'")
+    Optional<Job> findByIdAndEmployerId(@Param("id") String id, @Param("employerId") String employerId);
 
+    @Query("SELECT j FROM Job j " +
+            "WHERE j.id = :id " +
+            "AND j.humanResource.id = :hrId " +
+            "AND j.status != 'DELETED'")
+    Optional<Job>findByIdAndHRId(String id,String hrId);
+
+    @Query("SELECT j FROM Job j " +
+            "WHERE j.id = :id " +
+            "AND (:status IS NULL OR :status = '' OR j.status = :status) " +
+            "AND j.status != 'DELETED'")
+    Optional<Job>findByIdAndStatus(String id,EStatus status);
     @Query("SELECT j FROM Job j " +
             "WHERE (:keyword IS NULL OR " +
             "       (LOWER(j.name) LIKE %:keyword% " +

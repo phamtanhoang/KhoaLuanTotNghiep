@@ -96,6 +96,21 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public Optional<Job> findByIdAndEmployerId(String id, String employerId) throws IOException {
+        return jobRepository.findByIdAndEmployerId(id,employerId);
+    }
+
+    @Override
+    public Optional<Job> findByIdAndHRId(String id, String hrId) throws IOException {
+        return jobRepository.findByIdAndHRId(id,hrId);
+    }
+
+    @Override
+    public Optional<Job> findByIdAndStatus(String id, EStatus status) throws IOException {
+        return jobRepository.findByIdAndStatus(id,status);
+    }
+
+    @Override
     public Page<Job> findByEmployerId(String employerId, Pageable pageable) {
         return null;
     }

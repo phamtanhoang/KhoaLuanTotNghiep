@@ -318,7 +318,7 @@ public class ProcessController {
     public ResponseEntity<BaseResponse> getProcess(@RequestHeader("Authorization") String token,@PathVariable("id") String id) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER)||checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
             if (!permission)
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
@@ -329,9 +329,27 @@ public class ProcessController {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
+            Optional<Process>optionalProcess;
+            if(optionalUser.get().getRole().equals(ERole.EMPLOYER))
+            {
+                Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+                if (optionalEmployer.isEmpty())
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
+                    );
+                optionalProcess = processService.findByIdAndEmployerId(id,optionalEmployer.get().getId());
 
+            }
+            else
+            {
+                Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
+                if (optionalHumanResource.isEmpty())
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
+                    );
+                optionalProcess = processService.findByIdAndEmployerId(id,optionalHumanResource.get().getEmployer().getId());
+            }
 
-            Optional<Process> optionalProcess = processService.findById(id);
             if (optionalProcess.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy quy trình", HttpStatus.NOT_FOUND.value(), null)

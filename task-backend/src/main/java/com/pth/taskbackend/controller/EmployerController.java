@@ -6,11 +6,13 @@ import com.pth.taskbackend.dto.response.*;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Employer;
+import com.pth.taskbackend.model.meta.HumanResource;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.AuthService;
 import com.pth.taskbackend.service.EmployerService;
+import com.pth.taskbackend.service.HumanResourceService;
 import com.pth.taskbackend.service.VipEmployerService;
 import com.pth.taskbackend.util.func.CheckPermission;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -52,6 +54,8 @@ public class EmployerController {
     @Autowired
     VipEmployerService vipEmployerService;
 
+    @Autowired
+    HumanResourceService humanResourceService;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("getEmployers-admin")
     public ResponseEntity<BaseResponse> getEmployersByAdmin(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword,@RequestParam(required = false)EStatus status, Pageable pageable) {
@@ -461,6 +465,55 @@ public class EmployerController {
                 );
 
             Employer employer = optionalEmployer.get();
+            boolean isVip = vipEmployerService.isVip(employer.getId());
+            EmployerProfileResponse profile = new EmployerProfileResponse(
+                    employer.getId(),
+                    employer.getUser().getEmail(),
+                    employer.getName(),
+                    employer.getDescription(),
+                    employer.getLocation(),
+                    employer.getPhoneNumber(),
+                    employer.getBusinessCode(),
+                    employer.getImage(),
+                    employer.getBackgroundImage(),
+                    isVip);
+            return ResponseEntity.ok(
+                    new BaseResponse( "Hiện thông tin nhà tuyển dụng", HttpStatus.OK.value(), profile)
+            );
+
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "Get by id", description = "", tags = {})
+    @GetMapping("/profile-hr")
+    public ResponseEntity<BaseResponse> getEmployerProfileByHR(@RequestHeader("Authorization")String token) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
+            if (optionalHumanResource.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Employer>optionalEmployer = employerService.findById(optionalHumanResource.get().getEmployer().getId());
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Employer employer = optionalEmployer.get();
+
             boolean isVip = vipEmployerService.isVip(employer.getId());
             EmployerProfileResponse profile = new EmployerProfileResponse(
                     employer.getId(),
