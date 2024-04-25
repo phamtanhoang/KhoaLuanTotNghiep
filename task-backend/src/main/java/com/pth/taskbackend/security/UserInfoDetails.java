@@ -29,7 +29,6 @@ public class UserInfoDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        System.out.println(role.name());
         return Collections.singleton(new SimpleGrantedAuthority(role.name().toUpperCase()));
     }
 

@@ -53,7 +53,6 @@ public class JwtService {
         try {
             return extractClaim(token, Claims::getSubject);
         } catch (ExpiredJwtException ex) {
-            System.out.println("JWT đã hết hạn khi cố gắng trích xuất tên người dùng từ JWT!");
             return null;
         }
     }

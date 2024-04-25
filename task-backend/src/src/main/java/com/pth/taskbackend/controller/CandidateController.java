@@ -71,7 +71,6 @@ public class CandidateController {
         try {
 
             CheckPermission checkPermission = new CheckPermission();
-            System.out.println(token);
 //            boolean permission =checkPermission.                                                                                                                                                                                                                                        sPermission(token, EStatus.ACTIVE, ERole.ADMIN);
 //
 //            if (!permission) {

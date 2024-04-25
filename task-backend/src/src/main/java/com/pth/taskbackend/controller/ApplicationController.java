@@ -66,7 +66,6 @@ public class ApplicationController {
 
             String email = jwtService.extractUsername(token.substring(7));
             Candidate candidate = candidateService.findByUserEmail(email).orElse(null);
-            System.out.println(applicationRequest.jobId());
             Job job = jobService.findById(applicationRequest.jobId()).orElse(null);
 
             if (cVFile.isEmpty()||cVFile.getContentType().equals("application/pdf"))
