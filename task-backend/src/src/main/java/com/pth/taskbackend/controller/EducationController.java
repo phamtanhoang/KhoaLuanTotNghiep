@@ -58,7 +58,6 @@ public class EducationController {
                 );
 
             String email = authentication.getName();
-            System.out.println(email);
             Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
             if (!optionalCandidate.isPresent())
                 return ResponseEntity.ok(

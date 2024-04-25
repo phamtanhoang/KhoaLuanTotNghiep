@@ -883,12 +883,8 @@ public class JobController {
         }catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-//        } catch (DataIntegrityViolationException e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body(new BaseResponse("Tên công việc đã tồn tại", HttpStatus.BAD_REQUEST.value(), null));
         }
         catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
@@ -924,7 +920,6 @@ public class JobController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(new BaseResponse("Không tìm thấy quy trình", HttpStatus.NOT_FOUND.value(), null));
             }
-            System.out.println(optionalProcess.get());
             Job job = optionalJob.get();
             job.setStatus(EStatus.PENDING);
             job.setName(request.name());
@@ -953,7 +948,6 @@ public class JobController {
                 Set<com.pth.taskbackend.model.meta.Tag>tags= new HashSet<>();
                 for (com.pth.taskbackend.model.meta.Tag tag:request.tags()) {
                     Optional<com.pth.taskbackend.model.meta.Tag> optional = tagService.findById(tag.getId());
-                    System.out.println(optional.get());
                     tags.add(optional.get());
                 }
                 job.getTags().clear();

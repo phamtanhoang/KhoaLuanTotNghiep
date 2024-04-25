@@ -437,7 +437,6 @@ public class CandidateController {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
                 );
-            System.out.println("Da vao day");
             Candidate update = optionalCandidate.get();
             update.setFirstName(request.firstName());
             update.setLastName(request.lastName());

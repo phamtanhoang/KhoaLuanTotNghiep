@@ -137,8 +137,6 @@ public class ApplicationController {
                 collectionService.create(collection);
 
             } else {
-                System.out.println(optionalCandidate.get().getId());
-                System.out.println(collectionId);
                 Optional<Collection> optional = collectionService.findByIdAndCandidateId(collectionId, optionalCandidate.get().getId());
                 if (optional.isEmpty())
                     return ResponseEntity.ok(new BaseResponse("Không tìm thấy thông tin", HttpStatus.NOT_FOUND.value(), null));

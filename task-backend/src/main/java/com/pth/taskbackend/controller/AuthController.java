@@ -149,7 +149,6 @@ public class AuthController {
             try {
 
                 String email = jwtService.extractUsername(refreshToken.refreshToken());
-                System.out.println(email);
                 Optional<User> optionalUser = userRepository.findByEmail(email);
                 if (optionalUser.isPresent()) {
                    String accessToken= jwtService.refreshToken(refreshToken.refreshToken(), optionalUser.get().getStatus(), optionalUser.get().getRole());
@@ -225,7 +224,6 @@ public class AuthController {
                     request.username(),
                     request.password(),
                     ERole.CANDIDATE);
-            System.out.println(request);
             Candidate candidate = new Candidate();
             candidate.setFirstName(request.firstName());
             candidate.setLastName(request.lastName());

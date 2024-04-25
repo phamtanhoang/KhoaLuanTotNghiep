@@ -74,7 +74,6 @@ public class EmployerController {
     @GetMapping("")
     public ResponseEntity<BaseResponse> getEmployers(@RequestParam(required = false) String keyword, Pageable pageable) {
         try {
-            System.out.println(keyword + "test");
             Page<Employer> employers = employerService.findByKeyword(keyword, pageable);
             if (employers.isEmpty()) {
                 return ResponseEntity.ok(

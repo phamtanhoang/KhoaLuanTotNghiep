@@ -42,11 +42,7 @@ public class SocketHandler extends TextWebSocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage textMessage) throws IOException, InterruptedException {
         log.info("Test message {}", textMessage.toString());
         list.add(session);
-        System.out.println(textMessage.getPayload());
-        System.out.println(textMessage.getPayload());
-        System.out.println(textMessage.getPayload());
         String applicationId = (String) session.getAttributes().get("applicationId");
-        System.out.println(session.getAttributes().get("email"));
         String email = (String) session.getAttributes().get("email");
         Optional<User>optional = userRepository.findByEmail(email);
         if(optional.isEmpty())
