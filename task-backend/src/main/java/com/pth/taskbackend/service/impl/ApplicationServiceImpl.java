@@ -47,7 +47,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public Optional<Application> findByIdAndCandidateId(String id, String candidateId) throws IOException {
+    public Optional<Application> findByIdAndCandidateId(String id, String candidateId){
         return applicationRepository.findByIdAndCandidateId(id,candidateId);
     }
 
@@ -58,26 +58,26 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public Page<Application> findByEmployerId(String employerId, Pageable pageable) {
-        return null;
+        return applicationRepository.findByEmployerId(employerId,pageable);
     }
 
     @Override
     public Page<Application> findByHrId(String hrId, Pageable pageable) {
-        return null;
+        return applicationRepository.findByHrId(hrId,pageable);
     }
 
     @Override
     public Page<Application> findByJobId(String jobId, Pageable pageable) {
-        return null;
+        return applicationRepository.findByJobId(jobId,pageable);
     }
 
     @Override
-    public Optional<Application> findByIdAndJobHumanResourceId(String id, String humanResourceId) throws IOException {
+    public Optional<Application> findByIdAndJobHumanResourceId(String id, String humanResourceId)  {
         return applicationRepository.findByIdAndJobHumanResourceId(id,humanResourceId);
     }
 
     @Override
-    public Optional<Application> findByIdAndJobHumanResourceEmployerId(String id, String employerId) throws IOException {
+    public Optional<Application> findByIdAndJobHumanResourceEmployerId(String id, String employerId)  {
         return applicationRepository.findByIdAndJobHumanResourceEmployerId(id,employerId);
 
     }
@@ -93,7 +93,12 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public Page<Application> findByHrIdAndStatus(String hrId, EStatus status, Pageable pageable) {
-        return null;
+    public Page<Application> findByHRIdAndStatusAndNameContaining(String hrId, EApplyStatus status, String keyword, Pageable pageable)  {
+        return applicationRepository.findByHRIdAndStatusAndNameContaining(hrId,status,keyword,pageable);
+    }
+
+    @Override
+    public Page<Application> findByHrIdAndStatus(String hrId, EApplyStatus status, Pageable pageable) {
+        return applicationRepository.findByHrIdAndStatus(hrId,status,pageable);
     }
 }

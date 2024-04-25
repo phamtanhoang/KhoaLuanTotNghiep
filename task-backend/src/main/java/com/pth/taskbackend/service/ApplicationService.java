@@ -3,10 +3,10 @@ package com.pth.taskbackend.service;
 import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Application;
-import io.jsonwebtoken.io.IOException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.IOException;
 import java.util.Optional;
 
 public interface ApplicationService {
@@ -31,7 +31,7 @@ public interface ApplicationService {
     Optional<Application>findByIdAndJobHumanResourceEmployerId(String id, String employerId)throws IOException;
 
     Page<Application> findByEmployerIdAndStatusAndNameContaining(String employerId, EApplyStatus status, String keyword, Pageable pageable)throws IOException;
-
+    Page<Application> findByHRIdAndStatusAndNameContaining(String hrId, EApplyStatus status, String keyword, Pageable pageable) throws  IOException;
     Page<Application>findByEmployerIdAndStatus(String employerId, EApplyStatus status, Pageable pageable)throws IOException;
-    Page<Application> findByHrIdAndStatus(String hrId, EStatus status, Pageable pageable)throws IOException;
+    Page<Application> findByHrIdAndStatus(String hrId, EApplyStatus status, Pageable pageable)throws IOException;
 }

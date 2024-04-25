@@ -42,7 +42,7 @@ public class Application extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String letter;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "candidate_id")
     private Candidate candidate;
 

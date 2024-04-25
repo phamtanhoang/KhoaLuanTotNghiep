@@ -7,7 +7,8 @@ public enum EApplyStatus {
     PENDING("PENDING"),
     REJECTED("REJECTED"),
     APPROVED("APPROVED"),
-    PROCESSING("PROCESSING");
+    PROCESSING("PROCESSING"),
+    DELETED("DELETED");
 
     private final String status;
 

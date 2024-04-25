@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -65,15 +66,19 @@ public class ApplicationController {
     EmployerService employerService;
     private final CheckPermission checkPermission;
 
-    @Autowired ApplicationStepService applicationStepService;
+    @Autowired
+    ApplicationStepService applicationStepService;
 
-    @Autowired StepService stepService;
+    @Autowired
+    StepService stepService;
 
     @Autowired
     UserRepository userRepository;
     FileUploadFunc fileUploadFunc = new FileUploadFunc();
 
-    @Autowired HumanResourceService humanResourceService;
+    @Autowired
+    HumanResourceService humanResourceService;
+
     @PostMapping("/{id}")
     public ResponseEntity<BaseResponse> applyJob(
             @RequestHeader("Authorization") String token,
@@ -83,7 +88,7 @@ public class ApplicationController {
             @RequestParam String phoneNumber,
             @RequestParam(required = false) String letter,
             @RequestParam(required = false) String collectionId,
-            @PathVariable("id")String id
+            @PathVariable("id") String id
 
     ) {
 
@@ -100,7 +105,13 @@ public class ApplicationController {
                 return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null));
             }
 
-            Job job = jobService.findById(id).orElse(null);
+            Optional<Job> optionalJob = jobService.findById(id);
+            if (optionalJob.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy công việc ", HttpStatus.NOT_FOUND.value(), null));
+            }
+            Job job = optionalJob.get();
+            if (!job.getStatus().equals(EStatus.ACTIVE))
+                return ResponseEntity.ok(new BaseResponse("Công việc đang không được tuyển ", HttpStatus.BAD_REQUEST.value(), null));
 
             if (cVFile.isEmpty() || !Objects.equals(cVFile.getContentType(), "application/pdf"))
                 return ResponseEntity.ok(
@@ -109,10 +120,30 @@ public class ApplicationController {
 
             if (applicationService.findByJobIdAndCandidateId(id, optionalCandidate.get().getId()).isPresent())
                 return ResponseEntity.ok(
-                        new BaseResponse("Đã ứng tuyển vào công việc này!!!", HttpStatus.OK.value(), null)
+                        new BaseResponse("Đã ứng tuyển vào công việc này!!!", HttpStatus.BAD_REQUEST.value(), null)
                 );
 
             String cvPath = fileUploadFunc.uploadCV(cVFile);
+
+            Collection collection;
+            if (collectionId == null) {
+                collection = new Collection();
+                collection.setCV(cvPath);
+                collection.setEmail(email);
+                collection.setLetter(letter);
+                collection.setPhoneNumber(phoneNumber);
+                collection.setFullName(fullName);
+                collection.setCandidate(optionalCandidate.get());
+                collectionService.create(collection);
+
+            } else {
+                System.out.println(optionalCandidate.get().getId());
+                System.out.println(collectionId);
+                Optional<Collection> optional = collectionService.findByIdAndCandidateId(collectionId, optionalCandidate.get().getId());
+                if (optional.isEmpty())
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy thông tin", HttpStatus.NOT_FOUND.value(), null));
+            }
+
             Application application = new Application();
             application.setCV(cvPath);
             application.setPhoneNumber(phoneNumber);
@@ -125,55 +156,135 @@ public class ApplicationController {
             application.setCurrentStep(0);
             applicationService.create(application);
 
-            Collection collection = new Collection();
-            collection.setCV(cvPath);
-            collection.setEmail(email);
-            collection.setLetter(letter);
-            collection.setPhoneNumber(phoneNumber);
-            collection.setFullName(fullName);
-            collection.setCandidate(optionalCandidate.get());
 
-
-            if (collectionId != null)
-                collection.setId(collectionId);
-
-            collectionService.create(collection);
             return ResponseEntity.ok(
-                    new BaseResponse("Đã ứng tuyển công việc thành công", HttpStatus.OK.value(), application)
+                    new BaseResponse("Ứng tuyển công việc thành công", HttpStatus.OK.value(), application)
             );
 
-        }catch (ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
     @GetMapping("/pendingApplications-employer")
     public ResponseEntity<BaseResponse> pendingApplications(Pageable pageable,
-            @RequestHeader("Authorization") String token) {
+                                                            @RequestHeader("Authorization") String token) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
-            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
             if (!hasPermission) {
                 return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
             }
 
-            Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
-            if (optionalEmployer.isEmpty()) {
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty()) {
                 return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
             }
 
-            Page<Application> pendingApplications = applicationService.findByEmployerIdAndStatus(optionalEmployer.get().getId(), EApplyStatus.PENDING, pageable);
+            Page<Application> pendingApplications = Page.empty();
 
-            Page<ApplicationResponse> responseList = pendingApplications.map(application -> {
+            if (optionalUser.get().getRole().equals(ERole.EMPLOYER)) {
+                Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+                if (optionalEmployer.isEmpty()) {
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
+                }
+                pendingApplications = applicationService.findByEmployerIdAndStatus(optionalEmployer.get().getId(), EApplyStatus.PENDING, pageable);
+                if (pendingApplications.isEmpty())
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy đơn ứng tuyển", HttpStatus.OK.value(), null));
+            }
+            if (optionalUser.get().getRole().equals(ERole.HR)) {
+                Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
+                if (optionalHumanResource.isEmpty()) {
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
+                }
+                pendingApplications = applicationService.findByHrIdAndStatus(optionalHumanResource.get().getId(), EApplyStatus.PENDING, pageable);
+                if (pendingApplications.isEmpty())
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy đơn ứng tuyển", HttpStatus.OK.value(), null));
+            }
+
+
+            Page<ApplicationResponse> responseList = pendingApplications.map(application -> new ApplicationResponse(
+                    application.getId(),
+                    application.getCandidate().getId(),
+                    application.getCandidate().getUser().getEmail(),
+                    application.getCandidate().getFirstName() + application.getCandidate().getLastName(),
+                    application.getCandidate().getAvatar(),
+                    application.getCreated(),
+                    application.getStatus(),
+                    application.getJob().getId(),
+                    application.getJob().getName(),
+                    application.getJob().getHumanResource().getEmployer().getId(),
+                    application.getJob().getHumanResource().getEmployer().getName(),
+                    application.getCV()
+            ));
+
+
+            return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc đang đợi duyệt", HttpStatus.OK.value(), responseList));
+
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @GetMapping("/getApplications-employer")
+    public ResponseEntity<?> getApplicationsByEmployer(
+            Pageable pageable,
+            @RequestHeader("Authorization") String token,
+            @RequestParam("title") String title,
+            @RequestParam("status") EApplyStatus status
+    ) {
+
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) ||
+                    checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            }
+
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
+            }
+
+            Page<Application> applications = Page.empty();
+            if (optionalUser.get().getRole().equals(ERole.EMPLOYER)) {
+                Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+                if (optionalEmployer.isEmpty()) {
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
+                }
+                applications = applicationService.findByEmployerIdAndStatusAndNameContaining(optionalEmployer.get().getId(), status, title, pageable);
+                if (applications.isEmpty())
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy đơn ứng tuyển", HttpStatus.OK.value(), null));
+            }
+            if (optionalUser.get().getRole().equals(ERole.HR)) {
+                Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
+                if (optionalHumanResource.isEmpty()) {
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
+                }
+                applications = applicationService.findByHRIdAndStatusAndNameContaining(optionalHumanResource.get().getId(), status, title, pageable);
+
+                if (applications.isEmpty())
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy đơn ứng tuyển", HttpStatus.OK.value(), null));
+            }
+
+
+            Page<ApplicationResponse> responseList = applications.map(application -> {
                 ApplicationResponse response = new ApplicationResponse(
                         application.getId(),
                         application.getCandidate().getId(),
                         application.getCandidate().getUser().getEmail(),
-                        application.getCandidate().getFirstName()+application.getCandidate().getLastName() ,
+                        application.getCandidate().getFirstName() + application.getCandidate().getLastName(),
                         application.getCandidate().getAvatar(),
                         application.getCreated(),
                         application.getStatus(),
@@ -186,74 +297,19 @@ public class ApplicationController {
                 return response;
             });
 
-
-            return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc đang đợi duyệt", HttpStatus.OK.value(), responseList));
-
-        } catch (ExpiredJwtException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        }
-        catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
-
-
-    @GetMapping("/employerApplications")
-    public ResponseEntity<?> employerApplications(
-          Pageable pageable,
-            @RequestHeader("Authorization") String token,
-            @RequestParam("title") String title,
-            @RequestParam("status")EApplyStatus status
-    ) {
-
-        try {
-        String email = jwtService.extractUsername(token.substring(7));
-        boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
-        if (!hasPermission) {
-            return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
-        }
-
-        Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
-        if (optionalEmployer.isEmpty()) {
-            return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
-        }
-
-
-            Page<Application> applications = applicationService.findByEmployerIdAndStatusAndNameContaining(optionalEmployer.get().getId(),status,title,pageable);
-        Page<ApplicationResponse> responseList = applications.map(application -> {
-            ApplicationResponse response = new ApplicationResponse(
-                    application.getId(),
-                    application.getCandidate().getId(),
-                    application.getCandidate().getUser().getEmail(),
-                    application.getCandidate().getFirstName()+application.getCandidate().getLastName() ,
-                    application.getCandidate().getAvatar(),
-                    application.getCreated(),
-                    application.getStatus(),
-                    application.getJob().getId(),
-                    application.getJob().getName(),
-                    application.getJob().getHumanResource().getEmployer().getId(),
-                    application.getJob().getHumanResource().getEmployer().getName(),
-                    application.getCV()
-            );
-            return response;
-        });
-
             return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc cho nhà tuyển dụng", HttpStatus.OK.value(), responseList));
 
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 
-
-    @GetMapping("/candidateApplications")
-    public ResponseEntity<?> getCandidateApplications(
+    @GetMapping("/getApplications-candidate")
+    public ResponseEntity<?> getApplicationsByCandidate(
             Pageable pageable,
             @RequestHeader("Authorization") String token
     ) {
@@ -269,201 +325,77 @@ public class ApplicationController {
                 return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null));
             }
             Page<Application> applications = applicationService.findByCandidateId(optionalCandidate.get().getId(), pageable);
-            Page<ApplicationResponse> candidateApplications = applications.map(application -> {
-                ApplicationResponse response = new ApplicationResponse(
-                        application.getId(),
-                        application.getCandidate().getId(),
-                        application.getCandidate().getUser().getEmail(),
-                        application.getFullName(),
-                        application.getCandidate().getAvatar(),
-                        application.getCreated(),
-                        application.getStatus(),
-                        application.getJob().getId(),
-                        application.getJob().getName(),
-                        application.getJob().getHumanResource().getEmployer().getId(),
-                        application.getJob().getHumanResource().getEmployer().getName(),
-                        application.getCV()
-                );
-                return response;
-            });
+            if (applications.isEmpty())
+                return ResponseEntity.ok(new BaseResponse("Bạn chưa ứng tuyển công việc nào", HttpStatus.OK.value(), null));
+
+            Page<ApplicationResponse> candidateApplications = applications.map(application -> new ApplicationResponse(
+                    application.getId(),
+                    application.getCandidate().getId(),
+                    application.getCandidate().getUser().getEmail(),
+                    application.getFullName(),
+                    application.getCandidate().getAvatar(),
+                    application.getCreated(),
+                    application.getStatus(),
+                    application.getJob().getId(),
+                    application.getJob().getName(),
+                    application.getJob().getHumanResource().getEmployer().getId(),
+                    application.getJob().getHumanResource().getEmployer().getName(),
+                    application.getCV()
+            ));
             return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc của ứng viên", HttpStatus.OK.value(), candidateApplications));
 
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+//    @GetMapping("/getApplications-admin")
+//    public ResponseEntity<?> getApplicationsByAdmin(
+//            Pageable pageable,
+//            @RequestHeader("Authorization") String token
+//    ) {
+//        try {
+//            String email = jwtService.extractUsername(token.substring(7));
+//            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+//            if (!hasPermission) {
+//                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+//            }
 //
-
-    @GetMapping("/download")
-    public ResponseEntity<?> downloadFile(@RequestParam String fileName) {
-        try {
-            byte[] fileData = fileUploadFunc.download(fileName);
-            if (fileData != null) {
-                HttpHeaders headers = new HttpHeaders();
-                String contentType = fileName.endsWith(".pdf") ? MediaType.APPLICATION_PDF_VALUE : MediaType.TEXT_PLAIN_VALUE;
-                headers.setContentType(MediaType.parseMediaType(contentType));
-                headers.setContentDispositionFormData("attachment", fileName);
-
-                ByteArrayResource resource = new ByteArrayResource(fileData);
-
-                return ResponseEntity.ok()
-                        .headers(headers)
-                        .contentLength(fileData.length)
-                        .body(resource);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new BaseResponse("Không tìm thấy tệp", HttpStatus.NOT_FOUND.value(), null));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
-
-    @Operation(summary = "update step", description = "", tags = {})
-    @PatchMapping("/updateStep/{id}")
-    public ResponseEntity<BaseResponse> updateApplicationStep(@RequestHeader("Authorization") String token,
-                                                              @PathVariable("id") String id,
-                                                              @RequestBody String result) {
-        try {
-            String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
-            if (!permission)
-                return ResponseEntity.ok(
-                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-                );
-
-            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
-            if (optionalCandidate.isEmpty())
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null)
-                );
-
-            Optional<Application> optionalApplication = applicationService.findById(id);
-            if (optionalApplication.isEmpty())
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
-                );
-
-            Application application = optionalApplication.get();
-            if(stepService.countAllByProcessId(application.getJob().getProcess().getId())==application.getCurrentStep())
-            {
-                return ResponseEntity.ok(
-                        new BaseResponse("Đã tới bước cuối", HttpStatus.BAD_REQUEST.value(), null)
-                );
-            }
-            if(application.getStatus()==EApplyStatus.PENDING)
-                application.setStatus(EApplyStatus.PROCESSING);
-            application.setCurrentStep(application.getCurrentStep() + 1);
-
-            ApplicationStep applicationStep = new ApplicationStep();
-            applicationStep.setApplication(application);
-            Optional<Step> optionalStep = stepService.findByProcessIdAndNumber(application.getJob().getProcess().getId(), application.getCurrentStep());
-            if (optionalStep.isPresent()) {
-                Step step = optionalStep.get();
-                applicationStep.setName(step.getName());
-                applicationStep.setNumber(step.getNumber());
-                applicationStep.setResult(result);
-                applicationStepService.create(applicationStep);
-            } else {
-                return ResponseEntity.ok(new BaseResponse("Không tìm thấy bước tiếp theo", HttpStatus.NOT_FOUND.value(), null));
-            }
-
-            return ResponseEntity.ok(new BaseResponse("Cập nhật bước thành công", HttpStatus.OK.value(), null));
-
-        } catch (ExpiredJwtException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        } catch (EmptyResultDataAccessException e) {
-            return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên cần xóa!", HttpStatus.NOT_FOUND.value(), null));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
-
-    @Operation(summary = "update status", description = "", tags = {})
-    @PatchMapping("/updateStatus/{id}")
-    public ResponseEntity<BaseResponse> updateApplicationStatus(@RequestHeader("Authorization") String token,
-                                                              @PathVariable("id") String id,
-                                                             @RequestBody String status) {
-        try {
-            Map<String, String> jsonMap = objectMapper.readValue(status, new TypeReference<Map<String, String>>() {});
-
-            String statusValue = jsonMap.get("status");
-            EApplyStatus statusEnum = EApplyStatus.fromString(statusValue);
-            String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
-            if (!permission)
-                return ResponseEntity.ok(
-                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-                );
-
-            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
-            if (optionalCandidate.isEmpty())
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null)
-                );
-
-            Optional<Application> optionalApplication = applicationService.findById(id);
-            if (optionalApplication.isEmpty())
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
-                );
-
-            Application application = optionalApplication.get();
-
-            switch (statusEnum)
-            {
-                case PENDING :
-                    return ResponseEntity.ok(
-                            new BaseResponse("Không tìm được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
-                    );
-                case APPROVED:
-                    if(stepService.countAllByProcessId(application.getJob().getProcess().getId())!=application.getCurrentStep())
-                        return ResponseEntity.ok(
-                                new BaseResponse("Chưa đủ quá trình duyệt đơn", HttpStatus.BAD_REQUEST.value(), null)
-                        );
-                    if(application.getStatus()==EApplyStatus.APPROVED)
-                        return ResponseEntity.ok(
-                                new BaseResponse("Không thể duyệt lại đơn đã nhận", HttpStatus.BAD_REQUEST.value(), null)
-                        );
-                    application.setStatus(EApplyStatus.APPROVED);
-                    return ResponseEntity.ok(
-                            new BaseResponse("Duyệt đơn thành công", HttpStatus.BAD_REQUEST.value(), null)
-                    );
-                case REJECTED:
-                    if(application.getStatus()==EApplyStatus.REJECTED)
-                    return ResponseEntity.ok(
-                            new BaseResponse("Không thể duyệt lại đơn đã từ chối", HttpStatus.BAD_REQUEST.value(), null)
-                    );
-                    application.setStatus(EApplyStatus.REJECTED);
-                case PROCESSING:
-                    return ResponseEntity.ok(
-                            new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
-                    );
-                default:
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body(new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
-            }
-
-
-
-        } catch (ExpiredJwtException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        } catch (EmptyResultDataAccessException e) {
-            return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên cần xóa!", HttpStatus.NOT_FOUND.value(), null));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
-
+//            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+//            if (optionalCandidate.isEmpty()) {
+//                return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null));
+//            }
+//            Page<Application> applications = applicationService.findAll( pageable);
+//            if(applications.isEmpty())
+//                return ResponseEntity.ok(new BaseResponse("Bạn chưa ứng tuyển công việc nào", HttpStatus.OK.value(), null));
+//
+//            Page<ApplicationResponse> candidateApplications = applications.map(application -> new ApplicationResponse(
+//                    application.getId(),
+//                    application.getCandidate().getId(),
+//                    application.getCandidate().getUser().getEmail(),
+//                    application.getFullName(),
+//                    application.getCandidate().getAvatar(),
+//                    application.getCreated(),
+//                    application.getStatus(),
+//                    application.getJob().getId(),
+//                    application.getJob().getName(),
+//                    application.getJob().getHumanResource().getEmployer().getId(),
+//                    application.getJob().getHumanResource().getEmployer().getName(),
+//                    application.getCV()
+//            ));
+//            return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc của ứng viên", HttpStatus.OK.value(), candidateApplications));
+//
+//        } catch (ExpiredJwtException e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+//        }catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+//        }
+//    }
 
     @GetMapping("/getApplication-candidate/{id}")
     public ResponseEntity<?> getApplicationDetails(
@@ -472,7 +404,7 @@ public class ApplicationController {
     ) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE) ;
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
             if (!permission)
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
@@ -481,19 +413,19 @@ public class ApplicationController {
             Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
             if (optionalCandidate.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm người dùng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            Optional<Application> optionalApplication = applicationService.findByIdAndCandidateId(id,optionalCandidate.get().getId());
+            Optional<Application> optionalApplication = applicationService.findByIdAndCandidateId(id, optionalCandidate.get().getId());
             if (optionalApplication.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
                 );
             Application application = optionalApplication.get();
             ApplicationDetailResponse response = new ApplicationDetailResponse(
-                    application.getJob().getName(), // jobName
+                    application.getJob().getName(),
                     application.getEmail(),
-                    application.getFullName(), // firstName
+                    application.getFullName(),
                     application.getCandidate().getAvatar(),
                     application.getCandidate().getDateOfBirth(),
                     application.getCandidate().getSex(),
@@ -511,6 +443,7 @@ public class ApplicationController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
     @GetMapping("/getApplication-employer/{id}")
     public ResponseEntity<?> getApplicationDetailsEmployer(
             @RequestHeader("Authorization") String token,
@@ -594,15 +527,16 @@ public class ApplicationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
-}
-@GetMapping("/getApplication-admin/{id}")
+    }
+
+    @GetMapping("/getApplication-admin/{id}")
     public ResponseEntity<?> getApplicationDetailsAdmin(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") String id
     ) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN) ;
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
             if (!permission)
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
@@ -621,9 +555,9 @@ public class ApplicationController {
                 );
             Application application = optionalApplication.get();
             ApplicationDetailResponse response = new ApplicationDetailResponse(
-                    application.getJob().getName(), // jobName
+                    application.getJob().getName(),
                     application.getEmail(),
-                    application.getFullName(), // firstName
+                    application.getFullName(),
                     application.getCandidate().getAvatar(),
                     application.getCandidate().getDateOfBirth(),
                     application.getCandidate().getSex(),
@@ -641,43 +575,250 @@ public class ApplicationController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-}
 
-//
-//
-//    @GetMapping("/applicatonsJob")
-//    public ResponseEntity<?> getApplicatonsOfJob(
-//            @PageableDefault(page = 0, size = 10) Pageable pageable,
-//            @RequestHeader("Authorization") String token,
-//            @RequestParam("jobId") String jobId
-//    ) {
-//        try {
-//            String employerName = jwtService.extractUsername(token.substring(7));
-//            Employer employer = employerService.findByAccountUsername(employerName);
-//            if (employer == null) {
-//                return ResponseEntity.badRequest().body("vai");
-//            }
-//            Page<Application> applications = applicationService.findApplicationsByJobId(jobId, pageable);
-//            Page<ApplicationResponse> employerApplications = applications.map(application -> {
-//                ApplicationResponse dto = new ApplicationResponse();
-//                dto.setId(application.getId());
-//                dto.setAccountId(application.getCandidateId());
-//                dto.setJobId(application.getJobId());
-//                dto.setUserName(accountService.findById(candidateService.findById(application.getCandidateId()).get().getAccountId()).get().getUsername());
-//                dto.setAccountName(candidateService.findById(application.getCandidateId()).get().getFirstName()+ " "+candidateService.findById(application.getCandidateId()).get().getLastName());
-//                dto.setApplyDate(application.getApplyDate());
-//                dto.setTitle(jobService.findById(application.getJobId()).get().getTitle());
-//                dto.setExpiredDate(jobService.findById(application.getJobId()).get().getToDate());
-//                dto.setState(application.getState());
-//                dto.setImage(candidateService.findById(application.getCandidateId()).get().getAvatar());
-//                return dto;
-//            });
-//            return ResponseEntity.ok(employerApplications);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Page.empty());
-//        }
-//    }
-//
+
+    @GetMapping("/getApplications-job/{id}")
+    public ResponseEntity<?> getApplicationsByJobId(
+            Pageable pageable,
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") String jobId
+    ) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) ||
+                    checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            }
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null));
+            }
+
+            Page<Application> applications = Page.empty();
+            if (optionalUser.get().getRole().equals(ERole.EMPLOYER)) {
+                Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+                if (optionalEmployer.isEmpty()) {
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
+                }
+                Optional<Job> optionalJob = jobService.findByIdAndEmployerId(jobId, optionalEmployer.get().getId());
+                if (optionalJob.isEmpty()) {
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy công việc", HttpStatus.NOT_FOUND.value(), null));
+                }
+
+                applications = applicationService.findByJobId(jobId, pageable);
+
+                if (applications.isEmpty())
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy đơn ứng tuyển", HttpStatus.OK.value(), null));
+            }
+            if (optionalUser.get().getRole().equals(ERole.HR)) {
+                Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
+                if (optionalHumanResource.isEmpty()) {
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
+                }
+                Optional<Job> optionalJob = jobService.findByIdAndHRId(jobId, optionalHumanResource.get().getId());
+                if (optionalJob.isEmpty()) {
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy công việc", HttpStatus.NOT_FOUND.value(), null));
+                }
+                applications = applicationService.findByJobId(jobId, pageable);
+
+                if (applications.isEmpty())
+                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy đơn ứng tuyển", HttpStatus.OK.value(), null));
+            }
+
+
+            Page<ApplicationResponse> candidateApplications = applications.map(application -> new ApplicationResponse(
+                    application.getId(),
+                    application.getCandidate().getId(),
+                    application.getCandidate().getUser().getEmail(),
+                    application.getFullName(),
+                    application.getCandidate().getAvatar(),
+                    application.getCreated(),
+                    application.getStatus(),
+                    application.getJob().getId(),
+                    application.getJob().getName(),
+                    application.getJob().getHumanResource().getEmployer().getId(),
+                    application.getJob().getHumanResource().getEmployer().getName(),
+                    application.getCV()
+            ));
+            return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc của ứng viên", HttpStatus.OK.value(), candidateApplications));
+
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @GetMapping("/download")
+    public ResponseEntity<?> downloadFile(@RequestParam String fileName) {
+        try {
+            byte[] fileData = fileUploadFunc.download(fileName);
+            if (fileData != null) {
+                HttpHeaders headers = new HttpHeaders();
+                String contentType = fileName.endsWith(".pdf") ? MediaType.APPLICATION_PDF_VALUE : MediaType.TEXT_PLAIN_VALUE;
+                headers.setContentType(MediaType.parseMediaType(contentType));
+                headers.setContentDispositionFormData("attachment", fileName);
+
+                ByteArrayResource resource = new ByteArrayResource(fileData);
+
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .contentLength(fileData.length)
+                        .body(resource);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new BaseResponse("Không tìm thấy tệp", HttpStatus.NOT_FOUND.value(), null));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "update step", description = "", tags = {})
+    @PatchMapping("/updateStep/{id}")
+    public ResponseEntity<BaseResponse> updateApplicationStep(@RequestHeader("Authorization") String token,
+                                                              @PathVariable("id") String id,
+                                                              @RequestBody String result) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Application> optionalApplication = applicationService.findById(id);
+            if (optionalApplication.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Application application = optionalApplication.get();
+            if (stepService.countAllByProcessId(application.getJob().getProcess().getId()) == application.getCurrentStep()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Đã tới bước cuối", HttpStatus.BAD_REQUEST.value(), null)
+                );
+            }
+            if (application.getStatus() == EApplyStatus.PENDING)
+                application.setStatus(EApplyStatus.PROCESSING);
+            application.setCurrentStep(application.getCurrentStep() + 1);
+
+            ApplicationStep applicationStep = new ApplicationStep();
+            applicationStep.setApplication(application);
+            Optional<Step> optionalStep = stepService.findByProcessIdAndNumber(application.getJob().getProcess().getId(), application.getCurrentStep());
+            if (optionalStep.isPresent()) {
+                Step step = optionalStep.get();
+                applicationStep.setName(step.getName());
+                applicationStep.setNumber(step.getNumber());
+                applicationStep.setResult(result);
+                applicationStepService.create(applicationStep);
+            } else {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy bước tiếp theo", HttpStatus.NOT_FOUND.value(), null));
+            }
+
+            return ResponseEntity.ok(new BaseResponse("Cập nhật bước thành công", HttpStatus.OK.value(), null));
+
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên cần xóa!", HttpStatus.NOT_FOUND.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "update status", description = "", tags = {})
+    @PatchMapping("/updateStatus/{id}")
+    public ResponseEntity<BaseResponse> updateApplicationStatus(@RequestHeader("Authorization") String token,
+                                                                @PathVariable("id") String id,
+                                                                @RequestBody String status) {
+        try {
+            Map<String, String> jsonMap = objectMapper.readValue(status, new TypeReference<Map<String, String>>() {
+            });
+
+            String statusValue = jsonMap.get("status");
+            EApplyStatus statusEnum = EApplyStatus.fromString(statusValue);
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Application> optionalApplication = applicationService.findById(id);
+            if (optionalApplication.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Application application = optionalApplication.get();
+
+            switch (statusEnum) {
+                case PENDING:
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+                case APPROVED:
+                    if (stepService.countAllByProcessId(application.getJob().getProcess().getId()) != application.getCurrentStep())
+                        return ResponseEntity.ok(
+                                new BaseResponse("Chưa đủ quá trình duyệt đơn", HttpStatus.BAD_REQUEST.value(), null)
+                        );
+                    if (application.getStatus() == EApplyStatus.APPROVED)
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không thể duyệt lại đơn đã nhận", HttpStatus.BAD_REQUEST.value(), null)
+                        );
+                    application.setStatus(EApplyStatus.APPROVED);
+                    return ResponseEntity.ok(
+                            new BaseResponse("Duyệt đơn thành công", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+                case REJECTED:
+                    if (application.getStatus() == EApplyStatus.REJECTED)
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không thể duyệt lại đơn đã từ chối", HttpStatus.BAD_REQUEST.value(), null)
+                        );
+                    application.setStatus(EApplyStatus.REJECTED);
+                case PROCESSING:
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+                default:
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
+            }
+
+
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên cần xóa!", HttpStatus.NOT_FOUND.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+
+    //
 //
 //    @PutMapping("/updateState")
 //    public ResponseEntity<String> updateApplicationState(
@@ -716,20 +857,47 @@ public class ApplicationController {
 //    }
 //
 //
-//    @GetMapping("/isApplied")
-//    public ResponseEntity<?> isApplied(
-//            @RequestHeader("Authorization") String token,
-//            @RequestParam String jobId
-//    ) {
-//        try {
-//            String email = jwtService.extractUsername(token.substring(7));
-//            Candidate candidate = candidateService.findCandidateByAccountUsername(email).get();
-//            Application isApplied = applicationService.findByJobIdAndCandidateId(jobId, candidate.getId());
-//            return ResponseEntity.ok(isApplied);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("Failed to check application status: " + e.getMessage());
-//        }
+    @GetMapping("/isApplied/{id}")
+    public ResponseEntity<?> isApplied(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") String jobId
+    ) {
+        try {
+            String username = jwtService.extractUsername(token.substring(7));
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            }
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(username);
+            if (optionalCandidate.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null));
+            }
+
+            Optional<Job> optionalJob = jobService.findById(jobId);
+            if (optionalJob.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy công việc ", HttpStatus.NOT_FOUND.value(), null));
+            }
+
+
+            if (applicationService.findByJobIdAndCandidateId(jobId, optionalCandidate.get().getId()).isPresent())
+                return ResponseEntity.ok(
+                        new BaseResponse("Đã ứng tuyển ", HttpStatus.BAD_REQUEST.value(), true)
+                );
+            else
+                return ResponseEntity.ok(
+                        new BaseResponse("Chưa ứng tuyển ", HttpStatus.BAD_REQUEST.value(), false)
+                );
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+}
 
 //    }
 

@@ -1,7 +1,6 @@
 package com.pth.taskbackend.repository;
 
 import com.pth.taskbackend.enums.EApplyStatus;
-import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Application;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,14 +15,29 @@ import java.util.Optional;
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, String> {
 
+    @Query("SELECT app FROM Application app " +
+            "JOIN FETCH app.job job " +
+            "JOIN FETCH app.candidate c " +
+            "WHERE c.id = :candidateId " +
+            "And job.id = :jobId " +
+            "And app.status!='DELETED' " +
+            "ORDER BY app.created DESC")
     Optional<Application>findByJobIdAndCandidateId(String jobId, String candidateId);
-    Page<Application> findByCandidateId(String candidate_id, Pageable pageable);
+
+
+    @Query("SELECT app FROM Application app " +
+            "JOIN FETCH app.candidate c " +
+            "WHERE c.id = :candidateId " +
+            "And app.status!='DELETED' " +
+            "ORDER BY app.created DESC")
+    Page<Application> findByCandidateId(String candidateId, Pageable pageable);
 
     @Query("SELECT app FROM Application app " +
             "JOIN FETCH app.job job " +
             "JOIN FETCH job.humanResource hr " +
             "JOIN FETCH hr.employer employer " +
             "WHERE employer.id = :employerId " +
+            "And app.status!='DELETED' " +
             "ORDER BY app.created DESC")
     Page<Application> findByEmployerId(String employerId, Pageable pageable);
 
@@ -31,9 +45,15 @@ public interface ApplicationRepository extends JpaRepository<Application, String
             "JOIN FETCH app.job job " +
             "JOIN FETCH job.humanResource hr " +
             "WHERE hr.id = :hrId " +
+            "And app.status!='DELETED' " +
             "ORDER BY app.created DESC")
-    Page<Application> findByHrId(Long hrId, Pageable pageable);
+    Page<Application> findByHrId(String hrId, Pageable pageable);
 
+    @Query("SELECT app FROM Application app " +
+            "JOIN FETCH app.job job " +
+            "WHERE job.id = :jobId " +
+            "And app.status!='DELETED' " +
+            "ORDER BY app.created DESC")
     Page<Application> findByJobId(String jobId, Pageable pageable);
 
     @Query("SELECT app FROM Application app " +
@@ -41,8 +61,9 @@ public interface ApplicationRepository extends JpaRepository<Application, String
             "JOIN FETCH job.humanResource hr " +
             "JOIN FETCH hr.employer employer " +
             "WHERE employer.id = :employerId " +
-            "AND app.status = :status " +
+            "AND (:status IS NULL OR :status = '' OR app.status = :status) " +
             "AND job.name LIKE %:keyword% "+
+            "And app.status!='DELETED' " +
             "ORDER BY app.created DESC")
     Page<Application> findByEmployerIdAndStatusAndNameContaining(@Param("employerId") String employerId,
                                                                  @Param("status") EApplyStatus status,
@@ -51,9 +72,22 @@ public interface ApplicationRepository extends JpaRepository<Application, String
     @Query("SELECT app FROM Application app " +
             "JOIN FETCH app.job job " +
             "JOIN FETCH job.humanResource hr " +
+            "WHERE hr.id = :hrId " +
+            "AND (:status IS NULL OR :status = '' OR app.status = :status) " +
+            "AND job.name LIKE %:keyword% "+
+            "And app.status!='DELETED' " +
+            "ORDER BY app.created DESC")
+    Page<Application> findByHRIdAndStatusAndNameContaining(@Param("hrId") String hrId,
+                                                                 @Param("status") EApplyStatus status,
+                                                                 @Param("keyword") String keyword,
+                                                                 Pageable pageable);
+    @Query("SELECT app FROM Application app " +
+            "JOIN FETCH app.job job " +
+            "JOIN FETCH job.humanResource hr " +
             "JOIN FETCH hr.employer employer " +
             "WHERE employer.id = :employerId " +
-            "AND app.status = :status " +
+            "AND (:status IS NULL OR :status = '' OR app.status = :status) " +
+            "And app.status!='DELETED' " +
             "ORDER BY app.created DESC")
     Page<Application> findByEmployerIdAndStatus(@Param("employerId") String employerId,
                                                 @Param("status") EApplyStatus status,
@@ -63,9 +97,10 @@ public interface ApplicationRepository extends JpaRepository<Application, String
             "JOIN FETCH app.job job " +
             "JOIN FETCH job.humanResource hr " +
             "WHERE hr.id = :hrId " +
-            "AND app.status = :status " +
+            "AND (:status IS NULL OR :status = '' OR app.status = :status) " +
+            "And app.status!='DELETED' " +
             "ORDER BY app.created DESC")
-    Page<Application> findByHrIdAndStatus(Long hrId, EStatus status, Pageable pageable);
+    Page<Application> findByHrIdAndStatus(String hrId, EApplyStatus status, Pageable pageable);
 
     Optional<Application>findByIdAndJobHumanResourceId(String id, String humanResourceId);
     Optional<Application>findByIdAndCandidateId(String id, String candidateId);
