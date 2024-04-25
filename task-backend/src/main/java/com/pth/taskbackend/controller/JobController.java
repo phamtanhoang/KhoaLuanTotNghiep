@@ -875,10 +875,54 @@ public class JobController {
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new BaseResponse("Không tìm thấy quy trình", HttpStatus.NOT_FOUND.value(), null));
             job.setProcess(optionalProcess.get());
+
             jobService.create(job);
 
+                List<StepResponse> stepResponses;
+
+                if (job.getProcess() != null) {
+                    Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+
+                    List<Step> stepList = steps.getContent();
+                    stepResponses = stepList.stream()
+                            .map(step -> new StepResponse(
+                                    step.getId(),
+                                    step.getName(),
+                                    step.getNumber(),
+                                    step.getDescription(),
+                                    step.getProcess() != null ? step.getProcess().getId() : null
+                            ))
+                            .collect(Collectors.toList());
+                } else {
+                    stepResponses = Collections.emptyList();
+                }
+
+                JobResponse jobResponse = new JobResponse(
+                        job.getId(),
+                        job.getCreated(),
+                        job.getUpdated(),
+                        job.getToDate(),
+                        job.getName(),
+                        job.getDescription(),
+                        job.getExperience(),
+                        job.getFromSalary(),
+                        job.getToSalary(),
+                        job.getLocation(),
+                        job.getStatus(),
+                        job.getCategory().getId(),
+                        job.getCategory().getName(),
+                        job.getHumanResource().getId(),
+                        job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
+                        job.getHumanResource().getEmployer().getName(),
+                        job.getHumanResource().getEmployer().getId(),
+                        job.getHumanResource().getEmployer().getUser().getEmail(),
+                        job.getProcess() != null ? job.getProcess().getId() : null,
+                        job.getProcess() != null ? job.getProcess().getName() : null,
+                        stepResponses,
+                        job.getTags().stream().toList()
+                );
             return ResponseEntity.ok(
-                    new BaseResponse("Tạo công việc thành công", HttpStatus.OK.value(), job)
+                    new BaseResponse("Tạo công việc thành công", HttpStatus.OK.value(), jobResponse)
             );
         }catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
