@@ -25,6 +25,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -681,7 +682,7 @@ public class ApplicationController {
     @PatchMapping("/updateStep/{id}")
     public ResponseEntity<BaseResponse> updateApplicationStep(@RequestHeader("Authorization") String token,
                                                               @PathVariable("id") String id,
-                                                              @RequestBody String result) {
+                                                              @RequestParam String result) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
@@ -690,10 +691,10 @@ public class ApplicationController {
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
 
-            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
-            if (optionalCandidate.isEmpty())
+            Optional<HumanResource> humanResource = humanResourceService.findByEmail(email);
+            if (humanResource.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
             Optional<Application> optionalApplication = applicationService.findById(id);
@@ -708,7 +709,8 @@ public class ApplicationController {
                         new BaseResponse("Đã tới bước cuối", HttpStatus.BAD_REQUEST.value(), null)
                 );
             }
-            if (application.getStatus() == EApplyStatus.PENDING)
+            System.out.println(application.getStatus());
+            if (application.getStatus().equals(EApplyStatus.PENDING))
                 application.setStatus(EApplyStatus.PROCESSING);
             application.setCurrentStep(application.getCurrentStep() + 1);
 
@@ -721,10 +723,12 @@ public class ApplicationController {
                 applicationStep.setNumber(step.getNumber());
                 applicationStep.setResult(result);
                 applicationStepService.create(applicationStep);
+
+                System.out.println(applicationStep);
             } else {
                 return ResponseEntity.ok(new BaseResponse("Không tìm thấy bước tiếp theo", HttpStatus.NOT_FOUND.value(), null));
             }
-
+            System.out.println(applicationStep);
             return ResponseEntity.ok(new BaseResponse("Cập nhật bước thành công", HttpStatus.OK.value(), null));
 
         } catch (ExpiredJwtException e) {
@@ -756,13 +760,14 @@ public class ApplicationController {
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
 
-            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
-            if (optionalCandidate.isEmpty())
+            Optional<HumanResource> humanResource = humanResourceService.findByEmail(email);
+            if (humanResource.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            Optional<Application> optionalApplication = applicationService.findById(id);
+
+            Optional<Application> optionalApplication = applicationService.findByIdAndJobHumanResourceId(id,humanResource.get().getId());
             if (optionalApplication.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
@@ -773,7 +778,7 @@ public class ApplicationController {
             switch (statusEnum) {
                 case PENDING:
                     return ResponseEntity.ok(
-                            new BaseResponse("Không tìm được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
+                            new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
                     );
                 case APPROVED:
                     if (stepService.countAllByProcessId(application.getJob().getProcess().getId()) != application.getCurrentStep())

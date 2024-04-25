@@ -19,7 +19,7 @@ public class ApplicationStepServiceImpl  implements ApplicationStepService {
 
     @Override
     public ApplicationStep create(ApplicationStep applicationStep) {
-        return null;
+        return applicationStepRepository.save(applicationStep);
     }
 
     @Override

@@ -30,5 +30,13 @@
         @OneToMany(mappedBy = "process", cascade = CascadeType.ALL, orphanRemoval = true)
         private List<Step> steps;
 
+        @Override
+        public String toString() {
+            return "Process{" +
+                    "name='" + name + '\'' +
+                    ", description='" + description + '\'' +
+                    ", employer=" + employer +
+                    '}';
+        }
 
     }
