@@ -1,13 +1,19 @@
+import { LoadingContext } from "@/App";
+import { SelectCustom } from "@/components/form";
+import { ConfigSelect } from "@/components/form/SelectCustom/configSelect";
+import { categoriesService } from "@/services";
 import {
+  ONCHANGE_CATEGORY,
   ONCHANGE_KEYWORD,
   ONCHANGE_STATUS,
   ONCLEAR_FILTER,
 } from "@/store/reducers/searchReducer";
 import { DataConstants } from "@/utils/constants/dataConstants";
 import { EMPLOYER_PATHS } from "@/utils/constants/pathConstants";
-import { useEffect, useState } from "react";
+import { SelectHelper } from "@/utils/helpers/selectHelper";
+import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { useContext, useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
-import { FiFilter } from "react-icons/fi";
 import { MdFilterAlt, MdFilterAltOff } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
@@ -31,7 +37,9 @@ const Title = (props: any) => {
 };
 
 const FilterModal = (props: any) => {
+  const context = useContext(LoadingContext);
   const handleClose = props.handleClose;
+
   const dispatch = useDispatch();
   const searchReducer = useSelector((state: any) => state.searchReducer);
   const location = useLocation();
@@ -39,21 +47,57 @@ const FilterModal = (props: any) => {
   const [keyword, setKeyword] = useState<string>(searchReducer.keyword);
 
   const [status, setStatus] = useState<string>(searchReducer.status);
+  const [category, setCategory] = useState<string>(searchReducer.category);
+
+  const [categories, setCategories] = useState<CategoryModel[]>([]);
 
   const _onSearch = () => {
+    handleClose();
     if (location.pathname === EMPLOYER_PATHS.hr) {
       dispatch(ONCHANGE_STATUS(status));
       dispatch(ONCHANGE_KEYWORD(keyword));
+      return;
     }
     if (location.pathname === EMPLOYER_PATHS.procedure) {
       dispatch(ONCHANGE_KEYWORD(keyword));
+      return;
     }
-    handleClose();
+    if (location.pathname === EMPLOYER_PATHS.jobs) {
+      dispatch(ONCHANGE_STATUS(status));
+      dispatch(ONCHANGE_KEYWORD(keyword));
+      dispatch(ONCHANGE_CATEGORY(category));
+      return;
+    }
   };
   const _onClear = () => {
     setKeyword("");
     setStatus("");
+    setCategory("");
   };
+  const fetchDropdownData = (service: any, setState: any) => {
+    return service
+      .getList_Dropdown()
+      .then((res: any) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          setState(res.data.Data);
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      });
+  };
+  useEffect(() => {
+    context.handleOpenLoading();
+    const fetchTasks = [];
+    if (location.pathname === EMPLOYER_PATHS.jobs)
+      fetchTasks.push(fetchDropdownData(categoriesService, setCategories));
+    Promise.all(fetchTasks).finally(() => {
+      context.handleCloseLoading();
+    });
+  }, []);
+
   return (
     <div className="absolute inset-y-0 right-0 w-[85%] lg:w-[30%] overflow-y-auto">
       <div className="h-full flex flex-col px-4 py-8 lg:p-8 bg-white">
@@ -77,7 +121,7 @@ const FilterModal = (props: any) => {
             <input
               type="text"
               placeholder="Nhập từ khóa..."
-              className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-offset-2  transition-colors duration-300 ${
+              className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-1 transition-colors duration-300 ${
                 isAdminPath
                   ? "border-borderColor focus:border-bgBlue focus:ring-bgblue"
                   : "border-borderColor focus:border-orangetext focus:ring-orangetext"
@@ -86,13 +130,33 @@ const FilterModal = (props: any) => {
               onChange={(e) => setKeyword(e.target.value)}
             />
           </div>
-          {location.pathname === EMPLOYER_PATHS.hr && (
+          {location.pathname === EMPLOYER_PATHS.jobs && (
+            <div className="w-full">
+              <label className="block mb-1.5 text-base font-medium text-gray-600">
+                Loại công việc:
+              </label>
+              <SelectCustom
+                className={"mt-1"}
+                value={SelectHelper.findOptionByCategoryId(
+                  category,
+                  categories
+                )}
+                options={SelectHelper.convertCategoriesToOptions(categories)}
+                onChange={(e: any) => setCategory(e ? e.value : "")}
+                isMulti={false}
+                placeholder="--- Chọn loại công việc ---"
+                theme={ConfigSelect.customTheme}
+              />
+            </div>
+          )}
+          {(location.pathname === EMPLOYER_PATHS.hr ||
+            location.pathname === EMPLOYER_PATHS.jobs) && (
             <div className="w-full">
               <label className="block mb-1.5 text-base font-medium text-gray-600">
                 Tình trạng:
               </label>
               <select
-                className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-offset-2  transition-colors duration-300 ${
+                className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-1 transition-colors duration-300 ${
                   isAdminPath
                     ? "border-borderColor focus:border-bgBlue focus:ring-bgblue"
                     : "border-borderColor focus:border-orangetext focus:ring-orangetext"
@@ -101,92 +165,21 @@ const FilterModal = (props: any) => {
                 value={status}
               >
                 <option value="">Tất cả</option>
-                {DataConstants.HR_STATE_DATA.map((item, index) => (
-                  <option key={index} value={item.id} className="py-2">
-                    {item.name}
-                  </option>
-                ))}
+                {location.pathname === EMPLOYER_PATHS.hr &&
+                  DataConstants.HR_STATE_DATA.map((item, index) => (
+                    <option key={index} value={item.id} className="py-2">
+                      {item.name}
+                    </option>
+                  ))}
+                {location.pathname === EMPLOYER_PATHS.jobs &&
+                  DataConstants.JOB_STATE_DATA.map((item, index) => (
+                    <option key={index} value={item.id} className="py-2">
+                      {item.name}
+                    </option>
+                  ))}
               </select>
             </div>
           )}
-
-          {/* <div>
-            <label className="block mb-1.5 text-base font-medium text-gray-600">
-              Email:
-            </label>
-            <input
-              type="text"
-              placeholder="Nhập email..."
-              className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-offset-2  transition-colors duration-300 ${
-                isAdminPath
-                  ? "border-borderColor focus:border-bgBlue focus:ring-bgblue"
-                  : "border-borderColor focus:border-orangetext focus:ring-orangetext"
-              }`}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block mb-1.5 text-base font-medium text-gray-600">
-              Số điện thoại:
-            </label>
-            <input
-              type="text"
-              placeholder="Nhập số điên thoại..."
-              className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-offset-2  transition-colors duration-300 ${
-                isAdminPath
-                  ? "border-borderColor focus:border-bgBlue focus:ring-bgblue"
-                  : "border-borderColor focus:border-orangetext focus:ring-orangetext"
-              }`}
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
-          </div>
-          <div className="flex gap-4">
-            <div className="w-full">
-              <label className="block mb-1.5 text-base font-medium text-gray-600">
-                Giới tính:
-              </label>
-
-              <select
-                className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-offset-2  transition-colors duration-300 ${
-                  isAdminPath
-                    ? "border-borderColor focus:border-bgBlue focus:ring-bgblue"
-                    : "border-borderColor focus:border-orangetext focus:ring-orangetext"
-                }`}
-                onChange={(e) => setSex(e.target.value)}
-                value={sex}
-              >
-                <option value="">Tất cả</option>
-                {DataConstants.SEX_DATA.map((item, index) => (
-                  <option key={index} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="w-full">
-              <label className="block mb-1.5 text-base font-medium text-gray-600">
-                Tình trạng:
-              </label>
-              <select
-                className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-offset-2  transition-colors duration-300 ${
-                  isAdminPath
-                    ? "border-borderColor focus:border-bgBlue focus:ring-bgblue"
-                    : "border-borderColor focus:border-orangetext focus:ring-orangetext"
-                }`}
-                onChange={(e) => setStatus(e.target.value)}
-                value={status}
-              >
-                <option value="">Tất cả</option>
-                {DataConstants.HR_STATE_DATA.map((item, index) => (
-                  <option key={index} value={item.id} className="py-2">
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div> */}
         </div>
 
         <div className="flex justify-between items-center border-borderColor mt-10">

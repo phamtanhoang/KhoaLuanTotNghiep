@@ -1,5 +1,6 @@
 import { LoadingContext } from "@/App";
 import { proceduresService } from "@/services";
+import { AuthHelper } from "@/utils/helpers/authHelper";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
@@ -119,7 +120,7 @@ const UpdateProcedure = (props: any) => {
       <div className="lg:w-[40%] w-screen bg-white relative rounded">
         <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-orangetext rounded-t">
           <h2 className="text-xl font-semibold  line-clamp-1 my-auto">
-            Sửa quy trình phỏng vấn
+            Chi tiết quy trình phỏng vấn
           </h2>
           <button
             className="p-1 rounded-md text-lg hover:text-orangetext hover:bg-white"
@@ -146,6 +147,7 @@ const UpdateProcedure = (props: any) => {
                   onChange={(e) => {
                     setName(e.target.value);
                   }}
+                  disabled={AuthHelper.isHR() ? true : false}
                 />
               </div>
             </div>
@@ -161,6 +163,7 @@ const UpdateProcedure = (props: any) => {
                   onChange={(e) => {
                     setDescription(e.target.value);
                   }}
+                  disabled={AuthHelper.isHR() ? true : false}
                 />
               </div>
             </div>
@@ -184,19 +187,22 @@ const UpdateProcedure = (props: any) => {
                         placeholder="Nhập tên bước..."
                         value={item.name}
                         onChange={(e) => _onChangeStepName(index, e)}
+                        disabled={AuthHelper.isHR() ? true : false}
                       />
                     </div>
-                    <button
-                      className={`text-base my-auto text-white p-1.5 rounded ${
-                        steps.length == 1
-                          ? "bg-red-300/50"
-                          : "bg-red-500 hover:bg-red-500/90"
-                      }`}
-                      onClick={() => _onClickDelete(item)}
-                      disabled={steps.length == 1 ? true : false}
-                    >
-                      <FaTrashCan />
-                    </button>
+                    {AuthHelper.isEmployer() && (
+                      <button
+                        className={`text-base my-auto text-white p-1.5 rounded ${
+                          steps.length == 1
+                            ? "bg-red-300/50"
+                            : "bg-red-500 hover:bg-red-500/90"
+                        }`}
+                        onClick={() => _onClickDelete(item)}
+                        disabled={steps.length == 1 ? true : false}
+                      >
+                        <FaTrashCan />
+                      </button>
+                    )}
                   </div>
                   <div className="border border-dashed border-t-0 rounded-b-lg p-2 flex flex-col gap-2">
                     <div className="content-center">
@@ -208,6 +214,7 @@ const UpdateProcedure = (props: any) => {
                         value={item.description}
                         placeholder="Nhập mô tả bước.."
                         onChange={(e) => _onChangeStepDescription(index, e)}
+                        disabled={AuthHelper.isHR() ? true : false}
                       />
                     </div>
                   </div>
@@ -218,22 +225,26 @@ const UpdateProcedure = (props: any) => {
         </div>
 
         <div className="flex justify-between gap-4 px-4 py-3 border-t ">
-          <button
-            className="flex items-center gap-2 w-max h-max px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-600/85 font-medium"
-            onClick={_onClickAdd}
-          >
-            <MdAdd className="text-lg" />
-            <p>Thêm</p>
-          </button>
+          {AuthHelper.isEmployer() && (
+            <button
+              className="flex items-center gap-2 w-max h-max px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-600/85 font-medium"
+              onClick={_onClickAdd}
+            >
+              <MdAdd className="text-lg" />
+              <p>Thêm</p>
+            </button>
+          )}
 
           <div className="flex gap-4">
-            <button
-              className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-600/85 font-medium"
-              onClick={_onClickSave}
-            >
-              <FaRegSave className="text-lg" />
-              <p>Lưu</p>
-            </button>
+            {AuthHelper.isEmployer() && (
+              <button
+                className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-600/85 font-medium"
+                onClick={_onClickSave}
+              >
+                <FaRegSave className="text-lg" />
+                <p>Lưu</p>
+              </button>
+            )}
             <button
               className="flex items-center gap-2 w-max h-max px-4 py-2 bg-slate-300 text-white rounded-md hover:bg-slate-300/90 font-medium"
               onClick={handleClose}

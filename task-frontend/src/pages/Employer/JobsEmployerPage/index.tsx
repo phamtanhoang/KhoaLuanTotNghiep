@@ -12,32 +12,15 @@ import { SwalHelper } from "@/utils/helpers/swalHelper";
 import jobsService from "@/services/jobsService";
 import ModalBase from "@/components/modal";
 
-const sampleData = [
-  {
-    title: "Job 1",
-    createDate: "2024-03-01",
-    dealine: "2024-04-01",
-    state: "PENDING",
-  },
-  {
-    title: "Job 2",
-    createDate: "2024-03-05",
-    dealine: "2024-04-05",
-    state: "REJECT",
-  },
-  {
-    title: "Job 3",
-    createDate: "2024-03-10",
-    dealine: "2024-04-10",
-    state: "ACTIVE",
-  },
-  {
-    title: "Job 4",
-    createDate: "2024-03-15",
-    dealine: "2024-04-15",
-    state: "PAUSE",
-  },
-];
+export interface JobsTableProps {
+  value: JobModel[];
+  _onClickDelete: (item: JobModel) => void;
+  _onClickEdit: (item: JobModel) => void;
+  isLoading: boolean;
+  currentPage: number;
+  itemPerpage: number;
+}
+
 const JobsEmployerPage = () => {
   const context = useContext(LoadingContext);
   const searchReducer = useSelector((state: any) => state.searchReducer);
@@ -71,32 +54,36 @@ const JobsEmployerPage = () => {
     handleOpen();
   };
 
-  const _onClickDelete = () => {};
-  const _onClickEdit = (item: JobModel) => {
+  const _onClickDelete = (item: JobModel) => {
     SwalHelper.Confirm(
       "Xác nhận xóa tài khoản này?",
       "question",
       () => {
-        // context.handleOpenLoading();
-        // jobsService
-        //   .delete(item.id)
-        //   .then((res) => {
-        //     if (res.status === 200 && res.data.Status === 200) {
-        //       SwalHelper.MiniAlert(res.data.Message, "success");
-        //       fetchListData();
-        //     } else {
-        //       SwalHelper.MiniAlert(res.data.Message, "error");
-        //     }
-        //   })
-        //   .catch(() => {
-        //     SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
-        //   })
-        //   .finally(() => {
-        //     context.handleCloseLoading();
-        //   });
+        context.handleOpenLoading();
+        jobsService
+          .delete(item.id)
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              SwalHelper.MiniAlert(res.data.Message, "success");
+              fetchListData();
+            } else {
+              SwalHelper.MiniAlert(res.data.Message, "error");
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
       },
       () => {}
     );
+  };
+  const _onClickEdit = (item: JobModel) => {
+    setId(item.id);
+    setFuncs(MODAL_KEYS.detailJob);
+    handleOpen();
   };
 
   const fetchListData = () => {
@@ -169,20 +156,24 @@ const JobsEmployerPage = () => {
 
         <div className="bg-white lg:px-4 rounded relative w-full mt-2 lg:mt-5">
           <div className="max-lg:hidden">
-            {/* <JobsTableWeb
-            value={sampleData}
-            _onClickDelete={_onClickDelete}
-            _onClickEdit={_onClickEdit}
-            _onClickDetail={_onClickDetail}
-          /> */}
+            <JobsTableWeb
+              value={jobs}
+              _onClickDelete={_onClickDelete}
+              _onClickEdit={_onClickEdit}
+              isLoading={isLoadingTable}
+              currentPage={currentPage}
+              itemPerpage={itemPerpage}
+            />
           </div>
           <div className="lg:hidden">
-            {/* <JobsTableMobile
-            value={sampleData}
-            _onClickDelete={_onClickDelete}
-            _onClickEdit={_onClickEdit}
-            _onClickDetail={_onClickDetail}
-          /> */}
+            <JobsTableMobile
+              value={jobs}
+              _onClickDelete={_onClickDelete}
+              _onClickEdit={_onClickEdit}
+              isLoading={isLoadingTable}
+              currentPage={currentPage}
+              itemPerpage={itemPerpage}
+            />
           </div>
         </div>
 

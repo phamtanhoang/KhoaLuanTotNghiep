@@ -3236,6 +3236,10 @@ body {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
+.text-white\/90{
+  color: rgb(255 255 255 / 0.9);
+}
+
 .text-yellow-500{
   --tw-text-opacity: 1;
   color: rgb(234 179 8 / var(--tw-text-opacity));
@@ -3360,6 +3364,12 @@ body {
 .ring-2{
   --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
   --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.ring{
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
 
@@ -3766,8 +3776,9 @@ body {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
-.hover\:bg-red-600\/85:hover{
-  background-color: rgb(220 38 38 / 0.85);
+.hover\:bg-gray-50:hover{
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 250 251 / var(--tw-bg-opacity));
 }
 
 .hover\:text-bgBlue:hover{
@@ -3778,11 +3789,6 @@ body {
 .hover\:text-black:hover{
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity));
-}
-
-.hover\:text-blue-500:hover{
-  --tw-text-opacity: 1;
-  color: rgb(59 130 246 / var(--tw-text-opacity));
 }
 
 .hover\:text-blue-600:hover{
@@ -3907,6 +3913,14 @@ body {
   opacity: 1;
 }
 
+.focus\:border:focus{
+  border-width: 1px;
+}
+
+.focus\:border-4:focus{
+  border-width: 4px;
+}
+
 .focus\:border-bgBlue:focus{
   --tw-border-opacity: 1;
   border-color: rgb(77 77 255 / var(--tw-border-opacity));
@@ -3955,6 +3969,12 @@ body {
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
 
+.focus\:ring-8:focus{
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(8px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
 .focus\:ring-bgBlue:focus{
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(77 77 255 / var(--tw-ring-opacity));
@@ -3975,6 +3995,11 @@ body {
 
 .focus\:ring-offset-2:focus{
   --tw-ring-offset-width: 2px;
+}
+
+.active\:border-bgBlue:active{
+  --tw-border-opacity: 1;
+  border-color: rgb(77 77 255 / var(--tw-border-opacity));
 }
 
 .active\:opacity-\[0\.85\]:active{
@@ -4037,6 +4062,10 @@ body {
     -webkit-line-clamp: 2;
   }
 
+  .max-lg\:flex{
+    display: flex;
+  }
+
   .max-lg\:hidden{
     display: none;
   }
@@ -4051,6 +4080,10 @@ body {
 
   .max-lg\:flex-col{
     flex-direction: column;
+  }
+
+  .max-lg\:gap-5{
+    gap: 1.25rem;
   }
 
   .max-lg\:border-b{
@@ -4103,6 +4136,10 @@ body {
     top: 0.25rem;
   }
 
+  .sm\:col-span-2{
+    grid-column: span 2 / span 2;
+  }
+
   .sm\:ml-3{
     margin-left: 0.75rem;
   }
@@ -4115,6 +4152,10 @@ body {
     margin-top: 1rem;
   }
 
+  .sm\:mt-0{
+    margin-top: 0px;
+  }
+
   .sm\:block{
     display: block;
   }
@@ -4125,6 +4166,10 @@ body {
 
   .sm\:flex{
     display: flex;
+  }
+
+  .sm\:grid{
+    display: grid;
   }
 
   .sm\:w-\[30rem\]{
@@ -4168,6 +4213,10 @@ body {
     justify-content: center;
   }
 
+  .sm\:gap-4{
+    gap: 1rem;
+  }
+
   .sm\:space-y-0 > :not([hidden]) ~ :not([hidden]){
     --tw-space-y-reverse: 0;
     margin-top: calc(0px * calc(1 - var(--tw-space-y-reverse)));
@@ -4188,6 +4237,11 @@ body {
 
   .sm\:bg-transparent{
     background-color: transparent;
+  }
+
+  .sm\:px-6{
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 
   .sm\:text-4xl{
@@ -4322,6 +4376,10 @@ body {
     top: 0.5rem;
   }
 
+  .lg\:col-span-2{
+    grid-column: span 2 / span 2;
+  }
+
   .lg\:m-2{
     margin: 0.5rem;
   }
@@ -4453,6 +4511,10 @@ body {
 
   .lg\:table-row{
     display: table-row;
+  }
+
+  .lg\:grid{
+    display: grid;
   }
 
   .lg\:hidden{
@@ -4614,6 +4676,10 @@ body {
 
   .lg\:max-w-none{
     max-width: none;
+  }
+
+  .lg\:max-w-full{
+    max-width: 100%;
   }
 
   .lg\:flex-auto{

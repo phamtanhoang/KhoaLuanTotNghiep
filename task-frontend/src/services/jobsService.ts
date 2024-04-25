@@ -49,5 +49,17 @@ const jobsService = {
       headers: { "Content-Type": "application/json" },
     });
   },
+
+  async delete(id: string) {
+    return await axiosConfig.delete(JobAPI.jobById(id));
+  },
+
+  async getDetail_Employer(id: string) {
+    return await axiosConfig.get(JobAPI.getDetail_Employer(id));
+  },
+
+  async getDetail_Admin(id: string) {
+    return await axiosConfig.get(JobAPI.getDetail_Admin(id));
+  },
 };
 export default jobsService;

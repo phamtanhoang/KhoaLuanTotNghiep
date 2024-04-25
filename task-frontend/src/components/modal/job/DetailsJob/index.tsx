@@ -16,82 +16,136 @@ import { AuthHelper } from "@/utils/helpers/authHelper";
 import jobsService from "@/services/jobsService";
 import { TextHelper } from "@/utils/helpers/textHelper";
 
-const CreateJob = (props: any) => {
+const DetailsJob = (props: any) => {
   const context = useContext(LoadingContext);
   const handleClose = props.handleClose;
   const fetchData = props.fetchData;
+  const id = props.id;
 
-  // const [openSub, setOpenSub] = useState(false);
-  // const [funcsSub, setFuncsSub] = useState<string>("");
-  // const handleOpenSub = () => setOpenSub(true);
-  // const handleCloseSub = () => setOpenSub(false);
+  const [openSub, setOpenSub] = useState(false);
+  const [funcsSub, setFuncsSub] = useState<string>("");
+  const handleOpenSub = () => setOpenSub(true);
+  const handleCloseSub = () => setOpenSub(false);
 
-  const [name, setName] = useState<string>("");
-  const [description, setDescription] = useState<string>(
-    TextHelper.DescriptionJob
-  );
-  const [toDate, setToDate] = useState<string>(">");
-  const [location, setLocation] = useState<string>("");
-  const [checkSalary, setCheckSalary] = useState<boolean>(false);
-  const [fromSalary, setFromSalary] = useState<string>("");
-  const [toSalary, setToSalary] = useState<string>("");
-  const [experience, setExperience] = useState<string>("");
-  const [categoryId, setCategoryId] = useState<string>("");
-  const [humanResourceId, setHumanResourceId] = useState<string>("");
-  const [procedureId, setProcedureId] = useState<string>("");
-  const [selectedTags, setSelectedTags] = useState<TagModel[]>([]);
+  // const [name, setName] = useState<string>("");
+  // const [description, setDescription] = useState<string>(
+  //   TextHelper.DescriptionJob
+  // );
+  // const [toDate, setToDate] = useState<string>(">");
+  // const [location, setLocation] = useState<string>("");
+  // const [checkSalary, setCheckSalary] = useState<boolean>(false);
+  // const [fromSalary, setFromSalary] = useState<string>("");
+  // const [toSalary, setToSalary] = useState<string>("");
+  // const [experience, setExperience] = useState<string>("");
+  // const [categoryId, setCategoryId] = useState<string>("");
+  // const [humanResourceId, setHumanResourceId] = useState<string>("");
+  // const [procedureId, setProcedureId] = useState<string>("");
+  // const [selectedTags, setSelectedTags] = useState<TagModel[]>([]);
 
-  const [categories, setCategories] = useState<CategoryModel[]>([]);
-  const [hrs, setHrs] = useState<HumanResourceModel[]>([]);
-  const [tags, setTags] = useState<TagModel[]>([]);
-  const [procedures, setProcedures] = useState<ProcedureModel[]>([]);
+  // const [categories, setCategories] = useState<CategoryModel[]>([]);
+  // const [hrs, setHrs] = useState<HumanResourceModel[]>([]);
+  // const [tags, setTags] = useState<TagModel[]>([]);
+  // const [procedures, setProcedures] = useState<ProcedureModel[]>([]);
 
-  const _onClickSave = () => {
-    if (
-      !name ||
-      !description ||
-      !location ||
-      !experience ||
-      !categoryId ||
-      !humanResourceId ||
-      (checkSalary && !fromSalary && !toSalary)
-    ) {
-      SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "warning");
-      return;
-    }
+  // const _onClickSave = () => {
+  //   if (
+  //     !name ||
+  //     !description ||
+  //     !location ||
+  //     !experience ||
+  //     !categoryId ||
+  //     !humanResourceId ||
+  //     (checkSalary && !fromSalary && !toSalary)
+  //   ) {
+  //     SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "warning");
+  //     return;
+  //   }
 
-    let from = "";
-    let to = "";
-    if (checkSalary) {
-      from = fromSalary;
-      to = toSalary;
-    } else {
-      from = "";
-      to = "";
-    }
+  //   let from = "";
+  //   let to = "";
+  //   if (checkSalary) {
+  //     from = fromSalary;
+  //     to = toSalary;
+  //   } else {
+  //     from = "";
+  //     to = "";
+  //   }
 
-    if (checkSalary) context.handleOpenLoading();
+  //   if (checkSalary) context.handleOpenLoading();
+  //   jobsService
+  //     .create(
+  //       name,
+  //       description,
+  //       toDate,
+  //       location,
+  //       checkSalary ? fromSalary : "",
+  //       checkSalary ? toSalary : "",
+  //       experience,
+  //       categoryId,
+  //       humanResourceId,
+  //       procedureId,
+  //       selectedTags.map((item: any) => ({
+  //         id: item.value,
+  //       }))
+  //     )
+  //     .then((res) => {
+  //       if (res.status === 200 && res.data.Status === 200) {
+  //         SwalHelper.MiniAlert(res.data.Message, "success");
+  //         fetchData();
+  //         handleClose();
+  //       } else {
+  //         SwalHelper.MiniAlert(res.data.Message, "error");
+  //       }
+  //     })
+  //     .catch(() => {
+  //       SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+  //     })
+  //     .finally(() => {
+  //       context.handleCloseLoading();
+  //     });
+  // };
+
+  // const _onChangeCategoryId = (value: string) => {
+  //   setCategoryId(value);
+  // };
+  // const _onChangeProcedureId = (value: string) => {
+  //   setProcedureId(value);
+  // };
+  // const _onChangeHrId = (value: string) => {
+  //   setHumanResourceId(value);
+  // };
+
+  // const _onChangeTags = (selected: any) => {
+  //   setSelectedTags(selected);
+  // };
+  // const _onChangeDescription = (event: any, editor: any) => {
+  //   const data = editor.getData();
+  //   setDescription(data);
+  // };
+
+  // const fetchDropdownData = (service: any, setState: any) => {
+  //   return service
+  //     .getList_Dropdown()
+  //     .then((res: any) => {
+  //       if (res.status === 200 && res.data.Status === 200) {
+  //         setState(res.data.Data);
+  //       } else {
+  //         SwalHelper.MiniAlert(res.data.Message, "error");
+  //       }
+  //     })
+  //     .catch(() => {
+  //       SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+  //     });
+  // };
+  useEffect(() => {
+    context.handleOpenLoading();
     jobsService
-      .create(
-        name,
-        description,
-        toDate,
-        location,
-        checkSalary ? fromSalary : "",
-        checkSalary ? toSalary : "",
-        experience,
-        categoryId,
-        humanResourceId,
-        procedureId,
-        selectedTags.map((item: any) => ({
-          id: item.value,
-        }))
-      )
+      .getDetail_Employer(id)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          SwalHelper.MiniAlert(res.data.Message, "success");
-          fetchData();
-          handleClose();
+          // setName(res.data.Data.name);
+          // setDescription(res.data.Data.description);
+          // setSteps(res.data.Data.step);
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -102,62 +156,15 @@ const CreateJob = (props: any) => {
       .finally(() => {
         context.handleCloseLoading();
       });
-  };
-
-  const _onChangeCategoryId = (value: string) => {
-    setCategoryId(value);
-  };
-  const _onChangeProcedureId = (value: string) => {
-    setProcedureId(value);
-  };
-  const _onChangeHrId = (value: string) => {
-    setHumanResourceId(value);
-  };
-
-  const _onChangeTags = (selected: any) => {
-    setSelectedTags(selected);
-  };
-  const _onChangeDescription = (event: any, editor: any) => {
-    const data = editor.getData();
-    setDescription(data);
-  };
-
-  const fetchDropdownData = (service: any, setState: any) => {
-    return service
-      .getList_Dropdown()
-      .then((res: any) => {
-        if (res.status === 200 && res.data.Status === 200) {
-          setState(res.data.Data);
-        } else {
-          SwalHelper.MiniAlert(res.data.Message, "error");
-        }
-      })
-      .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-      });
-  };
-  useEffect(() => {
-    context.handleOpenLoading();
-    const fetchTasks = [];
-    fetchTasks.push(fetchDropdownData(categoriesService, setCategories));
-    fetchTasks.push(fetchDropdownData(tagsService, setTags));
-    fetchTasks.push(fetchDropdownData(proceduresService, setProcedures));
-    if (AuthHelper.isEmployer()) {
-      fetchTasks.push(fetchDropdownData(humanResourcesService, setHrs));
-    }
-
-    Promise.all(fetchTasks).finally(() => {
-      context.handleCloseLoading();
-    });
   }, []);
 
   return (
     <>
-      {/* <ModalBase open={openSub} handleClose={handleCloseSub} funcs={funcsSub} /> */}
+      <ModalBase open={openSub} handleClose={handleCloseSub} funcs={funcsSub} />
       <div className="lg:w-[45%] w-screen bg-white relative rounded">
         <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-orangetext rounded-t">
           <h2 className="text-xl font-semibold  line-clamp-1 my-auto">
-            Thêm tin tuyển dụng
+            Chi tiết tuyển dụng
           </h2>
           <button
             className="p-1 rounded-md text-lg hover:text-orangetext hover:bg-white"
@@ -167,12 +174,8 @@ const CreateJob = (props: any) => {
           </button>
         </div>
 
-        <div className="overflow-auto scrollbar-custom h-max max-h-[75vh] my-2 mr-1">
+        {/* <div className="overflow-auto scrollbar-custom h-max max-h-[75vh] my-2 mr-1">
           <div className="mx-4 my-2 text-gray-700 flex flex-col gap-3 lg:gap-4 text-sm">
-            <p className="font-semibold text-red-500">
-              Lưu ý: Tin tuyển dụng đã được đăng thì không được phép chỉnh sửa
-              thông tin
-            </p>
             <div className="flex justify-between gap-3 lg:gap-4 content-center">
               <div className="content-center w-full">
                 <label className="font-medium tracking-wide text-sm">
@@ -303,7 +306,7 @@ const CreateJob = (props: any) => {
                   Loại công việc&nbsp;<span className="text-red-500">*</span>
                 </label>
                 <SelectCustom
-                  className={"mt-1 "}
+                  className={"mt-1"}
                   value={SelectHelper.findOptionByCategoryId(
                     categoryId,
                     categories
@@ -369,15 +372,15 @@ const CreateJob = (props: any) => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="flex justify-end gap-4 px-4 py-3 border-t">
           <button
             className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-600/85 font-medium"
-            onClick={_onClickSave}
+            // onClick={_onClickSave}
           >
             <FaRegSave className="text-lg" />
-            <p>Tạo</p>
+            <p>Lưu</p>
           </button>
           <button
             className="flex items-center gap-2 w-max h-max px-4 py-2 bg-slate-300 text-white rounded-md hover:bg-slate-300/90 font-medium"
@@ -391,4 +394,4 @@ const CreateJob = (props: any) => {
     </>
   );
 };
-export default CreateJob;
+export default DetailsJob;

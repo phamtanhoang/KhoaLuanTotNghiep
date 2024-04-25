@@ -1,28 +1,26 @@
 import { ConstantsHelper } from "@/utils/helpers/constantsHelper";
+import { DateHelper } from "@/utils/helpers/dateHelper";
 import { AiFillDelete, AiFillEdit, AiFillEye } from "react-icons/ai";
 import { IoMdAddCircleOutline } from "react-icons/io";
-
-interface JobProps {
-  title: string;
-  createDate: string;
-  dealine: string;
-  state: string;
-}
-interface JobsTableWebProps {
-  value: JobProps[];
-  _onClickDelete: () => void;
-  _onClickDetail: () => void;
-  _onClickEdit: () => void;
-}
+import { JobsTableProps } from "../..";
+import { ListEmpty, Loading } from "@/components/ui";
 
 const ItemTSX: React.FC<{
-  item: JobProps;
+  item: JobModel;
   index: number;
-  _onClickDelete: () => void;
-  _onClickDetail: () => void;
-  _onClickEdit: () => void;
-}> = ({ item, index, _onClickDelete, _onClickDetail, _onClickEdit }) => {
-  let data = ConstantsHelper.findJobStateById(item.state);
+  _onClickDelete: (item: JobModel) => void;
+  _onClickEdit: (item: JobModel) => void;
+  currentPage: number;
+  itemPerpage: number;
+}> = ({
+  item,
+  index,
+  _onClickDelete,
+  _onClickEdit,
+  currentPage,
+  itemPerpage,
+}) => {
+  let data = ConstantsHelper.findJobStateById(item.status);
 
   return (
     <tr
@@ -32,14 +30,14 @@ const ItemTSX: React.FC<{
       <td className="table-cell">
         <div className="flex items-center w-full gap-2 justify-center">
           <p className="text-base font-medium leading-none text-gray-700">
-            {index}
+            {currentPage * itemPerpage - itemPerpage + index}
           </p>
         </div>
       </td>
       <td className="table-cell">
         <div className="flex items-center px-5 w-full gap-2 justify-start">
           <p className="text-base font-semibold text-gray-700 line-clamp-3">
-            {item.title}
+            {item.name}
           </p>
         </div>
       </td>
@@ -59,12 +57,16 @@ const ItemTSX: React.FC<{
       </td>
       <td className="table-cell">
         <div className="flex items-center px-5 w-full gap-2 justify-center">
-          <p className="text-base leading-8 text-gray-600">{item.createDate}</p>
+          <p className="text-base leading-8 text-gray-600 text-center">
+            {DateHelper.formatDateTime(item.created)}
+          </p>
         </div>
       </td>
       <td className="table-cell">
         <div className="flex items-center px-5 w-full gap-2 justify-center">
-          <p className="text-base leading-8 text-gray-600">{item.dealine}</p>
+          <p className="text-base leading-8 text-gray-600 text-center">
+            {DateHelper.formatDateTime(item.updated)}
+          </p>
         </div>
       </td>
 
@@ -72,15 +74,11 @@ const ItemTSX: React.FC<{
         <div className="flex items-center gap-5 text-2xl text-gray-600 justify-end px-4">
           <AiFillEye
             className=" cursor-pointer hover:text-orange-500"
-            onClick={_onClickDetail}
-          />
-          <AiFillEdit
-            className=" cursor-pointer hover:text-blue-500"
-            onClick={_onClickEdit}
+            onClick={() => _onClickEdit(item)}
           />
           <AiFillDelete
             className=" cursor-pointer hover:text-red-500"
-            onClick={_onClickDelete}
+            onClick={() => _onClickDelete(item)}
           />
         </div>
       </td>
@@ -88,11 +86,13 @@ const ItemTSX: React.FC<{
   );
 };
 
-const JobsTableWeb: React.FC<JobsTableWebProps> = ({
+const JobsTableWeb: React.FC<JobsTableProps> = ({
   value,
   _onClickDelete,
-  _onClickDetail,
   _onClickEdit,
+  isLoading,
+  currentPage,
+  itemPerpage,
 }) => {
   return (
     <>
@@ -106,18 +106,39 @@ const JobsTableWeb: React.FC<JobsTableWebProps> = ({
           <th className="px-5 w-[15%]"></th>
         </thead>
         <tbody>
-          {value.map((item, index) => (
+          {isLoading ? (
+            <tr className="bg-white">
+              <td className="pt-6 whitespace-no-wrap" colSpan={6}>
+                <Loading />
+              </td>
+            </tr>
+          ) : (
             <>
-              <tr className="h-3"></tr>
-              <ItemTSX
-                item={item}
-                index={index}
-                _onClickDelete={_onClickDelete}
-                _onClickDetail={_onClickDetail}
-                _onClickEdit={_onClickEdit}
-              />
+              {!value ? (
+                <tr className="bg-white">
+                  <td className="pt-6 whitespace-no-wrap" colSpan={6}>
+                    <ListEmpty />
+                  </td>
+                </tr>
+              ) : (
+                <>
+                  {value?.map((item, index) => (
+                    <>
+                      <tr className="h-3"></tr>
+                      <ItemTSX
+                        item={item}
+                        index={index}
+                        _onClickDelete={_onClickDelete}
+                        _onClickEdit={_onClickEdit}
+                        currentPage={currentPage}
+                        itemPerpage={itemPerpage}
+                      />
+                    </>
+                  ))}
+                </>
+              )}
             </>
-          ))}
+          )}
         </tbody>
       </table>
     </>

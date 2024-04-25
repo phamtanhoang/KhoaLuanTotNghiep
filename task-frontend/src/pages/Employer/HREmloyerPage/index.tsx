@@ -1,9 +1,8 @@
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { HRTableMobile, HRTableWeb } from "./components";
-import { Pagination, PaginationCustom } from "@/components/ui";
+import { PaginationCustom } from "@/components/ui";
 import { FiFilter } from "react-icons/fi";
 
-import Swal from "sweetalert2";
 import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { useContext, useEffect, useState } from "react";
 import { LoadingContext } from "@/App";
@@ -13,6 +12,15 @@ import ModalBase from "@/components/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { ONCLEAR_FILTER } from "@/store/reducers/searchReducer";
+
+export interface HRTableProps {
+  value: HumanResourceModel[];
+  _onClickDetail: (item: HumanResourceModel) => void;
+  _onClickDelete: (item: HumanResourceModel) => void;
+  isLoading: boolean;
+  currentPage: number;
+  itemPerpage: number;
+}
 
 const HREmployerPage = () => {
   const context = useContext(LoadingContext);

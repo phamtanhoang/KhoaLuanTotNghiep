@@ -1,15 +1,8 @@
 import { ListEmpty, Loading } from "@/components/ui";
 import { DateHelper } from "@/utils/helpers/dateHelper";
 import { AiFillDelete, AiFillEye } from "react-icons/ai";
-
-interface ProceduresTableWebProps {
-  value: ProcedureModel[];
-  _onClickDelete: (item: ProcedureModel) => void;
-  _onClickDetail: (item: ProcedureModel) => void;
-  isLoading: boolean;
-  currentPage: number;
-  itemPerpage: number;
-}
+import { ProceduresTableProps } from "../..";
+import { AuthHelper } from "@/utils/helpers/authHelper";
 
 const ItemTSX: React.FC<{
   item: ProcedureModel;
@@ -66,17 +59,19 @@ const ItemTSX: React.FC<{
             className=" cursor-pointer hover:text-orangetext"
             onClick={() => _onClickDetail(item)}
           />
-          <AiFillDelete
-            className=" cursor-pointer hover:text-red-500"
-            onClick={() => _onClickDelete(item)}
-          />
+          {AuthHelper.isEmployer() && (
+            <AiFillDelete
+              className=" cursor-pointer hover:text-red-500"
+              onClick={() => _onClickDelete(item)}
+            />
+          )}
         </div>
       </td>
     </tr>
   );
 };
 
-const ProceduresTableWeb: React.FC<ProceduresTableWebProps> = ({
+const ProceduresTableWeb: React.FC<ProceduresTableProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,

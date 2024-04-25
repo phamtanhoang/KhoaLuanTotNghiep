@@ -16,7 +16,9 @@ import employersService from "@/services/employersService";
 import {
   CLEAR_CURRENT_EMPLOYER,
   ONCHANGE_CURRENT_EMPLOYER,
+  ONCHANGE_CURRENT_HR,
 } from "@/store/reducers/employerReducer";
+import humanResourcesService from "@/services/humanResourcesService";
 
 const DropdownMessage = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -285,7 +287,7 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
-  const { currentEmployer } = useSelector(
+  const { currentEmployer, currentHR } = useSelector(
     (state: any) => state.employerReducer
   );
   const dispatch = useDispatch();
@@ -317,21 +319,41 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
 
   const fetchData = () => {
     context.handleOpenLoading();
-    employersService
-      .profile()
-      .then((res) => {
-        if (res.status === 200 && res.data.Status === 200) {
-          dispatch(ONCHANGE_CURRENT_EMPLOYER(res.data.Data));
-        } else {
-          SwalHelper.MiniAlert(res.data.Message, "error");
-        }
-      })
-      .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
-      })
-      .finally(() => {
-        context.handleCloseLoading();
-      });
+    if (AuthHelper.isEmployer()) {
+      employersService
+        .profile()
+        .then((res) => {
+          if (res.status === 200 && res.data.Status === 200) {
+            dispatch(ONCHANGE_CURRENT_EMPLOYER(res.data.Data));
+          } else {
+            SwalHelper.MiniAlert(res.data.Message, "error");
+          }
+        })
+        .catch(() => {
+          SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+        })
+        .finally(() => {
+          context.handleCloseLoading();
+        });
+      return;
+    } else {
+      humanResourcesService
+        .profile()
+        .then((res) => {
+          if (res.status === 200 && res.data.Status === 200) {
+            dispatch(ONCHANGE_CURRENT_HR(res.data.Data));
+          } else {
+            SwalHelper.MiniAlert(res.data.Message, "error");
+          }
+        })
+        .catch(() => {
+          SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+        })
+        .finally(() => {
+          context.handleCloseLoading();
+        });
+      return;
+    }
   };
 
   useEffect(() => {
@@ -348,14 +370,23 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black ">
-            {currentEmployer?.name}
+            {currentEmployer?.name ||
+              `${currentHR?.firstName} ${currentHR?.lastName}`}
           </span>
-          <span className="block text-xs">{currentEmployer?.email}</span>
+          <span className="block text-xs">
+            {currentEmployer?.email || currentHR?.email}
+          </span>
         </span>
 
         <span className="h-10 w-10 rounded-full">
           <img
-            src={currentEmployer?.image ? currentEmployer?.image : NON_USER}
+            src={
+              currentEmployer?.image
+                ? currentEmployer?.image
+                : currentHR?.avatar
+                ? currentHR?.avatar
+                : NON_USER
+            }
             alt="User"
           />
         </span>

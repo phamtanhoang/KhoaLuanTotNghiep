@@ -4,15 +4,7 @@ import { AiFillDelete, AiFillEye } from "react-icons/ai";
 import NON_USER from "@/assets/images/non-user.jpg";
 import { DateHelper } from "@/utils/helpers/dateHelper";
 import { ListEmpty, Loading } from "@/components/ui";
-
-interface HRTableWebProps {
-  value: HumanResourceModel[];
-  _onClickDetail: (item: HumanResourceModel) => void;
-  _onClickDelete: (item: HumanResourceModel) => void;
-  isLoading: boolean;
-  currentPage: number;
-  itemPerpage: number;
-}
+import { HRTableProps } from "../..";
 
 const ItemTSX: React.FC<{
   item: HumanResourceModel;
@@ -109,7 +101,7 @@ const ItemTSX: React.FC<{
   );
 };
 
-const HRTableWeb: React.FC<HRTableWebProps> = ({
+const HRTableWeb: React.FC<HRTableProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,

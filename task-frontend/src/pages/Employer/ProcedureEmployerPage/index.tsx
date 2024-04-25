@@ -11,6 +11,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { proceduresService } from "@/services";
 import { ONCLEAR_FILTER } from "@/store/reducers/searchReducer";
 import { useLocation } from "react-router-dom";
+import { AuthHelper } from "@/utils/helpers/authHelper";
+
+export interface ProceduresTableProps {
+  value: ProcedureModel[];
+  _onClickDelete: (item: ProcedureModel) => void;
+  _onClickDetail: (item: ProcedureModel) => void;
+  isLoading: boolean;
+  currentPage: number;
+  itemPerpage: number;
+}
 
 const ProceduresEmployerPage = () => {
   const searchReducer = useSelector((state: any) => state.searchReducer);
@@ -121,12 +131,14 @@ const ProceduresEmployerPage = () => {
             >
               <FiFilter className="text-xl lg:text-2xl font-medium leading-none t my-auto" />
             </button>
-            <button
-              className="inline-flex items-start justify-start text-white "
-              onClick={_onClickAdd}
-            >
-              <IoMdAddCircleOutline className="text-2xl lg:text-3xl font-medium leading-none t my-auto" />
-            </button>
+            {AuthHelper.isEmployer() && (
+              <button
+                className="inline-flex items-start justify-start text-white "
+                onClick={_onClickAdd}
+              >
+                <IoMdAddCircleOutline className="text-2xl lg:text-3xl font-medium leading-none t my-auto" />
+              </button>
+            )}
           </div>
         </div>
 

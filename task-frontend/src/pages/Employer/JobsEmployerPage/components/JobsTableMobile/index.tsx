@@ -1,29 +1,26 @@
 import { ConstantsHelper } from "@/utils/helpers/constantsHelper";
 import { useEffect, useRef, useState } from "react";
-import { AiFillDelete, AiFillEdit, AiFillEye } from "react-icons/ai";
 import { IoMdMore } from "react-icons/io";
-
-interface JobProps {
-  title: string;
-  createDate: string;
-  dealine: string;
-  state: string;
-}
-interface JobsTableMobileProps {
-  value: JobProps[];
-  _onClickDelete: () => void;
-  _onClickDetail: () => void;
-  _onClickEdit: () => void;
-}
+import { JobsTableProps } from "../..";
+import { DateHelper } from "@/utils/helpers/dateHelper";
+import { ListEmpty, Loading } from "@/components/ui";
 
 const ItemTSX: React.FC<{
-  item: JobProps;
+  item: JobModel;
   index: number;
-  _onClickDelete: () => void;
-  _onClickDetail: () => void;
-  _onClickEdit: () => void;
-}> = ({ item, index, _onClickDelete, _onClickDetail, _onClickEdit }) => {
-  let data = ConstantsHelper.findJobStateById(item.state);
+  _onClickDelete: (item: JobModel) => void;
+  _onClickEdit: (item: JobModel) => void;
+  currentPage: number;
+  itemPerpage: number;
+}> = ({
+  item,
+  index,
+  _onClickDelete,
+  _onClickEdit,
+  currentPage,
+  itemPerpage,
+}) => {
+  let data = ConstantsHelper.findJobStateById(item.status);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const trigger = useRef<any>(null);
@@ -60,8 +57,10 @@ const ItemTSX: React.FC<{
       <div className="w-full flex flex-col gap-1.5">
         <div className="flex items-center w-full gap-2 justify-start text-lg leading-8 font-semibold text-gray-800">
           <p>
-            <span>{index}.&nbsp;&nbsp;</span>
-            {item.title}
+            <span>
+              {currentPage * itemPerpage - itemPerpage + index}.&nbsp;&nbsp;
+            </span>
+            {item.name}
           </p>
         </div>
 
@@ -70,7 +69,7 @@ const ItemTSX: React.FC<{
             <span className="font-normal text-base text-gray-600">
               Ngày đăng:&nbsp;&nbsp;
             </span>
-            {item.createDate}
+            {DateHelper.formatDateTime(item.created)}
           </p>
         </div>
         <div className="flex items-center w-full gap-2 justify-start ">
@@ -78,12 +77,12 @@ const ItemTSX: React.FC<{
             <span className="font-normal text-base text-gray-600">
               Ngày hết hạn:&nbsp;&nbsp;
             </span>
-            {item.dealine}
+            {DateHelper.formatDateTime(item.updated)}
           </p>
         </div>
         <div className="flex justify-between gap-4">
           <div className="flex items-center w-full gap-2 justify-start">
-            <span className="font-normal text-base font-medium text-gray-600">
+            <span className="text-base font-medium text-gray-600">
               Trạng thái:&nbsp;&nbsp;
             </span>
             <div
@@ -107,38 +106,21 @@ const ItemTSX: React.FC<{
               ref={dropdown}
               onFocus={() => setDropdownOpen(true)}
               onBlur={() => setDropdownOpen(false)}
-              className={`absolute top-9 right-0 w-max rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-0.5 ${
+              className={`z-[1] absolute top-9 right-0 w-max rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-0.5 ${
                 dropdownOpen === true ? "block" : "hidden"
               }`}
             >
               <a
                 className="flex px-6 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2"
-                onClick={_onClickDetail}
+                onClick={() => _onClickEdit(item)}
               >
-                <AiFillEye
-                  className="text-orangetext text-lg"
-                  onClick={_onClickDetail}
-                />
                 Chi tiết
               </a>
+
               <a
                 className="flex px-6 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2"
-                onClick={_onClickEdit}
+                onClick={() => _onClickDelete(item)}
               >
-                <AiFillEdit
-                  className="text-orangetext text-lg"
-                  onClick={_onClickDetail}
-                />
-                Sửa
-              </a>
-              <a
-                className="flex px-6 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2"
-                onClick={_onClickDelete}
-              >
-                <AiFillDelete
-                  className="text-red-500 text-lg"
-                  onClick={_onClickDelete}
-                />
                 Xóa
               </a>
             </div>
@@ -149,27 +131,50 @@ const ItemTSX: React.FC<{
   );
 };
 
-const JobsTableMobile: React.FC<JobsTableMobileProps> = ({
+const JobsTableMobile: React.FC<JobsTableProps> = ({
   value,
   _onClickDelete,
-  _onClickDetail,
   _onClickEdit,
+  isLoading,
+  currentPage,
+  itemPerpage,
 }) => {
   return (
     <>
       <table className="w-full text-gray-600">
         <tbody className="flex flex-col gap-2">
-          {value.map((item, index) => (
+          {isLoading ? (
+            <tr className="bg-white flex align-center justify-center">
+              <td className="p-6 whitespace-no-wrap">
+                <Loading />
+              </td>
+            </tr>
+          ) : (
             <>
-              <ItemTSX
-                item={item}
-                index={index}
-                _onClickDelete={_onClickDelete}
-                _onClickDetail={_onClickDetail}
-                _onClickEdit={_onClickEdit}
-              />
+              {!value ? (
+                <tr className="bg-white flex align-center justify-center">
+                  <td className="pt-6 whitespace-no-wrap">
+                    <ListEmpty />
+                  </td>
+                </tr>
+              ) : (
+                <>
+                  {value?.map((item, index) => (
+                    <>
+                      <ItemTSX
+                        item={item}
+                        index={index}
+                        _onClickDelete={_onClickDelete}
+                        _onClickEdit={_onClickEdit}
+                        currentPage={currentPage}
+                        itemPerpage={itemPerpage}
+                      />
+                    </>
+                  ))}
+                </>
+              )}
             </>
-          ))}
+          )}
         </tbody>
       </table>
     </>

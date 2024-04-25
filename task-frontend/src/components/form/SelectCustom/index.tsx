@@ -32,6 +32,7 @@ const SelectCustom: React.FC<SelectCustomProps> = ({
       theme={theme}
       isMulti={isMulti}
       styles={styles}
+      isClearable
     />
   );
 };

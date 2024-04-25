@@ -3,15 +3,8 @@ import { IoMdMore } from "react-icons/io";
 import { AiFillDelete, AiFillEye } from "react-icons/ai";
 import { ListEmpty, Loading } from "@/components/ui";
 import { DateHelper } from "@/utils/helpers/dateHelper";
-
-interface ProceduresTableMobileProps {
-  value: ProcedureModel[];
-  _onClickDelete: (item: ProcedureModel) => void;
-  _onClickDetail: (item: ProcedureModel) => void;
-  isLoading: boolean;
-  currentPage: number;
-  itemPerpage: number;
-}
+import { ProceduresTableProps } from "../..";
+import { AuthHelper } from "@/utils/helpers/authHelper";
 
 const ItemTSX: React.FC<{
   item: ProcedureModel;
@@ -104,7 +97,7 @@ const ItemTSX: React.FC<{
               ref={dropdown}
               onFocus={() => setDropdownOpen(true)}
               onBlur={() => setDropdownOpen(false)}
-              className={`absolute top-9 right-0 w-max rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-0.5 group ${
+              className={`z-[1] absolute top-9 right-0 w-max rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-0.5 group ${
                 dropdownOpen === true ? "block" : "hidden"
               }`}
             >
@@ -115,13 +108,15 @@ const ItemTSX: React.FC<{
                 <AiFillEye className="text-orangetext text-lg" />
                 Chi tiết
               </a>
-              <a
-                className="flex px-6 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2"
-                onClick={() => _onClickDelete(item)}
-              >
-                <AiFillDelete className="text-red-500 text-lg" />
-                Xóa
-              </a>
+              {AuthHelper.isEmployer() && (
+                <a
+                  className="flex px-6 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2"
+                  onClick={() => _onClickDelete(item)}
+                >
+                  <AiFillDelete className="text-red-500 text-lg" />
+                  Xóa
+                </a>
+              )}
             </div>
           </button>
         </div>
@@ -130,7 +125,7 @@ const ItemTSX: React.FC<{
   );
 };
 
-const ProceduresTableMobile: React.FC<ProceduresTableMobileProps> = ({
+const ProceduresTableMobile: React.FC<ProceduresTableProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,

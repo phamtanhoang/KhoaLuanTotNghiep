@@ -17,10 +17,11 @@ const APPLY_STATE_DATA = [
   { id: "FAILED", name: "Rớt phỏng vấn", color: "#FF0000" },
   { id: "SUCCESS", name: "Đậu phỏng vấn", color: "#169C46" },
 ];
+
 const JOB_STATE_DATA = [
   { id: "PENDING", name: "Chờ duyệt", color: "#FFC300" },
-  { id: "REJECT", name: "Từ chối", color: "#FF0000" },
-  { id: "ACTIVE", name: "Phê duyệt", color: "#169C46" },
+  { id: "INACTIVE", name: "Không hoạt động", color: "#FF0000" },
+  { id: "ACTIVE", name: "Hoạt động", color: "#169C46" },
   { id: "PAUSE", name: "Tạm ngừng", color: "#0000FF" },
 ];
 
@@ -35,6 +36,7 @@ const EMPLOYER_STATE_DROPDOWN = [
   { id: "INACTIVE", name: "Không hoạt động" },
   { id: "PENDING", name: "Chờ duyệt" },
 ];
+
 const CANDIDATE_STATE_DROPDOWN = [
   { id: "", name: "Toàn bộ" },
   { id: "ACTIVE", name: "Hoạt động" },

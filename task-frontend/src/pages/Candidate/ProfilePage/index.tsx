@@ -1,6 +1,6 @@
 import Hero from "@/components/ui/Hero";
 import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
-import { FaPencilAlt } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 import { GiGraduateCap, GiSkills } from "react-icons/gi";
 import { IoNewspaperOutline } from "react-icons/io5";
 import { MdInfoOutline } from "react-icons/md";
@@ -153,7 +153,7 @@ const ProfilePage = () => {
                     className="text-gray-800 hover:text-orangetext p-1.5"
                     onClick={() => _onClickChange("skill")}
                   >
-                    <FaPencilAlt />
+                    <FaEdit className="text-xl" />
                   </button>
                 </div>
                 <ul className="list-inside space-y-2">
@@ -177,7 +177,7 @@ const ProfilePage = () => {
                     className="text-gray-800 hover:text-orangetext p-1.5"
                     onClick={() => _onClickChange("exp")}
                   >
-                    <FaPencilAlt />
+                    <FaEdit className="text-xl" />
                   </button>
                 </div>
                 <ul className="list-inside space-y-2">
@@ -203,7 +203,7 @@ const ProfilePage = () => {
                     className="text-gray-800 hover:text-orangetext p-1.5"
                     onClick={() => _onClickChange("edu")}
                   >
-                    <FaPencilAlt />
+                    <FaEdit className="text-xl" />
                   </button>
                 </div>
                 <ul className="list-inside space-y-2">

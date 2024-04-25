@@ -80,6 +80,7 @@ const TagAPI = {
 
   getList_Dropdown: "/tags/getTags_Dropdown",
 };
+
 const CategoryAPI = {
   categories: "/categories",
   createCategory: "/categories/create",
@@ -127,6 +128,7 @@ const ProcedureAPI = {
   create: "/processes",
   getList_Dropdown: "/processes/getProcesses_Dropdown",
 };
+
 const JobAPI = {
   getList_Employer: (
     keyword?: string,
@@ -139,6 +141,18 @@ const JobAPI = {
   },
 
   createJob: "/jobs/create",
+
+  jobById: (id: string) => {
+    return `/jobs/${id}`;
+  },
+
+  getDetail_Employer: (id: string) => {
+    return `/jobs/getDetail-employer/${id}`;
+  },
+
+  getDetail_Admin: (id: string) => {
+    return `/jobs/getDetail-admin/${id}`;
+  },
 };
 export {
   AuthAPI,

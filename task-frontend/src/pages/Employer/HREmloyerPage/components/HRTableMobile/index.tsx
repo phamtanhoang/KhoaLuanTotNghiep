@@ -2,18 +2,10 @@ import { ConstantsHelper } from "@/utils/helpers/constantsHelper";
 import { useEffect, useRef, useState } from "react";
 import { IoMdMore } from "react-icons/io";
 import NON_USER from "@/assets/images/non-user.jpg";
-import { AiFillDelete, AiFillEye } from "react-icons/ai";
+
 import { ListEmpty, Loading } from "@/components/ui";
 import { DateHelper } from "@/utils/helpers/dateHelper";
-
-interface HRTableMobileProps {
-  value: HumanResourceModel[];
-  _onClickDetail: (item: HumanResourceModel) => void;
-  _onClickDelete: (item: HumanResourceModel) => void;
-  isLoading: boolean;
-  currentPage: number;
-  itemPerpage: number;
-}
+import { HRTableProps } from "../..";
 
 const ItemTSX: React.FC<{
   item: HumanResourceModel;
@@ -66,7 +58,9 @@ const ItemTSX: React.FC<{
     >
       <div className="w-full flex flex-col gap-1.5">
         <div className="flex items-center w-full justify-start text-lg leading-8 font-semibold text-gray-800">
-          <span className="mt-auto">{index}.&nbsp;&nbsp;&nbsp;</span>
+          <span className="mt-auto">
+            {currentPage * itemPerpage - itemPerpage + index}.&nbsp;&nbsp;&nbsp;
+          </span>
           <div className="flex items-center w-full gap-2 justify-start">
             <div className="flex items-center gap-3">
               <img
@@ -134,7 +128,7 @@ const ItemTSX: React.FC<{
               ref={dropdown}
               onFocus={() => setDropdownOpen(true)}
               onBlur={() => setDropdownOpen(false)}
-              className={`absolute top-9 right-0 w-max rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-0.5 group ${
+              className={`z-[1] absolute top-9 right-0 w-max rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-0.5 group ${
                 dropdownOpen === true ? "block" : "hidden"
               }`}
             >
@@ -158,7 +152,7 @@ const ItemTSX: React.FC<{
   );
 };
 
-const HRTableMobile: React.FC<HRTableMobileProps> = ({
+const HRTableMobile: React.FC<HRTableProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,

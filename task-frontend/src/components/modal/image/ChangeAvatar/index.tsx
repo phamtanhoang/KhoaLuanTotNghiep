@@ -10,6 +10,7 @@ import { ImageHelper } from "@/utils/helpers/imageHelper";
 import employersService from "@/services/employersService";
 import { AuthHelper } from "@/utils/helpers/authHelper";
 import candidatesService from "@/services/candidatesService";
+import humanResourcesService from "@/services/humanResourcesService";
 
 const ChangeAvatar = (props: any) => {
   const handleClose = props.handleClose;
@@ -71,6 +72,24 @@ const ChangeAvatar = (props: any) => {
     } else if (AuthHelper.isEmployer()) {
       employersService
         .changeImage(img)
+        .then((res) => {
+          if (res.status === 200 && res.data.Status === 200) {
+            SwalHelper.MiniAlert(res.data.Message, "success");
+            fetchData();
+            handleClose();
+          } else {
+            SwalHelper.MiniAlert(res.data.Message, "error");
+          }
+        })
+        .catch(() => {
+          SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+        })
+        .finally(() => {
+          context.handleCloseLoading();
+        });
+    } else if (AuthHelper.isHR()) {
+      humanResourcesService
+        .updateAvatar(img)
         .then((res) => {
           if (res.status === 200 && res.data.Status === 200) {
             SwalHelper.MiniAlert(res.data.Message, "success");
