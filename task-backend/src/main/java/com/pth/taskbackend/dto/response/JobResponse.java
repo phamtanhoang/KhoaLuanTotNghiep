@@ -25,6 +25,8 @@ public record JobResponse (
         String employerName,
         String employerId,
         String employerEmail,
+        String employerAvatar,
+        String employerPhoneNumber,
         String processId,
         String processName,
         List<StepResponse>steps,

@@ -5,6 +5,7 @@ import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.model.meta.Employer;
+import com.pth.taskbackend.model.meta.Job;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.CategoryRepository;
 import com.pth.taskbackend.repository.JobRepository;
@@ -55,7 +56,7 @@ public class CategoryController {
     UserRepository userRepository;
     @Autowired
     JwtService jwtService;
-
+    @Autowired JobService jobService;
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getCategoryById(@PathVariable String id) {
@@ -232,6 +233,11 @@ public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization
                 );
             Optional<Category> existingCategory = categoryService.findById(id);
             if (existingCategory.isPresent()) {
+                List<Job> jobs = jobService.findByCategoryId(id,null).toList();
+                for(Job job :jobs){
+                    job.setCategory(null);
+                    jobService.update(job);
+                }
                 categoryService.deleteCategory(existingCategory.get());
                 return ResponseEntity.ok(
                         new BaseResponse("Xóa danh mục thành công", HttpStatus.OK.value(), null)

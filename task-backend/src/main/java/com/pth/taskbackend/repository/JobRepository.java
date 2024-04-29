@@ -25,9 +25,9 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "       OR LOWER(j.experience) LIKE %:keyword% " +
             "       OR LOWER(e.name) LIKE %:keyword%)) " +
             "AND (:location IS NULL OR LOWER(j.location) LIKE %:location%) " +
-            "AND (:fromSalary IS NULL OR j.fromSalary = :fromSalary) " +
-            "AND (:toSalary IS NULL OR j.toSalary = :toSalary) " +
-            "AND (:categoryId IS NULL OR j.category.id = :categoryId) " +
+            "AND (:fromSalary IS NULL OR :fromSalary = '' OR j.fromSalary = :fromSalary) " +
+            "AND (:toSalary IS NULL OR :toSalary = '' OR j.toSalary = :toSalary) " +
+            "AND (:categoryId IS NULL OR :categoryId = '' Or j.category.id = :categoryId) " +
             "AND j.status = 'ACTIVE' " +
             "AND j.toDate > CURRENT_TIMESTAMP " +
             "ORDER BY j.created DESC")
@@ -39,7 +39,15 @@ public interface JobRepository extends JpaRepository<Job, String> {
             @Param("categoryId") String categoryId,
             Pageable pageable);
 
-    Page<Job>findByNameContainingAndCategoryIdAndStatus(String name,String categoryId,EStatus status,Pageable pageable);
+    @Query("SELECT j FROM Job j " +
+            "WHERE (:keyword IS NULL OR " +
+            "       (LOWER(j.name) LIKE %:keyword%)) " +
+            "AND (:categoryId IS NULL OR :categoryId = '' Or j.category.id = :categoryId) " +
+            "AND j.status != 'DELETED' " +
+            "AND (:status IS NULL OR:status = ''  OR j.status = :status) " +
+            "AND j.toDate > CURRENT_TIMESTAMP " +
+            "ORDER BY j.created DESC")
+    Page<Job>findByNameContainingAndCategoryIdAndStatus(String keyword,String categoryId,EStatus status,Pageable pageable);
 
 
     @Query("SELECT j FROM Job j " +

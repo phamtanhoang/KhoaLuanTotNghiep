@@ -70,7 +70,7 @@ public class JobController {
             Page<Job> jobs = jobService.searchJobs(keyword, location, fromSalary, toSalary, categoryId, pageable);
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
@@ -93,6 +93,8 @@ public class JobController {
                     } else {
                         stepResponses = Collections.emptyList();
                     }
+                    List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
+
 
                     return new JobResponse(
                             job.getId(),
@@ -113,10 +115,12 @@ public class JobController {
                             job.getHumanResource().getEmployer().getName(),
                             job.getHumanResource().getEmployer().getId(),
                             job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            job.getHumanResource().getEmployer().getPhoneNumber(),
                             job.getProcess() != null ? job.getProcess().getId() : null,
                             job.getProcess() != null ? job.getProcess().getName() : null,
                             stepResponses,
-                            job.getTags().stream().toList()
+                            tags
                     );
                 }).collect(Collectors.toList());
 
@@ -128,10 +132,10 @@ public class JobController {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
+
 
     }
     @Operation(summary = "Get top Jobs", description = "", tags = {})
@@ -141,7 +145,7 @@ public class JobController {
             Page<Object[]> objects = jobService.findActiveJobsWithApplicationCount(pageable);
             if (objects.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 List<TopJobResponse> topJobResponses = objects.stream().map(result -> {
@@ -195,7 +199,7 @@ public class JobController {
             Page<Job> jobs = jobService.findByNameContainingAndCategoryIdAndStatus(name, categoryId,status, pageable);
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
@@ -217,6 +221,8 @@ public class JobController {
                     } else {
                         stepResponses = Collections.emptyList();
                     }
+                    List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
+
 
                     return new JobResponse(
                             job.getId(),
@@ -237,10 +243,12 @@ public class JobController {
                             job.getHumanResource().getEmployer().getName(),
                             job.getHumanResource().getEmployer().getId(),
                             job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            job.getHumanResource().getEmployer().getPhoneNumber(),
                             job.getProcess() != null ? job.getProcess().getId() : null,
                             job.getProcess() != null ? job.getProcess().getName() : null,
                             stepResponses,
-                            job.getTags().stream().toList()
+                            tags
                     );
                 }).collect(Collectors.toList());
 
@@ -332,6 +340,7 @@ public class JobController {
                     } else {
                         stepResponses = Collections.emptyList();
                     }
+                    List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
 
                     return new JobResponse(
                             job.getId(),
@@ -352,10 +361,12 @@ public class JobController {
                             job.getHumanResource().getEmployer().getName(),
                             job.getHumanResource().getEmployer().getId(),
                             job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            job.getHumanResource().getEmployer().getPhoneNumber(),
                             job.getProcess() != null ? job.getProcess().getId() : null,
                             job.getProcess() != null ? job.getProcess().getName() : null,
                             stepResponses,
-                            job.getTags().stream().toList()
+                            tags
                     );
                 }).collect(Collectors.toList());
 
@@ -414,6 +425,7 @@ public class JobController {
                     } else {
                         stepResponses = Collections.emptyList();
                     }
+                    List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
 
                     return new JobResponse(
                             job.getId(),
@@ -434,10 +446,12 @@ public class JobController {
                             job.getHumanResource().getEmployer().getName(),
                             job.getHumanResource().getEmployer().getId(),
                             job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            job.getHumanResource().getEmployer().getPhoneNumber(),
                             job.getProcess() != null ? job.getProcess().getId() : null,
                             job.getProcess() != null ? job.getProcess().getName() : null,
                             stepResponses,
-                            job.getTags().stream().toList()
+                           tags
                     );
                 }).collect(Collectors.toList());
 
@@ -525,6 +539,8 @@ public class JobController {
                     } else {
                         stepResponses = Collections.emptyList();
                     }
+                    List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
+
                     return new JobResponse(
                             job.getId(),
                             job.getCreated(),
@@ -544,10 +560,12 @@ public class JobController {
                             job.getHumanResource().getEmployer().getName(),
                             job.getHumanResource().getEmployer().getId(),
                             job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            job.getHumanResource().getEmployer().getPhoneNumber(),
                             job.getProcess() != null ? job.getProcess().getId() : null,
                             job.getProcess() != null ? job.getProcess().getName() : null,
                             stepResponses,
-                            job.getTags().stream().toList()
+                            tags
                     );
                 }).collect(Collectors.toList());
 
@@ -599,6 +617,7 @@ public class JobController {
                 } else {
                     stepResponses = Collections.emptyList();
                 }
+                List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
 
                 JobResponse jobResponse = new JobResponse(
                         job.getId(),
@@ -619,10 +638,12 @@ public class JobController {
                         job.getHumanResource().getEmployer().getName(),
                         job.getHumanResource().getEmployer().getId(),
                         job.getHumanResource().getEmployer().getUser().getEmail(),
+                        job.getHumanResource().getEmployer().getImage(),
+                        job.getHumanResource().getEmployer().getPhoneNumber(),
                         job.getProcess() != null ? job.getProcess().getId() : null,
                         job.getProcess() != null ? job.getProcess().getName() : null,
                         stepResponses,
-                        job.getTags().stream().toList()
+                        tags
                 );
 
                 return ResponseEntity.ok(
@@ -699,6 +720,7 @@ public class JobController {
                 } else {
                     stepResponses = Collections.emptyList();
                 }
+                List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
 
                 JobResponse jobResponse = new JobResponse(
                         job.getId(),
@@ -719,10 +741,12 @@ public class JobController {
                         job.getHumanResource().getEmployer().getName(),
                         job.getHumanResource().getEmployer().getId(),
                         job.getHumanResource().getEmployer().getUser().getEmail(),
+                        job.getHumanResource().getEmployer().getImage(),
+                        job.getHumanResource().getEmployer().getPhoneNumber(),
                         job.getProcess() != null ? job.getProcess().getId() : null,
                         job.getProcess() != null ? job.getProcess().getName() : null,
                         stepResponses,
-                        job.getTags().stream().toList()
+                       tags
                 );
 
                 return ResponseEntity.ok(
@@ -779,6 +803,8 @@ public class JobController {
                     stepResponses = Collections.emptyList();
                 }
 
+                List< com.pth.taskbackend.model.meta.Tag>tags = tagService.findByJobId(job.getId(),null).toList();
+
                 JobResponse jobResponse = new JobResponse(
                         job.getId(),
                         job.getCreated(),
@@ -798,12 +824,13 @@ public class JobController {
                         job.getHumanResource().getEmployer().getName(),
                         job.getHumanResource().getEmployer().getId(),
                         job.getHumanResource().getEmployer().getUser().getEmail(),
+                        job.getHumanResource().getEmployer().getImage(),
+                        job.getHumanResource().getEmployer().getPhoneNumber(),
                         job.getProcess() != null ? job.getProcess().getId() : null,
                         job.getProcess() != null ? job.getProcess().getName() : null,
                         stepResponses,
-                        job.getTags().stream().toList()
+                        tags
                 );
-
                 return ResponseEntity.ok(
                         new BaseResponse("Thông tin công việc", HttpStatus.OK.value(), jobResponse)
                 );
@@ -916,6 +943,8 @@ public class JobController {
                         job.getHumanResource().getEmployer().getName(),
                         job.getHumanResource().getEmployer().getId(),
                         job.getHumanResource().getEmployer().getUser().getEmail(),
+                        job.getHumanResource().getEmployer().getImage(),
+                        job.getHumanResource().getEmployer().getPhoneNumber(),
                         job.getProcess() != null ? job.getProcess().getId() : null,
                         job.getProcess() != null ? job.getProcess().getName() : null,
                         stepResponses,
@@ -1028,6 +1057,7 @@ public class JobController {
             } else {
                 stepResponses = Collections.emptyList();
             }
+            jobService.create(job);
 
             JobResponse jobResponse = new JobResponse(
                     job.getId(),
@@ -1048,6 +1078,8 @@ public class JobController {
                     job.getHumanResource().getEmployer().getName(),
                     job.getHumanResource().getEmployer().getId(),
                     job.getHumanResource().getEmployer().getUser().getEmail(),
+                    job.getHumanResource().getEmployer().getImage(),
+                    job.getHumanResource().getEmployer().getPhoneNumber(),
                     job.getProcess() != null ? job.getProcess().getId() : null,
                     job.getProcess() != null ? job.getProcess().getName() : null,
                     stepResponses,
@@ -1126,6 +1158,7 @@ public class JobController {
             switch (status)
             {
                 case PAUSED:
+
                 if(job.getStatus().equals(EStatus.PAUSED))
                     return ResponseEntity.ok(
                             new BaseResponse("Đang dừng tuyển dụng công việc này", HttpStatus.BAD_REQUEST.value(), null)
@@ -1139,9 +1172,10 @@ public class JobController {
                 jobService.update(job);
 
                 return ResponseEntity.ok(
-                        new BaseResponse("Bật tuyển công việc thành công", HttpStatus.OK.value(), null)
+                        new BaseResponse("Dừng tuyển công việc thành công", HttpStatus.OK.value(), null)
                 );
                 case ACTIVE :
+
                     if(job.getStatus().equals(EStatus.ACTIVE))
                         return ResponseEntity.ok(
                                 new BaseResponse("Đã bật tuyển dụng", HttpStatus.BAD_REQUEST.value(), null)
@@ -1153,6 +1187,13 @@ public class JobController {
                             new BaseResponse("Bật tuyển công việc thành công", HttpStatus.OK.value(), null)
                     );
                 case INACTIVE:
+                    if(optionalUser.get().getRole().equals(ERole.EMPLOYER))
+                    {
+                        return ResponseEntity.ok(
+                                new BaseResponse("Bạn không có quyền", HttpStatus.FORBIDDEN.value(), null)
+                        );
+
+                    }
                     if(job.getStatus().equals(EStatus.INACTIVE))
                         return ResponseEntity.ok(
                                 new BaseResponse("Đã tắt tuyển dụng công việc này", HttpStatus.BAD_REQUEST.value(), null)
@@ -1164,20 +1205,11 @@ public class JobController {
                             new BaseResponse("Tắt tuyển dụng công việc thành công", HttpStatus.OK.value(), null)
                     );
                 case PENDING:
-                    if (optionalUser.get().getRole().equals(ERole.ADMIN)) {
-                        job.setStatus(EStatus.ACTIVE);
-                        jobService.update(job);
 
-                        return ResponseEntity.ok(
-                                new BaseResponse("Duyệt công việc thành công", HttpStatus.OK.value(), null)
-                        );
-                    }
-                    else
-                    {
                         return ResponseEntity.ok(
                                 new BaseResponse("Không có quyền duyệt công việc này", HttpStatus.FORBIDDEN.value(), null)
                         );
-                    }
+
                 default:
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                             .body(new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));

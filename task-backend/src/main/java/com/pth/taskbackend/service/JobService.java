@@ -4,12 +4,13 @@ import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.model.meta.HumanResource;
 import com.pth.taskbackend.model.meta.Job;
-import io.jsonwebtoken.io.IOException;
+import com.pth.taskbackend.model.meta.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -18,7 +19,6 @@ public interface JobService {
     Job create(Job job)throws IOException;
     Job update(Job job)throws IOException;
     void deleteById(String jobId)throws IOException;
-
     void delete(Job job)throws IOException;
     Optional<Job> findById(String jobId)throws IOException;
     Page<Job>findByProcessId(String id, Pageable pageable)throws IOException;

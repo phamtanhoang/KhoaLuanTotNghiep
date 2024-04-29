@@ -72,6 +72,11 @@ public class TagServiceImpl implements TagService {
         tagRepository.delete(tag);
     }
 
+    @Override
+    public Page<Tag> findByJobId(String jobId, Pageable pageable)  {
+        return tagRepository.findByJobId(jobId,pageable);
+    }
+
     @Transactional
     @Override
     public void deleteTagByJobId(String jobId) throws IOException {

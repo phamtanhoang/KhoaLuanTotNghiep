@@ -16,6 +16,9 @@ public interface TagRepository extends JpaRepository<Tag, String> {
 
     Page<Tag> findByNameContaining(String name, Pageable pageable);
 
+    @Query("SELECT t FROM Tag t INNER JOIN t.jobs j WHERE j.id = :jobId")
+    Page<Tag> findByJobId(String jobId, Pageable pageable);
+
     @Modifying
     @Query(value = "DELETE FROM job_tag WHERE job_id = :jobId", nativeQuery = true)
     void deleteJobTagsByJobId(@Param("jobId") String jobId);
