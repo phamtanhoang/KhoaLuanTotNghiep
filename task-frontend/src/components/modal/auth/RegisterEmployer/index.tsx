@@ -1,6 +1,7 @@
 import { LoadingContext } from "@/App";
 import { authsService } from "@/services";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { SwalHelper } from "@/utils/helpers";
+
 import { ChangeEvent, useContext, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 

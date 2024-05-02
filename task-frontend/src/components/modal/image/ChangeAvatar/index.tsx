@@ -1,16 +1,16 @@
-import ImageCropper from "@/components/ui/ImageCropper";
 import { ChangeEvent, useContext, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import UPLOAD_IMG from "@/assets/images/upload_image.avif";
 import { FaRegSave } from "react-icons/fa";
 import { GrClear } from "react-icons/gr";
 import { LoadingContext } from "@/App";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import { ImageHelper } from "@/utils/helpers/imageHelper";
-import employersService from "@/services/employersService";
-import { AuthHelper } from "@/utils/helpers/authHelper";
-import candidatesService from "@/services/candidatesService";
-import humanResourcesService from "@/services/humanResourcesService";
+import { SwalHelper, ImageHelper, AuthHelper } from "@/utils/helpers";
+import {
+  humanResourcesService,
+  candidatesService,
+  employersService,
+} from "@/services";
+import { ImageCropper } from "@/components/ui";
 
 const ChangeAvatar = (props: any) => {
   const handleClose = props.handleClose;

@@ -1,5 +1,5 @@
 import axiosConfig from "@/configs/axiosConfig";
-import { HumanResourceAPI } from "@/configs/apis";
+import { HumanResourceAPI } from "@/Apis";
 
 const humanResourcesService = {
   async create(

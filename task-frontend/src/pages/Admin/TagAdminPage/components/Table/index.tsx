@@ -1,22 +1,24 @@
 import { AiFillDelete, AiFillEye } from "react-icons/ai";
 import { ListEmpty, Loading } from "@/components/ui";
-import { DateHelper } from "@/utils/helpers/dateHelper";
+import { DateHelper } from "@/utils/helpers";
 
-interface CategoryTableAdminProps {
-  value: CategoryModel[];
-  _onClickDetail: (item: CategoryModel) => void;
-  _onClickDelete: (item: CategoryModel) => void;
+interface TagTableProps {
+  value: TagModel[];
+  _onClickDetail: (item: TagModel) => void;
+  _onClickDelete: (item: TagModel) => void;
   isLoading: boolean;
+  isEmpty: boolean;
   currentPage: number;
   itemPerpage: number;
 }
-const CategoryTableAdminWeb: React.FC<CategoryTableAdminProps> = ({
+const Table: React.FC<TagTableProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,
   isLoading,
   currentPage,
   itemPerpage,
+  isEmpty,
 }) => {
   return (
     <>
@@ -32,9 +34,15 @@ const CategoryTableAdminWeb: React.FC<CategoryTableAdminProps> = ({
 
             <th
               scope="col"
-              className="px-4 py-3.5 text-base font-semibold text-left text-gray-600 w-[40%]"
+              className="px-4 py-3.5 text-base font-semibold text-left text-gray-600 w-[35%]"
             >
-              Tên danh mục
+              Tên nhãn
+            </th>
+            <th
+              scope="col"
+              className="px-4 py-3.5 text-base font-semibold text-center  text-gray-600 w-[10%]"
+            >
+              Màu sắc
             </th>
             <th
               scope="col"
@@ -50,7 +58,7 @@ const CategoryTableAdminWeb: React.FC<CategoryTableAdminProps> = ({
             </th>
             <th
               scope="col"
-              className="px-4 py-3.5 text-sm font-semibold text-left text-gray-600 w-[15%]"
+              className="px-4 py-3.5 text-sm font-semibold text-left text-gray-600 w-[10%]"
             ></th>
           </tr>
         </thead>
@@ -64,29 +72,46 @@ const CategoryTableAdminWeb: React.FC<CategoryTableAdminProps> = ({
             </tr>
           ) : (
             <>
-              {!value ? (
+              {isEmpty ? (
                 <tr className="bg-white">
                   <td className="py-3 whitespace-no-wrap" colSpan={6}>
                     <ListEmpty />
                   </td>
                 </tr>
               ) : (
-                value?.map((item: CategoryModel, index: number) => (
+                value?.map((item: TagModel, index: number) => (
                   <tr>
-                    <td className="px-4 py-4 font-medium text-gray-700 ">
-                      <span>
-                        {currentPage * itemPerpage - itemPerpage + index}
-                      </span>
+                    <td className="table-cell">
+                      <div className="px-4 py-4 font-medium text-gray-700 w-full">
+                        <span>
+                          {currentPage * itemPerpage - itemPerpage + index}
+                        </span>
+                      </div>
                     </td>
 
-                    <td className="px-4 py-4 font-medium text-gray-600 ">
-                      {item.name}
+                    <td className="table-cell">
+                      <div className="px-4 py-4 font-medium text-gray-600  w-full">
+                        {item.name}
+                      </div>
                     </td>
-                    <td className="px-4 py-4 text-center text-gray-600 ">
-                      {DateHelper.formatDateTime(item.created)}
+                    <td className="table-cell">
+                      <div className="px-4 py-4 flex justify-center">
+                        <div
+                          className="w-20 h-6 rounded block"
+                          style={{ backgroundColor: item.color }}
+                        ></div>
+                      </div>
                     </td>
-                    <td className="px-4 py-4 text-center text-gray-600 ">
-                      {DateHelper.formatDateTime(item.updated)}
+                    <td className="table-cell">
+                      <div className="px-4 py-4 text-center text-gray-600 ">
+                        {DateHelper.formatDateTime(item.created)}
+                      </div>
+                    </td>
+
+                    <td className="table-cell">
+                      <div className="px-4 py-4 text-center text-gray-600 ">
+                        {DateHelper.formatDateTime(item.updated)}
+                      </div>
                     </td>
 
                     <td className="px-4 py-4 whitespace-nowrap">
@@ -111,4 +136,4 @@ const CategoryTableAdminWeb: React.FC<CategoryTableAdminProps> = ({
     </>
   );
 };
-export default CategoryTableAdminWeb;
+export default Table;

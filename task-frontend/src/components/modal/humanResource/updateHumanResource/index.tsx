@@ -1,16 +1,14 @@
 import { LoadingContext } from "@/App";
-import humanResourcesService from "@/services/humanResourcesService";
-import { DataConstants } from "@/utils/constants/dataConstants";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { humanResourcesService } from "@/services";
+import { DataConstants, ModalConstants } from "@/utils/constants";
+import { SwalHelper, ImageHelper } from "@/utils/helpers";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
 import ModalBase from "../..";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { IoCameraSharp } from "react-icons/io5";
 import NON_USER from "@/assets/images/non-user.jpg";
-import { ImageHelper } from "@/utils/helpers/imageHelper";
 const UpdateHumanResource = (props: any) => {
   const context = useContext(LoadingContext);
   const handleClose = props.handleClose;
@@ -28,7 +26,7 @@ const UpdateHumanResource = (props: any) => {
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [sex, setSex] = useState<string>(DataConstants.SEX_DATA[0].id);
+  const [sex, setSex] = useState<string>(DataConstants.SEX_DATA_DROPDOWN[0].id);
   const [avatar, setAvatar] = useState<string>("");
   const [image, setImage] = useState<string | null>(null);
   const [newImage, setNewImage] = useState<string | null>(null);
@@ -79,14 +77,14 @@ const UpdateHumanResource = (props: any) => {
     }
 
     handleOpenSub();
-    setFuncsSub(MODAL_KEYS.chooseImage);
+    setFuncsSub(ModalConstants.COMMON_KEYS.chooseImage);
   };
 
   const _onChangeStatus = () => {
     setStatus(
-      status === DataConstants.USER_STATUS_DATA.ACTIVE
-        ? DataConstants.USER_STATUS_DATA.INACTIVE
-        : DataConstants.USER_STATUS_DATA.ACTIVE
+      status === DataConstants.STATUS_DATA.ACTIVE
+        ? DataConstants.STATUS_DATA.INACTIVE
+        : DataConstants.STATUS_DATA.ACTIVE
     );
   };
 
@@ -260,7 +258,7 @@ const UpdateHumanResource = (props: any) => {
                   onChange={_onChangeSex}
                   value={sex}
                 >
-                  {DataConstants.SEX_DATA.map((item, index) => (
+                  {DataConstants.SEX_DATA_DROPDOWN.map((item, index) => (
                     <option key={index} value={item.id}>
                       {item.name}
                     </option>
@@ -338,7 +336,7 @@ const UpdateHumanResource = (props: any) => {
             <input
               type="checkbox"
               className="border-borderColor focus:ring-3 h-5 w-5 rounded mt-0.5 cursor-pointer"
-              checked={status === DataConstants.USER_STATUS_DATA.ACTIVE}
+              checked={status === DataConstants.STATUS_DATA.ACTIVE}
               onChange={_onChangeStatus}
             />
 

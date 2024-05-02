@@ -1,14 +1,12 @@
-import ImageCropper from "@/components/ui/ImageCropper";
+import { ImageCropper } from "@/components/ui";
 import { ChangeEvent, useContext, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import UPLOAD_IMG from "@/assets/images/upload_image.avif";
 import { GrClear } from "react-icons/gr";
 import { FaRegSave } from "react-icons/fa";
 import { LoadingContext } from "@/App";
-import employersService from "@/services/employersService";
-import { ImageHelper } from "@/utils/helpers/imageHelper";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import { AuthHelper } from "@/utils/helpers/authHelper";
+import { employersService } from "@/services";
+import { ImageHelper, SwalHelper, AuthHelper } from "@/utils/helpers";
 
 const ChangeBackground = (props: any) => {
   const handleClose = props.handleClose;
@@ -47,7 +45,7 @@ const ChangeBackground = (props: any) => {
     context.handleOpenLoading();
     let img: File = ImageHelper.dataURItoFile(
       croppedImg,
-      "bg_img"+ AuthHelper.getUser().id 
+      "bg_img" + AuthHelper.getUser().id
     );
     employersService
       .ChangeBackgroundImage(img)

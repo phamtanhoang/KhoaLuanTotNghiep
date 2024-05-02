@@ -157,6 +157,7 @@ const HRTableMobile: React.FC<HRTableProps> = ({
   _onClickDelete,
   _onClickDetail,
   isLoading,
+  isEmpty,
   currentPage,
   itemPerpage,
 }) => {
@@ -172,7 +173,7 @@ const HRTableMobile: React.FC<HRTableProps> = ({
             </tr>
           ) : (
             <>
-              {!value ? (
+              {isEmpty ? (
                 <tr className="bg-white flex align-center justify-center">
                   <td className="pt-6 whitespace-no-wrap">
                     <ListEmpty />

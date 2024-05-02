@@ -10,10 +10,11 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import scheduleReducer from "./reducers/scheduleReducer";
-import candidateReducer from "./reducers/candidateReducer";
-import employerReducer from "./reducers/employerReducer";
+import authReducer from "./reducers/authReducer";
 import searchReducer from "./reducers/searchReducer";
+import listDataReducer from "./reducers/listDataReducer";
+import paginationReducer from "./reducers/paginationState";
+import singleDataReducer from "./reducers/singleDataReducer";
 
 const persistConfig = {
   key: "root",
@@ -22,10 +23,11 @@ const persistConfig = {
 };
 
 const rootReducer = combineReducers({
-  scheduleReducer: scheduleReducer,
-  candidateReducer: candidateReducer,
-  employerReducer: employerReducer,
+  authReducer: authReducer,
   searchReducer: searchReducer,
+  listDataReducer: listDataReducer,
+  singleDataReducer: singleDataReducer,
+  paginationReducer: paginationReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

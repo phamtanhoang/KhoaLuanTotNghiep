@@ -77,7 +77,7 @@ const ApplicationDetail = (props: any) => {
           </div>
 
           <div className="content-center">
-            <label className="font-medium tracking-wide text-sm text-base">
+            <label className="font-medium tracking-wide text-base">
               Thư giới thiệu:&nbsp;
             </label>
             <div
@@ -88,7 +88,7 @@ const ApplicationDetail = (props: any) => {
             />
           </div>
           <div className="content-center">
-            <label className="font-medium tracking-wide text-sm text-base">
+            <label className="font-medium tracking-wide text-base">
               Quá trình ứng tuyển:&nbsp;
             </label>
             <table className="border-collapse w-full mt-1">
@@ -116,13 +116,13 @@ const ApplicationDetail = (props: any) => {
                     </span>
                     KnobHome
                   </td>
-                  <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                  <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
                     <span className="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">
                       Country
                     </span>
                     German
                   </td>
-                  <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                  <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
                     <span className="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">
                       Status
                     </span>
@@ -130,7 +130,7 @@ const ApplicationDetail = (props: any) => {
                       deleted
                     </span>
                   </td>
-                  <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                  <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
                     <span className="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">
                       Actions
                     </span>
@@ -149,19 +149,19 @@ const ApplicationDetail = (props: any) => {
                   </td>
                 </tr>
                 <tr className="bg-white lg:hover:bg-gray-100 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0">
-                  <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
+                  <td className="w-full lg:w-auto p-3 text-gray-800 border border-b block lg:table-cell relative lg:static">
                     <span className="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">
                       Company name
                     </span>
                     Squary
                   </td>
-                  <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                  <td className="w-full lg:w-auto p-3 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
                     <span className="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">
                       Country
                     </span>
                     Schweden
                   </td>
-                  <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                  <td className="w-full lg:w-auto p-3 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
                     <span className="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">
                       Status
                     </span>
@@ -169,7 +169,7 @@ const ApplicationDetail = (props: any) => {
                       active
                     </span>
                   </td>
-                  <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                  <td className="w-full lg:w-auto p-3 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
                     <span className="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">
                       Actions
                     </span>
@@ -194,13 +194,13 @@ const ApplicationDetail = (props: any) => {
                     </span>
                     ghome
                   </td>
-                  <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                  <td className="w-full lg:w-auto p-3 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
                     <span className="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">
                       Country
                     </span>
                     Switzerland
                   </td>
-                  <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                  <td className="w-full lg:w-auto p-3 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
                     <span className="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">
                       Status
                     </span>
@@ -208,7 +208,7 @@ const ApplicationDetail = (props: any) => {
                       inactive
                     </span>
                   </td>
-                  <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+                  <td className="w-full lg:w-auto p-3 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
                     <span className="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">
                       Actions
                     </span>

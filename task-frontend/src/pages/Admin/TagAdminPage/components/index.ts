@@ -1,3 +1,3 @@
-import TagTableAdminWeb from "./TagTableAdminWeb";
+import Table from "./Table";
 
-export {TagTableAdminWeb}
+export { Table };

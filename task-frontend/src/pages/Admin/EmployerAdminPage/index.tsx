@@ -3,12 +3,29 @@ import ModalBase from "@/components/modal";
 import { PaginationCustom } from "@/components/ui";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
-import { EmployerTableAdminWeb } from "./components";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import employersService from "@/services/employersService";
+import { SwalHelper } from "@/utils/helpers";
+import { employersService } from "@/services";
+import { ModalConstants } from "@/utils/constants";
+import { Table } from "./components";
+import { useDispatch, useSelector } from "react-redux";
+import { ONCHANGE_EMPLOYER_LIST } from "@/store/reducers/listDataReducer";
+import {
+  CLEAR_PAGINATION_STATE,
+  ONCHANGE_CURRENTPAGE,
+  ONCHANGE_PAGINATION,
+} from "@/store/reducers/paginationState";
 
 const EmployerAdminPage = () => {
+  const dispatch = useDispatch();
+  const {
+    totalElements,
+    currentPage,
+    itemPerPage,
+    totalPages,
+    isEmpty,
+    numberOfElements,
+  } = useSelector((state: any) => state.paginationReducer);
+  const { employers } = useSelector((state: any) => state.listDataReducer);
   const context = useContext(LoadingContext);
 
   const [open, setOpen] = useState(false);
@@ -20,12 +37,6 @@ const EmployerAdminPage = () => {
   const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
   const [keyWord, setKeyWord] = useState<string>("");
   const [status, setStatus] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemPerpage = 10;
-  const [totalElements, setTotalElements] = useState<number>(0);
-  const [numberOfElements, setNumberOfElements] = useState<number>(0);
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [employers, setEmployers] = useState<EmployerModel[]>([]);
 
   const _onClickDelete = (item: EmployerModel) => {
     SwalHelper.Confirm(
@@ -34,7 +45,7 @@ const EmployerAdminPage = () => {
       () => {
         context.handleOpenLoading();
         employersService
-          .delete(item.id)
+          .delete(item.id!)
           .then((res) => {
             if (res.status === 200 && res.data.Status === 200) {
               SwalHelper.MiniAlert(res.data.Message, "success");
@@ -54,8 +65,8 @@ const EmployerAdminPage = () => {
     );
   };
   const _onClickDetail = (item: EmployerModel) => {
-    setId(item.id);
-    setFuncs(MODAL_KEYS.updateEmployer);
+    setId(item.id!);
+    setFuncs(ModalConstants.EMPLOYER_KEYS.updateEmployer);
     handleOpen();
   };
 
@@ -71,13 +82,11 @@ const EmployerAdminPage = () => {
   const fetchListData = () => {
     setIsLoadingTable(true);
     employersService
-      .getList(keyWord, status, currentPage - 1, itemPerpage)
+      .getList(keyWord, status, currentPage - 1, itemPerPage)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          setEmployers(res?.data?.Data?.content);
-          setTotalPages(res?.data?.Data?.totalPages);
-          setTotalElements(res?.data?.Data?.totalElements || 0);
-          setNumberOfElements(res?.data?.Data?.numberOfElements || 0);
+          dispatch(ONCHANGE_EMPLOYER_LIST(res.data.Data?.content || []));
+          dispatch(ONCHANGE_PAGINATION(res.data.Data));
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -89,6 +98,9 @@ const EmployerAdminPage = () => {
         setIsLoadingTable(false);
       });
   };
+  useEffect(() => {
+    dispatch(CLEAR_PAGINATION_STATE());
+  }, []);
 
   useEffect(() => {
     fetchListData();
@@ -131,7 +143,7 @@ const EmployerAdminPage = () => {
         </div>
       </section>
       <div className="overflow-auto border border-borderColor lg:rounded-lg  mt-2 lg:mt-4">
-        <EmployerTableAdminWeb
+        <Table
           value={employers}
           _onClickDelete={_onClickDelete}
           _onClickDetail={_onClickDetail}
@@ -139,13 +151,16 @@ const EmployerAdminPage = () => {
           status={status}
           isLoading={isLoadingTable}
           currentPage={currentPage}
-          itemPerpage={itemPerpage}
+          itemPerpage={itemPerPage}
+          isEmpty={isEmpty}
         />
       </div>
       <div className="w-max mx-auto mt-5">
         <PaginationCustom
           currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
+          setCurrentPage={(page: number) =>
+            dispatch(ONCHANGE_CURRENTPAGE(page))
+          }
           totalPages={totalPages}
           type={false}
         />

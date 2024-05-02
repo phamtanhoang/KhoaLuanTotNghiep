@@ -1,4 +1,5 @@
+import CandidateUpdate from "./CandidateUpdate";
 import ChangeExpSkillInfoCandidate from "./ChangeExpSkillInfoCandidate";
 import ChangeInfoCandidate from "./ChangeInfoCandidate";
 
-export { ChangeInfoCandidate, ChangeExpSkillInfoCandidate };
+export { ChangeInfoCandidate, ChangeExpSkillInfoCandidate, CandidateUpdate };

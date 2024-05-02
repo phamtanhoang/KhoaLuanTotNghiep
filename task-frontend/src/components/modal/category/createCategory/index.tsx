@@ -1,14 +1,14 @@
 import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
-import { ChangeEvent, useContext, useId, useState } from "react";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { ChangeEvent, useContext, useState } from "react";
+import { SwalHelper } from "@/utils/helpers";
 import { categoriesService } from "@/services";
 import { MdOutlineFileUpload } from "react-icons/md";
 import ModalBase from "../..";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import { ImageHelper } from "@/utils/helpers/imageHelper";
+import { ImageHelper } from "@/utils/helpers";
 import { LoadingContext } from "@/App";
+import { ModalConstants } from "@/utils/constants";
 
 const CreateCategory = (props: any) => {
   const handleClose = props.handleClose;
@@ -42,7 +42,7 @@ const CreateCategory = (props: any) => {
     }
 
     handleOpenSub();
-    setFuncsSub(MODAL_KEYS.chooseImage);
+    setFuncsSub(ModalConstants.COMMON_KEYS.chooseImage);
   };
 
   const _onClickSave = () => {

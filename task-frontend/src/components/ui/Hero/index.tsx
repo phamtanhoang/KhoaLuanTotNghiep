@@ -1,5 +1,4 @@
-import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
-import { IoBagOutline } from "react-icons/io5";
+import { PathConstants } from "@/utils/constants";
 import { Link } from "react-router-dom";
 import BANNER_SEARCH from "@/assets/images/banner-search.png";
 import { CiStar } from "react-icons/ci";
@@ -26,7 +25,10 @@ const Hero: React.FC<HeroProps> = ({ title, titleSearch, linkSearch }) => {
         </div>
 
         <div className="mt-4 pt-2 max-w-72 mx-auto flex justify-center text-gray-600 text-base gap-3 border-t-2 border-gray-400 border-dashed">
-          <Link to={CANDIDATE_PATHS.home} className="hover:text-orangetext">
+          <Link
+            to={PathConstants.CANDIDATE_PATHS.home}
+            className="hover:text-orangetext"
+          >
             Trang chủ
           </Link>
           <CiStar className="text-xl mt-0.5 text-orangetext" />

@@ -1,11 +1,9 @@
 import { LoadingContext } from "@/App";
 import { authsService } from "@/services";
-import { CLEAR_CURRENT_CANDIDATE } from "@/store/reducers/candidateReducer";
-import { CLEAR_CURRENT_EMPLOYER } from "@/store/reducers/employerReducer";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import { AuthHelper } from "@/utils/helpers/authHelper";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import { ChangeEvent, useContext, useState } from "react";
+import { CLEAR_AUTH_DATA } from "@/store/reducers/authReducer";
+import { ModalConstants } from "@/utils/constants";
+import { AuthHelper, SwalHelper } from "@/utils/helpers";
+import { useContext, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
@@ -21,16 +19,6 @@ const ChangePassword = (props: any) => {
   const [currentPassword, setCurrentPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
-
-  const _onChangeCurrentPassword = (e: ChangeEvent<HTMLInputElement>) => {
-    setCurrentPassword(e.target.value);
-  };
-  const _onChangeNewPassword = (e: ChangeEvent<HTMLInputElement>) => {
-    setNewPassword(e.target.value);
-  };
-  const _onChangeConfirmNewPassword = (e: ChangeEvent<HTMLInputElement>) => {
-    setConfirmNewPassword(e.target.value);
-  };
 
   const _onClickSubmit = () => {
     if (!currentPassword || !confirmNewPassword || !newPassword) {
@@ -51,19 +39,13 @@ const ChangePassword = (props: any) => {
           .changePassword(currentPassword, newPassword)
           .then((res) => {
             if (res.status === 200 && res.data.Status === 200) {
-              if (AuthHelper.isCandidate()) {
-                dispatch(CLEAR_CURRENT_CANDIDATE());
-              }
-              if (AuthHelper.isEmployer()) {
-                dispatch(CLEAR_CURRENT_EMPLOYER());
-              }
+              dispatch(CLEAR_AUTH_DATA());
               AuthHelper.removeAuthenticaton();
               SwalHelper.MiniAlert(
                 "Đổi mật khẩu thành công, vui lòng đăng nhập lại!",
                 "success"
               );
-
-              setFuncs(MODAL_KEYS.signin);
+              setFuncs(ModalConstants.AUTH_KEYS.signin);
             } else {
               SwalHelper.MiniAlert(
                 res.data.Message || "Đổi mật khẩu không thành công!",
@@ -115,7 +97,7 @@ const ChangePassword = (props: any) => {
             type="password"
             placeholder="**********"
             value={currentPassword}
-            onChange={_onChangeCurrentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
           />
         </div>
         <div className="mt-4 content-center">
@@ -129,7 +111,7 @@ const ChangePassword = (props: any) => {
             type="password"
             placeholder="**********"
             value={newPassword}
-            onChange={_onChangeNewPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
           />
         </div>
         <div className="mt-4 content-center">
@@ -143,7 +125,7 @@ const ChangePassword = (props: any) => {
             type="password"
             placeholder="**********"
             value={confirmNewPassword}
-            onChange={_onChangeConfirmNewPassword}
+            onChange={(e) => setConfirmNewPassword(e.target.value)}
           />
         </div>
         <div>

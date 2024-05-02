@@ -1,7 +1,28 @@
 import axiosConfig from "@/configs/axiosConfig";
-import { JobAPI } from "@/configs/apis";
+import { JobAPI } from "@/Apis";
 
 const jobsService = {
+  async getList_Public(
+    keyword?: string,
+    location?: string,
+    fromSalary?: string,
+    toSalary?: string,
+    category?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) {
+    return await axiosConfig.get(
+      JobAPI.getList_Public(
+        keyword,
+        location,
+        fromSalary,
+        toSalary,
+        category,
+        currentPage,
+        itemPerPage
+      )
+    );
+  },
   async getList_Employer(
     keyword?: string,
     category?: string,
@@ -17,6 +38,17 @@ const jobsService = {
         currentPage,
         itemPerPage
       )
+    );
+  },
+  async getList_Admin(
+    keyword?: string,
+    category?: string,
+    status?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) {
+    return await axiosConfig.get(
+      JobAPI.getList_Admin(keyword, category, status, currentPage, itemPerPage)
     );
   },
   async create(
@@ -54,6 +86,9 @@ const jobsService = {
     return await axiosConfig.delete(JobAPI.jobById(id));
   },
 
+  async getDetail_Public(id: string) {
+    return await axiosConfig.get(JobAPI.getDetail_Public(id));
+  },
   async getDetail_Employer(id: string) {
     return await axiosConfig.get(JobAPI.getDetail_Employer(id));
   },

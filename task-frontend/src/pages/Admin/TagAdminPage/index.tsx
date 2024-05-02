@@ -1,27 +1,37 @@
 import ModalBase from "@/components/modal";
-import { LoadingSpiner, PaginationCustom } from "@/components/ui";
+import { PaginationCustom } from "@/components/ui";
 import { tagsService } from "@/services";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { SwalHelper } from "@/utils/helpers";
+import { useContext, useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
-import { TagTableAdminWeb } from "./components";
+import { Table } from "./components";
 import { MdOutlineAddCircleOutline } from "react-icons/md";
-import TagTableAdminMobile from "./components/TagTableAdminMobile";
 import { LoadingContext } from "@/App";
+import { ModalConstants } from "@/utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  CLEAR_PAGINATION_STATE,
+  ONCHANGE_CURRENTPAGE,
+  ONCHANGE_PAGINATION,
+} from "@/store/reducers/paginationState";
+import { ONCHANGE_TAG_LIST } from "@/store/reducers/listDataReducer";
 
 const TagsAdminPage = () => {
+  const dispatch = useDispatch();
+  const {
+    totalElements,
+    currentPage,
+    itemPerPage,
+    totalPages,
+    isEmpty,
+    numberOfElements,
+  } = useSelector((state: any) => state.paginationReducer);
+  const { tags } = useSelector((state: any) => state.listDataReducer);
   const context = useContext(LoadingContext);
 
   const [id, setId] = useState<string>("");
   const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
   const [keyWord, setKeyWord] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemPerpage = 10;
-  const [totalElements, setTotalElements] = useState<number>(0);
-  const [numberOfElements, setNumberOfElements] = useState<number>(0);
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [tags, setTags] = useState<TagModel[]>([]);
 
   const [open, setOpen] = useState(false);
   const [funcs, setFuncs] = useState<string>("");
@@ -29,7 +39,7 @@ const TagsAdminPage = () => {
   const handleClose = () => setOpen(false);
 
   const _onClickAdd = () => {
-    setFuncs(MODAL_KEYS.createTag);
+    setFuncs(ModalConstants.TAG_KEYS.createTag);
     handleOpen();
   };
 
@@ -40,7 +50,7 @@ const TagsAdminPage = () => {
       () => {
         context.handleOpenLoading();
         tagsService
-          .deleteById(item.id)
+          .deleteById(item.id!)
           .then((res) => {
             if (res.status === 200 && res.data.Status === 200) {
               SwalHelper.MiniAlert(res.data.Message, "success");
@@ -61,25 +71,19 @@ const TagsAdminPage = () => {
   };
 
   const _onClickDetail = (item: TagModel) => {
-    setId(item.id);
-    setFuncs(MODAL_KEYS.updateTag);
+    setId(item.id!);
+    setFuncs(ModalConstants.TAG_KEYS.updateTag);
     handleOpen();
-  };
-  const _onChangeKeyword = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value || "";
-    setKeyWord(value);
   };
 
   const fetchListData = () => {
     setIsLoadingTable(true);
     tagsService
-      .getList(keyWord, currentPage - 1, itemPerpage)
+      .getList(keyWord, currentPage - 1, itemPerPage)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          setTags(res?.data?.Data?.content);
-          setTotalPages(res?.data?.Data?.totalPages);
-          setTotalElements(res?.data?.Data?.totalElements || 0);
-          setNumberOfElements(res?.data?.Data?.numberOfElements || 0);
+          dispatch(ONCHANGE_TAG_LIST(res.data.Data?.content || []));
+          dispatch(ONCHANGE_PAGINATION(res.data.Data));
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -91,6 +95,9 @@ const TagsAdminPage = () => {
         setIsLoadingTable(false);
       });
   };
+  useEffect(() => {
+    dispatch(CLEAR_PAGINATION_STATE());
+  }, []);
 
   useEffect(() => {
     fetchListData();
@@ -131,7 +138,7 @@ const TagsAdminPage = () => {
               placeholder="Nhập từ khóa..."
               className="block w-full py-2 pr-5 text-gray-700 bg-white border border-gray-200 rounded-lg lg:w-80 placeholder-gray-400/70 pl-11 rtl:pr-11 rtl:pl-5 focus:border-bgBlue focus:ring-bgBlue/20 focus:outline-none focus:ring focus:ring-opacity-40"
               value={keyWord}
-              onChange={_onChangeKeyword}
+              onChange={(e) => setKeyWord(e.target.value)}
             />
           </div>
           <div className="font-medium text-sm text-black">
@@ -142,29 +149,22 @@ const TagsAdminPage = () => {
       </section>
 
       <div className="overflow-auto border border-borderColor lg:rounded-lg  mt-2 lg:mt-4">
-        {/* <div className="max-lg:hidden"> */}
-        <TagTableAdminWeb
+        <Table
           value={tags}
           _onClickDelete={_onClickDelete}
           _onClickDetail={_onClickDetail}
           isLoading={isLoadingTable}
           currentPage={currentPage}
-          itemPerpage={itemPerpage}
+          itemPerpage={itemPerPage}
+          isEmpty={isEmpty}
         />
-        {/* </div>
-        <div className="lg:hidden">
-          <TagTableAdminMobile
-            value={tags}
-            _onClickDelete={_onClickDelete}
-            _onClickDetail={_onClickDetail}
-            isLoading={isLoadingTable}
-          />
-        </div> */}
       </div>
       <div className="w-max mx-auto mt-5">
         <PaginationCustom
           currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
+          setCurrentPage={(page: number) =>
+            dispatch(ONCHANGE_CURRENTPAGE(page))
+          }
           totalPages={totalPages}
           type={false}
         />

@@ -1,5 +1,5 @@
 import axiosConfig from "@/configs/axiosConfig";
-import { CandidateAPI } from "@/configs/apis";
+import { CandidateAPI } from "@/Apis";
 
 const candidatesService = {
   async profile() {
@@ -7,6 +7,33 @@ const candidatesService = {
   },
   async extraProfile() {
     return await axiosConfig.get(CandidateAPI.extraProfile);
+  },
+  async getSkills() {
+    return await axiosConfig.get(CandidateAPI.getSkills);
+  },
+  async getEducations() {
+    return await axiosConfig.get(CandidateAPI.getEducations);
+  },
+  async getExperiences() {
+    return await axiosConfig.get(CandidateAPI.getExperiences);
+  },
+  async saveSkills(items: SkillModel[]) {
+    const body = { skills: items };
+    return await axiosConfig.post(CandidateAPI.saveSkills, body, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
+  async saveEducations(items: EducationlModel[]) {
+    const body = { educationList: items };
+    return await axiosConfig.post(CandidateAPI.saveEducations, body, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
+  async saveExperiences(items: ExperienceModel[]) {
+    const body = { experiences: items };
+    return await axiosConfig.post(CandidateAPI.saveExperiences, body, {
+      headers: { "Content-Type": "application/json" },
+    });
   },
   async getList(
     name?: string,

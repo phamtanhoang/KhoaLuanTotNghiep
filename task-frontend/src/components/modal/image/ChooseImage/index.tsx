@@ -1,7 +1,6 @@
-import ImageCropper from "@/components/ui/ImageCropper";
-import { ChangeEvent, useState } from "react";
+import { ImageCropper } from "@/components/ui";
+import { useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
-import UPLOAD_IMG from "@/assets/images/upload_image.avif";
 import { FaRegSave } from "react-icons/fa";
 import { GrClear } from "react-icons/gr";
 

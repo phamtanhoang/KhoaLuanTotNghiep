@@ -1,5 +1,5 @@
 import axiosConfig from "@/configs/axiosConfig";
-import { ProcedureAPI } from "@/configs/apis";
+import { ProcedureAPI } from "@/Apis";
 
 const proceduresService = {
   async getList(name?: string, currentPage?: number, itemPerPage?: number) {

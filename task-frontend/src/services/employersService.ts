@@ -1,6 +1,6 @@
 import { ChangeBackground } from "@/components/modal/image";
 import axiosConfig from "@/configs/axiosConfig";
-import { EmployerAPI } from "@/configs/apis";
+import { EmployerAPI } from "@/Apis";
 
 const employersService = {
   async profile() {

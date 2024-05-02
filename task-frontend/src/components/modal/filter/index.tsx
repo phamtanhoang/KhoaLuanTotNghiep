@@ -1,17 +1,14 @@
 import { LoadingContext } from "@/App";
 import { SelectCustom } from "@/components/form";
-import { ConfigSelect } from "@/components/form/SelectCustom/configSelect";
+import { ConfigSelect } from "@/configs/selectConfig";
 import { categoriesService } from "@/services";
 import {
   ONCHANGE_CATEGORY,
   ONCHANGE_KEYWORD,
   ONCHANGE_STATUS,
-  ONCLEAR_FILTER,
 } from "@/store/reducers/searchReducer";
-import { DataConstants } from "@/utils/constants/dataConstants";
-import { EMPLOYER_PATHS } from "@/utils/constants/pathConstants";
-import { SelectHelper } from "@/utils/helpers/selectHelper";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { PathConstants, DataConstants } from "@/utils/constants";
+import { SelectHelper, SwalHelper } from "@/utils/helpers";
 import { useContext, useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { MdFilterAlt, MdFilterAltOff } from "react-icons/md";
@@ -21,15 +18,15 @@ import { useLocation } from "react-router-dom";
 const Title = (props: any) => {
   return (
     <>
-      {props.urlLink == EMPLOYER_PATHS.jobs
-        ? "Lọc công việc"
-        : props.urlLink == EMPLOYER_PATHS.applys
+      {props.urlLink == PathConstants.EMPLOYER_PATHS.jobs
+        ? "Lọc tin tuyển dụng"
+        : props.urlLink == PathConstants.EMPLOYER_PATHS.applys
         ? "Lọc đơn ứng tuyển"
-        : props.urlLink == EMPLOYER_PATHS.procedure
+        : props.urlLink == PathConstants.EMPLOYER_PATHS.procedure
         ? "Lọc quy trình"
-        : props.urlLink == EMPLOYER_PATHS.findCandidate
+        : props.urlLink == PathConstants.EMPLOYER_PATHS.findCandidate
         ? "Lọc ứng viên"
-        : props.urlLink == EMPLOYER_PATHS.hr
+        : props.urlLink == PathConstants.EMPLOYER_PATHS.hr
         ? "Lọc nhân sự"
         : ""}
     </>
@@ -53,16 +50,16 @@ const FilterModal = (props: any) => {
 
   const _onSearch = () => {
     handleClose();
-    if (location.pathname === EMPLOYER_PATHS.hr) {
+    if (location.pathname === PathConstants.EMPLOYER_PATHS.hr) {
       dispatch(ONCHANGE_STATUS(status));
       dispatch(ONCHANGE_KEYWORD(keyword));
       return;
     }
-    if (location.pathname === EMPLOYER_PATHS.procedure) {
+    if (location.pathname === PathConstants.EMPLOYER_PATHS.procedure) {
       dispatch(ONCHANGE_KEYWORD(keyword));
       return;
     }
-    if (location.pathname === EMPLOYER_PATHS.jobs) {
+    if (location.pathname === PathConstants.EMPLOYER_PATHS.jobs) {
       dispatch(ONCHANGE_STATUS(status));
       dispatch(ONCHANGE_KEYWORD(keyword));
       dispatch(ONCHANGE_CATEGORY(category));
@@ -91,7 +88,7 @@ const FilterModal = (props: any) => {
   useEffect(() => {
     context.handleOpenLoading();
     const fetchTasks = [];
-    if (location.pathname === EMPLOYER_PATHS.jobs)
+    if (location.pathname === PathConstants.EMPLOYER_PATHS.jobs)
       fetchTasks.push(fetchDropdownData(categoriesService, setCategories));
     Promise.all(fetchTasks).finally(() => {
       context.handleCloseLoading();
@@ -130,10 +127,10 @@ const FilterModal = (props: any) => {
               onChange={(e) => setKeyword(e.target.value)}
             />
           </div>
-          {location.pathname === EMPLOYER_PATHS.jobs && (
+          {location.pathname === PathConstants.EMPLOYER_PATHS.jobs && (
             <div className="w-full">
               <label className="block mb-1.5 text-base font-medium text-gray-600">
-                Loại công việc:
+                Ngành nghề:
               </label>
               <SelectCustom
                 className={"mt-1"}
@@ -144,13 +141,13 @@ const FilterModal = (props: any) => {
                 options={SelectHelper.convertCategoriesToOptions(categories)}
                 onChange={(e: any) => setCategory(e ? e.value : "")}
                 isMulti={false}
-                placeholder="--- Chọn loại công việc ---"
+                placeholder="--- Chọn Ngành nghề ---"
                 theme={ConfigSelect.customTheme}
               />
             </div>
           )}
-          {(location.pathname === EMPLOYER_PATHS.hr ||
-            location.pathname === EMPLOYER_PATHS.jobs) && (
+          {(location.pathname === PathConstants.EMPLOYER_PATHS.hr ||
+            location.pathname === PathConstants.EMPLOYER_PATHS.jobs) && (
             <div className="w-full">
               <label className="block mb-1.5 text-base font-medium text-gray-600">
                 Tình trạng:
@@ -164,15 +161,14 @@ const FilterModal = (props: any) => {
                 onChange={(e) => setStatus(e.target.value)}
                 value={status}
               >
-                <option value="">Tất cả</option>
-                {location.pathname === EMPLOYER_PATHS.hr &&
-                  DataConstants.HR_STATE_DATA.map((item, index) => (
+                {location.pathname === PathConstants.EMPLOYER_PATHS.hr &&
+                  DataConstants.HR_STATE_DROPDOWN.map((item, index) => (
                     <option key={index} value={item.id} className="py-2">
                       {item.name}
                     </option>
                   ))}
-                {location.pathname === EMPLOYER_PATHS.jobs &&
-                  DataConstants.JOB_STATE_DATA.map((item, index) => (
+                {location.pathname === PathConstants.EMPLOYER_PATHS.jobs &&
+                  DataConstants.JOB_STATE_DROPDOWN.map((item, index) => (
                     <option key={index} value={item.id} className="py-2">
                       {item.name}
                     </option>
@@ -202,4 +198,4 @@ const FilterModal = (props: any) => {
     </div>
   );
 };
-export default FilterModal;
+export { FilterModal };

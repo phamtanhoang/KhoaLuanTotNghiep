@@ -5,8 +5,10 @@ import FindCandidatePage from "./FindCandidatePage";
 import HREmployerPage from "./HREmloyerPage";
 import JobsEmployerPage from "./JobsEmployerPage";
 import ProcedureEmployerPage from "./ProcedureEmployerPage";
+import ProfileEmployerPage from "./ProfileEmployerPage";
 import ScheduleEmployerPage from "./ScheduleEmployerPage";
 import SigninEmployerPage from "./SigninEmployerPage";
+import UpgradeAccountEmployer from "./UpgradeAccountEmployer";
 
 export {
   SigninEmployerPage,
@@ -18,4 +20,6 @@ export {
   ChatEmployerPage,
   ProcedureEmployerPage,
   HREmployerPage,
+  ProfileEmployerPage,
+  UpgradeAccountEmployer,
 };

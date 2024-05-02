@@ -1,7 +1,7 @@
 interface TagModel {
-  id: string;
-  created: Date;
-  updated: Date;
-  name: string;
-  color: string;
+  id?: string;
+  created?: Date;
+  updated?: Date;
+  name?: string;
+  color?: string;
 }

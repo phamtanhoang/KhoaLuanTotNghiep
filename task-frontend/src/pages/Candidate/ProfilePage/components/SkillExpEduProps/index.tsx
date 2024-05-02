@@ -21,9 +21,12 @@ const SkillExpEduProps: React.FC<SkillExpEduPropsProps> = ({
           </p>
         )}
       </div>
-      <p className="text-gray-500 text-xs mt-2 lg:mt-1">
-        &nbsp;&nbsp;{description}
-      </p>
+      <p
+        className="text-gray-500 text-xs mt-2 lg:mt-1"
+        dangerouslySetInnerHTML={{
+          __html: description || "",
+        }}
+      />
     </>
   );
 };

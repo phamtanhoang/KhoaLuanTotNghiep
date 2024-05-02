@@ -41,4 +41,9 @@ const ADMIN_PATHS = {
   services: "/admin/services",
   setting: "/admin/setting",
 };
-export { CANDIDATE_PATHS, OTHER_PATHS, EMPLOYER_PATHS, ADMIN_PATHS };
+export const PathConstants = {
+  CANDIDATE_PATHS,
+  OTHER_PATHS,
+  EMPLOYER_PATHS,
+  ADMIN_PATHS,
+};

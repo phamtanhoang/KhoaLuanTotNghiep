@@ -3,10 +3,8 @@ import { FaRegSave } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
 import { HexColorPicker } from "react-colorful";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { SwalHelper, DateHelper } from "@/utils/helpers";
 import { tagsService } from "@/services";
-import { LoadingSpiner } from "@/components/ui";
-import { DateHelper } from "@/utils/helpers/dateHelper";
 import { LoadingContext } from "@/App";
 
 const UpdateTag = (props: any) => {

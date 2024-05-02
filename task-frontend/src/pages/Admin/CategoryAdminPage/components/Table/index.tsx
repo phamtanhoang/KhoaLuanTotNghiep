@@ -1,24 +1,25 @@
 import { AiFillDelete, AiFillEye } from "react-icons/ai";
 import { ListEmpty, Loading } from "@/components/ui";
-import { DateHelper } from "@/utils/helpers/dateHelper";
+import { DateHelper } from "@/utils/helpers";
 
-interface TagTableAdminProps {
-  value: TagModel[];
-  _onClickDetail: (item: TagModel) => void;
-  _onClickDelete: (item: TagModel) => void;
+interface CategoryTableAdminProps {
+  value: CategoryModel[];
+  _onClickDetail: (item: CategoryModel) => void;
+  _onClickDelete: (item: CategoryModel) => void;
   isLoading: boolean;
   currentPage: number;
   itemPerpage: number;
+  isEmpty: boolean;
 }
-const TagTableAdminWeb: React.FC<TagTableAdminProps> = ({
+const CategoryTableAdminWeb: React.FC<CategoryTableAdminProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,
   isLoading,
   currentPage,
   itemPerpage,
+  isEmpty,
 }) => {
-  console.log("currentPage ", currentPage);
   return (
     <>
       <table className="min-w-full divide-y divide-borderColor cursor-default">
@@ -33,15 +34,9 @@ const TagTableAdminWeb: React.FC<TagTableAdminProps> = ({
 
             <th
               scope="col"
-              className="px-4 py-3.5 text-base font-semibold text-left text-gray-600 w-[35%]"
+              className="px-4 py-3.5 text-base font-semibold text-left text-gray-600 w-[40%]"
             >
-              Tên nhãn
-            </th>
-            <th
-              scope="col"
-              className="px-4 py-3.5 text-base font-semibold text-center  text-gray-600 w-[10%]"
-            >
-              Màu sắc
+              Tên danh mục
             </th>
             <th
               scope="col"
@@ -57,7 +52,7 @@ const TagTableAdminWeb: React.FC<TagTableAdminProps> = ({
             </th>
             <th
               scope="col"
-              className="px-4 py-3.5 text-sm font-semibold text-left text-gray-600 w-[10%]"
+              className="px-4 py-3.5 text-sm font-semibold text-left text-gray-600 w-[15%]"
             ></th>
           </tr>
         </thead>
@@ -71,44 +66,29 @@ const TagTableAdminWeb: React.FC<TagTableAdminProps> = ({
             </tr>
           ) : (
             <>
-              {!value ? (
+              {isEmpty ? (
                 <tr className="bg-white">
                   <td className="py-3 whitespace-no-wrap" colSpan={6}>
                     <ListEmpty />
                   </td>
                 </tr>
               ) : (
-                value?.map((item: TagModel, index: number) => (
+                value?.map((item: CategoryModel, index: number) => (
                   <tr>
-                    <td className="table-cell">
-                      <div className="px-4 py-4 font-medium text-gray-700 w-full">
-                        <span>{currentPage * itemPerpage - itemPerpage + index}</span>
-                      </div>
+                    <td className="px-4 py-4 font-medium text-gray-700 ">
+                      <span>
+                        {currentPage * itemPerpage - itemPerpage + index}
+                      </span>
                     </td>
 
-                    <td className="table-cell">
-                      <div className="px-4 py-4 font-medium text-gray-600  w-full">
-                        {item.name}
-                      </div>
+                    <td className="px-4 py-4 font-medium text-gray-600 ">
+                      {item.name}
                     </td>
-                    <td className="table-cell">
-                      <div className="px-4 py-4 flex justify-center">
-                        <div
-                          className="w-20 h-6 rounded block"
-                          style={{ backgroundColor: item.color }}
-                        ></div>
-                      </div>
+                    <td className="px-4 py-4 text-center text-gray-600 ">
+                      {DateHelper.formatDateTime(item.created)}
                     </td>
-                    <td className="table-cell">
-                      <div className="px-4 py-4 text-center text-gray-600 ">
-                        {DateHelper.formatDateTime(item.created)}
-                      </div>
-                    </td>
-
-                    <td className="table-cell">
-                      <div className="px-4 py-4 text-center text-gray-600 ">
-                        {DateHelper.formatDateTime(item.updated)}
-                      </div>
+                    <td className="px-4 py-4 text-center text-gray-600 ">
+                      {DateHelper.formatDateTime(item.updated)}
                     </td>
 
                     <td className="px-4 py-4 whitespace-nowrap">
@@ -133,4 +113,4 @@ const TagTableAdminWeb: React.FC<TagTableAdminProps> = ({
     </>
   );
 };
-export default TagTableAdminWeb;
+export default CategoryTableAdminWeb;

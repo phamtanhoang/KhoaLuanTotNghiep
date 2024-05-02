@@ -18,7 +18,7 @@ const PaginationCustom: React.FC<PaginationCustomProps> = ({
 }) => {
   return (
     <>
-      <div className={type ? "pagination1" : "pagination2"}>
+      <div className={`pagi_custom ${type ? "pagination1" : "pagination2"}`}>
         <ResponsivePagination
           current={currentPage}
           total={totalPages}

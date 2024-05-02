@@ -1,11 +1,14 @@
-import Hero from "@/components/ui/Hero";
+import { Hero } from "@/components/ui";
 
-import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
 import { GreatEmployers, Pagination, SearchJobs } from "@/components/ui";
-import { DataConstants } from "@/utils/constants/dataConstants";
+import {
+  DataConstants,
+  ModalConstants,
+  PathConstants,
+} from "@/utils/constants";
 import { useEffect, useRef, useState } from "react";
 import ModalBase from "@/components/modal";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
+
 import { JobAppliedCard } from "./components";
 
 const AppliedJobsPage = () => {
@@ -33,7 +36,7 @@ const AppliedJobsPage = () => {
     setSelectedState(item);
   };
   const _onClickDetail = () => {
-    setFuncs(MODAL_KEYS.applycationDetail);
+    setFuncs(ModalConstants.APPLICATION_KEYS.applycationDetail);
     handleOpen();
   };
   return (
@@ -41,7 +44,7 @@ const AppliedJobsPage = () => {
       <ModalBase open={open} handleClose={handleClose} funcs={funcs} />
       <Hero
         title="Công việc đã ứng tuyển"
-        linkSearch={CANDIDATE_PATHS.jobs}
+        linkSearch={PathConstants.CANDIDATE_PATHS.jobs}
         titleSearch="Tuyển dụng khác"
       />
       <section className="pb-10 pt-8 bg-gray-100">
@@ -55,14 +58,14 @@ const AppliedJobsPage = () => {
                 setOpenDropdown(!openDropdown);
               }}
             >
-              Trạng thái:{" "}
+              {/* Trạng thái:{" "}
               <span className="font-semibold">
                 {selectedState ? selectedState.name : "Tất cả"}
-              </span>
+              </span> */}
             </button>
             {openDropdown && (
               <div className="absolute right-0 mt-2 py-2 w-max bg-white rounded-md shadow-xl z-20">
-                {DataConstants.APPLY_STATE_DATA.map((item: any) => (
+                {DataConstants.APPLY_STATE_DROPDOWN.map((item: any) => (
                   <button
                     className="block px-4 py-2 text-sm capitalize text-gray-700 hover:bg-gray-100 hover:text-orangetext w-full text-left"
                     onClick={() => _onClickState(item)}

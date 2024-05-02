@@ -106,6 +106,7 @@ const HRTableWeb: React.FC<HRTableProps> = ({
   _onClickDelete,
   _onClickDetail,
   isLoading,
+  isEmpty,
   currentPage,
   itemPerpage,
 }) => {
@@ -129,7 +130,7 @@ const HRTableWeb: React.FC<HRTableProps> = ({
             </tr>
           ) : (
             <>
-              {!value ? (
+              {isEmpty ? (
                 <tr className="bg-white">
                   <td className="pt-6 whitespace-no-wrap" colSpan={6}>
                     <ListEmpty />

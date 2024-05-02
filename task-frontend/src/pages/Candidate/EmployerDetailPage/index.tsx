@@ -1,14 +1,12 @@
-import Hero from "@/components/ui/Hero";
-import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
-
 import { LeftPage, RightPage } from "./components";
-import { GreatEmployers } from "@/components/ui";
+import { EmptyData, GreatEmployers } from "@/components/ui";
 import { useParams } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { LoadingContext } from "@/App";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import employersService from "@/services/employersService";
-import EmptyData from "@/components/ui/EmptyData";
+import { SwalHelper } from "@/utils/helpers";
+import { employersService } from "@/services";
+import { Hero } from "@/components/ui";
+import { PathConstants } from "@/utils/constants";
 
 const EmployerDetailPage = () => {
   const context = useContext(LoadingContext);
@@ -42,7 +40,7 @@ const EmployerDetailPage = () => {
     <>
       <Hero
         title="Chi tiết nhà tuyển dụng"
-        linkSearch={CANDIDATE_PATHS.employers}
+        linkSearch={PathConstants.CANDIDATE_PATHS.employers}
         titleSearch="Nhà tuyển dụng khác"
       />
       <section className="pb-10 pt-5 lg:pt-8 bg-gray-100 ">

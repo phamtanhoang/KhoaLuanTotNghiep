@@ -1,16 +1,14 @@
 import { LoadingContext } from "@/App";
-import humanResourcesService from "@/services/humanResourcesService";
-import { DataConstants } from "@/utils/constants/dataConstants";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { humanResourcesService } from "@/services";
+import { DataConstants, ModalConstants } from "@/utils/constants";
+import { SwalHelper, ImageHelper } from "@/utils/helpers";
 import { ChangeEvent, useContext, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
 import ModalBase from "../..";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { IoCameraSharp } from "react-icons/io5";
 import NON_USER from "@/assets/images/non-user.jpg";
-import { ImageHelper } from "@/utils/helpers/imageHelper";
 const CreateHumanResource = (props: any) => {
   const context = useContext(LoadingContext);
   const handleClose = props.handleClose;
@@ -27,7 +25,7 @@ const CreateHumanResource = (props: any) => {
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [sex, setSex] = useState<string>(DataConstants.SEX_DATA[0].id);
+  const [sex, setSex] = useState<string>(DataConstants.SEX_DATA_DROPDOWN[0].id);
   const [image, setImage] = useState<string | null>(null);
   const [croppedImg, setCroppedImg] = useState<string | null>(null);
   const [dateOfBirth, setDateOfBirth] = useState<string>("");
@@ -73,7 +71,7 @@ const CreateHumanResource = (props: any) => {
     }
 
     handleOpenSub();
-    setFuncsSub(MODAL_KEYS.chooseImage);
+    setFuncsSub(ModalConstants.COMMON_KEYS.chooseImage);
   };
 
   const _onClickSave = () => {
@@ -208,7 +206,7 @@ const CreateHumanResource = (props: any) => {
                   onChange={_onChangeSex}
                   value={sex}
                 >
-                  {DataConstants.SEX_DATA.map((item, index) => (
+                  {DataConstants.SEX_DATA_DROPDOWN.map((item, index) => (
                     <option key={index} value={item.id}>
                       {item.name}
                     </option>

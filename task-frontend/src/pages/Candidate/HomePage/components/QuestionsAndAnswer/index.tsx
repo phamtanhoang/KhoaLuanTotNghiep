@@ -20,7 +20,7 @@ const QuestionsAndAnswer = () => {
                 <span className="text-orangetext pr-1">Joobs</span> - Nền tảng
                 thông minh hoạt động như thế nào?
               </h1>
-              <p className="text-base text-gray-400 ml-8 lg:pr-16 mt-1">
+              <p className="text-base text-gray-400 ml-8 lg:pr-16 mt-1 text-justify">
                 Tìm hiểu về cách Joobs hoạt động và mang lại giải pháp thông
                 minh cho việc tìm kiếm việc làm. Chúng tôi không chỉ làm điều
                 đó, mà còn tạo ra trải nghiệm tìm việc linh hoạt và hiệu quả.
@@ -36,7 +36,7 @@ const QuestionsAndAnswer = () => {
                 Cách tạo hồ sơ ứng viên ấn tượng trên
                 <span className="text-orangetext pl-1">Joobs?</span>
               </h1>
-              <p className="text-base text-gray-400 ml-8 lg:pr-16 mt-1">
+              <p className="text-base text-gray-400 ml-8 lg:pr-16 mt-1 text-justify">
                 Tận dụng các tính năng tối ưu hóa hồ sơ cá nhân để thu hút sự
                 chú ý của nhà tuyển dụng và tăng cơ hội nhận được lời mời phỏng
                 vấn.
@@ -52,7 +52,7 @@ const QuestionsAndAnswer = () => {
                 Làm thế nào để cập nhật thông tin cá nhân trên
                 <span className="text-orangetext pl-1">Joobs?</span>
               </h1>
-              <p className="text-base text-gray-400 ml-8 lg:pr-16 mt-1">
+              <p className="text-base text-gray-400 ml-8 lg:pr-16 mt-1 text-justify">
                 Hướng dẫn chi tiết về cách quản lý và cập nhật thông tin cá nhân
                 của bạn để luôn giữ cho hồ sơ của bạn được cập nhật và chuyên
                 nghiệp.
@@ -66,7 +66,7 @@ const QuestionsAndAnswer = () => {
                 <span className="text-orangetext pr-1">Joobs </span> có an toàn
                 khi sử dụng với tài khoản của tôi không?
               </h1>
-              <p className="text-base text-gray-400 ml-8 lg:pr-16 mt-1">
+              <p className="text-base text-gray-400 ml-8 lg:pr-16 mt-1  text-justify">
                 Joobs cam kết bảo vệ thông tin cá nhân của bạn thông qua biện
                 pháp an ninh tài khoản mạnh mẽ, quản lý dữ liệu cá nhân an toàn
                 và kết nối được bảo vệ.

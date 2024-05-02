@@ -1,24 +1,24 @@
 import { useContext, useEffect, useState } from "react";
 import { BaseInfo, HRDetail, HRInfo, MoreDetail } from "./components";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import ModalBase from "@/components/modal";
 import { LoadingContext } from "@/App";
-import employersService from "@/services/employersService";
+import { employersService } from "@/services";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ONCHANGE_CURRENT_EMPLOYER,
-  ONCHANGE_CURRENT_HR,
-} from "@/store/reducers/employerReducer";
-import { AuthHelper } from "@/utils/helpers/authHelper";
+  ONCHANGE_CURRENT_HUMANRESOURCE,
+} from "@/store/reducers/authReducer";
+import { AuthHelper } from "@/utils/helpers";
 import humanResourcesService from "@/services/humanResourcesService";
 import { FaEdit } from "react-icons/fa";
+import { ModalConstants } from "@/utils/constants";
 
 const ProfileEmployerPage = () => {
   const context = useContext(LoadingContext);
   const dispatch = useDispatch();
   const { currentEmployer, currentHR } = useSelector(
-    (state: any) => state.employerReducer
+    (state: any) => state.authReducer
   );
 
   const [open, setOpen] = useState(false);
@@ -50,7 +50,7 @@ const ProfileEmployerPage = () => {
         .profile()
         .then((res) => {
           if (res.status === 200 && res.data.Status === 200) {
-            dispatch(ONCHANGE_CURRENT_HR(res.data.Data));
+            dispatch(ONCHANGE_CURRENT_HUMANRESOURCE(res.data.Data));
           } else {
             SwalHelper.MiniAlert(res.data.Message, "error");
           }
@@ -70,15 +70,15 @@ const ProfileEmployerPage = () => {
   }, []);
 
   const _onClickChangeImage = () => {
-    setFuncs(MODAL_KEYS.changeAvatar);
+    setFuncs(ModalConstants.COMMON_KEYS.changeAvatar);
     handleOpen();
   };
   const _onClickChangeBackgroundImage = () => {
-    setFuncs(MODAL_KEYS.changeBackground);
+    setFuncs(ModalConstants.EMPLOYER_KEYS.changeBackground);
     handleOpen();
   };
   const _onClickChangeInfo = () => {
-    setFuncs(MODAL_KEYS.changeInfoEmployer);
+    setFuncs(ModalConstants.EMPLOYER_KEYS.changeInfoEmployer);
     handleOpen();
   };
   return (

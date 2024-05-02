@@ -76,7 +76,7 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
             Mức lương: {salary}
           </p>
           <p className="flex gap-1 text-gray-500 text-[0.95rem] font-lato font-normal">
-            <BiCategoryAlt className="text-[1.1rem] mt-0.5" /> Loại công việc:{" "}
+            <BiCategoryAlt className="text-[1.1rem] mt-0.5" /> Ngành nghề:{" "}
             {category}
           </p>
         </div>
@@ -101,7 +101,7 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
       <hr className="mt-2 sm:mt-4"></hr>
       <p className="flex gap-1 text-gray-500 text-[0.95rem] font-lato font-normal mt-2">
         Trạng thái:{" "}
-        {DataConstants.APPLY_STATE_DATA.map(
+        {DataConstants.APPLY_STATE_DROPDOWN.map(
           (item: any) =>
             state === item.id && (
               <span

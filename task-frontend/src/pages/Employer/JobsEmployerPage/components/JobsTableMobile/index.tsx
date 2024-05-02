@@ -67,9 +67,9 @@ const ItemTSX: React.FC<{
         <div className="flex items-center w-full gap-2 justify-start ">
           <p className="text-base leading-8 font-medium text-gray-800">
             <span className="font-normal text-base text-gray-600">
-              Ngày đăng:&nbsp;&nbsp;
+              Danh mục:&nbsp;&nbsp;
             </span>
-            {DateHelper.formatDateTime(item.created)}
+            {item.categoryName}
           </p>
         </div>
         <div className="flex items-center w-full gap-2 justify-start ">
@@ -136,6 +136,7 @@ const JobsTableMobile: React.FC<JobsTableProps> = ({
   _onClickDelete,
   _onClickEdit,
   isLoading,
+  isEmpty,
   currentPage,
   itemPerpage,
 }) => {
@@ -151,7 +152,7 @@ const JobsTableMobile: React.FC<JobsTableProps> = ({
             </tr>
           ) : (
             <>
-              {!value ? (
+              {isEmpty ? (
                 <tr className="bg-white flex align-center justify-center">
                   <td className="pt-6 whitespace-no-wrap">
                     <ListEmpty />

@@ -1,11 +1,9 @@
 import { LoadingContext } from "@/App";
 import { authsService } from "@/services";
-import { CLEAR_CURRENT_EMPLOYER } from "@/store/reducers/employerReducer";
-import { DataConstants } from "@/utils/constants/dataConstants";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import { AuthHelper } from "@/utils/helpers/authHelper";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import useCaptchaGenerator from "@/utils/hooks/useCaptchaGenerator";
+import { CLEAR_AUTH_DATA } from "@/store/reducers/authReducer";
+import { DataConstants, ModalConstants } from "@/utils/constants";
+import { AuthHelper, SwalHelper } from "@/utils/helpers";
+import { useCaptchaGenerator } from "@/utils/hooks";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { IoReload } from "react-icons/io5";
@@ -36,7 +34,7 @@ const Signin = (props: any) => {
   }, []);
 
   const _onClickSignup = () => {
-    setFuncs(MODAL_KEYS.signup);
+    setFuncs(ModalConstants.AUTH_KEYS.signup);
   };
   const _onClickSubmit = () => {
     if (!email) {
@@ -60,7 +58,7 @@ const Signin = (props: any) => {
       .signin(email, password, DataConstants.ROLE_DATA.CANDIDATE)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          dispatch(CLEAR_CURRENT_EMPLOYER());
+          dispatch(CLEAR_AUTH_DATA());
           AuthHelper.setAuthenticaton(res.data.Data.tokens, res.data.Data.user);
           SwalHelper.MiniAlert(res.data.Message, "success", 1500);
           setTimeout(() => {

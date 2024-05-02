@@ -1,30 +1,41 @@
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { JobsTableMobile, JobsTableWeb } from "./components";
-import { Pagination, PaginationCustom } from "@/components/ui";
+import { PaginationCustom } from "@/components/ui";
 import { FiFilter } from "react-icons/fi";
 import { useContext, useEffect, useState } from "react";
 import { ONCLEAR_FILTER } from "@/store/reducers/searchReducer";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { useDispatch, useSelector } from "react-redux";
 import { LoadingContext } from "@/App";
 import { useLocation } from "react-router-dom";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import jobsService from "@/services/jobsService";
+import { SwalHelper } from "@/utils/helpers";
+import { jobsService } from "@/services";
 import ModalBase from "@/components/modal";
+import { ModalConstants } from "@/utils/constants";
+import {
+  CLEAR_PAGINATION_STATE,
+  ONCHANGE_CURRENTPAGE,
+  ONCHANGE_PAGINATION,
+} from "@/store/reducers/paginationState";
+import { ONCHANGE_JOB_LIST } from "@/store/reducers/listDataReducer";
 
 export interface JobsTableProps {
   value: JobModel[];
   _onClickDelete: (item: JobModel) => void;
   _onClickEdit: (item: JobModel) => void;
   isLoading: boolean;
+  isEmpty: boolean;
   currentPage: number;
   itemPerpage: number;
 }
 
 const JobsEmployerPage = () => {
-  const context = useContext(LoadingContext);
-  const searchReducer = useSelector((state: any) => state.searchReducer);
   const dispatch = useDispatch();
+  const searchReducer = useSelector((state: any) => state.searchReducer);
+  const { currentPage, itemPerPage, totalPages, isEmpty } = useSelector(
+    (state: any) => state.paginationReducer
+  );
+  const { jobs } = useSelector((state: any) => state.listDataReducer);
+  const context = useContext(LoadingContext);
   const location = useLocation();
   const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
 
@@ -35,33 +46,23 @@ const JobsEmployerPage = () => {
 
   const [id, setId] = useState<string>("");
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemPerpage = 10;
-
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [jobs, setJobs] = useState<JobModel[]>([]);
-
-  useEffect(() => {
-    dispatch(ONCLEAR_FILTER());
-  }, [location]);
-
   const _onClickFilter = () => {
-    setFuncs(MODAL_KEYS.filter);
+    setFuncs(ModalConstants.COMMON_KEYS.filter);
     handleOpen();
   };
   const _onClickAdd = () => {
-    setFuncs(MODAL_KEYS.createJob);
+    setFuncs(ModalConstants.JOB_KEYS.createJob);
     handleOpen();
   };
 
   const _onClickDelete = (item: JobModel) => {
     SwalHelper.Confirm(
-      "Xác nhận xóa tài khoản này?",
+      "Xác nhận xóa tin tuyển dụng này?",
       "question",
       () => {
         context.handleOpenLoading();
         jobsService
-          .delete(item.id)
+          .delete(item.id!)
           .then((res) => {
             if (res.status === 200 && res.data.Status === 200) {
               SwalHelper.MiniAlert(res.data.Message, "success");
@@ -81,8 +82,8 @@ const JobsEmployerPage = () => {
     );
   };
   const _onClickEdit = (item: JobModel) => {
-    setId(item.id);
-    setFuncs(MODAL_KEYS.detailJob);
+    setId(item.id!);
+    setFuncs(ModalConstants.JOB_KEYS.detailJob);
     handleOpen();
   };
 
@@ -94,12 +95,12 @@ const JobsEmployerPage = () => {
         searchReducer.category,
         searchReducer.status,
         currentPage - 1,
-        itemPerpage
+        itemPerPage
       )
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          setJobs(res?.data?.Data?.content);
-          setTotalPages(res?.data?.Data?.totalPages);
+          dispatch(ONCHANGE_JOB_LIST(res.data.Data?.content || []));
+          dispatch(ONCHANGE_PAGINATION(res.data.Data));
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -111,6 +112,11 @@ const JobsEmployerPage = () => {
         setIsLoadingTable(false);
       });
   };
+
+  useEffect(() => {
+    dispatch(ONCLEAR_FILTER());
+    dispatch(CLEAR_PAGINATION_STATE());
+  }, [location]);
 
   useEffect(() => {
     fetchListData();
@@ -135,7 +141,7 @@ const JobsEmployerPage = () => {
         <div className="-mt-12 flex justify-between relative p-4 lg:py-4 lg:px-8 place-items-center rounded-xl bg-orangetext bg-clip-border text-white shadow-md shadow-orange-500/40">
           <div className="items-center text-lg lg:text-2xl font-bold text-white">
             <h1 className="uppercase items-center text-center text-lg lg:text-xl flex font-bold w-full my-auto">
-              Danh sách công việc
+              Danh sách tin tuyển dụng
             </h1>
           </div>
           <div className="flex gap-3 lg:gap-5">
@@ -162,7 +168,8 @@ const JobsEmployerPage = () => {
               _onClickEdit={_onClickEdit}
               isLoading={isLoadingTable}
               currentPage={currentPage}
-              itemPerpage={itemPerpage}
+              itemPerpage={itemPerPage}
+              isEmpty={isEmpty}
             />
           </div>
           <div className="lg:hidden">
@@ -172,7 +179,8 @@ const JobsEmployerPage = () => {
               _onClickEdit={_onClickEdit}
               isLoading={isLoadingTable}
               currentPage={currentPage}
-              itemPerpage={itemPerpage}
+              itemPerpage={itemPerPage}
+              isEmpty={isEmpty}
             />
           </div>
         </div>
@@ -180,7 +188,9 @@ const JobsEmployerPage = () => {
         <div className="w-max mx-auto mt-5">
           <PaginationCustom
             currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
+            setCurrentPage={(page: number) =>
+              dispatch(ONCHANGE_CURRENTPAGE(page))
+            }
             totalPages={totalPages}
             type={true}
           />

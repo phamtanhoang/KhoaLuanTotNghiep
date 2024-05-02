@@ -1,5 +1,6 @@
 import React from "react";
 import Select, { StylesConfig, ThemeConfig } from "react-select";
+import makeAnimated from "react-select/animated";
 
 interface SelectCustomProps {
   className?: string;
@@ -10,7 +11,9 @@ interface SelectCustomProps {
   placeholder?: string;
   theme?: ThemeConfig;
   styles?: StylesConfig<any, boolean>;
+  disabled?: boolean;
 }
+const animatedComponents = makeAnimated();
 
 const SelectCustom: React.FC<SelectCustomProps> = ({
   className,
@@ -21,10 +24,11 @@ const SelectCustom: React.FC<SelectCustomProps> = ({
   placeholder,
   theme,
   styles,
+  disabled,
 }) => {
   return (
     <Select
-      className={className}
+      className={`${className}`}
       placeholder={placeholder}
       options={options}
       value={value}
@@ -33,6 +37,8 @@ const SelectCustom: React.FC<SelectCustomProps> = ({
       isMulti={isMulti}
       styles={styles}
       isClearable
+      components={animatedComponents}
+      isDisabled={disabled}
     />
   );
 };

@@ -1,35 +1,45 @@
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import { ChangeEvent, useContext, useEffect, useState } from "react";
-import { LoadingSpiner, PaginationCustom } from "@/components/ui";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { useContext, useEffect, useState } from "react";
+import { PaginationCustom } from "@/components/ui";
+import { SwalHelper } from "@/utils/helpers";
 import { categoriesService } from "@/services";
 import ModalBase from "@/components/modal";
 import { MdOutlineAddCircleOutline } from "react-icons/md";
 import { CiSearch } from "react-icons/ci";
-
 import { LoadingContext } from "@/App";
-import { CategoryTableAdminWeb } from "./components";
+import { Table } from "./components";
+import { ModalConstants } from "@/utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { ONCHANGE_CATEGORY_LIST } from "@/store/reducers/listDataReducer";
+import {
+  CLEAR_PAGINATION_STATE,
+  ONCHANGE_CURRENTPAGE,
+  ONCHANGE_PAGINATION,
+} from "@/store/reducers/paginationState";
 
 const CategoryAdminPage = () => {
+  const dispatch = useDispatch();
+  const {
+    totalElements,
+    currentPage,
+    itemPerPage,
+    totalPages,
+    isEmpty,
+    numberOfElements,
+  } = useSelector((state: any) => state.paginationReducer);
+  const { categories } = useSelector((state: any) => state.listDataReducer);
   const context = useContext(LoadingContext);
-
-  const [id, setId] = useState<string>("");
-  const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
-  const [keyWord, setKeyWord] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemPerpage = 10;
-  const [totalElements, setTotalElements] = useState<number>(0);
-  const [numberOfElements, setNumberOfElements] = useState<number>(0);
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [categories, setCategories] = useState<CategoryModel[]>([]);
 
   const [open, setOpen] = useState(false);
   const [funcs, setFuncs] = useState<string>("");
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const [id, setId] = useState<string>("");
+  const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
+  const [keyWord, setKeyWord] = useState<string>("");
+
   const _onClickAdd = () => {
-    setFuncs(MODAL_KEYS.createCategory);
+    setFuncs(ModalConstants.CATEGORY_KEYS.createCategory);
     handleOpen();
   };
   const _onClickDelete = (item: CategoryModel) => {
@@ -39,7 +49,7 @@ const CategoryAdminPage = () => {
       () => {
         context.handleOpenLoading();
         categoriesService
-          .deleteById(item.id)
+          .deleteById(item.id!)
           .then((res) => {
             if (res.status === 200 && res.data.Status === 200) {
               SwalHelper.MiniAlert(res.data.Message, "success");
@@ -59,26 +69,19 @@ const CategoryAdminPage = () => {
     );
   };
   const _onClickDetail = (item: CategoryModel) => {
-    setId(item.id);
-    setFuncs(MODAL_KEYS.updateCategory);
+    setId(item.id!);
+    setFuncs(ModalConstants.CATEGORY_KEYS.updateCategory);
     handleOpen();
-  };
-
-  const _onChangeKeyword = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value || "";
-    setKeyWord(value);
   };
 
   const fetchListData = () => {
     setIsLoadingTable(true);
     categoriesService
-      .getList(keyWord, currentPage - 1, itemPerpage)
+      .getList(keyWord, currentPage - 1, itemPerPage)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          setCategories(res?.data?.Data?.content);
-          setTotalPages(res?.data?.Data?.totalPages);
-          setTotalElements(res?.data?.Data?.totalElements || 0);
-          setNumberOfElements(res?.data?.Data?.numberOfElements || 0);
+          dispatch(ONCHANGE_CATEGORY_LIST(res.data.Data?.content || []));
+          dispatch(ONCHANGE_PAGINATION(res.data.Data));
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -90,6 +93,9 @@ const CategoryAdminPage = () => {
         setIsLoadingTable(false);
       });
   };
+  useEffect(() => {
+    dispatch(CLEAR_PAGINATION_STATE());
+  }, []);
 
   useEffect(() => {
     fetchListData();
@@ -131,7 +137,7 @@ const CategoryAdminPage = () => {
               placeholder="Nhập từ khóa..."
               className="block w-full py-2 pr-5 text-gray-700 bg-white border border-gray-200 rounded-lg lg:w-80 placeholder-gray-400/70 pl-11 rtl:pr-11 rtl:pl-5 focus:border-bgBlue focus:ring-bgBlue/20 focus:outline-none focus:ring focus:ring-opacity-40"
               value={keyWord}
-              onChange={_onChangeKeyword}
+              onChange={(e) => setKeyWord(e.target.value)}
             />
           </div>
           <div className="font-medium text-sm text-black">
@@ -142,29 +148,22 @@ const CategoryAdminPage = () => {
       </section>
 
       <div className="overflow-auto border border-borderColor lg:rounded-lg  mt-2 lg:mt-4">
-        {/* <div className="max-lg:hidden"> */}
-        <CategoryTableAdminWeb
+        <Table
           value={categories}
           _onClickDelete={_onClickDelete}
           _onClickDetail={_onClickDetail}
           isLoading={isLoadingTable}
           currentPage={currentPage}
-          itemPerpage={itemPerpage}
+          itemPerpage={itemPerPage}
+          isEmpty={isEmpty}
         />
-        {/* </div>
-        <div className="lg:hidden">
-          <TagTableAdminMobile
-            value={tags}
-            _onClickDelete={_onClickDelete}
-            _onClickDetail={_onClickDetail}
-            isLoading={isLoadingTable}
-          />
-        </div> */}
       </div>
       <div className="w-max mx-auto mt-5">
         <PaginationCustom
           currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
+          setCurrentPage={(page: number) =>
+            dispatch(ONCHANGE_CURRENTPAGE(page))
+          }
           totalPages={totalPages}
           type={false}
         />

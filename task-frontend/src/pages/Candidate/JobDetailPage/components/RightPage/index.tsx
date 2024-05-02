@@ -4,15 +4,15 @@ interface RightPageProps {
   employer?: string;
   location?: string;
   description?: string;
-  procedures?: any;
-  tags?: any;
+  steps?: StepModel[];
+  tags?: TagModel[];
 }
 
 const RightPage: React.FC<RightPageProps> = ({
   employer,
   location,
   description,
-  procedures,
+  steps,
   tags,
 }) => {
   return (
@@ -41,20 +41,18 @@ const RightPage: React.FC<RightPageProps> = ({
         </h3>
         <div className="p-5">
           <div className="flex flex-col gap-3 border-l-2 border-dashed ml-3">
-            {procedures &&
-              procedures.map((procedure: any, index: number) => (
+            {steps &&
+              steps.map((item: any, index: number) => (
                 <div className="relative w-full" key={index}>
                   <div className="absolute top-0 -left-[0.8rem] h-6 w-6 rounded-full text-white bg-orangetext flex items-center justify-center">
-                    <h1 className="text-center font-bold">
-                      {procedure.stepNumber}
+                    <h1 className="text-center font-semibold my-auto">
+                      {item.number + 1}
                     </h1>
                   </div>
                   <div className="pl-5 ">
-                    <h4 className="font-bold text-orangetext">
-                      {procedure.name}
-                    </h4>
+                    <h4 className="font-bold text-orangetext">{item.name}</h4>
                     <p className="mt-2 max-w-screen-sm text-sm text-gray-500">
-                      {procedure.description}
+                      {item.description}
                     </p>
                   </div>
                 </div>
@@ -68,17 +66,17 @@ const RightPage: React.FC<RightPageProps> = ({
         </h3>
         <div className="flex gap-1.5 flex-wrap p-5">
           {tags &&
-            tags.map((tag: any, index: number) => (
+            tags.map((item: TagModel, index: number) => (
               <span
                 className="text-base font-medium px-4 py-1 rounded text-white"
                 style={{
-                  backgroundColor: tag.color,
+                  backgroundColor: item.color,
                   borderWidth: "2px",
-                  borderColor: tag.color,
+                  borderColor: item.color,
                 }}
                 key={index}
               >
-                {tag.name}
+                {item.name}
               </span>
             ))}
         </div>

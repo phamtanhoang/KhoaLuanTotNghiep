@@ -1,5 +1,5 @@
 import axiosConfig from "@/configs/axiosConfig";
-import { CategoryAPI } from "@/configs/apis";
+import { CategoryAPI } from "@/Apis";
 
 const categoriesService = {
   async getById(id: string) {
@@ -26,7 +26,7 @@ const categoriesService = {
       CategoryAPI.getList(name?.trim(), currentPage, itemPerPage)
     );
   },
-  
+
   async getList_Dropdown() {
     return await axiosConfig.get(CategoryAPI.getList_Dropdown);
   },

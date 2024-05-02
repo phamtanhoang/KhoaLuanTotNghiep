@@ -2,28 +2,24 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { Link, NavLink } from "react-router-dom";
 import LOGO from "@/assets/images/logo.png";
-import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import NON_USER from "@/assets/images/non-user.jpg";
 import ModalBase from "@/components/modal";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import { AuthHelper } from "@/utils/helpers/authHelper";
+import { SwalHelper, AuthHelper } from "@/utils/helpers";
 import { LoadingContext } from "@/App";
 import { useDispatch, useSelector } from "react-redux";
-import candidatesService from "@/services/candidatesService";
 import {
-  CLEAR_CURRENT_CANDIDATE,
+  CLEAR_AUTH_DATA,
   ONCHANGE_CURRENT_CANDIDATE,
-} from "@/store/reducers/candidateReducer";
+} from "@/store/reducers/authReducer";
+import { candidatesService } from "@/services";
+import { ModalConstants, PathConstants } from "@/utils/constants";
 
 const Header = () => {
   const context = useContext(LoadingContext);
   const [sticky, setSticky] = useState(false);
   const [openInfo, setOpenInfo] = useState(false);
 
-  const { currentCandidate } = useSelector(
-    (state: any) => state.candidateReducer
-  );
+  const { currentCandidate } = useSelector((state: any) => state.authReducer);
 
   const dropdownRef = useRef<any>(null);
   const menuRef = useRef<any>(null);
@@ -70,15 +66,15 @@ const Header = () => {
   };
 
   const _onClickSignin = () => {
-    setFuncs(MODAL_KEYS.signin);
+    setFuncs(ModalConstants.AUTH_KEYS.signin);
     handleOpen();
   };
   const _onClickSignup = () => {
-    setFuncs(MODAL_KEYS.signup);
+    setFuncs(ModalConstants.AUTH_KEYS.signup);
     handleOpen();
   };
   const _onClickChangePassword = () => {
-    setFuncs(MODAL_KEYS.changePassword);
+    setFuncs(ModalConstants.AUTH_KEYS.changePassword);
     handleOpen();
   };
   const _onClickSignout = () => {
@@ -88,7 +84,7 @@ const Header = () => {
       () => {
         context.handleOpenLoading();
         AuthHelper.removeAuthenticaton();
-        dispatch(CLEAR_CURRENT_CANDIDATE());
+        dispatch(CLEAR_AUTH_DATA());
         SwalHelper.MiniAlert("Đăng xuất thành công", "success", 1500);
         setTimeout(() => {
           window.location.reload();
@@ -138,7 +134,7 @@ const Header = () => {
       >
         <div className="container mx-auto flex justify-between items-center">
           <div className="relative">
-            <NavLink to={CANDIDATE_PATHS.default}>
+            <NavLink to={PathConstants.CANDIDATE_PATHS.default}>
               <img src={LOGO} alt="logo" className="h-9" />
             </NavLink>
           </div>
@@ -150,7 +146,7 @@ const Header = () => {
               <li className="sm:mr-4 lg:mr-8 uppercase">
                 <NavLink
                   className="text-gray-800 hover:text-orangetext transition-colors duration-300 font-medium"
-                  to={CANDIDATE_PATHS.home}
+                  to={PathConstants.CANDIDATE_PATHS.home}
                 >
                   Trang chủ
                 </NavLink>
@@ -158,7 +154,7 @@ const Header = () => {
               <li className="sm:mr-4 lg:mr-8 uppercase">
                 <NavLink
                   className="text-gray-800 hover:text-orangetext transition-colors duration-300 font-medium"
-                  to={CANDIDATE_PATHS.jobs}
+                  to={PathConstants.CANDIDATE_PATHS.jobs}
                 >
                   Công việc
                 </NavLink>
@@ -166,7 +162,7 @@ const Header = () => {
               <li className="sm:mr-4 lg:mr-8 uppercase">
                 <NavLink
                   className="text-gray-800 hover:text-orangetext transition-colors duration-300 font-medium"
-                  to={CANDIDATE_PATHS.employers}
+                  to={PathConstants.CANDIDATE_PATHS.employers}
                 >
                   Nhà tuyển dụng
                 </NavLink>
@@ -207,7 +203,7 @@ const Header = () => {
                           <ul className="py-2 w-[200px]">
                             <li>
                               <Link
-                                to={CANDIDATE_PATHS.myProfile}
+                                to={PathConstants.CANDIDATE_PATHS.myProfile}
                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
                               >
                                 Quản lý hồ sơ
@@ -215,7 +211,7 @@ const Header = () => {
                             </li>
                             <li>
                               <Link
-                                to={CANDIDATE_PATHS.appliedJobs}
+                                to={PathConstants.CANDIDATE_PATHS.appliedJobs}
                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
                               >
                                 Công việc đã ứng tuyển
@@ -223,7 +219,7 @@ const Header = () => {
                             </li>
                             <li>
                               <Link
-                                to={CANDIDATE_PATHS.savedJobs}
+                                to={PathConstants.CANDIDATE_PATHS.savedJobs}
                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
                               >
                                 Công việc đã lưu
@@ -287,7 +283,7 @@ const Header = () => {
             <li className="px-5 hover:text-orangetext">
               <NavLink
                 className="text-gray-800 hover:text-orangetext transition-colors duration-300 font-medium"
-                to={CANDIDATE_PATHS.home}
+                to={PathConstants.CANDIDATE_PATHS.home}
               >
                 Trang chủ
               </NavLink>
@@ -295,7 +291,7 @@ const Header = () => {
             <li className="px-5 hover:text-orangetext">
               <NavLink
                 className="text-gray-800 hover:text-orangetext transition-colors duration-300 font-medium"
-                to={CANDIDATE_PATHS.jobs}
+                to={PathConstants.CANDIDATE_PATHS.jobs}
               >
                 Công việc
               </NavLink>
@@ -303,7 +299,7 @@ const Header = () => {
             <li className="px-5 hover:text-orangetext">
               <NavLink
                 className="text-gray-800 hover:text-orangetext transition-colors duration-300 font-medium"
-                to={CANDIDATE_PATHS.employers}
+                to={PathConstants.CANDIDATE_PATHS.employers}
               >
                 Nhà tuyển dụng
               </NavLink>

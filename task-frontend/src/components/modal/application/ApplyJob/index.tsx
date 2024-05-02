@@ -2,8 +2,8 @@ import { ChangeEvent, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { IoMdExit } from "react-icons/io";
 import { IoSend } from "react-icons/io5";
-import { TextEditor } from "@/components/form";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { TextEditor } from "@/components/form";
 
 const ApplyJob = (props: any) => {
   const handleClose = props.handleClose;
@@ -13,9 +13,6 @@ const ApplyJob = (props: any) => {
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [coverLetter, setCoverLetter] = useState<string>("");
 
-  const _onClickCVType = (type: boolean) => {
-    setChecked(type);
-  };
   const _onClickChooseCV = () => {
     if (checked) document.getElementById("input-CV")?.click();
   };
@@ -86,7 +83,7 @@ const ApplyJob = (props: any) => {
               <div className="mt-2 flex flex-col gap-2 ">
                 <div
                   className="flex gap-2 cursor-pointer"
-                  onClick={() => _onClickCVType(true)}
+                  onClick={() => setChecked(true)}
                 >
                   <input
                     type="checkbox"
@@ -102,7 +99,7 @@ const ApplyJob = (props: any) => {
                 </div>
                 <div
                   className="flex gap-2 cursor-pointer"
-                  onClick={() => _onClickCVType(false)}
+                  onClick={() => setChecked(false)}
                 >
                   <input
                     type="checkbox"

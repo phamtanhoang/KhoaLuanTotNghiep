@@ -1,6 +1,6 @@
 import { LoadingContext } from "@/App";
 import { proceduresService } from "@/services";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { SwalHelper } from "@/utils/helpers";
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
@@ -58,12 +58,6 @@ const CreateProcedure = (props: any) => {
     updatedData[index].description = e.target.value;
     setSteps(updatedData);
   };
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [steps.length]);
 
   const _onClickSave = () => {
     const checkSteps: boolean = steps.every((step) => step.name !== "");
@@ -153,7 +147,7 @@ const CreateProcedure = (props: any) => {
                   <div className="flex justify-between bg-gray-200  gap-2 p-2">
                     <div className="flex gap-2 w-full">
                       <label className="text-base font-semibold my-auto">
-                        {item.number + 1}.
+                        {item.number! + 1}.
                         <span className="text-red-500">*</span>
                       </label>
                       <input

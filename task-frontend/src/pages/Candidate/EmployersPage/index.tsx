@@ -1,42 +1,44 @@
 import "react-tooltip/dist/react-tooltip.css";
 import { EmployerCard, SearchEmployer } from "./components";
-import {
-  GreatEmployers,
-  ListEmpty,
-  Loading,
-  PaginationCustom,
-} from "@/components/ui";
-import { useContext, useEffect, useState } from "react";
-import { LoadingContext } from "@/App";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import employersService from "@/services/employersService";
+import { GreatEmployers, Loading, PaginationCustom } from "@/components/ui";
+import { useEffect, useState } from "react";
+import { SwalHelper } from "@/utils/helpers";
+import { employersService } from "@/services";
 import { useNavigate } from "react-router-dom";
-import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
 import EmptyData from "@/components/ui/EmptyData";
+import { PathConstants } from "@/utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  CLEAR_PAGINATION_STATE,
+  ONCHANGE_CURRENTPAGE,
+  ONCHANGE_PAGINATION,
+} from "@/store/reducers/paginationState";
+import { ONCHANGE_EMPLOYER_LIST } from "@/store/reducers/listDataReducer";
 
 const EmployersPage: React.FC = () => {
+  const dispatch = useDispatch();
+  const { totalPages, currentPage, itemPerPage, isEmpty } = useSelector(
+    (state: any) => state.paginationReducer
+  );
+  const { employers } = useSelector((state: any) => state.listDataReducer);
   const navigate = useNavigate();
-  const context = useContext(LoadingContext);
   const [keyWord, setKeyWord] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemPerpage = 10;
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [employers, setEmployers] = useState<EmployerModel[]>([]);
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const _onClickDetail = (id: string) => {
-    const path = `${CANDIDATE_PATHS.employers}/${id}`;
+    const path = `${PathConstants.CANDIDATE_PATHS.employers}/${id}`;
     navigate(path);
   };
 
   const fetchListData = () => {
     setIsLoading(false);
     employersService
-      .getListPublic(keyWord, currentPage - 1, itemPerpage)
+      .getListPublic(keyWord, currentPage - 1, itemPerPage)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          setEmployers(res?.data?.Data?.content);
-          setTotalPages(res?.data?.Data?.totalPages);
+          dispatch(ONCHANGE_EMPLOYER_LIST(res.data.Data?.content || []));
+          dispatch(ONCHANGE_PAGINATION(res.data.Data));
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -48,6 +50,9 @@ const EmployersPage: React.FC = () => {
         setIsLoading(false);
       });
   };
+  useEffect(() => {
+    dispatch(CLEAR_PAGINATION_STATE());
+  }, []);
 
   useEffect(() => {
     fetchListData();
@@ -60,7 +65,7 @@ const EmployersPage: React.FC = () => {
           <Loading />
         ) : (
           <>
-            {employers.length === 0 ? (
+            {isEmpty ? (
               <div className="px-5 lg:px-28 justify-between mx-auto">
                 <EmptyData text="Chưa tìm thấy nhà tuyển dụng phù hợp với yêu cầu của bạn" />
               </div>
@@ -70,13 +75,13 @@ const EmployersPage: React.FC = () => {
                   {employers.map((item: EmployerModel, index: number) => (
                     <EmployerCard
                       key={index}
-                      image={item.image}
-                      banner={item.backgroundImage}
-                      name={item.name}
-                      address={item.location}
-                      description={item.description}
-                      isVip={item.isVip}
-                      _onClickDetail={() => _onClickDetail(item.id)}
+                      image={item.image!}
+                      banner={item.backgroundImage!}
+                      name={item.name!}
+                      address={item.location!}
+                      description={item.description!}
+                      isVip={item.isVip!}
+                      _onClickDetail={() => _onClickDetail(item.id!)}
                     />
                   ))}
                 </div>
@@ -84,9 +89,11 @@ const EmployersPage: React.FC = () => {
                 <div className="px-2 lg:px-28 justify-between mx-auto w-max">
                   <PaginationCustom
                     currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
+                    setCurrentPage={(page: number) =>
+                      dispatch(ONCHANGE_CURRENTPAGE(page))
+                    }
                     totalPages={totalPages}
-                    type={false}
+                    type={true}
                   />
                 </div>
               </>

@@ -3,7 +3,7 @@ import { FaRegSave } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
 import { HexColorPicker } from "react-colorful";
 import { ChangeEvent, useContext, useState } from "react";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { SwalHelper } from "@/utils/helpers";
 import { tagsService } from "@/services";
 import { LoadingContext } from "@/App";
 

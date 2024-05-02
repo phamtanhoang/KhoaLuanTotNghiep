@@ -2,31 +2,42 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 import { HRTableMobile, HRTableWeb } from "./components";
 import { PaginationCustom } from "@/components/ui";
 import { FiFilter } from "react-icons/fi";
-
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { useContext, useEffect, useState } from "react";
 import { LoadingContext } from "@/App";
-import humanResourcesService from "@/services/humanResourcesService";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { humanResourcesService } from "@/services";
+import { SwalHelper } from "@/utils/helpers";
 import ModalBase from "@/components/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { ONCLEAR_FILTER } from "@/store/reducers/searchReducer";
+import { ModalConstants } from "@/utils/constants";
+import {
+  CLEAR_PAGINATION_STATE,
+  ONCHANGE_CURRENTPAGE,
+  ONCHANGE_PAGINATION,
+} from "@/store/reducers/paginationState";
+import { ONCHANGE_HUMAN_RESOURCE_LIST } from "@/store/reducers/listDataReducer";
 
 export interface HRTableProps {
   value: HumanResourceModel[];
   _onClickDetail: (item: HumanResourceModel) => void;
   _onClickDelete: (item: HumanResourceModel) => void;
   isLoading: boolean;
+  isEmpty: boolean;
   currentPage: number;
   itemPerpage: number;
 }
 
 const HREmployerPage = () => {
-  const context = useContext(LoadingContext);
-  const searchReducer = useSelector((state: any) => state.searchReducer);
   const dispatch = useDispatch();
+  const searchReducer = useSelector((state: any) => state.searchReducer);
+  const { currentPage, itemPerPage, totalPages, isEmpty } = useSelector(
+    (state: any) => state.paginationReducer
+  );
+  const { humanResources } = useSelector((state: any) => state.listDataReducer);
+  const context = useContext(LoadingContext);
   const location = useLocation();
+
   const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
 
   const [open, setOpen] = useState(false);
@@ -36,20 +47,8 @@ const HREmployerPage = () => {
 
   const [id, setId] = useState<string>("");
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemPerpage = 10;
-
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [humanResources, setHumanResources] = useState<HumanResourceModel[]>(
-    []
-  );
-
-  useEffect(() => {
-    dispatch(ONCLEAR_FILTER());
-  }, [location]);
-
   const _onClickFilter = () => {
-    setFuncs(MODAL_KEYS.filter);
+    setFuncs(ModalConstants.COMMON_KEYS.filter);
     handleOpen();
   };
   const _onClickDelete = (item: HumanResourceModel) => {
@@ -59,7 +58,7 @@ const HREmployerPage = () => {
       () => {
         context.handleOpenLoading();
         humanResourcesService
-          .delete(item.id)
+          .delete(item.id!)
           .then((res) => {
             if (res.status === 200 && res.data.Status === 200) {
               SwalHelper.MiniAlert(res.data.Message, "success");
@@ -80,13 +79,13 @@ const HREmployerPage = () => {
   };
 
   const _onClickDetail = (item: HumanResourceModel) => {
-    setId(item.id);
-    setFuncs(MODAL_KEYS.updateHumanResource);
+    setId(item.id!);
+    setFuncs(ModalConstants.HUMANRESOURCE_KEYS.updateHumanResource);
     handleOpen();
   };
 
   const _onClickAdd = () => {
-    setFuncs(MODAL_KEYS.createHumanResource);
+    setFuncs(ModalConstants.HUMANRESOURCE_KEYS.createHumanResource);
     handleOpen();
   };
 
@@ -97,12 +96,12 @@ const HREmployerPage = () => {
         searchReducer.keyword,
         searchReducer.status,
         currentPage - 1,
-        itemPerpage
+        itemPerPage
       )
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          setHumanResources(res?.data?.Data?.content);
-          setTotalPages(res?.data?.Data?.totalPages);
+          dispatch(ONCHANGE_HUMAN_RESOURCE_LIST(res.data.Data?.content || []));
+          dispatch(ONCHANGE_PAGINATION(res.data.Data));
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -114,6 +113,10 @@ const HREmployerPage = () => {
         setIsLoadingTable(false);
       });
   };
+  useEffect(() => {
+    dispatch(ONCLEAR_FILTER());
+    dispatch(CLEAR_PAGINATION_STATE());
+  }, [location]);
 
   useEffect(() => {
     fetchListData();
@@ -159,7 +162,8 @@ const HREmployerPage = () => {
               _onClickDetail={_onClickDetail}
               isLoading={isLoadingTable}
               currentPage={currentPage}
-              itemPerpage={itemPerpage}
+              itemPerpage={itemPerPage}
+              isEmpty={isEmpty}
             />
           </div>
           <div className="lg:hidden">
@@ -169,7 +173,8 @@ const HREmployerPage = () => {
               _onClickDetail={_onClickDetail}
               isLoading={isLoadingTable}
               currentPage={currentPage}
-              itemPerpage={itemPerpage}
+              itemPerpage={itemPerPage}
+              isEmpty={isEmpty}
             />
           </div>
         </div>
@@ -177,7 +182,9 @@ const HREmployerPage = () => {
         <div className="w-max mx-auto mt-5">
           <PaginationCustom
             currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
+            setCurrentPage={(page: number) =>
+              dispatch(ONCHANGE_CURRENTPAGE(page))
+            }
             totalPages={totalPages}
             type={true}
           />

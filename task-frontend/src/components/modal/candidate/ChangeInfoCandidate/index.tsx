@@ -1,7 +1,7 @@
 import { LoadingContext } from "@/App";
-import candidatesService from "@/services/candidatesService";
-import { DataConstants } from "@/utils/constants/dataConstants";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { candidatesService } from "@/services";
+import { DataConstants } from "@/utils/constants";
+import { SwalHelper } from "@/utils/helpers";
 import { ChangeEvent, useContext, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
@@ -10,9 +10,7 @@ import { useSelector } from "react-redux";
 
 const ChangeInfoCandidate = (props: any) => {
   const context = useContext(LoadingContext);
-  const { currentCandidate } = useSelector(
-    (state: any) => state.candidateReducer
-  );
+  const { currentCandidate } = useSelector((state: any) => state.authReducer);
   const handleClose = props.handleClose;
   const fetchData = props.fetchData;
   const email = currentCandidate?.email;
@@ -148,7 +146,7 @@ const ChangeInfoCandidate = (props: any) => {
                 onChange={_onChangeSex}
                 value={sex}
               >
-                {DataConstants.SEX_DATA.map((item, index) => (
+                {DataConstants.SEX_DATA_DROPDOWN.map((item, index) => (
                   <option key={index} value={item.id}>
                     {item.name}
                   </option>

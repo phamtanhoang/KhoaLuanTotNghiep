@@ -1,3 +1,3 @@
-import EmployerTableAdminWeb from "./EmployerTableAdminWeb";
+import Table from "./Table";
 
-export { EmployerTableAdminWeb };
+export { Table };

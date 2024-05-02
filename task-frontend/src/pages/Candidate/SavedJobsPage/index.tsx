@@ -1,14 +1,13 @@
-import { CANDIDATE_PATHS } from "@/utils/constants/pathConstants";
-
-import Hero from "@/components/ui/Hero";
+import { Hero } from "@/components/ui";
 import { GreatJobs, JobCard, Pagination, SearchJobs } from "@/components/ui";
+import { PathConstants } from "@/utils/constants";
 
 const SavedJobsPage = () => {
   return (
     <>
       <Hero
         title="Công việc đã lưu"
-        linkSearch={CANDIDATE_PATHS.jobs}
+        linkSearch={PathConstants.CANDIDATE_PATHS.jobs}
         titleSearch="Tuyển dụng khác"
       />
       <section className="pb-10 pt-8">

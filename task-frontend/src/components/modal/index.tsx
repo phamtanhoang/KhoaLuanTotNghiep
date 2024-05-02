@@ -1,18 +1,20 @@
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { ChangePassword, RegisterEmployer, Signin, Signup } from "./auth";
-import FilterModal from "./filter";
-import { CreateJob } from "./job";
+import { FilterModal } from "./filter";
+import { CreateJob, DetailsJob, DetailsJobAdmin } from "./job";
 import { ChangeAvatar, ChangeBackground, ChooseImage } from "./image";
 
-import { ChangeExpSkillInfoCandidate, ChangeInfoCandidate } from "./candidate";
+import {
+  CandidateUpdate,
+  ChangeExpSkillInfoCandidate,
+  ChangeInfoCandidate,
+} from "./candidate";
 import { ApplicationDetail, ApplyJob } from "./application";
 import { ChangeInfoEmployer, EmployerUpdate } from "./employer";
 import { CreateTag, UpdateTag } from "./tag";
 import { CreateCategory, UpdateCategory } from "./category";
 import { CreateHumanResource, UpdateHumanResource } from "./humanResource";
 import { CreateProcedure, UpdateProcedure } from "./procedure";
-import CandidateUpdate from "./candidate/CandidateUpdate";
-import DetailsJob from "./job/DetailsJob";
+import { ModalConstants } from "@/utils/constants";
 
 const ModalBase = (props: any) => {
   // take props
@@ -32,27 +34,34 @@ const ModalBase = (props: any) => {
   const password = props.password;
 
   const modalComponents: { [key: string]: React.ReactNode } = {
-    [MODAL_KEYS.signin]: (
+    [ModalConstants.AUTH_KEYS.signin]: (
       <Signin handleClose={handleClose} setFuncs={setFuncs} />
     ),
-    [MODAL_KEYS.signup]: (
+    [ModalConstants.AUTH_KEYS.signup]: (
       <Signup handleClose={handleClose} setFuncs={setFuncs} />
     ),
-    [MODAL_KEYS.changePassword]: (
+    [ModalConstants.AUTH_KEYS.changePassword]: (
       <ChangePassword setFuncs={setFuncs} handleClose={handleClose} />
     ),
-    [MODAL_KEYS.applyJob]: <ApplyJob handleClose={handleClose} />,
-    [MODAL_KEYS.changeInfoCandidate]: (
+
+    [ModalConstants.APPLICATION_KEYS.applyJob]: (
+      <ApplyJob handleClose={handleClose} />
+    ),
+    [ModalConstants.CANDIDATE_KEYS.changeInfoCandidate]: (
       <ChangeInfoCandidate fetchData={fetchData} handleClose={handleClose} />
     ),
-    [MODAL_KEYS.changeExpSkillInfoCandidate]: (
-      <ChangeExpSkillInfoCandidate type={type} handleClose={handleClose} />
+    [ModalConstants.CANDIDATE_KEYS.changeExpSkillInfoCandidate]: (
+      <ChangeExpSkillInfoCandidate
+        fetchData={fetchData}
+        type={type}
+        handleClose={handleClose}
+      />
     ),
-    [MODAL_KEYS.applycationDetail]: (
+    [ModalConstants.APPLICATION_KEYS.applycationDetail]: (
       <ApplicationDetail handleClose={handleClose} />
     ),
 
-    [MODAL_KEYS.registerEmployer]: (
+    [ModalConstants.AUTH_KEYS.registerEmployer]: (
       <RegisterEmployer
         email={email}
         password={password}
@@ -60,21 +69,30 @@ const ModalBase = (props: any) => {
       />
     ),
 
-    [MODAL_KEYS.filter]: <FilterModal handleClose={handleClose} />,
-    [MODAL_KEYS.createJob]: (
+    [ModalConstants.COMMON_KEYS.filter]: (
+      <FilterModal handleClose={handleClose} />
+    ),
+    [ModalConstants.JOB_KEYS.createJob]: (
       <CreateJob fetchData={fetchData} handleClose={handleClose} />
     ),
-    [MODAL_KEYS.detailJob]: (
+    [ModalConstants.JOB_KEYS.detailJob]: (
       <DetailsJob id={id} fetchData={fetchData} handleClose={handleClose} />
     ),
+    [ModalConstants.JOB_KEYS.detailJobAdmin]: (
+      <DetailsJobAdmin
+        id={id}
+        fetchData={fetchData}
+        handleClose={handleClose}
+      />
+    ),
 
-    [MODAL_KEYS.changeAvatar]: (
+    [ModalConstants.COMMON_KEYS.changeAvatar]: (
       <ChangeAvatar fetchData={fetchData} handleClose={handleClose} />
     ),
-    [MODAL_KEYS.changeBackground]: (
+    [ModalConstants.EMPLOYER_KEYS.changeBackground]: (
       <ChangeBackground fetchData={fetchData} handleClose={handleClose} />
     ),
-    [MODAL_KEYS.changeInfoEmployer]: (
+    [ModalConstants.EMPLOYER_KEYS.changeInfoEmployer]: (
       <ChangeInfoEmployer
         data={data}
         fetchData={fetchData}
@@ -82,30 +100,30 @@ const ModalBase = (props: any) => {
       />
     ),
 
-    [MODAL_KEYS.createTag]: (
+    [ModalConstants.TAG_KEYS.createTag]: (
       <CreateTag fetchData={fetchData} handleClose={handleClose} />
     ),
-    [MODAL_KEYS.updateTag]: (
+    [ModalConstants.TAG_KEYS.updateTag]: (
       <UpdateTag id={id} fetchData={fetchData} handleClose={handleClose} />
     ),
-    [MODAL_KEYS.createCategory]: (
+    [ModalConstants.CATEGORY_KEYS.createCategory]: (
       <CreateCategory fetchData={fetchData} handleClose={handleClose} />
     ),
-    [MODAL_KEYS.updateCategory]: (
+    [ModalConstants.CATEGORY_KEYS.updateCategory]: (
       <UpdateCategory id={id} fetchData={fetchData} handleClose={handleClose} />
     ),
 
-    [MODAL_KEYS.chooseImage]: (
+    [ModalConstants.COMMON_KEYS.chooseImage]: (
       <ChooseImage
         image={image}
         setCroppedImg={setCroppedImg}
         handleClose={handleClose}
       />
     ),
-    [MODAL_KEYS.updateEmployer]: (
+    [ModalConstants.EMPLOYER_KEYS.updateEmployer]: (
       <EmployerUpdate id={id} fetchData={fetchData} handleClose={handleClose} />
     ),
-    [MODAL_KEYS.updateCandidate]: (
+    [ModalConstants.CANDIDATE_KEYS.updateCandidate]: (
       <CandidateUpdate
         id={id}
         fetchData={fetchData}
@@ -113,10 +131,10 @@ const ModalBase = (props: any) => {
       />
     ),
 
-    [MODAL_KEYS.createHumanResource]: (
+    [ModalConstants.HUMANRESOURCE_KEYS.createHumanResource]: (
       <CreateHumanResource fetchData={fetchData} handleClose={handleClose} />
     ),
-    [MODAL_KEYS.updateHumanResource]: (
+    [ModalConstants.HUMANRESOURCE_KEYS.updateHumanResource]: (
       <UpdateHumanResource
         id={id}
         fetchData={fetchData}
@@ -124,10 +142,10 @@ const ModalBase = (props: any) => {
       />
     ),
 
-    [MODAL_KEYS.createProcedure]: (
+    [ModalConstants.PROCEDURE_KEYS.createProcedure]: (
       <CreateProcedure fetchData={fetchData} handleClose={handleClose} />
     ),
-    [MODAL_KEYS.updateProcedure]: (
+    [ModalConstants.PROCEDURE_KEYS.updateProcedure]: (
       <UpdateProcedure
         id={id}
         fetchData={fetchData}
@@ -150,8 +168,3 @@ const ModalBase = (props: any) => {
 };
 
 export default ModalBase;
-
-// const [open, setOpen] = useState(false);
-//   const [funcs, setFuncs] = useState<string>("");
-//   const handleOpen = () => setOpen(true);
-//   const handleClose = () => setOpen(false);

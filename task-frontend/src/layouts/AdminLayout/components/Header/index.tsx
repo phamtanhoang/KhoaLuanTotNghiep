@@ -1,7 +1,6 @@
 import { LoadingContext } from "@/App";
-import { ADMIN_PATHS } from "@/utils/constants/pathConstants";
-import { AuthHelper } from "@/utils/helpers/authHelper";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { PathConstants } from "@/utils/constants";
+import { AuthHelper, SwalHelper } from "@/utils/helpers";
 import { useContext } from "react";
 import { BiLogOut } from "react-icons/bi";
 import { RiAdminFill } from "react-icons/ri";
@@ -31,7 +30,7 @@ const Header: React.FC<HeaderProps> = ({ openSideBar }) => {
   return (
     <header className="fixed top-0 bg-white shadow-md flex items-center justify-between py-0 z-10 w-full">
       <Link
-        to={ADMIN_PATHS.dashboard}
+        to={PathConstants.ADMIN_PATHS.dashboard}
         className={`flex items-center justify-start lg:justify-center lg:pl-0 pl-3 lg:w-64 h-16 bg-bgBlue text-white gap-2 transition-all duration-300 ${
           openSideBar ? "max-lg:w-56" : "max-lg:w-14"
         }`}

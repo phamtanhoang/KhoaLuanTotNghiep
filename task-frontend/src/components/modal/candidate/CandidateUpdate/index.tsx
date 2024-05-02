@@ -1,14 +1,12 @@
 import { LoadingContext } from "@/App";
-import candidatesService from "@/services/candidatesService";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { candidatesService } from "@/services";
+import { ConstantsHelper, DateHelper, SwalHelper } from "@/utils/helpers";
 import { useContext, useEffect, useState } from "react";
-import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
-import { IoMdExit } from "react-icons/io";
+import { AiOutlineClose } from "react-icons/ai";
 import NON_USER from "@/assets/images/non-user.jpg";
-import { DateHelper } from "@/utils/helpers/dateHelper";
+import { DataConstants } from "@/utils/constants";
 import { MdOutlineNotStarted, MdPauseCircleOutline } from "react-icons/md";
-import { DataConstants } from "@/utils/constants/dataConstants";
-import { ConstantsHelper } from "@/utils/helpers/constantsHelper";
+import { IoMdExit } from "react-icons/io";
 
 const CandidateUpdate = (props: any) => {
   const handleClose = props.handleClose;
@@ -130,7 +128,7 @@ const CandidateUpdate = (props: any) => {
                   className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
                   type="text"
                   value={
-                    candidate?.status === DataConstants.USER_STATUS_DATA.ACTIVE
+                    candidate?.status === DataConstants.STATUS_DATA.ACTIVE
                       ? "Hoạt động"
                       : "Không hoạt động"
                   }
@@ -240,23 +238,23 @@ const CandidateUpdate = (props: any) => {
         </div>
 
         <div className="flex justify-end gap-4 px-4 py-3 border-t">
-          {(candidate?.status === DataConstants.USER_STATUS_DATA.ACTIVE ||
-            candidate?.status === DataConstants.USER_STATUS_DATA.PENDING) && (
+          {(candidate?.status === DataConstants.STATUS_DATA.ACTIVE ||
+            candidate?.status === DataConstants.STATUS_DATA.PENDING) && (
             <button
               className="flex items-center gap-2 w-max h-max px-4 py-2  text-white rounded-md bg-red-600 hover:bg-red-600/90 font-[450]"
               onClick={() => {
-                _onClickUpdateState(DataConstants.USER_STATUS_DATA.INACTIVE);
+                _onClickUpdateState(DataConstants.STATUS_DATA.INACTIVE);
               }}
             >
               <MdPauseCircleOutline className="text-xl" />
               <p>Khóa</p>
             </button>
           )}
-          {candidate?.status === DataConstants.USER_STATUS_DATA.INACTIVE && (
+          {candidate?.status === DataConstants.STATUS_DATA.INACTIVE && (
             <button
               className="flex items-center gap-2 w-max h-max px-4 py-2  text-white rounded-md bg-blue-600 hover:bg-blue-600/90 font-[450]"
               onClick={() => {
-                _onClickUpdateState(DataConstants.USER_STATUS_DATA.ACTIVE);
+                _onClickUpdateState(DataConstants.STATUS_DATA.ACTIVE);
               }}
             >
               <MdOutlineNotStarted className="text-xl" />

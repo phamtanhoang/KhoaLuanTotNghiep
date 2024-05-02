@@ -1,17 +1,23 @@
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { ProceduresTableMobile, ProceduresTableWeb } from "./components";
-import { Pagination, PaginationCustom } from "@/components/ui";
+import { PaginationCustom } from "@/components/ui";
 import { FiFilter } from "react-icons/fi";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 import { useContext, useEffect, useState } from "react";
 import { LoadingContext } from "@/App";
 import ModalBase from "@/components/modal";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { SwalHelper } from "@/utils/helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { proceduresService } from "@/services";
 import { ONCLEAR_FILTER } from "@/store/reducers/searchReducer";
 import { useLocation } from "react-router-dom";
-import { AuthHelper } from "@/utils/helpers/authHelper";
+import { AuthHelper } from "@/utils/helpers";
+import { ModalConstants } from "@/utils/constants";
+import {
+  CLEAR_PAGINATION_STATE,
+  ONCHANGE_CURRENTPAGE,
+  ONCHANGE_PAGINATION,
+} from "@/store/reducers/paginationState";
+import { ONCHANGE_PROCEDURE_LIST } from "@/store/reducers/listDataReducer";
 
 export interface ProceduresTableProps {
   value: ProcedureModel[];
@@ -23,9 +29,15 @@ export interface ProceduresTableProps {
 }
 
 const ProceduresEmployerPage = () => {
-  const searchReducer = useSelector((state: any) => state.searchReducer);
-  const context = useContext(LoadingContext);
   const dispatch = useDispatch();
+  const searchReducer = useSelector((state: any) => state.searchReducer);
+  const { currentPage, itemPerPage, totalPages, isEmpty } = useSelector(
+    (state: any) => state.paginationReducer
+  );
+  const { procedures } = useSelector((state: any) => state.listDataReducer);
+
+  const context = useContext(LoadingContext);
+
   const location = useLocation();
   const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
 
@@ -36,13 +48,8 @@ const ProceduresEmployerPage = () => {
 
   const [id, setId] = useState<string>("");
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemPerpage = 10;
-
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [procedures, setProcedures] = useState<ProcedureModel[]>([]);
   const _onClickFilter = () => {
-    setFuncs(MODAL_KEYS.filter);
+    setFuncs(ModalConstants.COMMON_KEYS.filter);
     handleOpen();
   };
   useEffect(() => {
@@ -56,7 +63,7 @@ const ProceduresEmployerPage = () => {
       () => {
         context.handleOpenLoading();
         proceduresService
-          .delete(item.id)
+          .delete(item.id!)
           .then((res) => {
             if (res.status === 200 && res.data.Status === 200) {
               SwalHelper.MiniAlert(res.data.Message, "success");
@@ -76,22 +83,22 @@ const ProceduresEmployerPage = () => {
     );
   };
   const _onClickDetail = (item: ProcedureModel) => {
-    setId(item.id);
-    setFuncs(MODAL_KEYS.updateProcedure);
+    setId(item.id!);
+    setFuncs(ModalConstants.PROCEDURE_KEYS.updateProcedure);
     handleOpen();
   };
   const _onClickAdd = () => {
-    setFuncs(MODAL_KEYS.createProcedure);
+    setFuncs(ModalConstants.PROCEDURE_KEYS.createProcedure);
     handleOpen();
   };
   const fetchListData = () => {
     setIsLoadingTable(true);
     proceduresService
-      .getList(searchReducer.keyword, currentPage - 1, itemPerpage)
+      .getList(searchReducer.keyword, currentPage - 1, itemPerPage)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          setProcedures(res?.data?.Data?.content);
-          setTotalPages(res?.data?.Data?.totalPages);
+          dispatch(ONCHANGE_PROCEDURE_LIST(res.data.Data?.content || []));
+          dispatch(ONCHANGE_PAGINATION(res.data.Data));
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -103,6 +110,11 @@ const ProceduresEmployerPage = () => {
         setIsLoadingTable(false);
       });
   };
+
+  useEffect(() => {
+    dispatch(ONCLEAR_FILTER());
+    dispatch(CLEAR_PAGINATION_STATE());
+  }, [location]);
 
   useEffect(() => {
     fetchListData();
@@ -150,7 +162,7 @@ const ProceduresEmployerPage = () => {
               _onClickDetail={_onClickDetail}
               isLoading={isLoadingTable}
               currentPage={currentPage}
-              itemPerpage={itemPerpage}
+              itemPerpage={itemPerPage}
             />
           </div>
           <div className="lg:hidden">
@@ -160,7 +172,7 @@ const ProceduresEmployerPage = () => {
               _onClickDetail={_onClickDetail}
               isLoading={isLoadingTable}
               currentPage={currentPage}
-              itemPerpage={itemPerpage}
+              itemPerpage={itemPerPage}
             />
           </div>
         </div>
@@ -168,7 +180,9 @@ const ProceduresEmployerPage = () => {
         <div className="w-max mx-auto mt-5">
           <PaginationCustom
             currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
+            setCurrentPage={(page: number) =>
+              dispatch(ONCHANGE_CURRENTPAGE(page))
+            }
             totalPages={totalPages}
             type={true}
           />

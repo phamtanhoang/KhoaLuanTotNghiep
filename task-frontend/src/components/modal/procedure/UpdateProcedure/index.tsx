@@ -1,7 +1,6 @@
 import { LoadingContext } from "@/App";
 import { proceduresService } from "@/services";
-import { AuthHelper } from "@/utils/helpers/authHelper";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { AuthHelper, SwalHelper } from "@/utils/helpers";
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
@@ -61,11 +60,6 @@ const UpdateProcedure = (props: any) => {
     setSteps(updatedData);
   };
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [steps.length]);
 
   useEffect(() => {
     context.handleOpenLoading();
@@ -178,11 +172,11 @@ const UpdateProcedure = (props: any) => {
                   <div className="flex justify-between bg-gray-200  gap-2 p-2">
                     <div className="flex gap-2 w-full">
                       <label className="text-base font-semibold my-auto">
-                        {item.number + 1}.
+                        {item.number! + 1}.
                         <span className="text-red-500">*</span>
                       </label>
                       <input
-                        className="w-full content-center text-sm  px-2 py-1 border rounded focus:outline-none focus:border-orangetext"
+                        className="w-full content-center text-sm  px-2 py-1 border rounded focus:outline-none focus:border-orangetext font-medium"
                         type="text"
                         placeholder="Nhập tên bước..."
                         value={item.name}
@@ -224,7 +218,11 @@ const UpdateProcedure = (props: any) => {
           </div>
         </div>
 
-        <div className="flex justify-between gap-4 px-4 py-3 border-t ">
+        <div
+          className={`flex gap-4 px-4 py-3 border-t ${
+            AuthHelper.isEmployer() ? "justify-between " : "justify-end"
+          }`}
+        >
           {AuthHelper.isEmployer() && (
             <button
               className="flex items-center gap-2 w-max h-max px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-600/85 font-medium"

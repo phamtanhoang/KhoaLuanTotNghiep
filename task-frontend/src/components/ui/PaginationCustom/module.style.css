@@ -32,3 +32,6 @@
   border: 0px;
   color: #ffffff;
 }
+.disabled span {
+  color: #dee2e6;
+}

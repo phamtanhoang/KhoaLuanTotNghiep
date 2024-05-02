@@ -1,10 +1,8 @@
 import { LoadingContext } from "@/App";
 import ModalBase from "@/components/modal";
 import { authsService } from "@/services";
-import { CLEAR_CURRENT_CANDIDATE } from "@/store/reducers/candidateReducer";
+
 import { DataConstants } from "@/utils/constants/dataConstants";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import { EMPLOYER_PATHS } from "@/utils/constants/pathConstants";
 import { AuthHelper } from "@/utils/helpers/authHelper";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import useCaptchaGenerator from "@/utils/hooks/useCaptchaGenerator";
@@ -14,6 +12,8 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import "./module.style.css";
 import LOGO from "@/assets/images/auth-logo.jpg";
+import { CLEAR_AUTH_DATA } from "@/store/reducers/authReducer";
+import { ModalConstants, PathConstants } from "@/utils/constants";
 
 const SigninEmployerPage = () => {
   const navigate = useNavigate();
@@ -66,9 +66,9 @@ const SigninEmployerPage = () => {
       .signin(email, password, DataConstants.ROLE_DATA.EMPLOYER)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          dispatch(CLEAR_CURRENT_CANDIDATE());
+          dispatch(CLEAR_AUTH_DATA());
           AuthHelper.setAuthenticaton(res.data.Data.tokens, res.data.Data.user);
-          navigate(EMPLOYER_PATHS.dashboard);
+          navigate(PathConstants.EMPLOYER_PATHS.dashboard);
           SwalHelper.MiniAlert(res.data.Message, "success");
         } else {
           reloadCaptcha();
@@ -87,7 +87,7 @@ const SigninEmployerPage = () => {
       });
   };
   const _onClickSignup = () => {
-    setFuncs(MODAL_KEYS.registerEmployer);
+    setFuncs(ModalConstants.AUTH_KEYS.registerEmployer);
     handleOpen();
   };
 

@@ -1,7 +1,6 @@
 import { ConstantsHelper } from "@/utils/helpers/constantsHelper";
 import { DateHelper } from "@/utils/helpers/dateHelper";
-import { AiFillDelete, AiFillEdit, AiFillEye } from "react-icons/ai";
-import { IoMdAddCircleOutline } from "react-icons/io";
+import { AiFillDelete, AiFillEye } from "react-icons/ai";
 import { JobsTableProps } from "../..";
 import { ListEmpty, Loading } from "@/components/ui";
 
@@ -58,7 +57,7 @@ const ItemTSX: React.FC<{
       <td className="table-cell">
         <div className="flex items-center px-5 w-full gap-2 justify-center">
           <p className="text-base leading-8 text-gray-600 text-center">
-            {DateHelper.formatDateTime(item.created)}
+            {item.categoryName}
           </p>
         </div>
       </td>
@@ -91,6 +90,7 @@ const JobsTableWeb: React.FC<JobsTableProps> = ({
   _onClickDelete,
   _onClickEdit,
   isLoading,
+  isEmpty,
   currentPage,
   itemPerpage,
 }) => {
@@ -99,9 +99,9 @@ const JobsTableWeb: React.FC<JobsTableProps> = ({
       <table className="w-full text-gray-600 table-fixed">
         <thead>
           <th className="w-[5%]">STT</th>
-          <th className="px-5 w-[40%] text-left">Tên công việc</th>
+          <th className="px-5 w-[35%] text-left">Tên công việc</th>
           <th className="px-5 w-[15%] text-left">Tình trạng</th>
-          <th className="px-5 w-[15%]">Ngày đăng</th>
+          <th className="px-5 w-[20%]">Danh mục</th>
           <th className="px-5 w-[15%]">Ngày hết hạn</th>
           <th className="px-5 w-[15%]"></th>
         </thead>
@@ -114,7 +114,7 @@ const JobsTableWeb: React.FC<JobsTableProps> = ({
             </tr>
           ) : (
             <>
-              {!value ? (
+              {isEmpty ? (
                 <tr className="bg-white">
                   <td className="pt-6 whitespace-no-wrap" colSpan={6}>
                     <ListEmpty />

@@ -1,3 +1,3 @@
-import CandidateTableAdminWeb from "./CandidateTableAdminWeb";
+import Table from "./Table";
 
-export {CandidateTableAdminWeb}
+export { Table };

@@ -1,9 +1,8 @@
 import { LoadingContext } from "@/App";
 import { authsService } from "@/services";
-import { DataConstants } from "@/utils/constants/dataConstants";
+import { DataConstants, ModalConstants } from "@/utils/constants";
+import { SwalHelper } from "@/utils/helpers";
 
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { ChangeEvent, useContext, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 
@@ -15,7 +14,7 @@ const Signup = (props: any) => {
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [dob, setDOB] = useState<Date>();
-  const [sex, setSex] = useState<string>(DataConstants.SEX_DATA[0].id);
+  const [sex, setSex] = useState<string>(DataConstants.SEX_DATA_DROPDOWN[0].id);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -44,7 +43,7 @@ const Signup = (props: any) => {
   };
 
   const _onClickSignin = () => {
-    setFuncs(MODAL_KEYS.signin);
+    setFuncs(ModalConstants.AUTH_KEYS.signin);
   };
 
   const _onClickSubmit = () => {
@@ -70,7 +69,7 @@ const Signup = (props: any) => {
       .signupCandiDate(firstName, lastName, dob, sex, email, password)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          setFuncs(MODAL_KEYS.signin);
+          setFuncs(ModalConstants.AUTH_KEYS.signin);
           SwalHelper.MiniAlert(
             "Đăng kí thành công, vui lòng đăng nhập lại!",
             "success"
@@ -157,7 +156,7 @@ const Signup = (props: any) => {
               onChange={_onChangeSex}
               value={sex}
             >
-              {DataConstants.SEX_DATA.map((item: any) => (
+              {DataConstants.SEX_DATA_DROPDOWN.map((item: any) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
                 </option>

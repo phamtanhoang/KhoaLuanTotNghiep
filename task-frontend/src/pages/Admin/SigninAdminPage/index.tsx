@@ -1,12 +1,9 @@
 import { LoadingContext } from "@/App";
 import { authsService } from "@/services";
-import { CLEAR_CURRENT_CANDIDATE } from "@/store/reducers/candidateReducer";
-import { CLEAR_CURRENT_EMPLOYER } from "@/store/reducers/employerReducer";
-import { DataConstants } from "@/utils/constants/dataConstants";
-import { ADMIN_PATHS } from "@/utils/constants/pathConstants";
-import { AuthHelper } from "@/utils/helpers/authHelper";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import { ChangeEvent, useContext, useState } from "react";
+import { CLEAR_AUTH_DATA } from "@/store/reducers/authReducer";
+import { PathConstants, DataConstants } from "@/utils/constants";
+import { AuthHelper, SwalHelper } from "@/utils/helpers";
+import { useContext, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -18,14 +15,6 @@ const SigninAdminPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-
-  const _onChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-
-  const _onChangePassword = (e: ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
 
   const _onClickSubmit = () => {
     setError("");
@@ -43,10 +32,9 @@ const SigninAdminPage = () => {
       .signin(email.trim(), password.trim(), DataConstants.ROLE_DATA.ADMIN)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          dispatch(CLEAR_CURRENT_EMPLOYER());
-          dispatch(CLEAR_CURRENT_CANDIDATE());
+          dispatch(CLEAR_AUTH_DATA());
           AuthHelper.setAuthenticaton(res.data.Data.tokens, res.data.Data.user);
-          navigate(ADMIN_PATHS.dashboard);
+          navigate(PathConstants.ADMIN_PATHS.dashboard);
           SwalHelper.MiniAlert(res.data.Message, "success");
         } else {
           setError(res.data.Message || "Đăng nhập không thành công");
@@ -88,7 +76,7 @@ const SigninAdminPage = () => {
                 className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-bgBlue focus:border-bgBlue"
                 placeholder="your@email.com"
                 required
-                onChange={_onChangeEmail}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="mb-4">
@@ -101,7 +89,7 @@ const SigninAdminPage = () => {
                 className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-bgBlue focus:border-bgBlue"
                 placeholder="********"
                 required
-                onChange={_onChangePassword}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 

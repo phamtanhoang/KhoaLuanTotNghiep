@@ -28,19 +28,13 @@ import {
   HREmployerPage,
   JobsEmployerPage,
   ProcedureEmployerPage,
+  ProfileEmployerPage,
   ScheduleEmployerPage,
   SigninEmployerPage,
+  UpgradeAccountEmployer,
 } from "@/pages/Employer";
-import ProfileEmployerPage from "@/pages/Employer/ProfileEmployerPage";
-import UpgradeAccountEmployer from "@/pages/Employer/UpgradeAccountEmployer";
-
-import {
-  ADMIN_PATHS,
-  CANDIDATE_PATHS,
-  EMPLOYER_PATHS,
-  OTHER_PATHS,
-} from "@/utils/constants/pathConstants";
-import { AuthHelper } from "@/utils/helpers/authHelper";
+import { PathConstants } from "@/utils/constants";
+import { AuthHelper } from "@/utils/helpers";
 import { useEffect } from "react";
 import {
   BrowserRouter,
@@ -70,47 +64,61 @@ const Routers = () => {
       <ScrollToTop />
       <Routes>
         <Route
-          path={CANDIDATE_PATHS.default}
-          element={<Navigate to={CANDIDATE_PATHS.home} replace />}
+          path={PathConstants.CANDIDATE_PATHS.default}
+          element={<Navigate to={PathConstants.CANDIDATE_PATHS.home} replace />}
         />
         <Route
-          path={EMPLOYER_PATHS.default}
-          element={<Navigate to={EMPLOYER_PATHS.signin} replace />}
+          path={PathConstants.EMPLOYER_PATHS.default}
+          element={
+            <Navigate to={PathConstants.EMPLOYER_PATHS.signin} replace />
+          }
         />
         <Route
-          path={ADMIN_PATHS.default}
-          element={<Navigate to={ADMIN_PATHS.signin} replace />}
+          path={PathConstants.ADMIN_PATHS.default}
+          element={<Navigate to={PathConstants.ADMIN_PATHS.signin} replace />}
         />
 
         <Route element={<CandidateLayout />}>
-          <Route path={CANDIDATE_PATHS.home} element={<HomePage />} />
-          <Route path={CANDIDATE_PATHS.jobs} element={<JobsPage />} />
-          <Route path={CANDIDATE_PATHS.employers} element={<EmployersPage />} />
           <Route
-            path={CANDIDATE_PATHS.jobDetails}
+            path={PathConstants.CANDIDATE_PATHS.home}
+            element={<HomePage />}
+          />
+          <Route
+            path={PathConstants.CANDIDATE_PATHS.jobs}
+            element={<JobsPage />}
+          />
+          <Route
+            path={PathConstants.CANDIDATE_PATHS.employers}
+            element={<EmployersPage />}
+          />
+          <Route
+            path={PathConstants.CANDIDATE_PATHS.jobDetails}
             element={<JobDetailPage />}
           />
           <Route
-            path={CANDIDATE_PATHS.employerDetails}
+            path={PathConstants.CANDIDATE_PATHS.employerDetails}
             element={<EmployerDetailPage />}
           />
           <Route
             element={
               <ProtectedRoute
                 isAllowed={AuthHelper.isCandidate()}
-                redirectTo={CANDIDATE_PATHS.home}
+                redirectTo={PathConstants.CANDIDATE_PATHS.home}
               />
             }
           >
             <Route
-              path={CANDIDATE_PATHS.savedJobs}
+              path={PathConstants.CANDIDATE_PATHS.savedJobs}
               element={<SavedJobsPage />}
             />
             <Route
-              path={CANDIDATE_PATHS.appliedJobs}
+              path={PathConstants.CANDIDATE_PATHS.appliedJobs}
               element={<AppliedJobsPage />}
             />
-            <Route path={CANDIDATE_PATHS.myProfile} element={<ProfilePage />} />
+            <Route
+              path={PathConstants.CANDIDATE_PATHS.myProfile}
+              element={<ProfilePage />}
+            />
           </Route>
         </Route>
 
@@ -118,12 +126,12 @@ const Routers = () => {
           element={
             <ProtectedRoute
               isAllowed={!AuthHelper.isEmployer() && !AuthHelper.isHR()}
-              redirectTo={EMPLOYER_PATHS.dashboard}
+              redirectTo={PathConstants.EMPLOYER_PATHS.dashboard}
             />
           }
         >
           <Route
-            path={EMPLOYER_PATHS.signin}
+            path={PathConstants.EMPLOYER_PATHS.signin}
             element={<SigninEmployerPage />}
           />
         </Route>
@@ -132,40 +140,49 @@ const Routers = () => {
           element={
             <ProtectedRoute
               isAllowed={AuthHelper.isEmployer() || AuthHelper.isHR()}
-              redirectTo={EMPLOYER_PATHS.signin}
+              redirectTo={PathConstants.EMPLOYER_PATHS.signin}
             />
           }
         >
           <Route element={<EmployerLayout />}>
             <Route
-              path={EMPLOYER_PATHS.dashboard}
+              path={PathConstants.EMPLOYER_PATHS.dashboard}
               element={<DashboardPage />}
             />
-            <Route path={EMPLOYER_PATHS.jobs} element={<JobsEmployerPage />} />
             <Route
-              path={EMPLOYER_PATHS.applys}
+              path={PathConstants.EMPLOYER_PATHS.jobs}
+              element={<JobsEmployerPage />}
+            />
+            <Route
+              path={PathConstants.EMPLOYER_PATHS.applys}
               element={<ApplicationsEmployerPage />}
             />
             <Route
-              path={EMPLOYER_PATHS.findCandidate}
+              path={PathConstants.EMPLOYER_PATHS.findCandidate}
               element={<FindCandidatePage />}
             />
-            <Route path={EMPLOYER_PATHS.chat} element={<ChatEmployerPage />} />
             <Route
-              path={EMPLOYER_PATHS.schedule}
+              path={PathConstants.EMPLOYER_PATHS.chat}
+              element={<ChatEmployerPage />}
+            />
+            <Route
+              path={PathConstants.EMPLOYER_PATHS.schedule}
               element={<ScheduleEmployerPage />}
             />
             <Route
-              path={EMPLOYER_PATHS.procedure}
+              path={PathConstants.EMPLOYER_PATHS.procedure}
               element={<ProcedureEmployerPage />}
             />
-            <Route path={EMPLOYER_PATHS.hr} element={<HREmployerPage />} />
             <Route
-              path={EMPLOYER_PATHS.profile}
+              path={PathConstants.EMPLOYER_PATHS.hr}
+              element={<HREmployerPage />}
+            />
+            <Route
+              path={PathConstants.EMPLOYER_PATHS.profile}
               element={<ProfileEmployerPage />}
             />
             <Route
-              path={EMPLOYER_PATHS.upgrade}
+              path={PathConstants.EMPLOYER_PATHS.upgrade}
               element={<UpgradeAccountEmployer />}
             />
           </Route>
@@ -175,44 +192,56 @@ const Routers = () => {
           element={
             <ProtectedRoute
               isAllowed={!AuthHelper.isAdmin()}
-              redirectTo={ADMIN_PATHS.dashboard}
+              redirectTo={PathConstants.ADMIN_PATHS.dashboard}
             />
           }
         >
-          <Route path={ADMIN_PATHS.signin} element={<SigninAdminPage />} />
+          <Route
+            path={PathConstants.ADMIN_PATHS.signin}
+            element={<SigninAdminPage />}
+          />
         </Route>
         <Route
           element={
             <ProtectedRoute
               isAllowed={AuthHelper.isAdmin()}
-              redirectTo={ADMIN_PATHS.signin}
+              redirectTo={PathConstants.ADMIN_PATHS.signin}
             />
           }
         >
           <Route element={<AdminLayout />}>
             <Route
-              path={ADMIN_PATHS.dashboard}
+              path={PathConstants.ADMIN_PATHS.dashboard}
               element={<DashboardAdminPage />}
             />
             <Route
-              path={ADMIN_PATHS.categories}
+              path={PathConstants.ADMIN_PATHS.categories}
               element={<CategoryAdminPage />}
             />
-            <Route path={ADMIN_PATHS.jobs} element={<JobAdminPage />} />
-            <Route path={ADMIN_PATHS.tags} element={<TagsAdminPage />} />
             <Route
-              path={ADMIN_PATHS.employers}
+              path={PathConstants.ADMIN_PATHS.jobs}
+              element={<JobAdminPage />}
+            />
+            <Route
+              path={PathConstants.ADMIN_PATHS.tags}
+              element={<TagsAdminPage />}
+            />
+            <Route
+              path={PathConstants.ADMIN_PATHS.employers}
               element={<EmployerAdminPage />}
             />
             <Route
-              path={ADMIN_PATHS.candidates}
+              path={PathConstants.ADMIN_PATHS.candidates}
               element={<CandidateAdminPage />}
             />
-            <Route path={ADMIN_PATHS.services} element={<ServiceAdminPage />} />
+            <Route
+              path={PathConstants.ADMIN_PATHS.services}
+              element={<ServiceAdminPage />}
+            />
           </Route>
         </Route>
 
-        <Route path={OTHER_PATHS.all} element={<ErrorPage />} />
+        <Route path={PathConstants.OTHER_PATHS.all} element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   );

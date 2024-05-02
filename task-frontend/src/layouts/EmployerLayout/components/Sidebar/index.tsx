@@ -1,15 +1,13 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import LOGO from "@/assets/images/logo.png";
-import { EMPLOYER_PATHS } from "@/utils/constants/pathConstants";
 import { IoHome, IoNewspaper } from "react-icons/io5";
-
 import { FaClipboardList, FaUsers } from "react-icons/fa6";
-import { FaUsersCog } from "react-icons/fa";
 import { RiUserSearchFill } from "react-icons/ri";
 import { AiFillMessage, AiFillSchedule } from "react-icons/ai";
 import { MdTimeline } from "react-icons/md";
-import { AuthHelper } from "@/utils/helpers/authHelper";
+import { AuthHelper } from "@/utils/helpers";
+import { PathConstants } from "@/utils/constants";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -103,7 +101,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     >
       <div className="flex items-center justify-between px-12 py-3">
         <NavLink
-          to={EMPLOYER_PATHS.dashboard}
+          to={PathConstants.EMPLOYER_PATHS.dashboard}
           onClick={() => setSidebarOpen(false)}
         >
           <img src={LOGO} alt="Logo" className="w-full" />
@@ -121,14 +119,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear scrollbar-custom my-4 mx-1">
         <nav className="px-2">
           <div>
-            <h3 className="mb-2 ml-4 text-sm font-bold text-lightGray">
-              CHỨC NĂNG
+            <h3 className="mb-2 ml-4 text-sm font-bold text-lightGray uppercase">
+              Quản lý
             </h3>
 
             <ul className="mb-4 flex flex-col gap-1.5">
               <li>
                 <SidebarLink
-                  link={EMPLOYER_PATHS.dashboard}
+                  link={PathConstants.EMPLOYER_PATHS.dashboard}
                   name="Trang chủ"
                   icon={<IoHome className="text-lg" />}
                   setSidebarOpen={setSidebarOpen}
@@ -136,56 +134,50 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </li>
               <li>
                 <SidebarLink
-                  link={EMPLOYER_PATHS.jobs}
-                  name="Công việc"
+                  link={PathConstants.EMPLOYER_PATHS.jobs}
+                  name="Tin tuyển dụng"
                   icon={<FaClipboardList className="text-lg" />}
                   setSidebarOpen={setSidebarOpen}
                 />
               </li>
               <li>
                 <SidebarLink
-                  link={EMPLOYER_PATHS.applys}
+                  link={PathConstants.EMPLOYER_PATHS.applys}
                   name="Đơn ứng tuyển"
                   icon={<IoNewspaper className="text-lg" />}
-                  setSidebarOpen={setSidebarOpen}
-                />
-              </li>
-              <li>
-                <SidebarLink
-                  link={EMPLOYER_PATHS.procedure}
-                  name="Quy trình"
-                  icon={<MdTimeline className="text-xl" />}
-                  setSidebarOpen={setSidebarOpen}
-                />
-              </li>
-              <li>
-                <SidebarLink
-                  link={EMPLOYER_PATHS.findCandidate}
-                  name="Tìm ứng viên"
-                  icon={<RiUserSearchFill className="text-lg" />}
                   setSidebarOpen={setSidebarOpen}
                 />
               </li>
               {AuthHelper.isEmployer() && (
                 <li>
                   <SidebarLink
-                    link={EMPLOYER_PATHS.hr}
+                    link={PathConstants.EMPLOYER_PATHS.hr}
                     name="Bộ phận nhân sự"
                     icon={<FaUsers className="text-lg" />}
                     setSidebarOpen={setSidebarOpen}
                   />
                 </li>
               )}
+              <li>
+                <SidebarLink
+                  link={PathConstants.EMPLOYER_PATHS.procedure}
+                  name="Quy trình"
+                  icon={<MdTimeline className="text-xl" />}
+                  setSidebarOpen={setSidebarOpen}
+                />
+              </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="mb-2 ml-4 text-sm font-bold text-lightGray">KHÁC</h3>
+            <h3 className="mb-2 ml-4 text-sm font-bold text-lightGray uppercase">
+              Chức năng
+            </h3>
 
             <ul className="mb-6 flex flex-col gap-1.5">
               <li>
                 <SidebarLink
-                  link={EMPLOYER_PATHS.schedule}
+                  link={PathConstants.EMPLOYER_PATHS.schedule}
                   name="Lịch"
                   icon={<AiFillSchedule className="text-xl" />}
                   setSidebarOpen={setSidebarOpen}
@@ -193,7 +185,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </li>
               <li>
                 <SidebarLink
-                  link={EMPLOYER_PATHS.chat}
+                  link={PathConstants.EMPLOYER_PATHS.findCandidate}
+                  name="Tìm ứng viên"
+                  icon={<RiUserSearchFill className="text-lg" />}
+                  setSidebarOpen={setSidebarOpen}
+                />
+              </li>
+              <li>
+                <SidebarLink
+                  link={PathConstants.EMPLOYER_PATHS.chat}
                   name="Trò chuyện"
                   icon={<AiFillMessage className="text-lg" />}
                   setSidebarOpen={setSidebarOpen}

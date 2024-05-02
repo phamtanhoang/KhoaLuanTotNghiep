@@ -3,32 +3,32 @@ import {
   AiFillEye,
   AiOutlineCheck,
   AiOutlineClose,
-  AiOutlineExclamation,
 } from "react-icons/ai";
 import { ListEmpty, Loading } from "@/components/ui";
-import { DateHelper } from "@/utils/helpers/dateHelper";
+import { DateHelper } from "@/utils/helpers";
 import NON_USER from "@/assets/images/non-user.jpg";
-import { ConstantsHelper } from "@/utils/helpers/constantsHelper";
-import { DataConstants } from "@/utils/constants/dataConstants";
+import { DataConstants } from "@/utils/constants";
 import { ChangeEvent } from "react";
 
-interface CandidateTableAdminProps {
+interface CandidateTableProps {
   value: CandidateModel[];
   _onClickDetail: (item: CandidateModel) => void;
   _onClickDelete: (item: CandidateModel) => void;
   _onChangeStatus: (e: ChangeEvent<HTMLSelectElement>) => void;
   status: string;
   isLoading: boolean;
+  isEmpty: boolean;
   currentPage: number;
   itemPerpage: number;
 }
-const CandidateTableAdminWeb: React.FC<CandidateTableAdminProps> = ({
+const Table: React.FC<CandidateTableProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,
   _onChangeStatus,
   status,
   isLoading,
+  isEmpty,
   currentPage,
   itemPerpage,
 }) => {
@@ -89,7 +89,7 @@ const CandidateTableAdminWeb: React.FC<CandidateTableAdminProps> = ({
             </tr>
           ) : (
             <>
-              {!value ? (
+              {isEmpty ? (
                 <tr className="bg-white">
                   <td className="py-3 whitespace-no-wrap" colSpan={6}>
                     <ListEmpty />
@@ -122,7 +122,7 @@ const CandidateTableAdminWeb: React.FC<CandidateTableAdminProps> = ({
                       </div>
                     </td>
                     <td className="px-4 py-4 text-gray-600 text-center">
-                      {item.status === DataConstants.USER_STATUS_DATA.ACTIVE ? (
+                      {item.status === DataConstants.STATUS_DATA.ACTIVE ? (
                         <div className="inline-flex items-center px-3 py-1 rounded-full gap-x-2 text-green-500 bg-green-500/10">
                           <AiOutlineCheck />
                           <h2 className="text-sm font-normal">Hoạt động</h2>
@@ -162,4 +162,4 @@ const CandidateTableAdminWeb: React.FC<CandidateTableAdminProps> = ({
     </>
   );
 };
-export default CandidateTableAdminWeb;
+export default Table;

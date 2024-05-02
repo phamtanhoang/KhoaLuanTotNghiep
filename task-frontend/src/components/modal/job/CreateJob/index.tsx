@@ -4,17 +4,22 @@ import { useContext, useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
-import ModalBase from "../..";
-
 import { SelectCustom, TextEditor } from "@/components/form";
-import { ConfigSelect } from "@/components/form/SelectCustom/configSelect";
-import { SelectHelper } from "@/utils/helpers/selectHelper";
-import { categoriesService, proceduresService, tagsService } from "@/services";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import humanResourcesService from "@/services/humanResourcesService";
-import { AuthHelper } from "@/utils/helpers/authHelper";
-import jobsService from "@/services/jobsService";
-import { TextHelper } from "@/utils/helpers/textHelper";
+import { ConfigSelect } from "@/configs/selectConfig";
+import {
+  SelectHelper,
+  SwalHelper,
+  AuthHelper,
+  TextHelper,
+} from "@/utils/helpers";
+import {
+  categoriesService,
+  proceduresService,
+  tagsService,
+  humanResourcesService,
+  jobsService,
+} from "@/services";
+import { DataConstants } from "@/utils/constants";
 
 const CreateJob = (props: any) => {
   const context = useContext(LoadingContext);
@@ -33,8 +38,8 @@ const CreateJob = (props: any) => {
   const [toDate, setToDate] = useState<string>(">");
   const [location, setLocation] = useState<string>("");
   const [checkSalary, setCheckSalary] = useState<boolean>(false);
-  const [fromSalary, setFromSalary] = useState<string>("");
-  const [toSalary, setToSalary] = useState<string>("");
+  const [fromSalary, setFromSalary] = useState<string | null>("");
+  const [toSalary, setToSalary] = useState<string | null>("");
   const [experience, setExperience] = useState<string>("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [humanResourceId, setHumanResourceId] = useState<string>("");
@@ -53,35 +58,25 @@ const CreateJob = (props: any) => {
       !location ||
       !experience ||
       !categoryId ||
-      !humanResourceId ||
+      (AuthHelper.isEmployer() && !humanResourceId) ||
       (checkSalary && !fromSalary && !toSalary)
     ) {
       SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "warning");
       return;
     }
 
-    let from = "";
-    let to = "";
-    if (checkSalary) {
-      from = fromSalary;
-      to = toSalary;
-    } else {
-      from = "";
-      to = "";
-    }
-
-    if (checkSalary) context.handleOpenLoading();
+    context.handleOpenLoading();
     jobsService
       .create(
         name,
         description,
         toDate,
         location,
-        checkSalary ? fromSalary : "",
-        checkSalary ? toSalary : "",
+        checkSalary ? fromSalary || "" : "",
+        checkSalary ? toSalary || "" : "",
         experience,
         categoryId,
-        humanResourceId,
+        AuthHelper.isEmployer() ? humanResourceId : "",
         procedureId,
         selectedTags.map((item: any) => ({
           id: item.value,
@@ -168,7 +163,7 @@ const CreateJob = (props: any) => {
         </div>
 
         <div className="overflow-auto scrollbar-custom h-max max-h-[75vh] my-2 mr-1">
-          <div className="mx-4 my-2 text-gray-700 flex flex-col gap-3 lg:gap-4 text-sm">
+          <div className="mx-4 my-2 text-gray-700 flex flex-col gap-3 text-sm">
             <p className="font-semibold text-red-500">
               Lưu ý: Tin tuyển dụng đã được đăng thì không được phép chỉnh sửa
               thông tin
@@ -179,7 +174,7 @@ const CreateJob = (props: any) => {
                   Tên công việc&nbsp;<span className="text-red-500">*</span>
                 </label>
                 <input
-                  className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
+                  className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext focus:ring-orangetext focus:ring-1 transition-colors duration-300"
                   type="text"
                   value={name}
                   onChange={(e) => {
@@ -194,7 +189,7 @@ const CreateJob = (props: any) => {
                   Địa điểm&nbsp;<span className="text-red-500">*</span>
                 </label>
                 <input
-                  className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
+                  className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext focus:ring-orangetext focus:ring-1 transition-colors duration-300"
                   type="text"
                   value={location}
                   onChange={(e) => {
@@ -209,7 +204,7 @@ const CreateJob = (props: any) => {
                   Thời hạn&nbsp;<span className="text-red-500">*</span>
                 </label>
                 <input
-                  className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
+                  className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext focus:ring-orangetext focus:ring-1 transition-colors duration-300"
                   type="date"
                   value={toDate}
                   onChange={(e) => {
@@ -223,13 +218,24 @@ const CreateJob = (props: any) => {
                 <label className="font-medium tracking-wide text-sm">
                   Kinh nghiệm&nbsp;<span className="text-red-500">*</span>
                 </label>
-                <input
-                  className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
+                {/* <input
+                  className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext focus:ring-orangetext focus:ring-1 transition-colors duration-300"
                   type="text"
                   value={experience}
                   onChange={(e) => {
                     setExperience(e.target.value);
                   }}
+                /> */}
+                <SelectCustom
+                  className={"mt-1"}
+                  value={DataConstants.EXPERIENCE_DROPDOWN.find(
+                    (item) => item.value == experience
+                  )}
+                  options={DataConstants.EXPERIENCE_DROPDOWN}
+                  onChange={(e: any) => setExperience(e ? e.value : "")}
+                  isMulti={false}
+                  placeholder="--- Chọn kinh nghiệm ---"
+                  theme={ConfigSelect.customTheme}
                 />
               </div>
               {AuthHelper.isEmployer() && (
@@ -269,12 +275,13 @@ const CreateJob = (props: any) => {
                 <div className="content-center w-full flex gap-4">
                   <div className="content-center w-full">
                     <label className="font-medium tracking-wide text-sm ">
-                      Mức lương từ &nbsp;<span className="text-red-500">*</span>
+                      Mức lương từ&nbsp;
+                      <span className="text-red-500">*</span>
                     </label>
                     <input
-                      className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext  text-sm"
+                      className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext focus:ring-orangetext focus:ring-1 transition-colors duration-300"
                       type="text"
-                      value={fromSalary}
+                      value={fromSalary || ""}
                       onChange={(e) => {
                         setFromSalary(e.target.value);
                       }}
@@ -282,13 +289,13 @@ const CreateJob = (props: any) => {
                   </div>
                   <div className="content-center w-full">
                     <label className="font-medium tracking-wide text-sm">
-                      Mức lương đến &nbsp;
+                      Mức lương đến&nbsp;
                       <span className="text-red-500">*</span>
                     </label>
                     <input
-                      className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext text-sm"
+                      className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext focus:ring-orangetext focus:ring-1 transition-colors duration-300"
                       type="text"
-                      value={toSalary}
+                      value={toSalary || ""}
                       onChange={(e) => {
                         setToSalary(e.target.value);
                       }}
@@ -300,7 +307,7 @@ const CreateJob = (props: any) => {
             <div className="flex max-lg:flex-col justify-between gap-3 lg:gap-4 content-center">
               <div className="content-center w-full">
                 <label className="font-medium tracking-wide text-sm">
-                  Loại công việc&nbsp;<span className="text-red-500">*</span>
+                  Ngành nghề&nbsp;<span className="text-red-500">*</span>
                 </label>
                 <SelectCustom
                   className={"mt-1 "}
@@ -311,7 +318,7 @@ const CreateJob = (props: any) => {
                   options={SelectHelper.convertCategoriesToOptions(categories)}
                   onChange={(e: any) => _onChangeCategoryId(e ? e.value : "")}
                   isMulti={false}
-                  placeholder="--- Chọn loại công việc ---"
+                  placeholder="--- Chọn ngành nghề ---"
                   theme={ConfigSelect.customTheme}
                 />
               </div>
@@ -357,7 +364,7 @@ const CreateJob = (props: any) => {
             <div className="flex justify-between gap-3 lg:gap-4 content-center">
               <div className="content-center w-full">
                 <label className="font-medium tracking-wide text-sm">
-                  Mô tả về công việc&nbsp;
+                  Thông tin chi tiết&nbsp;
                   <span className="text-red-500">*</span>
                 </label>
                 <div className="mt-1">

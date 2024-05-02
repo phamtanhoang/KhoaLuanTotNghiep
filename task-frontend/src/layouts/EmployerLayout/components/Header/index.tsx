@@ -4,21 +4,19 @@ import { AiOutlineMenu, AiOutlineMessage } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import NON_USER from "@/assets/images/non-user.jpg";
 import { IoNotificationsOutline } from "react-icons/io5";
-import { EMPLOYER_PATHS } from "@/utils/constants/pathConstants";
+
 import { FaChevronDown } from "react-icons/fa6";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
-import ModalBase from "@/components/modal";
 import { LoadingContext } from "@/App";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import { AuthHelper } from "@/utils/helpers/authHelper";
+import { SwalHelper, AuthHelper } from "@/utils/helpers";
 import { useDispatch, useSelector } from "react-redux";
-import employersService from "@/services/employersService";
 import {
-  CLEAR_CURRENT_EMPLOYER,
+  CLEAR_AUTH_DATA,
   ONCHANGE_CURRENT_EMPLOYER,
-  ONCHANGE_CURRENT_HR,
-} from "@/store/reducers/employerReducer";
-import humanResourcesService from "@/services/humanResourcesService";
+  ONCHANGE_CURRENT_HUMANRESOURCE,
+} from "@/store/reducers/authReducer";
+import { humanResourcesService, employersService } from "@/services";
+import { ModalConstants, PathConstants } from "@/utils/constants";
+import ModalBase from "@/components/modal";
 
 const DropdownMessage = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -288,7 +286,7 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
   const { currentEmployer, currentHR } = useSelector(
-    (state: any) => state.employerReducer
+    (state: any) => state.authReducer
   );
   const dispatch = useDispatch();
   const context = useContext(LoadingContext);
@@ -341,7 +339,7 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
         .profile()
         .then((res) => {
           if (res.status === 200 && res.data.Status === 200) {
-            dispatch(ONCHANGE_CURRENT_HR(res.data.Data));
+            dispatch(ONCHANGE_CURRENT_HUMANRESOURCE(res.data.Data));
           } else {
             SwalHelper.MiniAlert(res.data.Message, "error");
           }
@@ -409,7 +407,7 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
         <ul className="flex flex-col border-b border-borderColor w-[200px]">
           <li>
             <Link
-              to={EMPLOYER_PATHS.profile}
+              to={PathConstants.EMPLOYER_PATHS.profile}
               className="block px-5 py-2.5 text-base font-medium hover:bg-gray-500/10 hover:text-orangetext"
             >
               Quản lý tài khoản
@@ -418,7 +416,7 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
           {AuthHelper.isEmployer() && (
             <li>
               <Link
-                to={EMPLOYER_PATHS.upgrade}
+                to={PathConstants.EMPLOYER_PATHS.upgrade}
                 className="block px-5 py-2.5 text-base font-medium hover:bg-gray-500/10 hover:text-orangetext"
               >
                 Nâng cấp tài khoản
@@ -468,7 +466,7 @@ const Header = (props: {
       "question",
       () => {
         context.handleOpenLoading();
-        dispatch(CLEAR_CURRENT_EMPLOYER());
+        dispatch(CLEAR_AUTH_DATA());
         AuthHelper.removeAuthenticaton();
         SwalHelper.MiniAlert("Đăng xuất thành công", "success", 1500);
         setTimeout(() => {
@@ -481,7 +479,7 @@ const Header = (props: {
   };
 
   const _onClickChangePassword = () => {
-    setFuncs(MODAL_KEYS.changePassword);
+    setFuncs(ModalConstants.AUTH_KEYS.changePassword);
     handleOpen();
   };
   return (

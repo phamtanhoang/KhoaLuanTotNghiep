@@ -1,6 +1,6 @@
 import { LoadingContext } from "@/App";
-import employersService from "@/services/employersService";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { employersService } from "@/services";
+import { SwalHelper } from "@/utils/helpers";
 import { ChangeEvent, useContext, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";

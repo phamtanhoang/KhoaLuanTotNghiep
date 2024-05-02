@@ -1,3 +1,3 @@
-import CategoryTableAdminWeb from "./CategoryTableAdminWeb";
+import Table from "./Table";
 
-export { CategoryTableAdminWeb };
+export { Table };

@@ -32,6 +32,14 @@ const CandidateAPI = {
   updateProfile: "/candidates/updateProfile",
 
   extraProfile: "/candidates/extraProfile",
+
+  getSkills: "/candidates/getSkills",
+  getExperiences: "/candidates/getExperiences",
+  getEducations: "/candidates/getEducations",
+  
+  saveSkills: "candidates/saveSkills",
+  saveExperiences: "/candidates/saveExperiences",
+  saveEducations: "/candidates/saveEducations",
 };
 
 const EmployerAPI = {
@@ -139,6 +147,15 @@ const JobAPI = {
   ) => {
     return `/jobs/getJobs-employer?keyword=${keyword}&categoryId=${category}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
   },
+  getList_Admin: (
+    keyword?: string,
+    category?: string,
+    status?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/jobs/getJobs-admin?keyword=${keyword}&categoryId=${category}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
+  },
 
   createJob: "/jobs/create",
 
@@ -146,12 +163,27 @@ const JobAPI = {
     return `/jobs/${id}`;
   },
 
+  getDetail_Public: (id: string) => {
+    return `/jobs/${id}`;
+  },
   getDetail_Employer: (id: string) => {
     return `/jobs/getDetail-employer/${id}`;
   },
 
   getDetail_Admin: (id: string) => {
     return `/jobs/getDetail-admin/${id}`;
+  },
+
+  getList_Public: (
+    keyword?: string,
+    location?: string,
+    fromSalary?: string,
+    toSalary?: string,
+    category?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/jobs?keyword=${keyword}&location=${location}&fromSalary=${fromSalary}&toSalary=${toSalary}&categoryId=${category}&page=${currentPage}&size=${itemPerPage}`;
   },
 };
 export {
