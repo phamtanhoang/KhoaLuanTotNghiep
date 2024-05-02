@@ -174,7 +174,7 @@ public class JobController {
 
     @GetMapping("/getJobs-admin")
     public ResponseEntity<?> getJobsByAdmin(@RequestHeader("Authorization") String token,
-                                            @RequestParam(required = false) String name,
+                                            @RequestParam(required = false) String keyword,
                                             @RequestParam(required = false) String categoryId,
                                             @RequestParam(required = false) EStatus status, Pageable pageable) {
         try {
@@ -196,7 +196,7 @@ public class JobController {
                         new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
                 );
 
-            Page<Job> jobs = jobService.findByNameContainingAndCategoryIdAndStatus(name, categoryId,status, pageable);
+            Page<Job> jobs = jobService.findByNameContainingAndCategoryIdAndStatus(keyword, categoryId,status, pageable);
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
