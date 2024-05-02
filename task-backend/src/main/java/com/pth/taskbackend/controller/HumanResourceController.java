@@ -602,7 +602,7 @@ public class HumanResourceController {
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
 
-            Optional<HumanResource> optionalHumanResource = humanResourceService.findById(email);
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
             if (optionalHumanResource.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)

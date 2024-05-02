@@ -591,7 +591,7 @@ public class JobController {
     public ResponseEntity<BaseResponse> getJob(@PathVariable String id) {
         try {
 
-            Optional<Job> optionalJob = jobService.findByIdAndStatus(id,EStatus.ACTIVE);
+            Optional<Job> optionalJob = jobService.findByIdAndStatus(id, EStatus.ACTIVE).isEmpty() ?jobService.findByIdAndStatus(id, EStatus.PAUSED): jobService.findByIdAndStatus(id, EStatus.ACTIVE);
 
             if (optionalJob.isEmpty()) {
                 return ResponseEntity.ok(
