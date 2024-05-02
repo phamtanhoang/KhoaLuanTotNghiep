@@ -75,7 +75,7 @@ const JobDetailPage = () => {
               id={job?.id!}
               image={job?.employerAvartar}
               employer={job?.employerName}
-              category={job?.categoryName}
+              category={job?.categoryName || "Khác"}
               name={job?.name}
               description={job?.description}
               experience={job?.experience}

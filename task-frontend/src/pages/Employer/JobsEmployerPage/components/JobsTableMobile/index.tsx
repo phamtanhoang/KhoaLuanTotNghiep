@@ -69,7 +69,7 @@ const ItemTSX: React.FC<{
             <span className="font-normal text-base text-gray-600">
               Danh mục:&nbsp;&nbsp;
             </span>
-            {item.categoryName}
+            {item.categoryName|| "Khác"}
           </p>
         </div>
         <div className="flex items-center w-full gap-2 justify-start ">

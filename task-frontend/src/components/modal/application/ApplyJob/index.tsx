@@ -58,7 +58,7 @@ const ApplyJob = (props: any) => {
                 <input
                   className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
                   type="text"
-                  placeholder="Nguyễn Văn A"
+                  placeholder="Nguyễn Văn A..."
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -70,7 +70,7 @@ const ApplyJob = (props: any) => {
                 <input
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
                   type="text"
-                  placeholder="(+84) 111111"
+                  placeholder="(+84) xxxxxxxx"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                 />

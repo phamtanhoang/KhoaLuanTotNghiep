@@ -116,7 +116,7 @@ const JobsEmployerPage = () => {
   useEffect(() => {
     dispatch(ONCLEAR_FILTER());
     dispatch(CLEAR_PAGINATION_STATE());
-  }, [location]);
+  }, []);
 
   useEffect(() => {
     fetchListData();

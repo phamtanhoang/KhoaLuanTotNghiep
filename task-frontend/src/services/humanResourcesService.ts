@@ -91,27 +91,19 @@ const humanResourcesService = {
   async updateProfile(
     firstName?: string,
     lastName?: string,
-    address?: string,
     phoneNumber?: string,
     dateOfBirth?: string,
-    link?: string,
-    job?: string,
-    introduction?: string,
     sex?: string
   ) {
     const body = {
       firstName: firstName?.trim(),
       lastName: lastName?.trim(),
-      address: address?.trim(),
       phoneNumber: phoneNumber?.trim(),
       dateOfBirth: new Date(dateOfBirth!),
-      link: link?.trim(),
-      job: job?.trim(),
-      introduction: introduction?.trim(),
       sex: sex,
     };
     return await axiosConfig.patch(HumanResourceAPI.updateProfile, body, {
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: { "Content-Type": "application/json" },
     });
   },
 

@@ -36,7 +36,7 @@ const CandidateAPI = {
   getSkills: "/candidates/getSkills",
   getExperiences: "/candidates/getExperiences",
   getEducations: "/candidates/getEducations",
-  
+
   saveSkills: "candidates/saveSkills",
   saveExperiences: "/candidates/saveExperiences",
   saveEducations: "/candidates/saveEducations",
@@ -185,6 +185,9 @@ const JobAPI = {
   ) => {
     return `/jobs?keyword=${keyword}&location=${location}&fromSalary=${fromSalary}&toSalary=${toSalary}&categoryId=${category}&page=${currentPage}&size=${itemPerPage}`;
   },
+
+  updateStatus_Admin: "/jobs/updateStatus-admin",
+  updateStatus_Employer: "/jobs/updateStatus-employer",
 };
 export {
   AuthAPI,

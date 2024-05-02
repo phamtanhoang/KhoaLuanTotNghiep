@@ -132,7 +132,7 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
                           Ứng tuyển ngay
                         </span>
                       </button>
-                      {!isSaved ? (
+                      {isSaved ? (
                         <button
                           className="font-medium bg-transparent text-orangetext hover:text-orange-500 border-2 border-orangetext hover:border-orange-500 w-full lg:w-[35%] py-[6px] px-4 rounded flex  justify-center items-center min-w-max"
                           onClick={() => _onClickUnSaveJob(id)}

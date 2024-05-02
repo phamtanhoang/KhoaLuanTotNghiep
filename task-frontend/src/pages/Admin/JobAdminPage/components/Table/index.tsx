@@ -139,7 +139,7 @@ const Table: React.FC<JobTableProps> = ({
                     </td>
                     <td className="table-cell">
                       <div className="px-4 py-4 text-center text-gray-600 ">
-                        {item.categoryName}
+                        {item.categoryName || "Khác"}
                       </div>
                     </td>
 

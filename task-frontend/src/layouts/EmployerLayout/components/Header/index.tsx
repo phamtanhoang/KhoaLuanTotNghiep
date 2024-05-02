@@ -285,7 +285,7 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
-  const { currentEmployer, currentHR } = useSelector(
+  const { currentEmployer, currentHumanResource } = useSelector(
     (state: any) => state.authReducer
   );
   const dispatch = useDispatch();
@@ -369,10 +369,10 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black ">
             {currentEmployer?.name ||
-              `${currentHR?.firstName} ${currentHR?.lastName}`}
+              `${currentHumanResource?.firstName} ${currentHumanResource?.lastName}`}
           </span>
           <span className="block text-xs">
-            {currentEmployer?.email || currentHR?.email}
+            {currentEmployer?.email || currentHumanResource?.email}
           </span>
         </span>
 
@@ -381,11 +381,12 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
             src={
               currentEmployer?.image
                 ? currentEmployer?.image
-                : currentHR?.avatar
-                ? currentHR?.avatar
+                : currentHumanResource?.avatar
+                ? currentHumanResource?.avatar
                 : NON_USER
             }
             alt="User"
+            className="rounded-full"
           />
         </span>
 

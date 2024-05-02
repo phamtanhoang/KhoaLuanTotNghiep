@@ -14,16 +14,43 @@ import { MdWork } from "react-icons/md";
 const sectionStyle = {
   backgroundImage: `url(${BANNER_SEARCH})`,
 };
-const SearchJob = () => {
+interface SearchJobProps {
+  name?: string;
+  setName?: any;
+  location?: string;
+  setLocation?: any;
+  category?: string;
+  setCategory?: () => void;
+  experience?: string;
+  setExperience?: () => void;
+  dateSubmit?: string;
+  setDateSubmit?: () => void;
+  type?: string;
+  setType?: () => void;
+}
+const SearchJob: React.FC<SearchJobProps> = ({
+  name,
+  setName,
+  category,
+  setCategory,
+  dateSubmit,
+  setDateSubmit,
+  experience,
+  setExperience,
+  location,
+  setLocation,
+  type,
+  setType,
+}) => {
   const context = useContext(LoadingContext);
   const [hideFilter, setHideFilter] = useState<boolean>(false);
 
-  const [name, setName] = useState<string>("");
-  const [location, setLocation] = useState<string>("");
-  const [category, setCategory] = useState<string | null>(null);
-  const [experience, setExperience] = useState<string | null>(null);
-  const [dateSubmit, setDateSubmit] = useState<string | null>(null);
-  const [type, setType] = useState<boolean | null>(null);
+  const [tempName, setTempName] = useState<string>(name || "");
+  const [tempLocation, setTempLocation] = useState<string>(location || "");
+  const [tempCategory, setTempCategory] = useState<string | null>(null);
+  const [tempExperience, setTempExperience] = useState<string | null>(null);
+  const [tempDateSubmit, setTempDateSubmit] = useState<string | null>(null);
+  const [tempType, setTempType] = useState<boolean | null>(null);
   const [categories, setCategories] = useState<CategoryModel[]>([
     { id: "", name: "Tất cả ngành nghề" },
   ]);
@@ -51,6 +78,11 @@ const SearchJob = () => {
       });
   };
 
+  const _onClickSearch = () => {
+    setName(tempName);
+    setLocation(tempLocation);
+  };
+
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -74,8 +106,8 @@ const SearchJob = () => {
                 className="w-full bg-transparent ml-2 text-gray-800 focus:outline-none"
                 type="text"
                 placeholder="Nhập tên công việc..."
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={tempName}
+                onChange={(e) => setTempName(e.target.value)}
               />
             </div>
             <div className="flex gap-1 w-full lg:w-[40%] bg-white text-left mb-3 lg:mb-0 py-2 lg:py-0">
@@ -84,14 +116,15 @@ const SearchJob = () => {
                 className="w-full bg-transparent ml-2 text-gray-800 focus:outline-none"
                 type="text"
                 placeholder="Nhập địa điểm..."
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                value={tempLocation}
+                onChange={(e) => setTempLocation(e.target.value)}
               />
             </div>
 
             <button
               className="w-full lg:w-max py-3 px-4 lg:px-14 text-white rounded lg:rounded-full flex  justify-center items-center min-w-max   h-10 outline-none relative overflow-hidden duration-300 ease-linear
                             after:absolute after:inset-x-0 after:aspect-square after:scale-0 after:opacity-70 after:origin-center after:duration-300 after:ease-linear after:rounded-full after:top-0 after:left-0 after:bg-orange-500 hover:after:opacity-100 hover:after:scale-[2.5] bg-orangetext border-transparent hover:border-orange-500"
+              onClick={_onClickSearch}
             >
               <span className="flex relative z-[1] font-medium">Tìm kiếm</span>
             </button>
@@ -124,7 +157,7 @@ const SearchJob = () => {
                     options={SelectHelper.convertCategoriesToOptions(
                       categories
                     )}
-                    onChange={(e: any) => setCategory(e ? e.value : null)}
+                    // onChange={(e: any) => setCategory(e ? e.value : null)}
                     isMulti={false}
                     placeholder="--- Chọn ngành nghề ---"
                     theme={ConfigSelect.customTheme}
@@ -139,7 +172,7 @@ const SearchJob = () => {
                       ) || null
                     }
                     options={DataConstants.EXPERIENCE_DROPDOWN}
-                    onChange={(e: any) => setExperience(e ? e.value : null)}
+                    // onChange={(e: any) => setExperience(e ? e.value : null)}
                     isMulti={false}
                     placeholder="--- Chọn kinh nghiệm ---"
                     theme={ConfigSelect.customTheme}
@@ -155,7 +188,7 @@ const SearchJob = () => {
                       ) || null
                     }
                     options={DataConstants.DATESUBMIT_DROPDOWN}
-                    onChange={(e: any) => setDateSubmit(e ? e.value : null)}
+                    // onChange={(e: any) => setDateSubmit(e ? e.value : null)}
                     isMulti={false}
                     placeholder="--- Chọn ngày đăng ---"
                     theme={ConfigSelect.customTheme}
@@ -170,7 +203,7 @@ const SearchJob = () => {
                       ) || null
                     }
                     options={DataConstants.TYPEJOB_DROPDOWN}
-                    onChange={(e: any) => setType(e ? e.value : null)}
+                    // onChange={(e: any) => setType(e ? e.value : null)}
                     isMulti={false}
                     placeholder="--- Chọn loại tin ---"
                     theme={ConfigSelect.customTheme}

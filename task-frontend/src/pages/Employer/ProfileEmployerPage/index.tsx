@@ -17,7 +17,7 @@ import { ModalConstants } from "@/utils/constants";
 const ProfileEmployerPage = () => {
   const context = useContext(LoadingContext);
   const dispatch = useDispatch();
-  const { currentEmployer, currentHR } = useSelector(
+  const { currentEmployer, currentHumanResource } = useSelector(
     (state: any) => state.authReducer
   );
 
@@ -78,7 +78,12 @@ const ProfileEmployerPage = () => {
     handleOpen();
   };
   const _onClickChangeInfo = () => {
-    setFuncs(ModalConstants.EMPLOYER_KEYS.changeInfoEmployer);
+    if (AuthHelper.isEmployer()) {
+      setFuncs(ModalConstants.EMPLOYER_KEYS.changeInfoEmployer);
+    } else {
+      setFuncs(ModalConstants.HUMANRESOURCE_KEYS.changeInfoHumanResource);
+    }
+
     handleOpen();
   };
   return (
@@ -89,7 +94,7 @@ const ProfileEmployerPage = () => {
         funcs={funcs}
         setFuncs={setFuncs}
         fetchData={fetchData}
-        data={currentEmployer}
+        data={currentEmployer || currentHumanResource}
       />
 
       {AuthHelper.isEmployer() ? (
@@ -126,9 +131,9 @@ const ProfileEmployerPage = () => {
         <>
           <div className="bg-white w-1/2 lg:w-full overflow-hidden lg:rounded-lg h-max">
             <HRInfo
-              avatar={currentHR?.avatar}
-              firstName={currentHR?.firstName}
-              lastName={currentHR?.lastName}
+              avatar={currentHumanResource?.avatar}
+              firstName={currentHumanResource?.firstName}
+              lastName={currentHumanResource?.lastName}
               _onClickChangeImage={_onClickChangeImage}
             />
             <div className="px-4 py-4 lg:px-6 flex justify-between gap-4 border-b border-gray-200">
@@ -143,14 +148,14 @@ const ProfileEmployerPage = () => {
               </button>
             </div>
             <HRDetail
-              firstName={currentHR?.firstName}
-              lastName={currentHR?.lastName}
-              dateOfBirth={currentHR?.dateOfBirth}
-              email={currentHR?.email}
-              phoneNumber={currentHR?.phoneNumber}
-              sex={currentHR?.sex}
-              status={currentHR?.status}
-              employerName={currentHR?.employerName}
+              firstName={currentHumanResource?.firstName}
+              lastName={currentHumanResource?.lastName}
+              dateOfBirth={currentHumanResource?.dateOfBirth}
+              email={currentHumanResource?.email}
+              phoneNumber={currentHumanResource?.phoneNumber}
+              sex={currentHumanResource?.sex}
+              status={currentHumanResource?.status}
+              employerName={currentHumanResource?.employerName}
             />
           </div>
         </>

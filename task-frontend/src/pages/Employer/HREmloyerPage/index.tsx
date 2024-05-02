@@ -36,7 +36,6 @@ const HREmployerPage = () => {
   );
   const { humanResources } = useSelector((state: any) => state.listDataReducer);
   const context = useContext(LoadingContext);
-  const location = useLocation();
 
   const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
 
@@ -116,7 +115,7 @@ const HREmployerPage = () => {
   useEffect(() => {
     dispatch(ONCLEAR_FILTER());
     dispatch(CLEAR_PAGINATION_STATE());
-  }, [location]);
+  }, []);
 
   useEffect(() => {
     fetchListData();

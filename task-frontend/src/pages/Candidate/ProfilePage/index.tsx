@@ -9,7 +9,7 @@ import { useContext, useEffect, useState } from "react";
 import ModalBase from "@/components/modal";
 import { LoadingContext } from "@/App";
 import { candidatesService } from "@/services";
-import { SwalHelper, DateHelper, ConstantsHelper } from "@/utils/helpers";
+import { SwalHelper, DateHelper } from "@/utils/helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { ONCHANGE_CURRENT_CANDIDATE } from "@/store/reducers/authReducer";
 import {
@@ -210,7 +210,11 @@ const ProfilePage = () => {
                         fromDate={DateHelper.formatDate(
                           new Date(item?.fromDate!)
                         )}
-                        toDate={DateHelper.formatDate(new Date(item?.toDate!))}
+                        toDate={DateHelper.formatDate(
+                          item?.toDate == "now"
+                            ? "Hiện nay"
+                            : new Date(item?.toDate!)
+                        )}
                         description={item?.description}
                       />
                     </li>
@@ -242,7 +246,10 @@ const ProfilePage = () => {
                         fromDate={DateHelper.formatDate(
                           new Date(item?.fromDate!)
                         )}
-                        toDate={DateHelper.formatDate(new Date(item?.toDate!))}
+                        toDate={
+                          DateHelper.formatDate(new Date(item?.toDate!)) ||
+                          "Hiện nay"
+                        }
                         description={item?.description}
                       />
                     </li>

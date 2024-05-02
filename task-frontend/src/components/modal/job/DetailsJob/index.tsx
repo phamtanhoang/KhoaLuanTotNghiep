@@ -38,8 +38,29 @@ const DetailsJob = (props: any) => {
   }, []);
 
   const tagOptions =
-    job.tags.map((item) => ({ ...item, value: item.id, label: item.name })) ||
+    job?.tags?.map((item) => ({ ...item, value: item.id, label: item.name })) ||
     [];
+
+  const _onClickUpdateStatus = (status: string) => {
+    context.handleOpenLoading();
+    jobsService
+      .updateStatus(id, status)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          handleClose();
+          SwalHelper.MiniAlert(res.data.Message, "success");
+          fetchData();
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  };
 
   return (
     <>
@@ -183,7 +204,7 @@ const DetailsJob = (props: any) => {
                 <input
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext text-sm"
                   type="text"
-                  value={job?.categoryName}
+                  value={job?.categoryName || "Khác"}
                   disabled
                 />
               </div>
@@ -242,7 +263,9 @@ const DetailsJob = (props: any) => {
           {job?.status == DataConstants.STATUS_DATA.PAUSED && (
             <button
               className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-500/85 font-medium"
-              // onClick={_onClickSave}
+              onClick={() =>
+                _onClickUpdateStatus(DataConstants.STATUS_DATA.ACTIVE)
+              }
             >
               <MdOutlinePauseCircle className="text-xl" />
               <p>Bật tìm kiếm</p>
@@ -251,7 +274,9 @@ const DetailsJob = (props: any) => {
           {job?.status == DataConstants.STATUS_DATA.ACTIVE && (
             <button
               className="flex items-center gap-2 w-max h-max px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-500/85 font-medium"
-              // onClick={_onClickSave}
+              onClick={() =>
+                _onClickUpdateStatus(DataConstants.STATUS_DATA.PAUSED)
+              }
             >
               <MdOutlinePauseCircle className="text-xl" />
               <p>Tắt tìm kiếm</p>

@@ -52,9 +52,6 @@ const ProceduresEmployerPage = () => {
     setFuncs(ModalConstants.COMMON_KEYS.filter);
     handleOpen();
   };
-  useEffect(() => {
-    dispatch(ONCLEAR_FILTER());
-  }, [location]);
 
   const _onClickDelete = (item: ProcedureModel) => {
     SwalHelper.Confirm(
@@ -114,7 +111,7 @@ const ProceduresEmployerPage = () => {
   useEffect(() => {
     dispatch(ONCLEAR_FILTER());
     dispatch(CLEAR_PAGINATION_STATE());
-  }, [location]);
+  }, []);
 
   useEffect(() => {
     fetchListData();

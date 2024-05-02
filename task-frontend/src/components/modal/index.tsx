@@ -12,7 +12,11 @@ import { ApplicationDetail, ApplyJob } from "./application";
 import { ChangeInfoEmployer, EmployerUpdate } from "./employer";
 import { CreateTag, UpdateTag } from "./tag";
 import { CreateCategory, UpdateCategory } from "./category";
-import { CreateHumanResource, UpdateHumanResource } from "./humanResource";
+import {
+  CreateHumanResource,
+  UpdateHumanResource,
+  ChangeInfoHumanResource,
+} from "./humanResource";
 import { CreateProcedure, UpdateProcedure } from "./procedure";
 import { ModalConstants } from "@/utils/constants";
 
@@ -137,6 +141,13 @@ const ModalBase = (props: any) => {
     [ModalConstants.HUMANRESOURCE_KEYS.updateHumanResource]: (
       <UpdateHumanResource
         id={id}
+        fetchData={fetchData}
+        handleClose={handleClose}
+      />
+    ),
+    [ModalConstants.HUMANRESOURCE_KEYS.changeInfoHumanResource]: (
+      <ChangeInfoHumanResource
+        data={data}
         fetchData={fetchData}
         handleClose={handleClose}
       />

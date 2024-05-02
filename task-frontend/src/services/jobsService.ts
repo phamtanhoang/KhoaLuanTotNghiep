@@ -96,5 +96,14 @@ const jobsService = {
   async getDetail_Admin(id: string) {
     return await axiosConfig.get(JobAPI.getDetail_Admin(id));
   },
+
+  async updateStatus_Admin(id: string, status: string) {
+    const body = {
+      status: status,
+    };
+    return await axiosConfig.patch(JobAPI.jobById(id), body, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
 };
 export default jobsService;

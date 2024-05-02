@@ -40,6 +40,10 @@ const DetailsJobAdmin = (props: any) => {
       });
   }, []);
 
+  const _onClickUpdateState =() =>{
+    
+  }
+
   return (
     <div className="lg:w-[45%] w-screen bg-white relative rounded">
       <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-bgBlue rounded-t">
@@ -83,7 +87,7 @@ const DetailsJobAdmin = (props: any) => {
               <div className="">
                 <p className="">
                   <span className="font-semibold">Ngành nghề:&nbsp;&nbsp;</span>
-                  {job?.categoryName}
+                  {job?.categoryName || "Khác"}
                 </p>
               </div>
               <div className="">
@@ -207,7 +211,7 @@ const DetailsJobAdmin = (props: any) => {
           <button
             className="flex items-center gap-2 w-max h-max px-4 py-2  text-white rounded-md bg-green-600 hover:bg-green-600/90 font-[450]"
             onClick={() => {
-              //   _onClickUpdateState(DataConstants.STATUS_DATA.ACTIVE);
+              _onClickUpdateState(DataConstants.STATUS_DATA.ACTIVE);
             }}
           >
             <AiOutlineCheck className="text-base" />
@@ -220,7 +224,7 @@ const DetailsJobAdmin = (props: any) => {
           <button
             className="flex items-center gap-2 w-max h-max px-4 py-2  text-white rounded-md bg-red-600 hover:bg-red-600/90 font-[450]"
             onClick={() => {
-              //   _onClickUpdateState(DataConstants.STATUS_DATA.INACTIVE);
+              _onClickUpdateState(DataConstants.STATUS_DATA.INACTIVE);
             }}
           >
             <MdPauseCircleOutline className="text-xl" />
@@ -231,7 +235,7 @@ const DetailsJobAdmin = (props: any) => {
           <button
             className="flex items-center gap-2 w-max h-max px-4 py-2  text-white rounded-md bg-blue-600 hover:bg-blue-600/90 font-[450]"
             onClick={() => {
-              //   _onClickUpdateState(DataConstants.STATUS_DATA.ACTIVE);
+              _onClickUpdateState(DataConstants.STATUS_DATA.ACTIVE);
             }}
           >
             <MdOutlineNotStarted className="text-xl" />

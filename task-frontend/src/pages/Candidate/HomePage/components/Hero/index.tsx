@@ -1,8 +1,19 @@
 import HERO from "@/assets/images/hero.png";
+import { PathConstants } from "@/utils/constants";
+import { useState } from "react";
 import { FaLocationCrosshairs } from "react-icons/fa6";
 import { MdWork } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const [name, setName] = useState<string>("");
+  const [location, setLocation] = useState<string>("");
+  const _onClickSearch = () => {
+    navigate(PathConstants.CANDIDATE_PATHS.jobs, {
+      state: { name: name, location: location },
+    });
+  };
   return (
     <section className=" bg-orangebackground py-5">
       <div className="md:pl-28 mx-auto flex flex-wrap md:flex-row flex-col-reverse items-center">
@@ -33,32 +44,25 @@ const Hero = () => {
                 className="w-full bg-transparent ml-2 text-gray-800 focus:outline-none"
                 type="text"
                 placeholder="Nhập tên công việc..."
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
             <div className="flex gap-1 w-full lg:w-[45%] bg-white text-left py-2 px-3 pl-5 mb-3 lg:mb-0">
               <FaLocationCrosshairs className="text-orangetext h-full text-2xl" />
-              <select className="bg-transparent ml-2 text-gray-800 focus:outline-none w-full">
-                <option className="w-full" value="">
-                  Afganistan
-                </option>
-                <option className="w-full" value="">
-                  Albaniya
-                </option>
-                <option className="w-full" value="">
-                  Bangladesh
-                </option>
-                <option className="w-full" value="">
-                  Belgium
-                </option>
-                <option className="w-full" value="">
-                  Canada
-                </option>
-              </select>
+              <input
+                className="w-full bg-transparent ml-2 text-gray-800 focus:outline-none"
+                type="text"
+                placeholder="Nhập địa điểm..."
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
             </div>
 
             <button
               className="w-full  py-3  text-white rounded lg:rounded-r-full flex  justify-center items-center min-w-max lg:w-max px-4 lg:px-6 h-12 outline-none relative overflow-hidden border duration-300 ease-linear
                             after:absolute after:inset-x-0 after:aspect-square after:scale-0 after:opacity-70 after:origin-center after:duration-300 after:ease-linear after:rounded-full after:top-0 after:left-0 after:bg-orange-500 hover:after:opacity-100 hover:after:scale-[2.5] bg-orangetext border-transparent hover:border-orange-500"
+              onClick={_onClickSearch}
             >
               <span className="flex relative z-[1] font-medium">Tìm kiếm</span>
             </button>

@@ -13,7 +13,6 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/free-mode";
 import { FreeMode, Navigation, Pagination } from "swiper/modules";
-import { Tooltip } from "react-tooltip";
 
 const employers = [
   {

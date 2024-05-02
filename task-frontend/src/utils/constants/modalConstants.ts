@@ -28,6 +28,7 @@ const APPLICATION_KEYS = {
 const HUMANRESOURCE_KEYS = {
   createHumanResource: "CreateHumanResource",
   updateHumanResource: "UpdateHumanResource",
+  changeInfoHumanResource: "ChangeInfoHumanResource",
 };
 const EMPLOYER_KEYS = {
   updateEmployer: "updateEmployer",

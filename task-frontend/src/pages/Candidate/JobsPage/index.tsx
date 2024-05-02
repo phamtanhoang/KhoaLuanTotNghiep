@@ -15,8 +15,11 @@ import {
   ONCHANGE_PAGINATION,
 } from "@/store/reducers/paginationState";
 import { ONCHANGE_JOB_SINGLE } from "@/store/reducers/singleDataReducer";
+import { useLocation } from "react-router-dom";
 
 const JobsPage: React.FC = () => {
+  const { state } = useLocation();
+
   const dispatch = useDispatch();
   const { totalPages, currentPage, itemPerPage, isEmpty } = useSelector(
     (state: any) => state.paginationReducer
@@ -30,8 +33,8 @@ const JobsPage: React.FC = () => {
   const handleClose = () => setOpen(false);
   const [id, setId] = useState<string>("");
 
-  const [keyWord, setKeyWord] = useState<string>("");
-  const [location, setLocation] = useState<string>("");
+  const [name, setName] = useState<string>(state?.name || "");
+  const [location, setLocation] = useState<string>(state?.location || "");
   const [fromSalary, setFromSalary] = useState<string>("");
   const [toSalary, setToSalary] = useState<string>("");
   const [category, setCategory] = useState<string>("");
@@ -63,7 +66,7 @@ const JobsPage: React.FC = () => {
     setIsLoading(false);
     jobsService
       .getList_Public(
-        keyWord,
+        name,
         location,
         fromSalary,
         toSalary,
@@ -95,7 +98,7 @@ const JobsPage: React.FC = () => {
   }, []);
   useEffect(() => {
     fetchListData();
-  }, [currentPage]);
+  }, [name, location, currentPage]);
 
   const _onClickApplyJob = (id: string) => {
     setId(id);
@@ -116,7 +119,12 @@ const JobsPage: React.FC = () => {
   return (
     <>
       <ModalBase id={id} open={open} handleClose={handleClose} funcs={funcs} />
-      <SearchJob />
+      <SearchJob
+        name={name}
+        setName={setName}
+        location={location}
+        setLocation={setLocation}
+      />
       <section className="pb-10 pt-8 ">
         {isLoading ? (
           <Loading />
@@ -140,7 +148,7 @@ const JobsPage: React.FC = () => {
                       employerId={job?.employerId}
                       fromDate={DateHelper.formatDate(job?.fromDate)}
                       toDate={DateHelper.formatDate(job?.toDate)}
-                      category={job?.categoryName}
+                      category={job?.categoryName|| "Khác"}
                       image={job?.employerAvatar}
                       experience={job?.experience}
                       salary={TextHelper.SalaryText(

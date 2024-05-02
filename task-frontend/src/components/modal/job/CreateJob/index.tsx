@@ -57,7 +57,6 @@ const CreateJob = (props: any) => {
       !description ||
       !location ||
       !experience ||
-      !categoryId ||
       (AuthHelper.isEmployer() && !humanResourceId) ||
       (checkSalary && !fromSalary && !toSalary)
     ) {
@@ -307,7 +306,7 @@ const CreateJob = (props: any) => {
             <div className="flex max-lg:flex-col justify-between gap-3 lg:gap-4 content-center">
               <div className="content-center w-full">
                 <label className="font-medium tracking-wide text-sm">
-                  Ngành nghề&nbsp;<span className="text-red-500">*</span>
+                  Ngành nghề
                 </label>
                 <SelectCustom
                   className={"mt-1 "}
@@ -346,7 +345,7 @@ const CreateJob = (props: any) => {
             <div className="flex justify-between gap-3 g lg:gap-4 content-center">
               <div className="content-center w-full">
                 <label className="font-medium tracking-wide text-sm">
-                  Nhãn&nbsp;<span className="text-red-500">*</span>
+                  Nhãn
                 </label>
                 <SelectCustom
                   className={"mt-1"}
