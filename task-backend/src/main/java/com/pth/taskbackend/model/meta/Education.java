@@ -25,18 +25,16 @@ public class Education  extends BaseEntity  {
     private String education;
 
 
-    @Column(nullable = false)
-    private LocalDateTime fromDate;
+    private String fromDate;
 
-    @Column(nullable = false)
-    private LocalDateTime toDate;
+    private String toDate;
 
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "candidate_id")
     private Candidate candidate;
 

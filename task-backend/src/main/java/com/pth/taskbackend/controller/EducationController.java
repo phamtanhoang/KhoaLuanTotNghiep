@@ -63,7 +63,7 @@ public class EducationController {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy ứng viên tương ứng", HttpStatus.NOT_FOUND.value(), null)
                 );
-            List<Education>educationList = request.educationList();
+            List<Education>educationList = request.educations();
             for (Education education : educationList) {
                 if (education.getId() == null)
                     education.setId(UUID.randomUUID().toString());

@@ -108,8 +108,8 @@ public class JobController {
                             job.getToSalary(),
                             job.getLocation(),
                             job.getStatus(),
-                            job.getCategory().getId(),
-                            job.getCategory().getName(),
+                            job.getCategory()!=null ? job.getCategory().getId():null,
+                            job.getCategory()!=null ? job.getCategory().getName():null,
                             job.getHumanResource().getId(),
                             job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
                             job.getHumanResource().getEmployer().getName(),
@@ -236,8 +236,8 @@ public class JobController {
                             job.getToSalary(),
                             job.getLocation(),
                             job.getStatus(),
-                            job.getCategory().getId(),
-                            job.getCategory().getName(),
+                            job.getCategory()!=null ? job.getCategory().getId():null,
+                            job.getCategory()!=null ? job.getCategory().getName():null,
                             job.getHumanResource().getId(),
                             job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
                             job.getHumanResource().getEmployer().getName(),
@@ -354,8 +354,8 @@ public class JobController {
                             job.getToSalary(),
                             job.getLocation(),
                             job.getStatus(),
-                            job.getCategory().getId(),
-                            job.getCategory().getName(),
+                            job.getCategory()!=null ? job.getCategory().getId():null,
+                            job.getCategory()!=null ? job.getCategory().getName():null,
                             job.getHumanResource().getId(),
                             job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
                             job.getHumanResource().getEmployer().getName(),
@@ -439,8 +439,8 @@ public class JobController {
                             job.getToSalary(),
                             job.getLocation(),
                             job.getStatus(),
-                            job.getCategory().getId(),
-                            job.getCategory().getName(),
+                            job.getCategory()!=null ? job.getCategory().getId():null,
+                            job.getCategory()!=null ? job.getCategory().getName():null,
                             job.getHumanResource().getId(),
                             job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
                             job.getHumanResource().getEmployer().getName(),
@@ -553,8 +553,8 @@ public class JobController {
                             job.getToSalary(),
                             job.getLocation(),
                             job.getStatus(),
-                            job.getCategory().getId(),
-                            job.getCategory().getName(),
+                            job.getCategory()!=null ? job.getCategory().getId():null,
+                            job.getCategory()!=null ? job.getCategory().getName():null,
                             job.getHumanResource().getId(),
                             job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
                             job.getHumanResource().getEmployer().getName(),
@@ -631,8 +631,8 @@ public class JobController {
                         job.getToSalary(),
                         job.getLocation(),
                         job.getStatus(),
-                        job.getCategory().getId(),
-                        job.getCategory().getName(),
+                        job.getCategory()!=null ? job.getCategory().getId():null,
+                        job.getCategory()!=null ? job.getCategory().getName():null,
                         job.getHumanResource().getId(),
                         job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
                         job.getHumanResource().getEmployer().getName(),
@@ -734,8 +734,8 @@ public class JobController {
                         job.getToSalary(),
                         job.getLocation(),
                         job.getStatus(),
-                        job.getCategory().getId(),
-                        job.getCategory().getName(),
+                        job.getCategory()!=null ? job.getCategory().getId():null,
+                        job.getCategory()!=null ? job.getCategory().getName():null,
                         job.getHumanResource().getId(),
                         job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
                         job.getHumanResource().getEmployer().getName(),
@@ -817,8 +817,8 @@ public class JobController {
                         job.getToSalary(),
                         job.getLocation(),
                         job.getStatus(),
-                        job.getCategory().getId(),
-                        job.getCategory().getName(),
+                        job.getCategory()!=null ? job.getCategory().getId():null,
+                        job.getCategory()!=null ? job.getCategory().getName():null,
                         job.getHumanResource().getId(),
                         job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
                         job.getHumanResource().getEmployer().getName(),
@@ -936,8 +936,8 @@ public class JobController {
                         job.getToSalary(),
                         job.getLocation(),
                         job.getStatus(),
-                        job.getCategory().getId(),
-                        job.getCategory().getName(),
+                        job.getCategory()!=null ? job.getCategory().getId():null,
+                        job.getCategory()!=null ? job.getCategory().getName():null,
                         job.getHumanResource().getId(),
                         job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
                         job.getHumanResource().getEmployer().getName(),
@@ -1071,8 +1071,8 @@ public class JobController {
                     job.getToSalary(),
                     job.getLocation(),
                     job.getStatus(),
-                    job.getCategory().getId(),
-                    job.getCategory().getName(),
+                    job.getCategory()!=null ? job.getCategory().getId():null,
+                    job.getCategory()!=null ? job.getCategory().getName():null,
                     job.getHumanResource().getId(),
                     job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
                     job.getHumanResource().getEmployer().getName(),
@@ -1101,13 +1101,84 @@ public class JobController {
     }
 
     @Operation(summary = "update status", description = "", tags = {})
-    @PatchMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateJobStatus(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestPart EStatus status) {
+    @PatchMapping("/updateStatus-admin")
+    public ResponseEntity<BaseResponse> updateJobStatusByAdmin(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestPart EStatus status) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN)||
-                                checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR)||
-                                checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Job> optionalJob=jobService.findById(id);
+
+            if (optionalJob.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy công việc tương ứng", HttpStatus.NOT_FOUND.value(), null)
+                );
+            if(status==EStatus.DELETED)
+                return ResponseEntity.ok(
+                        new BaseResponse("Không được xóa", HttpStatus.FORBIDDEN.value(), null)
+                );
+            Job job = optionalJob.get();
+            switch (status)
+            {
+
+                case ACTIVE :
+
+                    if(job.getStatus().equals(EStatus.ACTIVE))
+                        return ResponseEntity.ok(
+                                new BaseResponse("Đã bật tuyển dụng", HttpStatus.BAD_REQUEST.value(), null)
+                        );
+                    job.setStatus(EStatus.ACTIVE);
+                    jobService.update(job);
+
+                    return ResponseEntity.ok(
+                            new BaseResponse("Bật tuyển công việc thành công", HttpStatus.OK.value(), null)
+                    );
+                case INACTIVE:
+
+                    if(job.getStatus().equals(EStatus.INACTIVE))
+                        return ResponseEntity.ok(
+                                new BaseResponse("Đã tắt tuyển dụng công việc này", HttpStatus.BAD_REQUEST.value(), null)
+                        );
+                    job.setStatus(EStatus.INACTIVE);
+                    jobService.update(job);
+
+                    return ResponseEntity.ok(
+                            new BaseResponse("Tắt tuyển dụng công việc thành công", HttpStatus.OK.value(), null));
+
+
+                default:
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
+            }
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy công việc cần duyệt!", HttpStatus.NOT_FOUND.value(), null));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }@Operation(summary = "update status", description = "", tags = {})
+    @PatchMapping("/updateStatus-employer")
+    public ResponseEntity<BaseResponse> updateJobStatusByEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestPart EStatus status) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission =
+                    checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR)||
+                    checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
             if (!permission)
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
@@ -1120,11 +1191,8 @@ public class JobController {
                 );
 
             Optional<Job> optionalJob = Optional.empty();
-            if(optionalUser.get().getRole().equals(ERole.ADMIN))
-            {
-                optionalJob=jobService.findById(id);
-            }
-            else if(optionalUser.get().getRole().equals(ERole.EMPLOYER))
+
+            if(optionalUser.get().getRole().equals(ERole.EMPLOYER))
             {
                 Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
                 if (optionalEmployer.isEmpty())
@@ -1159,21 +1227,17 @@ public class JobController {
             {
                 case PAUSED:
 
-                if(job.getStatus().equals(EStatus.PAUSED))
-                    return ResponseEntity.ok(
-                            new BaseResponse("Đang dừng tuyển dụng công việc này", HttpStatus.BAD_REQUEST.value(), null)
-                    );
-                if (optionalUser.get().getRole().equals(ERole.ADMIN))
-                    return ResponseEntity.ok(
-                            new BaseResponse("Không được dừng công việc này", HttpStatus.FORBIDDEN.value(), null)
-                    );
+                    if(job.getStatus().equals(EStatus.PAUSED))
+                        return ResponseEntity.ok(
+                                new BaseResponse("Đang dừng tuyển dụng công việc này", HttpStatus.BAD_REQUEST.value(), null)
+                        );
 
-                job.setStatus(EStatus.PAUSED);
-                jobService.update(job);
+                    job.setStatus(EStatus.PAUSED);
+                    jobService.update(job);
 
-                return ResponseEntity.ok(
-                        new BaseResponse("Dừng tuyển công việc thành công", HttpStatus.OK.value(), null)
-                );
+                    return ResponseEntity.ok(
+                            new BaseResponse("Dừng tuyển công việc thành công", HttpStatus.OK.value(), null)
+                    );
                 case ACTIVE :
 
                     if(job.getStatus().equals(EStatus.ACTIVE))
@@ -1186,29 +1250,6 @@ public class JobController {
                     return ResponseEntity.ok(
                             new BaseResponse("Bật tuyển công việc thành công", HttpStatus.OK.value(), null)
                     );
-                case INACTIVE:
-                    if(optionalUser.get().getRole().equals(ERole.EMPLOYER))
-                    {
-                        return ResponseEntity.ok(
-                                new BaseResponse("Bạn không có quyền", HttpStatus.FORBIDDEN.value(), null)
-                        );
-
-                    }
-                    if(job.getStatus().equals(EStatus.INACTIVE))
-                        return ResponseEntity.ok(
-                                new BaseResponse("Đã tắt tuyển dụng công việc này", HttpStatus.BAD_REQUEST.value(), null)
-                        );
-                    job.setStatus(EStatus.INACTIVE);
-                    jobService.update(job);
-
-                    return ResponseEntity.ok(
-                            new BaseResponse("Tắt tuyển dụng công việc thành công", HttpStatus.OK.value(), null)
-                    );
-                case PENDING:
-
-                        return ResponseEntity.ok(
-                                new BaseResponse("Không có quyền duyệt công việc này", HttpStatus.FORBIDDEN.value(), null)
-                        );
 
                 default:
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)

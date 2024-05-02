@@ -8,11 +8,13 @@ import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Employer;
+import com.pth.taskbackend.model.meta.HumanResource;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.security.UserInfoDetails;
 import com.pth.taskbackend.service.AuthService;
+import com.pth.taskbackend.service.HumanResourceService;
 import com.pth.taskbackend.util.func.CheckPermission;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpRequest;
@@ -62,7 +64,8 @@ public class AuthController {
     @Autowired
     JwtService jwtService;
     final Set<String> issuedRefreshTokens = Collections.synchronizedSet(new HashSet<>());
-
+    @Autowired
+    HumanResourceService humanResourceService;
 
     @Operation(summary = "Login/Signin", description = "", tags = {})
     @PostMapping("login")
@@ -92,27 +95,38 @@ public class AuthController {
             return ResponseEntity.ok(
                     new BaseResponse("Vui lòng đăng nhập với tài khoản ứng viên!", HttpStatus.FORBIDDEN.value(), null)
             );
-        if(authenticationRequest.role().equals(ERole.EMPLOYER) && !user.get().getRole().equals(ERole.EMPLOYER)&& !user.get().getRole().equals(ERole.HR))
+        if(authenticationRequest.role().equals(ERole.EMPLOYER) && !user.get().getRole().equals(ERole.EMPLOYER)&& !user.get().getRole().equals(ERole.HR)) {
             return ResponseEntity.ok(
                     new BaseResponse("Vui lòng đăng nhập với tài khoản nhà tuyển dụng!", HttpStatus.FORBIDDEN.value(), null)
+
             );
 
-            if(!authenticationRequest.role().equals(ERole.ADMIN)) {
-                if (user.get().getStatus().equals(EStatus.DELETED)) {
-                    return ResponseEntity.ok(
-                            new BaseResponse("Tài khoản không tồn tại!", HttpStatus.FORBIDDEN.value(), null)
-                    );
-                }
-                if (user.get().getStatus().equals(EStatus.INACTIVE)) {
-                    return ResponseEntity.ok(
-                            new BaseResponse("Tài khoản của bạn đã bị khóa!", HttpStatus.FORBIDDEN.value(), null)
-                    );
-                }
-                if (user.get().getStatus().equals(EStatus.PENDING)) {
-                    return ResponseEntity.ok(new BaseResponse("Tài khoản của bạn chưa được duyệt!", HttpStatus.FORBIDDEN.value(), null)
-                    );
-                }
+        }
+        if(user.get().getRole().equals(ERole.HR))
+        {
+            Optional<HumanResource>optionalHumanResource = humanResourceService.findByEmail(user.get().getEmail());
+             if(optionalHumanResource.isPresent()&& !optionalHumanResource.get().getEmployer().getUser().getStatus().equals(EStatus.ACTIVE)){
+                return ResponseEntity.ok(
+                        new BaseResponse("Tài khoản chủ không hoạt động!", HttpStatus.FORBIDDEN.value(), null)
+                );
             }
+        }
+        if(!authenticationRequest.role().equals(ERole.ADMIN)) {
+            if (user.get().getStatus().equals(EStatus.DELETED)) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Tài khoản không tồn tại!", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }
+            if (user.get().getStatus().equals(EStatus.INACTIVE)) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Tài khoản của bạn đã bị khóa!", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }
+            if (user.get().getStatus().equals(EStatus.PENDING)) {
+                return ResponseEntity.ok(new BaseResponse("Tài khoản của bạn chưa được duyệt!", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }
+        }
 
 
         String token = jwtService.generateToken(authenticationRequest.username(), EStatus.ACTIVE,user.get().getRole());

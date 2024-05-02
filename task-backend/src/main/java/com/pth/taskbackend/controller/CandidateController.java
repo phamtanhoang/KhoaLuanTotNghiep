@@ -837,17 +837,17 @@ public class CandidateController {
                         new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            List<Education>deleteEducations = educationService.findByCandidateId(optionalCandidate.get().getId(),Pageable.unpaged()).stream().toList();
+            List<Education>deleteEducations = educationService.findByCandidateId(optionalCandidate.get().getId(),null).stream().toList();
 
             for (Education education : deleteEducations)
                 educationService.delete(education);
+            System.out.println(request);
+            List<Education>educationList = request.educations();
 
-            List<Education>experiences = request.educationList();
-
-            for (Education education : experiences) {
+            for (Education education : educationList) {
                 education.setCandidate(optionalCandidate.get());
             }
-            educationService.save(experiences);
+            educationService.save(educationList);
 
             return ResponseEntity.ok(
                     new BaseResponse( "Thêm danh sách học vấn thành công", HttpStatus.OK.value(),null)

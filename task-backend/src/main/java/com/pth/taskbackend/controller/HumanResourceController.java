@@ -529,7 +529,6 @@ public class HumanResourceController {
                                                             @RequestParam LocalDateTime dateOfBirth,
                                                             @RequestParam(required = false) MultipartFile avatar,
                                                             @RequestParam(required = false) String password,
-
                                                             @RequestParam EStatus status) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
@@ -569,10 +568,11 @@ public class HumanResourceController {
             hr.setFirstName(firstName);
             hr.setLastName(lastName);
             hr.getUser().setEmail(username);
-
             hr.setSex(sex);
             hr.setDateOfBirth(dateOfBirth);
             hr.setPhoneNumber(phoneNumber);
+            hr.getUser().setStatus(status);
+
             humanResourceService.update(hr,avatar);
             return ResponseEntity.ok(
                     new BaseResponse( "Cập nhật thành công", HttpStatus.OK.value(), hr)
@@ -592,13 +592,8 @@ public class HumanResourceController {
     @Operation(summary = "update by token", description = "", tags = {})
     @PatchMapping("/updateProfile")
     public ResponseEntity<BaseResponse> updateHumanResourceProfile(@RequestHeader("Authorization")String token,
-                                                                   @RequestParam(required = false) String password,
-                                                                   @RequestParam String firstName,
-                                                                   @RequestParam String lastName,
-                                                                   @RequestParam ESex sex,
-                                                                   @RequestParam LocalDateTime dateOfBirth,
-                                                                   @RequestParam String phoneNumber,
-                                                                   @RequestParam(required = false) MultipartFile avatar) {
+                                                                   @RequestBody CreateHumanResourceRequest request
+                                                                 ) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
@@ -613,16 +608,12 @@ public class HumanResourceController {
                         new BaseResponse("Không tìm thấy HR ", HttpStatus.NOT_FOUND.value(), null)
                 );
             HumanResource hr = optionalHumanResource.get();
-            if(password!=null)
-                if(!passwordEncoder.matches(password,hr.getUser().getPassword())&&!password.isEmpty())
-                    hr.getUser().setPassword(passwordEncoder.encode(password));
-            hr.setFirstName(firstName);
-            hr.setLastName(lastName);
-
-            hr.setSex(sex);
-            hr.setDateOfBirth(dateOfBirth);
-            hr.setPhoneNumber(phoneNumber);
-            humanResourceService.update(hr,avatar);
+            hr.setFirstName(request.firstName());
+            hr.setLastName(request.lastName());
+            hr.setSex(request.sex());
+            hr.setDateOfBirth(request.dateOfBirth());
+            hr.setPhoneNumber(request.phoneNumber());
+            humanResourceService.update(hr,null);
             return ResponseEntity.ok(
                     new BaseResponse( "Cập nhật thành công", HttpStatus.OK.value(), hr)
             );

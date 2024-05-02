@@ -24,16 +24,15 @@ public class Experience extends BaseEntity  {
     @Column(nullable = false)
     private int sequence;
 
-    @Column(nullable = false)
-    private LocalDateTime fromDate;
+    private String fromDate;
 
 
-    private LocalDateTime toDate;
+    private String toDate;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "candidate_id")
     private Candidate candidate;
 }
