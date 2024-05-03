@@ -30,7 +30,7 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "       OR LOWER(e.name) LIKE %:keyword%)) " +
             "AND (:experience IS NULL OR :experience = '' OR j.experience = :experience) " +
             "AND (:location IS NULL OR :location = '' OR LOWER(j.location) LIKE %:location%) " +
-            "AND (:categoryId IS NULL OR :categoryId = '' OR j.category.id = :categoryId) " +
+            "AND (COALESCE(:categoryId, '') = '' OR j.category.id = :categoryId) " +
             "AND j.status = 'ACTIVE' " +
             "AND j.toDate > CURRENT_TIMESTAMP " +
             "AND (:fromDate IS NULL OR j.created >= :fromDate) " +
@@ -53,7 +53,7 @@ public interface JobRepository extends JpaRepository<Job, String> {
     @Query("SELECT j FROM Job j " +
             "WHERE (:keyword IS NULL OR " +
             "       (LOWER(j.name) LIKE %:keyword%)) " +
-            "AND (:categoryId IS NULL OR :categoryId = '' Or j.category.id = :categoryId) " +
+            "AND (COALESCE(:categoryId, '') = '' OR j.category.id = :categoryId) " +
             "AND j.status != 'DELETED' " +
             "AND (:status IS NULL OR:status = ''  OR j.status = :status) " +
             "AND j.toDate > CURRENT_TIMESTAMP " +
@@ -88,7 +88,7 @@ public interface JobRepository extends JpaRepository<Job, String> {
             Pageable pageable);
 
     @Query("SELECT j FROM Job j " +
-            "INNER JOIN j.category c " +
+            "left JOIN j.category c " +
             "WHERE (:keyword IS NULL OR " +
             "       (LOWER(j.name) LIKE %:keyword% " +
             "       OR LOWER(j.description) LIKE %:keyword% " +
@@ -112,7 +112,7 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "       OR LOWER(j.experience) LIKE %:keyword% " +
             "       OR LOWER(c.name) LIKE %:keyword%)) " +
             "AND (:status IS NULL OR :status = '' OR j.status = :status) " +
-            "AND (:categoryId IS NULL OR :categoryId = '' OR j.category.id = :categoryId) " +
+            "AND (COALESCE(:categoryId, '') = '' OR j.category.id = :categoryId) " +
             "AND j.humanResource.employer.id = :employerId " +
             "AND j.status != 'DELETED' " +
             "ORDER BY j.created DESC")
@@ -142,12 +142,13 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "AND j.status != 'DELETED'")
     Optional<Job>findByIdAndStatus(String id,EStatus status);
     @Query("SELECT j FROM Job j " +
+            "LEFT JOIN j.category c " +
             "WHERE (:keyword IS NULL OR " +
             "       (LOWER(j.name) LIKE %:keyword% " +
             "       OR LOWER(j.description) LIKE %:keyword% " +
             "       OR LOWER(j.experience) LIKE %:keyword% " +
             "       OR LOWER(j.category.name) LIKE %:keyword%)) " +
-            "AND (:categoryId IS NULL or (:categoryId = '')  OR j.category.id = :categoryId) " +
+            "AND (COALESCE(:categoryId, '') = '' OR j.category.id = :categoryId) " +
             "AND j.humanResource.employer.id = :employerId " +
             "AND  j.status !='DELETED' " +
             "ORDER BY j.created DESC")
