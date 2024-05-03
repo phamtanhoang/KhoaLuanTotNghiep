@@ -114,10 +114,15 @@ public class ApplicationController {
             if (!job.getStatus().equals(EStatus.ACTIVE))
                 return ResponseEntity.ok(new BaseResponse("Công việc đang không được tuyển ", HttpStatus.BAD_REQUEST.value(), null));
 
-            if (cVFile.isEmpty() || !Objects.equals(cVFile.getContentType(), "application/pdf"))
+            if (cVFile.isEmpty() ||
+                    (!Objects.equals(cVFile.getContentType(), "application/pdf") &&
+                            !Objects.equals(cVFile.getContentType(), "application/vnd.openxmlformats-officedocument.wordprocessingml.document") &&
+                            !Objects.equals(cVFile.getContentType(), "application/msword"))) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Chưa có nhập file hoặc định dạng file sai!!!", HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), null)
+                        new BaseResponse("Chưa có nhập file hoặc định dạng file không hợp lệ!!!", HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), null)
                 );
+            }
+
 
             if (applicationService.findByJobIdAndCandidateId(id, optionalCandidate.get().getId()).isPresent())
                 return ResponseEntity.ok(
@@ -157,7 +162,7 @@ public class ApplicationController {
     @PostMapping("/applyWithLink/{id}")
     public ResponseEntity<BaseResponse> applyJobWithOldCV(
             @RequestHeader("Authorization") String token,
-            @RequestParam("cvFile") String cVFile,
+            @RequestParam("cVFile") String cVFile,
             @RequestParam String fullName,
             @RequestParam String email,
             @RequestParam String phoneNumber,

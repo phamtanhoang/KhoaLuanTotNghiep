@@ -59,7 +59,6 @@ public class FileUploadFunc {
         String fileExtension = getFileExtension(file.getName());
         String contentType;
         if (fileExtension.equalsIgnoreCase(".pdf")) {
-
             contentType = "application/pdf";
         } else if (Arrays.asList(".jpg", ".jpeg").contains(fileExtension.toLowerCase())) {
             contentType = "image/jpeg";
@@ -67,9 +66,12 @@ public class FileUploadFunc {
             contentType = "image/png";
         } else if (fileExtension.equalsIgnoreCase(".gif")) {
             contentType = "image/gif";
+        } else if (Arrays.asList(".doc", ".docx").contains(fileExtension.toLowerCase())) {
+            contentType = "application/msword";
         } else {
             contentType = "application/octet-stream";
         }
+
         Resource resource = new ClassPathResource("/serviceAccountKey.json");
         FileInputStream serviceAccount = new FileInputStream(resource.getFile());
         Credentials credentials = GoogleCredentials.fromStream(serviceAccount);

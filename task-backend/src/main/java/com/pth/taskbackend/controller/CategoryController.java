@@ -92,8 +92,20 @@ public class CategoryController {
 
     @Operation(summary = "Get list by name", description = "", tags = {})
     @GetMapping
-    public ResponseEntity<BaseResponse> getCategories(@RequestParam(required = false) String name, Pageable pageable) {
+    public ResponseEntity<BaseResponse> getCategories(@RequestHeader("Authorization")String token, @RequestParam(required = false) String name, Pageable pageable) {
         try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy quản trị viên", HttpStatus.NOT_FOUND.value(), null)
+                );
+
             Page<Category> categories;
             if (name != null) {
                 categories = categoryService.findByNameContaining(name, pageable);
