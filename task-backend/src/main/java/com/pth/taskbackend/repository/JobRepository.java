@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -19,25 +20,32 @@ public interface JobRepository extends JpaRepository<Job, String> {
     @Query("SELECT j FROM Job j " +
             "INNER JOIN j.humanResource hr " +
             "INNER JOIN hr.employer e " +
+            "LEFT JOIN j.tags jt " +
             "WHERE (:keyword IS NULL OR " +
             "       (LOWER(j.name) LIKE %:keyword% " +
             "       OR LOWER(j.description) LIKE %:keyword% " +
-            "       OR LOWER(j.experience) LIKE %:keyword% " +
             "       OR LOWER(e.name) LIKE %:keyword%)) " +
-            "AND (:location IS NULL OR LOWER(j.location) LIKE %:location%) " +
-            "AND (:fromSalary IS NULL OR :fromSalary = '' OR j.fromSalary = :fromSalary) " +
-            "AND (:toSalary IS NULL OR :toSalary = '' OR j.toSalary = :toSalary) " +
-            "AND (:categoryId IS NULL OR :categoryId = '' Or j.category.id = :categoryId) " +
+            "AND (:experience IS NULL OR :experience = '' OR j.experience = :experience) " +
+            "AND (:location IS NULL OR :location = '' OR LOWER(j.location) LIKE %:location%) " +
+            "AND (:categoryId IS NULL OR :categoryId = '' OR j.category.id = :categoryId) " +
             "AND j.status = 'ACTIVE' " +
             "AND j.toDate > CURRENT_TIMESTAMP " +
+            "AND (:fromDate IS NULL OR j.created >= :fromDate) " +
+            "AND (:tags IS NULL OR jt.name IN (:tags)) " +
+            "AND (:isVip IS NULL OR  :isVip = false OR e IN (SELECT DISTINCT e FROM Employer e " +
+            "JOIN VipEmployer v ON e.id = v.employer.id " +
+            "WHERE DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE())) " +
             "ORDER BY j.created DESC")
     Page<Job> findBySorting(
             @Param("keyword") String keyword,
             @Param("location") String location,
-            @Param("fromSalary") String fromSalary,
-            @Param("toSalary") String toSalary,
+            @Param("experience") String experience,
+            @Param("fromDate") LocalDateTime fromDate,
             @Param("categoryId") String categoryId,
+            @Param("isVip") boolean isVip,
+            @Param("tags") List<String> tags,
             Pageable pageable);
+
 
     @Query("SELECT j FROM Job j " +
             "WHERE (:keyword IS NULL OR " +

@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface JobService {
@@ -27,7 +28,7 @@ public interface JobService {
 
     Page<Job> findAll(Pageable pageable)throws IOException;
 
-    Page<Job> searchJobs(String keyword, String address, String fromSalary, String toSalary, String categoryId , Pageable pageable)throws IOException;
+    Page<Job> searchJobs(String keyword, String address, String location, LocalDateTime fromDate, String categoryId, boolean isVip,List<String> tags, Pageable pageable) throws java.io.IOException ;
 
     Page<Job>findByKeywordAndStatusAndCategoryIdAndHRId(String keyword, EStatus status,String categoryId,String hRId,Pageable pageable)throws IOException;
     Page<Job>findByKeywordAndStatusAndCategoryIdAndEmployerId(String keyword, EStatus status,String categoryId,String employerId,Pageable pageable)throws IOException;

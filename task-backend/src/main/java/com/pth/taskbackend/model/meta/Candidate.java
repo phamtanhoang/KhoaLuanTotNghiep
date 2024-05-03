@@ -51,6 +51,7 @@ public class Candidate extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String introduction;
 
+    private String cV;
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;

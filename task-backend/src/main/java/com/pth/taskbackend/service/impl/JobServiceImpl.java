@@ -2,6 +2,7 @@ package com.pth.taskbackend.service.impl;
 
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Job;
+import com.pth.taskbackend.model.meta.Tag;
 import com.pth.taskbackend.repository.JobRepository;
 import com.pth.taskbackend.service.JobService;
 import io.jsonwebtoken.io.IOException;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -67,9 +70,12 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Page<Job> searchJobs(String keyword, String location, String fromSalary, String toSalary, String categoryId , Pageable pageable) {
-        return jobRepository.findBySorting(keyword,location,fromSalary,toSalary,categoryId,pageable);
+    public Page<Job> searchJobs(String keyword, String address, String location, LocalDateTime fromDate, String categoryId, boolean isVip, List<String> tags, Pageable pageable) throws java.io.IOException {
+       System.out.println(tags);
+        return jobRepository.findBySorting(keyword,address,location,fromDate,categoryId,isVip,tags,pageable);
     }
+
+
 
     @Override
     public Page<Job> findByKeywordAndStatusAndCategoryIdAndHRId(String keyword, EStatus status, String categoryId,String hRId, Pageable pageable) throws IOException {

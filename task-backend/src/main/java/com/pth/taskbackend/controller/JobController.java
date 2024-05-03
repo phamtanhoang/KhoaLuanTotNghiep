@@ -26,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -58,16 +59,23 @@ public class JobController {
     ProcessService processService;
     @Autowired StepService stepService;
     @Autowired TagService tagService;
+    @Autowired VipEmployerService vipEmployerService;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("")
     public ResponseEntity<BaseResponse> getJobs(@RequestParam(required = false) String keyword,
                                                 @RequestParam(required = false) String location,
-                                                @RequestParam(required = false) String fromSalary,
-                                                @RequestParam(required = false) String toSalary,
+                                                @RequestParam(required = false) String experience,
+                                                @RequestParam(required = false) Integer dateNumber,
                                                 @RequestParam(required = false) String categoryId,
+                                                @RequestParam(required = false) Boolean isVip,
+                                                @RequestParam(required = false) List<String> tags,
                                                 Pageable pageable) {
         try {
-            Page<Job> jobs = jobService.searchJobs(keyword, location, fromSalary, toSalary, categoryId, pageable);
+            LocalDateTime fromDate = null;
+            if (dateNumber != null) {
+                fromDate = LocalDateTime.now().minusDays(dateNumber);
+            }
+            Page<Job> jobs = jobService.searchJobs(keyword, location, experience, fromDate, categoryId,isVip,tags , pageable);
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
@@ -77,7 +85,7 @@ public class JobController {
                     List<StepResponse> stepResponses;
 
                     if (job.getProcess() != null) {
-                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(), Pageable.unpaged());
+                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(),null);
 
                         List<Step> stepList = steps.getContent();
 
@@ -93,9 +101,29 @@ public class JobController {
                     } else {
                         stepResponses = Collections.emptyList();
                     }
-                    List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
+                    List<com.pth.taskbackend.model.meta.Tag> tagList = tagService.findByJobId(job.getId(), null).toList();
 
+                    JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                            job.getCategory()!=null ? job.getCategory().getId():null,
+                            job.getCategory()!=null ? job.getCategory().getName():null);
 
+                    JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                            job.getHumanResource().getEmployer().getName(),
+                            job.getHumanResource().getEmployer().getId(),
+                            job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            job.getHumanResource().getEmployer().getPhoneNumber());
+
+                    JobProcessResponse jobProcessResponse = new JobProcessResponse(
+                            job.getProcess() != null ? job.getProcess().getId() : null,
+                            job.getProcess() != null ? job.getProcess().getName() : null,
+                            stepResponses
+                    );
+
+                    JobHrResponse jobHrResponse = new JobHrResponse(
+                            job.getHumanResource().getId(),
+                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
+                    );
                     return new JobResponse(
                             job.getId(),
                             job.getCreated(),
@@ -108,19 +136,14 @@ public class JobController {
                             job.getToSalary(),
                             job.getLocation(),
                             job.getStatus(),
-                            job.getCategory()!=null ? job.getCategory().getId():null,
-                            job.getCategory()!=null ? job.getCategory().getName():null,
-                            job.getHumanResource().getId(),
-                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
-                            job.getHumanResource().getEmployer().getName(),
-                            job.getHumanResource().getEmployer().getId(),
-                            job.getHumanResource().getEmployer().getUser().getEmail(),
-                            job.getHumanResource().getEmployer().getImage(),
-                            job.getHumanResource().getEmployer().getPhoneNumber(),
-                            job.getProcess() != null ? job.getProcess().getId() : null,
-                            job.getProcess() != null ? job.getProcess().getName() : null,
-                            stepResponses,
-                            tags
+                            vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
+                            false,
+                            false,
+                            categoryResponse,
+                            jobEmployerResponse,
+                            jobHrResponse,
+                            jobProcessResponse,
+                            tagList
                     );
                 }).collect(Collectors.toList());
 
@@ -175,7 +198,6 @@ public class JobController {
     @GetMapping("/getJobs-admin")
     public ResponseEntity<?> getJobsByAdmin(@RequestHeader("Authorization") String token,
                                             @RequestParam(required = false) String keyword,
-                                            @RequestParam(required = false) String categoryId,
                                             @RequestParam(required = false) EStatus status, Pageable pageable) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
@@ -196,7 +218,7 @@ public class JobController {
                         new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
                 );
 
-            Page<Job> jobs = jobService.findByNameContainingAndCategoryIdAndStatus(keyword, categoryId,status, pageable);
+            Page<Job> jobs = jobService.findByNameContainingAndCategoryIdAndStatus(keyword, null,status, pageable);
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
@@ -224,6 +246,28 @@ public class JobController {
                     List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
 
 
+                    JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                            job.getCategory()!=null ? job.getCategory().getId():null,
+                            job.getCategory()!=null ? job.getCategory().getName():null);
+
+                    JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                            job.getHumanResource().getEmployer().getName(),
+                            job.getHumanResource().getEmployer().getId(),
+                            job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            job.getHumanResource().getEmployer().getPhoneNumber());
+
+                    JobProcessResponse jobProcessResponse = new JobProcessResponse(
+                            job.getProcess() != null ? job.getProcess().getId() : null,
+                            job.getProcess() != null ? job.getProcess().getName() : null,
+                            stepResponses
+                    );
+
+                    JobHrResponse jobHrResponse = new JobHrResponse(
+                            job.getHumanResource().getId(),
+                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
+                    );
+
                     return new JobResponse(
                             job.getId(),
                             job.getCreated(),
@@ -236,18 +280,13 @@ public class JobController {
                             job.getToSalary(),
                             job.getLocation(),
                             job.getStatus(),
-                            job.getCategory()!=null ? job.getCategory().getId():null,
-                            job.getCategory()!=null ? job.getCategory().getName():null,
-                            job.getHumanResource().getId(),
-                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
-                            job.getHumanResource().getEmployer().getName(),
-                            job.getHumanResource().getEmployer().getId(),
-                            job.getHumanResource().getEmployer().getUser().getEmail(),
-                            job.getHumanResource().getEmployer().getImage(),
-                            job.getHumanResource().getEmployer().getPhoneNumber(),
-                            job.getProcess() != null ? job.getProcess().getId() : null,
-                            job.getProcess() != null ? job.getProcess().getName() : null,
-                            stepResponses,
+                            vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
+                            false,
+                            !job.getToDate().isBefore(LocalDateTime.now()),
+                            categoryResponse,
+                            jobEmployerResponse,
+                            jobHrResponse,
+                            jobProcessResponse,
                             tags
                     );
                 }).collect(Collectors.toList());
@@ -342,6 +381,28 @@ public class JobController {
                     }
                     List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
 
+                    JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                            job.getCategory()!=null ? job.getCategory().getId():null,
+                            job.getCategory()!=null ? job.getCategory().getName():null);
+
+                    JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                            job.getHumanResource().getEmployer().getName(),
+                            job.getHumanResource().getEmployer().getId(),
+                            job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            job.getHumanResource().getEmployer().getPhoneNumber());
+
+                    JobProcessResponse jobProcessResponse = new JobProcessResponse(
+                            job.getProcess() != null ? job.getProcess().getId() : null,
+                            job.getProcess() != null ? job.getProcess().getName() : null,
+                            stepResponses
+                    );
+
+                    JobHrResponse jobHrResponse = new JobHrResponse(
+                            job.getHumanResource().getId(),
+                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
+                    );
+
                     return new JobResponse(
                             job.getId(),
                             job.getCreated(),
@@ -354,18 +415,13 @@ public class JobController {
                             job.getToSalary(),
                             job.getLocation(),
                             job.getStatus(),
-                            job.getCategory()!=null ? job.getCategory().getId():null,
-                            job.getCategory()!=null ? job.getCategory().getName():null,
-                            job.getHumanResource().getId(),
-                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
-                            job.getHumanResource().getEmployer().getName(),
-                            job.getHumanResource().getEmployer().getId(),
-                            job.getHumanResource().getEmployer().getUser().getEmail(),
-                            job.getHumanResource().getEmployer().getImage(),
-                            job.getHumanResource().getEmployer().getPhoneNumber(),
-                            job.getProcess() != null ? job.getProcess().getId() : null,
-                            job.getProcess() != null ? job.getProcess().getName() : null,
-                            stepResponses,
+                            false,
+                            false,
+                            false,
+                            categoryResponse,
+                            jobEmployerResponse,
+                            jobHrResponse,
+                            jobProcessResponse,
                             tags
                     );
                 }).collect(Collectors.toList());
@@ -427,6 +483,28 @@ public class JobController {
                     }
                     List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
 
+                    JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                            job.getCategory()!=null ? job.getCategory().getId():null,
+                            job.getCategory()!=null ? job.getCategory().getName():null);
+
+                    JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                            job.getHumanResource().getEmployer().getName(),
+                            job.getHumanResource().getEmployer().getId(),
+                            job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            job.getHumanResource().getEmployer().getPhoneNumber());
+
+                    JobProcessResponse jobProcessResponse = new JobProcessResponse(
+                            job.getProcess() != null ? job.getProcess().getId() : null,
+                            job.getProcess() != null ? job.getProcess().getName() : null,
+                            stepResponses
+                    );
+
+                    JobHrResponse jobHrResponse = new JobHrResponse(
+                            job.getHumanResource().getId(),
+                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
+                    );
+
                     return new JobResponse(
                             job.getId(),
                             job.getCreated(),
@@ -439,19 +517,14 @@ public class JobController {
                             job.getToSalary(),
                             job.getLocation(),
                             job.getStatus(),
-                            job.getCategory()!=null ? job.getCategory().getId():null,
-                            job.getCategory()!=null ? job.getCategory().getName():null,
-                            job.getHumanResource().getId(),
-                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
-                            job.getHumanResource().getEmployer().getName(),
-                            job.getHumanResource().getEmployer().getId(),
-                            job.getHumanResource().getEmployer().getUser().getEmail(),
-                            job.getHumanResource().getEmployer().getImage(),
-                            job.getHumanResource().getEmployer().getPhoneNumber(),
-                            job.getProcess() != null ? job.getProcess().getId() : null,
-                            job.getProcess() != null ? job.getProcess().getName() : null,
-                            stepResponses,
-                           tags
+                            vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
+                            false,
+                            !job.getToDate().isBefore(LocalDateTime.now()),
+                            categoryResponse,
+                            jobEmployerResponse,
+                            jobHrResponse,
+                            jobProcessResponse,
+                            tags
                     );
                 }).collect(Collectors.toList());
 
@@ -541,6 +614,28 @@ public class JobController {
                     }
                     List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
 
+                    JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                            job.getCategory()!=null ? job.getCategory().getId():null,
+                            job.getCategory()!=null ? job.getCategory().getName():null);
+
+                    JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                            job.getHumanResource().getEmployer().getName(),
+                            job.getHumanResource().getEmployer().getId(),
+                            job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            job.getHumanResource().getEmployer().getPhoneNumber());
+
+                    JobProcessResponse jobProcessResponse = new JobProcessResponse(
+                            job.getProcess() != null ? job.getProcess().getId() : null,
+                            job.getProcess() != null ? job.getProcess().getName() : null,
+                            stepResponses
+                    );
+
+                    JobHrResponse jobHrResponse = new JobHrResponse(
+                            job.getHumanResource().getId(),
+                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
+                    );
+
                     return new JobResponse(
                             job.getId(),
                             job.getCreated(),
@@ -553,18 +648,13 @@ public class JobController {
                             job.getToSalary(),
                             job.getLocation(),
                             job.getStatus(),
-                            job.getCategory()!=null ? job.getCategory().getId():null,
-                            job.getCategory()!=null ? job.getCategory().getName():null,
-                            job.getHumanResource().getId(),
-                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
-                            job.getHumanResource().getEmployer().getName(),
-                            job.getHumanResource().getEmployer().getId(),
-                            job.getHumanResource().getEmployer().getUser().getEmail(),
-                            job.getHumanResource().getEmployer().getImage(),
-                            job.getHumanResource().getEmployer().getPhoneNumber(),
-                            job.getProcess() != null ? job.getProcess().getId() : null,
-                            job.getProcess() != null ? job.getProcess().getName() : null,
-                            stepResponses,
+                            vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
+                            false,
+                            !job.getToDate().isBefore(LocalDateTime.now()),
+                            categoryResponse,
+                            jobEmployerResponse,
+                            jobHrResponse,
+                            jobProcessResponse,
                             tags
                     );
                 }).collect(Collectors.toList());
@@ -619,6 +709,28 @@ public class JobController {
                 }
                 List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
 
+                JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                        job.getCategory()!=null ? job.getCategory().getId():null,
+                        job.getCategory()!=null ? job.getCategory().getName():null);
+
+                JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                        job.getHumanResource().getEmployer().getName(),
+                        job.getHumanResource().getEmployer().getId(),
+                        job.getHumanResource().getEmployer().getUser().getEmail(),
+                        job.getHumanResource().getEmployer().getImage(),
+                        job.getHumanResource().getEmployer().getPhoneNumber());
+
+                JobProcessResponse jobProcessResponse = new JobProcessResponse(
+                        job.getProcess() != null ? job.getProcess().getId() : null,
+                        job.getProcess() != null ? job.getProcess().getName() : null,
+                        stepResponses
+                );
+
+                JobHrResponse jobHrResponse = new JobHrResponse(
+                        job.getHumanResource().getId(),
+                        job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
+                );
+
                 JobResponse jobResponse = new JobResponse(
                         job.getId(),
                         job.getCreated(),
@@ -631,18 +743,13 @@ public class JobController {
                         job.getToSalary(),
                         job.getLocation(),
                         job.getStatus(),
-                        job.getCategory()!=null ? job.getCategory().getId():null,
-                        job.getCategory()!=null ? job.getCategory().getName():null,
-                        job.getHumanResource().getId(),
-                        job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
-                        job.getHumanResource().getEmployer().getName(),
-                        job.getHumanResource().getEmployer().getId(),
-                        job.getHumanResource().getEmployer().getUser().getEmail(),
-                        job.getHumanResource().getEmployer().getImage(),
-                        job.getHumanResource().getEmployer().getPhoneNumber(),
-                        job.getProcess() != null ? job.getProcess().getId() : null,
-                        job.getProcess() != null ? job.getProcess().getName() : null,
-                        stepResponses,
+                        vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
+                        false,
+                        !job.getToDate().isBefore(LocalDateTime.now()),
+                        categoryResponse,
+                        jobEmployerResponse,
+                        jobHrResponse,
+                        jobProcessResponse,
                         tags
                 );
 
@@ -722,6 +829,28 @@ public class JobController {
                 }
                 List<com.pth.taskbackend.model.meta.Tag> tags = tagService.findByJobId(job.getId(), null).toList();
 
+                JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                        job.getCategory()!=null ? job.getCategory().getId():null,
+                        job.getCategory()!=null ? job.getCategory().getName():null);
+
+                JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                        job.getHumanResource().getEmployer().getName(),
+                        job.getHumanResource().getEmployer().getId(),
+                        job.getHumanResource().getEmployer().getUser().getEmail(),
+                        job.getHumanResource().getEmployer().getImage(),
+                        job.getHumanResource().getEmployer().getPhoneNumber());
+
+                JobProcessResponse jobProcessResponse = new JobProcessResponse(
+                        job.getProcess() != null ? job.getProcess().getId() : null,
+                        job.getProcess() != null ? job.getProcess().getName() : null,
+                        stepResponses
+                );
+
+                JobHrResponse jobHrResponse = new JobHrResponse(
+                        job.getHumanResource().getId(),
+                        job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
+                );
+
                 JobResponse jobResponse = new JobResponse(
                         job.getId(),
                         job.getCreated(),
@@ -734,21 +863,15 @@ public class JobController {
                         job.getToSalary(),
                         job.getLocation(),
                         job.getStatus(),
-                        job.getCategory()!=null ? job.getCategory().getId():null,
-                        job.getCategory()!=null ? job.getCategory().getName():null,
-                        job.getHumanResource().getId(),
-                        job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
-                        job.getHumanResource().getEmployer().getName(),
-                        job.getHumanResource().getEmployer().getId(),
-                        job.getHumanResource().getEmployer().getUser().getEmail(),
-                        job.getHumanResource().getEmployer().getImage(),
-                        job.getHumanResource().getEmployer().getPhoneNumber(),
-                        job.getProcess() != null ? job.getProcess().getId() : null,
-                        job.getProcess() != null ? job.getProcess().getName() : null,
-                        stepResponses,
-                       tags
+                        vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
+                        false,
+                        !job.getToDate().isBefore(LocalDateTime.now()),
+                        categoryResponse,
+                        jobEmployerResponse,
+                        jobHrResponse,
+                        jobProcessResponse,
+                        tags
                 );
-
                 return ResponseEntity.ok(
                         new BaseResponse("Thông tin công việc", HttpStatus.OK.value(), jobResponse)
                 );
@@ -805,6 +928,28 @@ public class JobController {
 
                 List< com.pth.taskbackend.model.meta.Tag>tags = tagService.findByJobId(job.getId(),null).toList();
 
+                JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                        job.getCategory()!=null ? job.getCategory().getId():null,
+                        job.getCategory()!=null ? job.getCategory().getName():null);
+
+                JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                        job.getHumanResource().getEmployer().getName(),
+                        job.getHumanResource().getEmployer().getId(),
+                        job.getHumanResource().getEmployer().getUser().getEmail(),
+                        job.getHumanResource().getEmployer().getImage(),
+                        job.getHumanResource().getEmployer().getPhoneNumber());
+
+                JobProcessResponse jobProcessResponse = new JobProcessResponse(
+                        job.getProcess() != null ? job.getProcess().getId() : null,
+                        job.getProcess() != null ? job.getProcess().getName() : null,
+                        stepResponses
+                );
+
+                JobHrResponse jobHrResponse = new JobHrResponse(
+                        job.getHumanResource().getId(),
+                        job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
+                );
+
                 JobResponse jobResponse = new JobResponse(
                         job.getId(),
                         job.getCreated(),
@@ -817,18 +962,13 @@ public class JobController {
                         job.getToSalary(),
                         job.getLocation(),
                         job.getStatus(),
-                        job.getCategory()!=null ? job.getCategory().getId():null,
-                        job.getCategory()!=null ? job.getCategory().getName():null,
-                        job.getHumanResource().getId(),
-                        job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
-                        job.getHumanResource().getEmployer().getName(),
-                        job.getHumanResource().getEmployer().getId(),
-                        job.getHumanResource().getEmployer().getUser().getEmail(),
-                        job.getHumanResource().getEmployer().getImage(),
-                        job.getHumanResource().getEmployer().getPhoneNumber(),
-                        job.getProcess() != null ? job.getProcess().getId() : null,
-                        job.getProcess() != null ? job.getProcess().getName() : null,
-                        stepResponses,
+                        vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
+                        false,
+                        !job.getToDate().isBefore(LocalDateTime.now()),
+                        categoryResponse,
+                        jobEmployerResponse,
+                        jobHrResponse,
+                        jobProcessResponse,
                         tags
                 );
                 return ResponseEntity.ok(
@@ -860,17 +1000,12 @@ public class JobController {
                 );
 
 
-            Optional<Category> existedCategory = categoryService.findById(request.categoryId());
-            if (existedCategory.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new BaseResponse("Danh mục không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
-            }
             Job job = new Job();
             job.setName(request.name());
             job.setStatus(EStatus.PENDING);
             job.setExperience(request.experience());
             job.setDescription(request.description());
-            job.setCategory(existedCategory.get());
+            job.setCategory(categoryService.findById(request.categoryId()).isEmpty()?categoryService.findById(request.categoryId()).get():null);
             job.setFromSalary(request.fromSalary());
             job.setToSalary(request.toSalary());
             job.setToDate(request.toDate());
@@ -924,32 +1059,49 @@ public class JobController {
                     stepResponses = Collections.emptyList();
                 }
 
-                JobResponse jobResponse = new JobResponse(
-                        job.getId(),
-                        job.getCreated(),
-                        job.getUpdated(),
-                        job.getToDate(),
-                        job.getName(),
-                        job.getDescription(),
-                        job.getExperience(),
-                        job.getFromSalary(),
-                        job.getToSalary(),
-                        job.getLocation(),
-                        job.getStatus(),
-                        job.getCategory()!=null ? job.getCategory().getId():null,
-                        job.getCategory()!=null ? job.getCategory().getName():null,
-                        job.getHumanResource().getId(),
-                        job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
-                        job.getHumanResource().getEmployer().getName(),
-                        job.getHumanResource().getEmployer().getId(),
-                        job.getHumanResource().getEmployer().getUser().getEmail(),
-                        job.getHumanResource().getEmployer().getImage(),
-                        job.getHumanResource().getEmployer().getPhoneNumber(),
-                        job.getProcess() != null ? job.getProcess().getId() : null,
-                        job.getProcess() != null ? job.getProcess().getName() : null,
-                        stepResponses,
-                        job.getTags().stream().toList()
-                );
+            JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                    job.getCategory()!=null ? job.getCategory().getId():null,
+                    job.getCategory()!=null ? job.getCategory().getName():null);
+
+            JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                    job.getHumanResource().getEmployer().getName(),
+                    job.getHumanResource().getEmployer().getId(),
+                    job.getHumanResource().getEmployer().getUser().getEmail(),
+                    job.getHumanResource().getEmployer().getImage(),
+                    job.getHumanResource().getEmployer().getPhoneNumber());
+
+            JobProcessResponse jobProcessResponse = new JobProcessResponse(
+                    job.getProcess() != null ? job.getProcess().getId() : null,
+                    job.getProcess() != null ? job.getProcess().getName() : null,
+                    stepResponses
+            );
+
+            JobHrResponse jobHrResponse = new JobHrResponse(
+                    job.getHumanResource().getId(),
+                    job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
+            );
+
+            JobResponse jobResponse = new JobResponse(
+                    job.getId(),
+                    job.getCreated(),
+                    job.getUpdated(),
+                    job.getToDate(),
+                    job.getName(),
+                    job.getDescription(),
+                    job.getExperience(),
+                    job.getFromSalary(),
+                    job.getToSalary(),
+                    job.getLocation(),
+                    job.getStatus(),
+                    vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
+                    false,
+                    !job.getToDate().isBefore(LocalDateTime.now()),
+                    categoryResponse,
+                    jobEmployerResponse,
+                    jobHrResponse,
+                    jobProcessResponse,
+                    tags.stream().toList()
+            );
             return ResponseEntity.ok(
                     new BaseResponse("Tạo công việc thành công", HttpStatus.OK.value(), jobResponse)
             );
@@ -1029,15 +1181,8 @@ public class JobController {
             job.setProcess(optionalProcess.get());
 
 
-            if (request.categoryId() != null) {
-                Optional<Category> optionalCategory = categoryService.findById(request.categoryId());
-                if (optionalCategory.isPresent()) {
-                    job.setCategory(optionalCategory.get());
-                } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body(new BaseResponse("Danh mục không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
-                }
-            }
+            job.setCategory(categoryService.findById(request.categoryId()).isEmpty()?categoryService.findById(request.categoryId()).get():null);
+
 
 
             List<StepResponse> stepResponses;
@@ -1059,6 +1204,33 @@ public class JobController {
             }
             jobService.create(job);
 
+            JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                    job.getCategory()!=null ? job.getCategory().getId():null,
+                    job.getCategory()!=null ? job.getCategory().getName():null);
+
+            JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                    job.getHumanResource().getEmployer().getName(),
+                    job.getHumanResource().getEmployer().getId(),
+                    job.getHumanResource().getEmployer().getUser().getEmail(),
+                    job.getHumanResource().getEmployer().getImage(),
+                    job.getHumanResource().getEmployer().getPhoneNumber());
+
+            JobProcessResponse jobProcessResponse = new JobProcessResponse(
+                    job.getProcess() != null ? job.getProcess().getId() : null,
+                    job.getProcess() != null ? job.getProcess().getName() : null,
+                    stepResponses
+            );
+
+            JobHrResponse jobHrResponse = new JobHrResponse(
+                    job.getHumanResource().getId(),
+                    job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
+            );
+
+            Set<com.pth.taskbackend.model.meta.Tag>tags= new HashSet<>();
+            for (com.pth.taskbackend.model.meta.Tag tag:request.tags()) {
+                Optional<com.pth.taskbackend.model.meta.Tag> optional = tagService.findById(tag.getId());
+                optional.ifPresent(tags::add);
+            }
             JobResponse jobResponse = new JobResponse(
                     job.getId(),
                     job.getCreated(),
@@ -1071,19 +1243,14 @@ public class JobController {
                     job.getToSalary(),
                     job.getLocation(),
                     job.getStatus(),
-                    job.getCategory()!=null ? job.getCategory().getId():null,
-                    job.getCategory()!=null ? job.getCategory().getName():null,
-                    job.getHumanResource().getId(),
-                    job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName(),
-                    job.getHumanResource().getEmployer().getName(),
-                    job.getHumanResource().getEmployer().getId(),
-                    job.getHumanResource().getEmployer().getUser().getEmail(),
-                    job.getHumanResource().getEmployer().getImage(),
-                    job.getHumanResource().getEmployer().getPhoneNumber(),
-                    job.getProcess() != null ? job.getProcess().getId() : null,
-                    job.getProcess() != null ? job.getProcess().getName() : null,
-                    stepResponses,
-                    job.getTags().stream().toList()
+                    vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
+                    false,
+                    !job.getToDate().isBefore(LocalDateTime.now()),
+                    categoryResponse,
+                    jobEmployerResponse,
+                    jobHrResponse,
+                    jobProcessResponse,
+                    tags.stream().toList()
             );
 
             return ResponseEntity.ok(

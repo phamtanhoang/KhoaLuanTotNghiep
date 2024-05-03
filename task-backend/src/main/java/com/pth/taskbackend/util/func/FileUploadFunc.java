@@ -28,7 +28,9 @@ public class FileUploadFunc {
 
             File file = convertToFile(multipartFile, fileName);
             String uploadedFileName = uploadFile(file, fileName);
+            System.out.println(uploadedFileName);
             file.delete();
+
             return uploadedFileName;
         } catch (Exception e) {
             e.printStackTrace();
@@ -54,10 +56,10 @@ public class FileUploadFunc {
     }
 
     private String uploadFile(File file, String fileName) throws IOException {
-        String fileExtension = getFileExtension(fileName);
+        String fileExtension = getFileExtension(file.getName());
         String contentType;
-
         if (fileExtension.equalsIgnoreCase(".pdf")) {
+
             contentType = "application/pdf";
         } else if (Arrays.asList(".jpg", ".jpeg").contains(fileExtension.toLowerCase())) {
             contentType = "image/jpeg";
@@ -68,7 +70,6 @@ public class FileUploadFunc {
         } else {
             contentType = "application/octet-stream";
         }
-
         Resource resource = new ClassPathResource("/serviceAccountKey.json");
         FileInputStream serviceAccount = new FileInputStream(resource.getFile());
         Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
@@ -77,7 +78,7 @@ public class FileUploadFunc {
         BlobId blobId = BlobId.of(STORAGE_BUCKET_NAME, fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(contentType).build();
         storage.create(blobInfo, Files.readAllBytes(file.toPath()));
-
+        System.out.println(fileName+"is that true?");
         return fileName;
     }
 
@@ -101,15 +102,19 @@ public class FileUploadFunc {
         }
     }
     private File convertToFile(MultipartFile multipartFile, String fileName) throws IOException {
-        File tempFile = new File(fileName);
-        try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-            fos.write(multipartFile.getBytes());
-        }
+        String originalFileName = multipartFile.getOriginalFilename();
+        String fileExtension = getFileExtension(originalFileName);
+        File tempFile = File.createTempFile(fileName, fileExtension);
+        multipartFile.transferTo(tempFile);
+
         return tempFile;
     }
 
+
     private String getFileExtension(String fileName) {
+        System.out.println(fileName + "hello");
         int dotIndex = fileName.lastIndexOf('.');
+        System.out.println(fileName.substring(dotIndex));
         return dotIndex == -1 ? "" : fileName.substring(dotIndex);
     }
 }

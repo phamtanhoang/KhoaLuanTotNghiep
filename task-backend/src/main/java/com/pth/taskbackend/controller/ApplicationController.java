@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -80,15 +81,14 @@ public class ApplicationController {
     @Autowired
     HumanResourceService humanResourceService;
 
-    @PostMapping("/{id}")
-    public ResponseEntity<BaseResponse> applyJob(
+    @PostMapping("/applyWithCV/{id}")
+    public ResponseEntity<BaseResponse> applyJobWithNewCV(
             @RequestHeader("Authorization") String token,
             @RequestParam("cVFile") MultipartFile cVFile,
             @RequestParam String fullName,
             @RequestParam String email,
             @RequestParam String phoneNumber,
             @RequestParam(required = false) String letter,
-            @RequestParam(required = false) String collectionId,
             @PathVariable("id") String id
 
     ) {
@@ -124,27 +124,79 @@ public class ApplicationController {
                         new BaseResponse("Đã ứng tuyển vào công việc này!!!", HttpStatus.BAD_REQUEST.value(), null)
                 );
 
-            String cvPath = fileUploadFunc.uploadCV(cVFile);
+            Application application = new Application();
+            System.out.println(cVFile.getContentType());
+            String uploadCV = fileUploadFunc.uploadCV(cVFile);
+            uploadCV = fileUploadFunc.getFullImagePath(uploadCV);
+            application.setCV(uploadCV);
 
-            Collection collection;
-            if (collectionId == null) {
-                collection = new Collection();
-                collection.setCV(cvPath);
-                collection.setEmail(email);
-                collection.setLetter(letter);
-                collection.setPhoneNumber(phoneNumber);
-                collection.setFullName(fullName);
-                collection.setCandidate(optionalCandidate.get());
-                collectionService.create(collection);
+            application.setPhoneNumber(phoneNumber);
+            application.setCandidate(optionalCandidate.get());
+            application.setEmail(email);
+            application.setLetter(letter);
+            application.setStatus(EApplyStatus.PENDING);
+            application.setJob(job);
+            application.setFullName(fullName);
+            application.setCurrentStep(0);
+            applicationService.create(application);
 
-            } else {
-                Optional<Collection> optional = collectionService.findByIdAndCandidateId(collectionId, optionalCandidate.get().getId());
-                if (optional.isEmpty())
-                    return ResponseEntity.ok(new BaseResponse("Không tìm thấy thông tin", HttpStatus.NOT_FOUND.value(), null));
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Ứng tuyển công việc thành công", HttpStatus.OK.value(), application)
+            );
+
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @PostMapping("/applyWithLink/{id}")
+    public ResponseEntity<BaseResponse> applyJobWithOldCV(
+            @RequestHeader("Authorization") String token,
+            @RequestParam("cvFile") String cVFile,
+            @RequestParam String fullName,
+            @RequestParam String email,
+            @RequestParam String phoneNumber,
+            @RequestParam(required = false) String letter,
+            @PathVariable("id") String id
+
+    ) {
+
+        try {
+
+            String username = jwtService.extractUsername(token.substring(7));
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
             }
 
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(username);
+            if (optionalCandidate.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null));
+            }
+
+            Optional<Job> optionalJob = jobService.findById(id);
+            if (optionalJob.isEmpty()) {
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy công việc ", HttpStatus.NOT_FOUND.value(), null));
+            }
+            Job job = optionalJob.get();
+            if (!job.getStatus().equals(EStatus.ACTIVE))
+                return ResponseEntity.ok(new BaseResponse("Công việc đang không được tuyển ", HttpStatus.BAD_REQUEST.value(), null));
+
+
+            if (applicationService.findByJobIdAndCandidateId(id, optionalCandidate.get().getId()).isPresent())
+                return ResponseEntity.ok(
+                        new BaseResponse("Đã ứng tuyển vào công việc này!!!", HttpStatus.BAD_REQUEST.value(), null)
+                );
+
             Application application = new Application();
-            application.setCV(cvPath);
+
+            application.setCV(cVFile);
+
             application.setPhoneNumber(phoneNumber);
             application.setCandidate(optionalCandidate.get());
             application.setEmail(email);

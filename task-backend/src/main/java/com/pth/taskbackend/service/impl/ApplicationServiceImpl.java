@@ -18,6 +18,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     ApplicationRepository applicationRepository;
     @Override
     public Application create(Application application) {
+
+
         return applicationRepository.save(application);
     }
 
