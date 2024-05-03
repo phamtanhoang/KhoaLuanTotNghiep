@@ -1,4 +1,5 @@
 package com.pth.taskbackend.controller;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.pth.taskbackend.dto.request.JobRequest;
 import com.pth.taskbackend.dto.response.*;
 import com.pth.taskbackend.enums.ERole;
@@ -14,6 +15,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -61,6 +63,8 @@ public class JobController {
     @Autowired TagService tagService;
     @Autowired VipEmployerService vipEmployerService;
     @Autowired CandidateService candidateService;
+    @Autowired
+    ObjectMapper objectMapper;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("")
     public ResponseEntity<BaseResponse> getJobs(@RequestHeader(value = "Authorization",required = false)String token,
@@ -1295,7 +1299,7 @@ public class JobController {
 
     @Operation(summary = "update status", description = "", tags = {})
     @PatchMapping("/updateStatus-admin/{id}")
-    public ResponseEntity<BaseResponse> updateJobStatusByAdmin(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestPart EStatus status) {
+    public ResponseEntity<BaseResponse> updateJobStatusByAdmin(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody String status) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
@@ -1310,18 +1314,22 @@ public class JobController {
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
+            Map<String, String> jsonMap = objectMapper.readValue(status, new TypeReference<Map<String, String>>() {});
+
+            String statusValue = jsonMap.get("status");
+            EStatus statusEnum = EStatus.fromString(statusValue);
             Optional<Job> optionalJob=jobService.findById(id);
 
             if (optionalJob.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy công việc tương ứng", HttpStatus.NOT_FOUND.value(), null)
                 );
-            if(status==EStatus.DELETED)
+            if(statusEnum==EStatus.DELETED)
                 return ResponseEntity.ok(
                         new BaseResponse("Không được xóa", HttpStatus.FORBIDDEN.value(), null)
                 );
             Job job = optionalJob.get();
-            switch (status)
+            switch (statusEnum)
             {
 
                 case ACTIVE :
@@ -1366,7 +1374,7 @@ public class JobController {
         }
     }@Operation(summary = "update status", description = "", tags = {})
     @PatchMapping("/updateStatus-employer/{id}")
-    public ResponseEntity<BaseResponse> updateJobStatusByEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestPart EStatus status) {
+    public ResponseEntity<BaseResponse> updateJobStatusByEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody  String status) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission =
@@ -1383,6 +1391,10 @@ public class JobController {
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
+            Map<String, String> jsonMap = objectMapper.readValue(status, new TypeReference<Map<String, String>>() {});
+
+            String statusValue = jsonMap.get("status");
+            EStatus statusEnum = EStatus.fromString(statusValue);
             Optional<Job> optionalJob = Optional.empty();
 
             if(optionalUser.get().getRole().equals(ERole.EMPLOYER))
@@ -1411,12 +1423,12 @@ public class JobController {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy công việc tương ứng", HttpStatus.NOT_FOUND.value(), null)
                 );
-            if(status==EStatus.DELETED)
+            if(statusEnum==EStatus.DELETED)
                 return ResponseEntity.ok(
                         new BaseResponse("Không được xóa", HttpStatus.FORBIDDEN.value(), null)
                 );
             Job job = optionalJob.get();
-            switch (status)
+            switch (statusEnum)
             {
                 case PAUSED:
 
