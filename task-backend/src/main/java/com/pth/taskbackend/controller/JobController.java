@@ -94,6 +94,10 @@ public class JobController {
             if (dateNumber != null) {
                 fromDate = LocalDateTime.now().minusDays(dateNumber);
             }
+            if (isVip==null)
+            {
+                isVip=false;
+            }
             Page<Job> jobs = jobService.searchJobs(keyword, location, experience, fromDate, categoryId,isVip,tag , pageable);
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
@@ -1026,7 +1030,8 @@ public class JobController {
             job.setStatus(EStatus.PENDING);
             job.setExperience(request.experience());
             job.setDescription(request.description());
-            job.setCategory(categoryService.findById(request.categoryId()).isEmpty()?categoryService.findById(request.categoryId()).get():null);
+            System.out.println(request.categoryId()+"oke");
+            job.setCategory(request.categoryId()==null? null: categoryService.findById(request.categoryId()).isEmpty()?null:categoryService.findById(request.categoryId()).get());
             job.setFromSalary(request.fromSalary());
             job.setToSalary(request.toSalary());
             job.setToDate(request.toDate());
@@ -1131,6 +1136,7 @@ public class JobController {
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         }
         catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
@@ -1202,7 +1208,7 @@ public class JobController {
             job.setProcess(optionalProcess.get());
 
 
-            job.setCategory(categoryService.findById(request.categoryId()).isEmpty()?categoryService.findById(request.categoryId()).get():null);
+            job.setCategory(request.categoryId()==null? null: categoryService.findById(request.categoryId()).isEmpty()?null:categoryService.findById(request.categoryId()).get());
 
 
 
