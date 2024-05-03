@@ -642,7 +642,6 @@ public class JobController {
                     JobCategoryResponse categoryResponse = new JobCategoryResponse(
                             job.getCategory()!=null ? job.getCategory().getId():null,
                             job.getCategory()!=null ? job.getCategory().getName():null);
-
                     JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
                             job.getHumanResource().getEmployer().getName(),
                             job.getHumanResource().getEmployer().getId(),
@@ -1065,6 +1064,7 @@ public class JobController {
             job.setProcess(optionalProcess.get());
 
             jobService.create(job);
+
                 List<StepResponse> stepResponses;
 
                 if (job.getProcess() != null) {

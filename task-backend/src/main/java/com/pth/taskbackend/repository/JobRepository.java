@@ -69,23 +69,24 @@ public interface JobRepository extends JpaRepository<Job, String> {
     Page<Job>findByStatusOrderByCreatedDesc(EStatus status, Pageable pageable);
 
     @Query("SELECT j FROM Job j " +
-            "INNER JOIN j.category c " +
+            "left JOIN j.category c " +
             "WHERE (:keyword IS NULL OR " +
             "       (LOWER(j.name) LIKE %:keyword% " +
             "       OR LOWER(j.description) LIKE %:keyword% " +
             "       OR LOWER(j.experience) LIKE %:keyword% " +
             "       OR LOWER(c.name) LIKE %:keyword%)) " +
             "AND (:status IS NULL OR :status = '' OR j.status = :status) " +
-            "AND (:categoryId IS NULL OR :categoryId = '' OR j.category.id = :categoryId) " +
-            "And j.humanResource.id=:hRId " +
-            "AND  j.status !='DELETED' " +
+            "AND (COALESCE(:categoryId, '') = '' OR j.category.id = :categoryId) " +
+            "AND j.humanResource.id = :hRId " +
+            "AND j.status != 'DELETED' " +
             "ORDER BY j.created DESC")
     Page<Job> findByKeywordAndStatusAndCategoryIdAndHRId(
             @Param("keyword") String keyword,
             @Param("status") EStatus status,
             @Param("categoryId") String categoryId,
-            @Param("hRId")String hRId,
+            @Param("hRId") String hRId,
             Pageable pageable);
+
     @Query("SELECT j FROM Job j " +
             "INNER JOIN j.category c " +
             "WHERE (:keyword IS NULL OR " +
@@ -104,15 +105,16 @@ public interface JobRepository extends JpaRepository<Job, String> {
             Pageable pageable);
 
     @Query("SELECT j FROM Job j " +
+            "LEFT JOIN j.category c " +
             "WHERE (:keyword IS NULL OR " +
             "       (LOWER(j.name) LIKE %:keyword% " +
             "       OR LOWER(j.description) LIKE %:keyword% " +
             "       OR LOWER(j.experience) LIKE %:keyword% " +
-            "       OR LOWER(j.category.name) LIKE %:keyword%)) " +
+            "       OR LOWER(c.name) LIKE %:keyword%)) " +
             "AND (:status IS NULL OR :status = '' OR j.status = :status) " +
             "AND (:categoryId IS NULL OR :categoryId = '' OR j.category.id = :categoryId) " +
             "AND j.humanResource.employer.id = :employerId " +
-            "AND  j.status != 'DELETED' " +
+            "AND j.status != 'DELETED' " +
             "ORDER BY j.created DESC")
     Page<Job> findByKeywordAndStatusAndCategoryIdAndEmployerId(
             @Param("keyword") String keyword,
@@ -120,6 +122,7 @@ public interface JobRepository extends JpaRepository<Job, String> {
             @Param("categoryId") String categoryId,
             @Param("employerId") String employerId,
             Pageable pageable);
+
 
     @Query("SELECT j FROM Job j " +
             "WHERE j.id = :id " +
