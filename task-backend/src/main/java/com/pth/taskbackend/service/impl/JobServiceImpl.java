@@ -70,9 +70,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Page<Job> searchJobs(String keyword, String address, String location, LocalDateTime fromDate, String categoryId, boolean isVip, List<String> tags, Pageable pageable) throws java.io.IOException {
-       System.out.println(tags);
-        return jobRepository.findBySorting(keyword,address,location,fromDate,categoryId,isVip,tags,pageable);
+    public Page<Job> searchJobs(String keyword, String address, String location, LocalDateTime fromDate, String categoryId, boolean isVip, String tag, Pageable pageable) throws java.io.IOException {
+        return jobRepository.findBySorting(keyword,address,location,fromDate,categoryId,isVip,tag,pageable);
     }
 
 

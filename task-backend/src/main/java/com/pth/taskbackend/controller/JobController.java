@@ -68,14 +68,14 @@ public class JobController {
                                                 @RequestParam(required = false) Integer dateNumber,
                                                 @RequestParam(required = false) String categoryId,
                                                 @RequestParam(required = false) Boolean isVip,
-                                                @RequestParam(required = false) List<String> tags,
+                                                @RequestParam(required = false) String tag,
                                                 Pageable pageable) {
         try {
             LocalDateTime fromDate = null;
             if (dateNumber != null) {
                 fromDate = LocalDateTime.now().minusDays(dateNumber);
             }
-            Page<Job> jobs = jobService.searchJobs(keyword, location, experience, fromDate, categoryId,isVip,tags , pageable);
+            Page<Job> jobs = jobService.searchJobs(keyword, location, experience, fromDate, categoryId,isVip,tag , pageable);
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)

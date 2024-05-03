@@ -31,7 +31,7 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "AND j.status = 'ACTIVE' " +
             "AND j.toDate > CURRENT_TIMESTAMP " +
             "AND (:fromDate IS NULL OR j.created >= :fromDate) " +
-            "AND (:tags IS NULL OR jt.name IN (:tags)) " +
+            "AND (:tag IS NULL OR :tag = '' OR jt.name = :tag) " +
             "AND (:isVip IS NULL OR  :isVip = false OR e IN (SELECT DISTINCT e FROM Employer e " +
             "JOIN VipEmployer v ON e.id = v.employer.id " +
             "WHERE DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE())) " +
@@ -43,7 +43,7 @@ public interface JobRepository extends JpaRepository<Job, String> {
             @Param("fromDate") LocalDateTime fromDate,
             @Param("categoryId") String categoryId,
             @Param("isVip") boolean isVip,
-            @Param("tags") List<String> tags,
+            @Param("tag") String tag,
             Pageable pageable);
 
 

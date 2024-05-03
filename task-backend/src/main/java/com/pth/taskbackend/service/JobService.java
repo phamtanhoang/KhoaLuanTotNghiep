@@ -28,7 +28,7 @@ public interface JobService {
 
     Page<Job> findAll(Pageable pageable)throws IOException;
 
-    Page<Job> searchJobs(String keyword, String address, String location, LocalDateTime fromDate, String categoryId, boolean isVip,List<String> tags, Pageable pageable) throws java.io.IOException ;
+    Page<Job> searchJobs(String keyword, String address, String location, LocalDateTime fromDate, String categoryId, boolean isVip,String tag, Pageable pageable) throws java.io.IOException ;
 
     Page<Job>findByKeywordAndStatusAndCategoryIdAndHRId(String keyword, EStatus status,String categoryId,String hRId,Pageable pageable)throws IOException;
     Page<Job>findByKeywordAndStatusAndCategoryIdAndEmployerId(String keyword, EStatus status,String categoryId,String employerId,Pageable pageable)throws IOException;
