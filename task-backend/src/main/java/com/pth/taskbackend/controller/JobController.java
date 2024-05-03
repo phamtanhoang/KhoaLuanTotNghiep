@@ -60,9 +60,11 @@ public class JobController {
     @Autowired StepService stepService;
     @Autowired TagService tagService;
     @Autowired VipEmployerService vipEmployerService;
+    @Autowired CandidateService candidateService;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("")
-    public ResponseEntity<BaseResponse> getJobs(@RequestParam(required = false) String keyword,
+    public ResponseEntity<BaseResponse> getJobs(@RequestHeader(value = "Authorization",required = false)String token,
+                                                @RequestParam(required = false) String keyword,
                                                 @RequestParam(required = false) String location,
                                                 @RequestParam(required = false) String experience,
                                                 @RequestParam(required = false) Integer dateNumber,
@@ -71,6 +73,23 @@ public class JobController {
                                                 @RequestParam(required = false) String tag,
                                                 Pageable pageable) {
         try {
+            Optional<Candidate> optionalCandidate;
+                if(token!=null) {
+                    String email = jwtService.extractUsername(token.substring(7));
+                    boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+                    if (!permission)
+                        return ResponseEntity.ok(
+                                new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                        );
+
+                    optionalCandidate = candidateService.findByUserEmail(email);
+                    if (optionalCandidate.isEmpty())
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                } else {
+                    optionalCandidate = null;
+                }
             LocalDateTime fromDate = null;
             if (dateNumber != null) {
                 fromDate = LocalDateTime.now().minusDays(dateNumber);
@@ -124,6 +143,8 @@ public class JobController {
                             job.getHumanResource().getId(),
                             job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
                     );
+
+
                     return new JobResponse(
                             job.getId(),
                             job.getCreated(),
@@ -137,7 +158,7 @@ public class JobController {
                             job.getLocation(),
                             job.getStatus(),
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                            false,
+                            token != null && (optionalCandidate.isEmpty() ? false : jobService.findByCandidateIdAndJobId(optionalCandidate.get().getId(), job.getId()).isPresent()),
                             false,
                             categoryResponse,
                             jobEmployerResponse,

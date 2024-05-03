@@ -7,6 +7,7 @@ import com.pth.taskbackend.model.meta.Job;
 import com.pth.taskbackend.model.meta.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -49,5 +50,11 @@ public interface JobService {
 
 
     Long countAll()throws IOException;
+
+    Page<Job> findByCandidateId(String candidateId, Pageable pageable);
+    Optional<Job> findByCandidateIdAndJobId(String candidateId,String jobId);
+    void deleteSavedJobByJobIdAndCandidateId( String jobId,String candidateId);
+
+    void saveJob( String jobId,  String candidateId);
 
 }

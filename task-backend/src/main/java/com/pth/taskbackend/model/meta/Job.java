@@ -1,6 +1,7 @@
 package com.pth.taskbackend.model.meta;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -67,4 +68,13 @@ public class Job  extends BaseEntity {
     @JoinColumn(name = "process_id")
     private Process process;
 
+
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            },
+            mappedBy = "jobs")
+    @JsonIgnore
+    private Set<Candidate> candidates = new HashSet<>();
 }

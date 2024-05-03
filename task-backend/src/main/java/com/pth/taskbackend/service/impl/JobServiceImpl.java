@@ -142,4 +142,24 @@ public class JobServiceImpl implements JobService {
     public Long countAll() throws IOException {
         return jobRepository.countAll();
     }
+
+    @Override
+    public Page<Job> findByCandidateId(String candidateId, Pageable pageable) {
+        return  jobRepository.findByCandidateId(candidateId,pageable);
+    }
+
+    @Override
+    public Optional<Job> findByCandidateIdAndJobId(String candidateId, String jobId) {
+        return jobRepository.findByCandidateIdAndJobId(candidateId,jobId);
+    }
+
+    @Override
+    public void deleteSavedJobByJobIdAndCandidateId(String jobId, String candidateId) {
+        jobRepository.deleteSavedJobByJobIdAndCandidateId(jobId,candidateId);
+    }
+
+    @Override
+    public void saveJob(String jobId, String candidateId) {
+        jobRepository.saveJob(jobId,candidateId);
+    }
 }

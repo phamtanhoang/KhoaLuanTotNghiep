@@ -65,5 +65,15 @@ public class Candidate extends BaseEntity {
     @OneToMany(mappedBy = "education", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Education> educations = new HashSet<>();
 
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "saved_job",
+            joinColumns = @JoinColumn(name = "candidate_id"),
+            inverseJoinColumns = @JoinColumn(name = "job_id")
+    )
+    private Set<Job> jobs = new HashSet<>();
+
+
 }
 
