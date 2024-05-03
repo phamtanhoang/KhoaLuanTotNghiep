@@ -1,5 +1,5 @@
 package com.pth.taskbackend.dto.response;
 
-public record JobCategoryResponse(   String categoryId,
-                                     String categoryName) {
+public record JobCategoryResponse(   String id,
+                                     String name) {
 }

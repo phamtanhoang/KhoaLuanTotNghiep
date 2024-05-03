@@ -1065,7 +1065,6 @@ public class JobController {
             job.setProcess(optionalProcess.get());
 
             jobService.create(job);
-
                 List<StepResponse> stepResponses;
 
                 if (job.getProcess() != null) {
@@ -1295,7 +1294,7 @@ public class JobController {
     }
 
     @Operation(summary = "update status", description = "", tags = {})
-    @PatchMapping("/updateStatus-admin")
+    @PatchMapping("/updateStatus-admin/{id}")
     public ResponseEntity<BaseResponse> updateJobStatusByAdmin(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestPart EStatus status) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
@@ -1366,7 +1365,7 @@ public class JobController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }@Operation(summary = "update status", description = "", tags = {})
-    @PatchMapping("/updateStatus-employer")
+    @PatchMapping("/updateStatus-employer/{id}")
     public ResponseEntity<BaseResponse> updateJobStatusByEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestPart EStatus status) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
