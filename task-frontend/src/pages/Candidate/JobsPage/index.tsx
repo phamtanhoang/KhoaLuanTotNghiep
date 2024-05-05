@@ -35,10 +35,12 @@ const JobsPage: React.FC = () => {
 
   const [name, setName] = useState<string>(state?.name || "");
   const [location, setLocation] = useState<string>(state?.location || "");
-  const [fromSalary, setFromSalary] = useState<string>("");
-  const [toSalary, setToSalary] = useState<string>("");
-  const [category, setCategory] = useState<string>("");
-  const [experience, setExperience] = useState<string>("");
+
+  const [category, setCategory] = useState<string | null>(null);
+  const [tag, setTag] = useState<string | null>(null);
+  const [experience, setExperience] = useState<string | null>(null);
+  const [dateSubmit, setDateSubmit] = useState<string | null>(null);
+  const [type, setType] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
@@ -68,10 +70,12 @@ const JobsPage: React.FC = () => {
       .getList_Public(
         name,
         location,
-        fromSalary,
-        toSalary,
-        category,
-        currentPage - 1,
+        category || "",
+        tag || "",
+        dateSubmit || "",
+        experience || "",
+        type || "",
+        currentPage,
         itemPerPage
       )
       .then((res) => {
@@ -98,7 +102,16 @@ const JobsPage: React.FC = () => {
   }, []);
   useEffect(() => {
     fetchListData();
-  }, [name, location, currentPage]);
+  }, [
+    name,
+    location,
+    currentPage,
+    experience,
+    category,
+    tag,
+    type,
+    dateSubmit,
+  ]);
 
   const _onClickApplyJob = (id: string) => {
     setId(id);
@@ -118,12 +131,23 @@ const JobsPage: React.FC = () => {
 
   return (
     <>
-      <ModalBase id={id} open={open} handleClose={handleClose} funcs={funcs} />
+      <ModalBase
+        id={id}
+        fetchData={fetchSingleData}
+        open={open}
+        handleClose={handleClose}
+        funcs={funcs}
+      />
       <SearchJob
         name={name}
         setName={setName}
         location={location}
         setLocation={setLocation}
+        setCategory={setCategory}
+        setDateSubmit={setDateSubmit}
+        setExperience={setExperience}
+        setTag={setTag}
+        setType={setType}
       />
       <section className="pb-10 pt-8 ">
         {isLoading ? (
@@ -144,12 +168,13 @@ const JobsPage: React.FC = () => {
                     <JobDetailCard
                       id={job?.id}
                       name={job?.name}
-                      employerName={job?.employerName}
-                      employerId={job?.employerId}
+                      status={job?.status}
+                      employerName={job?.employer?.name}
+                      employerId={job?.employer?.id}
                       fromDate={DateHelper.formatDate(job?.fromDate)}
                       toDate={DateHelper.formatDate(job?.toDate)}
-                      category={job?.categoryName|| "Khác"}
-                      image={job?.employerAvatar}
+                      category={job?.category?.name || "Khác"}
+                      image={job?.employer?.image}
                       experience={job?.experience}
                       salary={TextHelper.SalaryText(
                         job?.fromSalary,
@@ -178,10 +203,10 @@ const JobsPage: React.FC = () => {
                       >
                         <JobCard
                           id={item?.id}
-                          image={item?.employerAvatar}
+                          image={item?.employer?.image}
                           name={item?.name}
                           dateline={DateHelper.formatDate(job?.toDate)}
-                          employer={item?.employerName}
+                          employer={item?.employer?.name}
                           location={item?.location}
                           salary={TextHelper.SalaryText(
                             item?.fromSalary,

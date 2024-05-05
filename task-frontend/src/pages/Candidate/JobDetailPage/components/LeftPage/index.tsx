@@ -11,9 +11,11 @@ import parse from "html-react-parser";
 import { IoWarning } from "react-icons/io5";
 import { AuthHelper } from "@/utils/helpers";
 import { FaInfoCircle } from "react-icons/fa";
+import { DataConstants } from "@/utils/constants";
 interface LeftPageCardProps {
   id: string;
   image?: string;
+  status?: string;
   name?: string;
   employer?: string;
   category?: string;
@@ -34,9 +36,9 @@ interface LeftPageCardProps {
 }
 
 const LeftPage: React.FC<LeftPageCardProps> = ({
-  id,
   image,
   name,
+  status,
   employer,
   salary,
   experience,
@@ -110,6 +112,16 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
                       &nbsp;để ứng tuyển!
                     </div>
                   </div>
+                ) : status == DataConstants.STATUS_DATA.PAUSED ? (
+                  <div
+                    className="flex gap-2 bg-red-100 rounded px-4 py-2 text-sm text-red-700 w-full mt-2.5 max-lg:hidden"
+                    role="alert"
+                  >
+                    <IoWarning className="text-xl" />
+                    <div className="font-medium">
+                      Công việc đã ngưng tuyển dụng!
+                    </div>
+                  </div>
                 ) : isTimeUp ? (
                   <div
                     className="flex gap-2 bg-red-100 rounded px-4 py-2 text-sm text-red-700 w-full mt-2.5 max-lg:hidden"
@@ -139,7 +151,7 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
                         Ứng tuyển ngay
                       </span>
                     </button>
-                    {!isSaved ? (
+                    {isSaved ? (
                       <button
                         className="font-medium bg-transparent text-orangetext hover:text-orange-500 border-2 border-orangetext hover:border-orange-500 w-full lg:w-[35%] py-[6px] px-4 rounded flex  justify-center items-center min-w-max"
                         onClick={() => _onClickUnSaveJob()}

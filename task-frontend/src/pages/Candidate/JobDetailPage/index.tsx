@@ -19,7 +19,6 @@ const JobDetailPage = () => {
   const handleClose = () => setOpen(false);
 
   const [job, setJob] = useState<JobModel>();
-  const [employer, setEmployer] = useState<EmployerModel>();
   const [steps, setSteps] = useState<StepModel[]>([]);
   const [tags, setTags] = useState<TagModel[]>([]);
 
@@ -44,8 +43,8 @@ const JobDetailPage = () => {
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           setJob(res.data.Data);
-          setSteps(res.data.Data.steps);
           setTags(res.data.Data.tags);
+          setSteps(res.data.Data.process?.steps);
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -73,9 +72,10 @@ const JobDetailPage = () => {
           <div className="w-full lg:w-8/12 flex flex-col mx-auto">
             <LeftPage
               id={job?.id!}
-              image={job?.employerAvartar}
-              employer={job?.employerName}
-              category={job?.categoryName || "Khác"}
+              image={job?.employer?.image}
+              status={job?.status}
+              employer={job?.employer?.name}
+              category={job?.category?.name || "Khác"}
               name={job?.name}
               description={job?.description}
               experience={job?.experience}
@@ -84,6 +84,9 @@ const JobDetailPage = () => {
               location={job?.location}
               salary={TextHelper.SalaryText(job?.fromSalary, job?.toSalary)}
               isVip={job?.isVip}
+              isSaved={job?.isSave}
+              isApplied={job?.isApply}
+              isTimeUp={job?.isTimeUp}
               _onClickApplyJob={_onClickApplyJob}
               _onClickSaveJob={_onClickSaveJob}
               _onClickLogin={_onClickLogin}
@@ -92,9 +95,10 @@ const JobDetailPage = () => {
           </div>
           <div className="w-full lg:w-4/12 lg:flex flex-col gap-5">
             <RightPage
-              employer={job?.employerName}
-              location={job?.employerLocation}
-              description={job?.employerDescription}
+              id={job?.employer?.id}
+              employer={job?.employer?.name}
+              email={job?.employer?.email}
+              phoneNumber={job?.employer?.phoneNumber}
               steps={steps}
               tags={tags}
             />

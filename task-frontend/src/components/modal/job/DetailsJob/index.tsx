@@ -4,11 +4,10 @@ import { AiOutlineClose } from "react-icons/ai";
 import { IoMdExit } from "react-icons/io";
 import { SelectCustom, TextEditor } from "@/components/form";
 import { ConfigSelect } from "@/configs/selectConfig";
-import { SwalHelper } from "@/utils/helpers/swalHelper";
-import { AuthHelper } from "@/utils/helpers/authHelper";
+import { SwalHelper, AuthHelper } from "@/utils/helpers";
 import { jobsService } from "@/services";
 import { DateHelper } from "@/utils/helpers/dateHelper";
-import { MdOutlinePauseCircle, MdOutlineTimer } from "react-icons/md";
+import { MdOutlinePauseCircle } from "react-icons/md";
 import { DataConstants } from "@/utils/constants/dataConstants";
 
 const DetailsJob = (props: any) => {
@@ -37,14 +36,18 @@ const DetailsJob = (props: any) => {
       });
   }, []);
 
-  const tagOptions =
-    job?.tags?.map((item) => ({ ...item, value: item.id, label: item.name })) ||
-    [];
+  const tagOptions = Array.isArray(job?.tags)
+    ? job.tags.map((item: TagModel) => ({
+        ...item,
+        value: item.id,
+        label: item.name,
+      }))
+    : [];
 
   const _onClickUpdateStatus = (status: string) => {
     context.handleOpenLoading();
     jobsService
-      .updateStatus(id, status)
+      .updateStatus_Employer(id, status)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           handleClose();
@@ -112,8 +115,8 @@ const DetailsJob = (props: any) => {
                 </label>
                 <input
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
-                  type="date"
-                  value={DateHelper.convertDate(job?.created)}
+                  type="text"
+                  value={DateHelper.formatDateTime(job?.created)}
                   disabled
                 />
               </div>
@@ -123,8 +126,8 @@ const DetailsJob = (props: any) => {
                 </label>
                 <input
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
-                  type="date"
-                  value={DateHelper.convertDate(job?.toDate)}
+                  type="text"
+                  value={DateHelper.formatDateTime(new Date(job?.toDate!))}
                   disabled
                 />
               </div>
@@ -149,7 +152,7 @@ const DetailsJob = (props: any) => {
                   <input
                     className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext text-sm"
                     type="text"
-                    value={job?.hrName}
+                    value={job?.humanResource?.name}
                     disabled
                   />
                 </div>
@@ -204,7 +207,7 @@ const DetailsJob = (props: any) => {
                 <input
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext text-sm"
                   type="text"
-                  value={job?.categoryName || "Khác"}
+                  value={job?.category?.name || "Khác"}
                   disabled
                 />
               </div>
@@ -215,7 +218,7 @@ const DetailsJob = (props: any) => {
                 <input
                   className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext text-sm"
                   type="text"
-                  value={job?.processName}
+                  value={job?.process?.name}
                   disabled
                 />
               </div>
@@ -252,14 +255,6 @@ const DetailsJob = (props: any) => {
         </div>
 
         <div className="flex justify-end gap-4 px-4 py-3 border-t">
-          <button
-            className="flex items-center gap-2 w-max h-max px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-500/85 font-medium"
-            // onClick={_onClickSave}
-          >
-            <MdOutlineTimer className="text-xl" />
-            <p>Gia hạn</p>
-          </button>
-
           {job?.status == DataConstants.STATUS_DATA.PAUSED && (
             <button
               className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-500/85 font-medium"

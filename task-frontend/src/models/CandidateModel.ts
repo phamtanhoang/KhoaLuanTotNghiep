@@ -15,4 +15,6 @@ interface CandidateModel {
   email?: string;
   userId?: string;
   isVip?: boolean;
+  isFindJob?: boolean;
+  cv?: string;
 }

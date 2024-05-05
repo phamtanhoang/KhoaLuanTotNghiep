@@ -2,7 +2,7 @@ import { LoadingContext } from "@/App";
 import BANNER_SEARCH from "@/assets/images/banner-search.png";
 import { SelectCustom } from "@/components/form";
 import { ConfigSelect } from "@/configs/selectConfig";
-import { categoriesService } from "@/services";
+import { categoriesService, tagsService } from "@/services";
 import { DataConstants } from "@/utils/constants/dataConstants";
 import { SelectHelper } from "@/utils/helpers/selectHelper";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
@@ -19,27 +19,21 @@ interface SearchJobProps {
   setName?: any;
   location?: string;
   setLocation?: any;
-  category?: string;
-  setCategory?: () => void;
-  experience?: string;
-  setExperience?: () => void;
-  dateSubmit?: string;
-  setDateSubmit?: () => void;
-  type?: string;
-  setType?: () => void;
+  setCategory?: any;
+  setTag?: any;
+  setExperience?: any;
+  setDateSubmit?: any;
+  setType?: any;
 }
 const SearchJob: React.FC<SearchJobProps> = ({
   name,
   setName,
-  category,
-  setCategory,
-  dateSubmit,
-  setDateSubmit,
-  experience,
-  setExperience,
   location,
   setLocation,
-  type,
+  setCategory,
+  setTag,
+  setDateSubmit,
+  setExperience,
   setType,
 }) => {
   const context = useContext(LoadingContext);
@@ -48,43 +42,63 @@ const SearchJob: React.FC<SearchJobProps> = ({
   const [tempName, setTempName] = useState<string>(name || "");
   const [tempLocation, setTempLocation] = useState<string>(location || "");
   const [tempCategory, setTempCategory] = useState<string | null>(null);
+  const [tempTag, setTempTag] = useState<string | null>(null);
   const [tempExperience, setTempExperience] = useState<string | null>(null);
   const [tempDateSubmit, setTempDateSubmit] = useState<string | null>(null);
-  const [tempType, setTempType] = useState<boolean | null>(null);
+  const [tempType, setTempType] = useState<string | null>(null);
   const [categories, setCategories] = useState<CategoryModel[]>([
     { id: "", name: "Tất cả ngành nghề" },
   ]);
+  const [tags, setTags] = useState<TagModel[]>([
+    { id: "", name: "Tất cả nhãn" },
+  ]);
 
   const _onClickHideFilter = () => {
+    if (hideFilter == true) {
+      setTempCategory(null);
+      setTempTag(null);
+      setTempExperience(null);
+      setTempDateSubmit(null);
+      setTempType(null);
+    }
     setHideFilter(!hideFilter);
   };
 
-  const fetchCategories = async () => {
-    context.handleOpenLoading();
-    await categoriesService
+  const _onClickSearch = () => {
+    setName(tempName);
+    setLocation(tempLocation);
+    setCategory(tempCategory);
+    setExperience(tempExperience);
+    setTag(tempTag);
+    setType(tempType);
+    setDateSubmit(tempDateSubmit);
+  };
+
+  const fetchDropdownData = (service: any, setState: any, state: any) => {
+    return service
       .getList_Dropdown()
       .then((res: any) => {
         if (res.status === 200 && res.data.Status === 200) {
-          setCategories([...categories, ...res.data.Data]);
+          setState([...state, ...res.data.Data]);
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
       })
       .catch(() => {
         SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-      })
-      .finally(() => {
-        context.handleCloseLoading();
       });
   };
 
-  const _onClickSearch = () => {
-    setName(tempName);
-    setLocation(tempLocation);
-  };
-
   useEffect(() => {
-    fetchCategories();
+    context.handleOpenLoading();
+    const fetchTasks = [];
+    fetchTasks.push(
+      fetchDropdownData(categoriesService, setCategories, categories)
+    );
+    fetchTasks.push(fetchDropdownData(tagsService, setTags, tags));
+    Promise.all(fetchTasks).finally(() => {
+      context.handleCloseLoading();
+    });
   }, []);
 
   return (
@@ -142,14 +156,13 @@ const SearchJob: React.FC<SearchJobProps> = ({
 
           {hideFilter && (
             <>
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 border border-white p-2 rounded transition-all duration-300">
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-2 lg:gap-1.5 border border-white p-1.5 rounded transition-all duration-300">
                 <div className="content-center w-full">
                   <SelectCustom
-                    className={"mt-1"}
                     value={
-                      category || category == ""
+                      tempCategory || tempCategory == ""
                         ? SelectHelper.findOptionByCategoryId(
-                            category,
+                            tempCategory,
                             categories
                           )
                         : null
@@ -157,55 +170,66 @@ const SearchJob: React.FC<SearchJobProps> = ({
                     options={SelectHelper.convertCategoriesToOptions(
                       categories
                     )}
-                    // onChange={(e: any) => setCategory(e ? e.value : null)}
+                    onChange={(e: any) => setTempCategory(e ? e.value : null)}
                     isMulti={false}
-                    placeholder="--- Chọn ngành nghề ---"
+                    placeholder="Chọn ngành nghề..."
                     theme={ConfigSelect.customTheme}
                   />
                 </div>
                 <div className="content-center w-full">
                   <SelectCustom
-                    className={"mt-1"}
+                    value={
+                      tempTag || tempTag == ""
+                        ? SelectHelper.findOptionByTagId(tempTag, tags)
+                        : null
+                    }
+                    options={SelectHelper.convertTagsToOptions(tags)}
+                    onChange={(e: any) => setTempTag(e ? e.value : null)}
+                    isMulti={false}
+                    placeholder="Chọn nhãn..."
+                    theme={ConfigSelect.customTheme}
+                  />
+                </div>
+                <div className="content-center w-full">
+                  <SelectCustom
                     value={
                       DataConstants.EXPERIENCE_DROPDOWN.find(
-                        (item) => item.value == experience
+                        (item) => item.value == tempExperience
                       ) || null
                     }
                     options={DataConstants.EXPERIENCE_DROPDOWN}
-                    // onChange={(e: any) => setExperience(e ? e.value : null)}
+                    onChange={(e: any) => setTempExperience(e ? e.value : null)}
                     isMulti={false}
-                    placeholder="--- Chọn kinh nghiệm ---"
+                    placeholder="Chọn kinh nghiệm..."
                     theme={ConfigSelect.customTheme}
                   />
                 </div>
 
                 <div className="content-center w-full">
                   <SelectCustom
-                    className={"mt-1"}
                     value={
                       DataConstants.DATESUBMIT_DROPDOWN.find(
-                        (item) => item.value == dateSubmit
+                        (item) => item.value == tempDateSubmit
                       ) || null
                     }
                     options={DataConstants.DATESUBMIT_DROPDOWN}
-                    // onChange={(e: any) => setDateSubmit(e ? e.value : null)}
+                    onChange={(e: any) => setTempDateSubmit(e ? e.value : null)}
                     isMulti={false}
-                    placeholder="--- Chọn ngày đăng ---"
+                    placeholder="Chọn ngày đăng..."
                     theme={ConfigSelect.customTheme}
                   />
                 </div>
                 <div className="content-center w-full">
                   <SelectCustom
-                    className={"mt-1"}
                     value={
                       DataConstants.TYPEJOB_DROPDOWN.find(
-                        (item) => item.value == type
+                        (item) => item.value == tempType
                       ) || null
                     }
                     options={DataConstants.TYPEJOB_DROPDOWN}
-                    // onChange={(e: any) => setType(e ? e.value : null)}
+                    onChange={(e: any) => setTempType(e ? e.value : null)}
                     isMulti={false}
-                    placeholder="--- Chọn loại tin ---"
+                    placeholder="Chọn loại tin..."
                     theme={ConfigSelect.customTheme}
                   />
                 </div>

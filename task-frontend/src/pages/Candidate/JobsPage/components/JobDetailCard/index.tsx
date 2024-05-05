@@ -3,12 +3,13 @@ import NONE_USER from "@/assets/images/non-user.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import parse from "html-react-parser";
 import { AuthHelper, TextHelper } from "@/utils/helpers";
-import { PathConstants } from "@/utils/constants";
+import { DataConstants, PathConstants } from "@/utils/constants";
 import { IoWarning } from "react-icons/io5";
 import { FaInfoCircle } from "react-icons/fa";
 interface JobDetailCardProps {
   id: string;
   image?: string;
+  status?: string;
   name?: string;
   employerName?: string;
   employerId?: string;
@@ -23,8 +24,8 @@ interface JobDetailCardProps {
   totalStep?: number;
   isLoading?: boolean;
   isTimeUp?: boolean;
-  isApplied?: boolean;
-  isSaved?: boolean;
+  isApply?: boolean;
+  isSave?: boolean;
   _onClickApplyJob: (id: string) => void;
   _onClickSaveJob: (id: string) => void;
   _onClickUnSaveJob: (id: string) => void;
@@ -34,6 +35,7 @@ interface JobDetailCardProps {
 const JobDetailCard: React.FC<JobDetailCardProps> = ({
   id,
   image,
+  status,
   name,
   employerName,
   employerId,
@@ -52,8 +54,8 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
   _onClickLogin,
   isLoading,
   isTimeUp,
-  isApplied,
-  isSaved,
+  isApply,
+  isSave,
 }) => {
   const navigate = useNavigate();
 
@@ -103,6 +105,16 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
                         &nbsp;để ứng tuyển!
                       </div>
                     </div>
+                  ) : status == DataConstants.STATUS_DATA.PAUSED ? (
+                    <div
+                      className="flex gap-2 bg-red-100 rounded px-4 py-2 text-sm text-red-700 w-full"
+                      role="alert"
+                    >
+                      <IoWarning className="text-xl" />
+                      <div className="font-medium">
+                        Công việc đã ngưng tuyển dụng!
+                      </div>
+                    </div>
                   ) : isTimeUp ? (
                     <div
                       className="flex gap-2 bg-red-100 rounded px-4 py-2 text-sm text-red-700 w-full"
@@ -111,7 +123,7 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
                       <IoWarning className="text-xl" />
                       <div className="font-medium">Công việc đã hết hạn!</div>
                     </div>
-                  ) : isApplied ? (
+                  ) : isApply ? (
                     <div
                       className="flex gap-2 bg-blue-100 rounded px-4 py-2 text-sm text-blue-700 w-full"
                       role="alert"
@@ -132,7 +144,7 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
                           Ứng tuyển ngay
                         </span>
                       </button>
-                      {isSaved ? (
+                      {isSave ? (
                         <button
                           className="font-medium bg-transparent text-orangetext hover:text-orange-500 border-2 border-orangetext hover:border-orange-500 w-full lg:w-[35%] py-[6px] px-4 rounded flex  justify-center items-center min-w-max"
                           onClick={() => _onClickUnSaveJob(id)}

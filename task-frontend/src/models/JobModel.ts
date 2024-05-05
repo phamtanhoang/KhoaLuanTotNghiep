@@ -14,8 +14,12 @@ interface JobModel {
   hrId?: string;
   employerId?: string;
   isVip?: boolean;
+  isSave?: boolean;
   isTimeUp?: boolean;
-  isApplied?: boolean;
-  isSaved?: boolean;
-  processId?: string;
+  isApply?: boolean;
+  category?: CategoryModel;
+  employer?: EmployerModel;
+  humanResource?: HumanResourceModel;
+  process?: ProcedureModel;
+  tags?: TagModel;
 }

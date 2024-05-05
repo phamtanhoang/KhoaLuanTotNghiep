@@ -4,17 +4,22 @@ import { IoLocationOutline } from "react-icons/io5";
 import { MdOutlineAttachMoney } from "react-icons/md";
 import { RiVipCrown2Line } from "react-icons/ri";
 import "react-tooltip/dist/react-tooltip.css";
-import { Tooltip } from "react-tooltip";
 import NONE_USER from "@/assets/images/non-user.jpg";
 import { AiFillEye } from "react-icons/ai";
 import { BiCategoryAlt } from "react-icons/bi";
 import { DataConstants } from "@/utils/constants/dataConstants";
+import { PathConstants } from "@/utils/constants";
+import { Link } from "react-router-dom";
+import { TextHelper } from "@/utils/helpers";
 
 interface JobAppliedCardProps {
+  id?: string;
   image?: string;
   name?: string;
   employer?: string;
-  salary?: string;
+  employerId?: string;
+  fromSalary?: string;
+  toSalary?: string;
   location?: string;
   appliedDate?: string;
   category?: string;
@@ -24,10 +29,13 @@ interface JobAppliedCardProps {
 }
 
 const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
+  id,
   image,
   name,
   employer,
-  salary,
+  employerId,
+  fromSalary,
+  toSalary,
   location,
   appliedDate,
   category,
@@ -35,85 +43,99 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
   state,
   _onClickDetail,
 }) => {
-  const urlLink = window.location.pathname;
   return (
-    <div className="w-full cursor-pointer bg-white transition-all duration-300 rounded-l-md p-5 border-2 hover:shadow-md hover:border-orangetext border-borderColor">
+    <div className="w-full cursor-pointer bg-white transition-all duration-300 rounded-l-md p-3 lg:p-4 border-2 hover:shadow-md hover:border-orangetext border-borderColor">
       <div className=" flex w-full gap-3">
         <img
-          className="w-20 h-20 border-2  border-gray-200 p-2 shadow-sm rounded"
+          className="w-[4.5rem] h-[4.5rem] border-2  border-gray-200 shadow-sm rounded"
           src={image ? image : NONE_USER}
           alt={name}
         />
         <div className="w-[80%]">
-          <p className="flex gap-1 text-gray-500 text-[0.95rem] font-lato font-normal">
-            <CiClock2 className="text-[1.1rem] mt-0.5" /> Ngày ứng tuyển:{" "}
+          <p className="flex text-gray-500 text-sm font-lato font-normal">
+            <CiClock2 className="my-auto" />
+            &nbsp;Ngày ứng tuyển:&nbsp;&nbsp;
             {appliedDate}
           </p>
-          <h1
-            className="text-lg uppercase font-semibold text-gray-700 max-lg:line-clamp-2 line-clamp-1"
+          <Link
+            to={`${PathConstants.CANDIDATE_PATHS.jobs}/${id}`}
+            className="text-base uppercase font-semibold text-gray-700 line-clamp-1 mt-1"
             data-tooltip-id="tooltip"
             data-tooltip-content={name}
           >
             {name}
-          </h1>
+          </Link>
 
-          <div className="mt-1 relative">
-            <FaBuilding className="text-gray-600 absolute top-0 left-0 text-lg " />
-            <a className="text-gray-600 text-base font-medium hover:text-gray-800  line-clamp-1">
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{employer}
-            </a>
+          <div className="mt-1 relative flex text-sm">
+            <FaBuilding className="text-gray-600 text-sm my-auto" />
+            &nbsp;
+            <Link
+              to={`${PathConstants.CANDIDATE_PATHS.employers}/${employerId}`}
+              className="line-clamp-1"
+              data-tooltip-id="tooltip"
+              data-tooltip-content={employer}
+            >
+              {employer}
+            </Link>
           </div>
         </div>
       </div>
-      <div className="flex gap-3 justify-between mt-3">
-        <div className="w-full flex flex-col gap-2.5">
-          <p className="flex gap-1 text-gray-500 text-[0.95rem] font-lato font-normal">
-            <IoLocationOutline className="text-[1.1rem] mt-0.5" />
-            Địa điểm: {location}
+      <div className="flex gap-3 justify-between mt-4">
+        <div className="w-full flex flex-col gap-2 text-sm">
+          <p className="flex gap-1 text-gray-500 font-lato font-normal">
+            <MdOutlineAttachMoney className="text-base my-auto" />
+            &nbsp;
+            <p className="line-clamp-1">
+              Mức lương:&nbsp;{TextHelper.SalaryText(fromSalary, toSalary)}
+            </p>
           </p>
-          <p className="flex gap-1 text-gray-500 text-[0.95rem] font-lato font-normal">
-            <MdOutlineAttachMoney className="text-[1.1rem] mt-0.5" />
-            Mức lương: {salary}
+          <p className="flex gap-1 text-gray-500 font-lato font-normal">
+            <BiCategoryAlt className="text-base my-auto" />
+            &nbsp;
+            <p className="line-clamp-1">Ngành nghề:&nbsp;{category}</p>
           </p>
-          <p className="flex gap-1 text-gray-500 text-[0.95rem] font-lato font-normal">
-            <BiCategoryAlt className="text-[1.1rem] mt-0.5" /> Ngành nghề:{" "}
-            {category}
+          <p className="flex gap-1 text-gray-500  font-lato font-normal">
+            <IoLocationOutline className="text-base my-auto" />
+            &nbsp;
+            <p className="line-clamp-1">Địa điểm:&nbsp;{location}</p>
           </p>
         </div>
         <div className="relative">
           {isVip && (
             <p
-              className="absolute bottom-13 right-0 text-lg p-2.5 rounded-full  text-orangebackground bg-orangetext"
+              className="absolute bottom-0 right-0 text-lg p-2 rounded-full  text-orangebackground bg-orangetext"
               data-tooltip-id="tooltip"
               data-tooltip-content="Tin tuyển dụng VIP"
             >
               <RiVipCrown2Line />
             </p>
           )}
-          <button
-            className="absolute bottom-0 right-0 text-2xl p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext"
-            onClick={_onClickDetail}
-          >
-            <AiFillEye />
-          </button>
         </div>
       </div>
-      <hr className="mt-2 sm:mt-4"></hr>
-      <p className="flex gap-1 text-gray-500 text-[0.95rem] font-lato font-normal mt-2">
-        Trạng thái:{" "}
-        {DataConstants.APPLY_STATE_DROPDOWN.map(
-          (item: any) =>
-            state === item.id && (
-              <span
-                key={item.id}
-                className="font-medium ml-1 sm:ml-3"
-                style={{ color: item.color }}
-              >
-                {item.name}
-              </span>
-            )
-        )}
-      </p>
+      <hr className="my-1.5  lg:mt-3"></hr>
+      <div className="flex justify-between gap-2">
+        <p className="flex text-gray-500 text-base font-lato font-normal my-auto">
+          Trạng thái:&nbsp;&nbsp;
+          {DataConstants.APPLY_STATE_DROPDOWN.map(
+            (item: any) =>
+              state === item.id && (
+                <span
+                  key={item.id}
+                  className="font-medium"
+                  style={{ color: item.color }}
+                >
+                  {item.name}
+                </span>
+              )
+          )}
+        </p>
+        <button
+          className="text-xl p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext"
+          onClick={_onClickDetail}
+        >
+          <AiFillEye />
+        </button>
+      </div>
     </div>
   );
 };

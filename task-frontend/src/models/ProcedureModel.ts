@@ -6,4 +6,5 @@ interface ProcedureModel {
   created?: string;
   updated?: string;
   totalStep?: number;
+  steps?: StepModel;
 }

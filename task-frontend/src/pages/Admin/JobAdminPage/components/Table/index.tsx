@@ -123,23 +123,25 @@ const Table: React.FC<JobTableProps> = ({
                         <img
                           className="object-cover w-10 h-10 rounded-full"
                           src={
-                            item.employerAvatar ? item.employerAvatar : NON_USER
+                            item?.employer?.image
+                              ? item?.employer?.image
+                              : NON_USER
                           }
                           alt="logo"
                         />
                         <div>
                           <h2 className="text-base font-medium text-gray-800 line-clamp-2">
-                            {item.employerName}
+                            {item?.employer?.name}
                           </h2>
                           <p className="text-sm font-normal text-gray-600 line-clamp-1">
-                            {item.employerEmail}
+                            {item?.employer?.email}
                           </p>
                         </div>
                       </div>
                     </td>
                     <td className="table-cell">
                       <div className="px-4 py-4 text-center text-gray-600 ">
-                        {item.categoryName || "Khác"}
+                        {item?.category?.name || "Khác"}
                       </div>
                     </td>
 

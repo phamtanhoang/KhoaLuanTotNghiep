@@ -46,6 +46,13 @@ const convertHrsToOptions = (hrs: HumanResourceModel[]) => {
 const findOptionByHrId = (id: string, hrs: HumanResourceModel[]) => {
   return convertHrsToOptions(hrs).find((option) => option.value === id) || null;
 };
+const findOptionByTagId = (id: string, tags: TagModel[]) => {
+  return (
+    convertTagsToOptions(tags).find((option) => option.value === id) || null
+  );
+};
+
+
 
 export const SelectHelper = {
   convertCategoriesToOptions,
@@ -55,4 +62,5 @@ export const SelectHelper = {
   convertTagsToOptions,
   convertHrsToOptions,
   findOptionByHrId,
+  findOptionByTagId,
 };

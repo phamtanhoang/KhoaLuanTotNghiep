@@ -3,7 +3,12 @@ import { FaEdit } from "react-icons/fa";
 import { GiGraduateCap, GiSkills } from "react-icons/gi";
 import { IoNewspaperOutline } from "react-icons/io5";
 import { MdInfoOutline } from "react-icons/md";
-import { SkillExpEduProps, Information, UserCard } from "./components";
+import {
+  SkillExpEduProps,
+  Information,
+  UserCard,
+  SettingAccount,
+} from "./components";
 import { GreatJobs } from "@/components/ui";
 import { useContext, useEffect, useState } from "react";
 import ModalBase from "@/components/modal";
@@ -123,6 +128,10 @@ const ProfilePage = () => {
               job={currentCandidate?.job}
               description={currentCandidate?.introduction}
               _onClickChangeImage={_onClickChangeImage}
+            />
+            <SettingAccount
+              myCV={currentCandidate?.myCV}
+              _onClickChangeMyCV={_onClickChangeImage}
               isFindJob={isFindJob}
               _onClickFindJob={_onClickFindJob}
             />
@@ -210,11 +219,11 @@ const ProfilePage = () => {
                         fromDate={DateHelper.formatDate(
                           new Date(item?.fromDate!)
                         )}
-                        toDate={DateHelper.formatDate(
+                        toDate={
                           item?.toDate == "now"
-                            ? "Hiện nay"
-                            : new Date(item?.toDate!)
-                        )}
+                            ? "Hiện tại"
+                            : DateHelper.formatDate(new Date(item?.toDate!))
+                        }
                         description={item?.description}
                       />
                     </li>
@@ -247,8 +256,9 @@ const ProfilePage = () => {
                           new Date(item?.fromDate!)
                         )}
                         toDate={
-                          DateHelper.formatDate(new Date(item?.toDate!)) ||
-                          "Hiện nay"
+                          item?.toDate == "now"
+                            ? "Hiện tại"
+                            : DateHelper.formatDate(new Date(item?.toDate!))
                         }
                         description={item?.description}
                       />

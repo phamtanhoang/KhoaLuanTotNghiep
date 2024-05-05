@@ -20,6 +20,8 @@ const DetailsJobAdmin = (props: any) => {
   const id = props.id;
 
   const [job, setJob] = useState<JobModel>();
+  const [steps, setSteps] = useState<StepModel[]>([]);
+  const [tags, setTags] = useState<TagModel[]>([]);
 
   useEffect(() => {
     context.handleOpenLoading();
@@ -28,6 +30,8 @@ const DetailsJobAdmin = (props: any) => {
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           setJob(res.data.Data);
+          setSteps(res.data.Data?.process?.steps);
+          setTags(res.data.Data?.tags);
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -40,9 +44,26 @@ const DetailsJobAdmin = (props: any) => {
       });
   }, []);
 
-  const _onClickUpdateState =() =>{
-    
-  }
+  const _onClickUpdateState = (status: string) => {
+    context.handleOpenLoading();
+    jobsService
+      .updateStatus_Admin(id, status)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          handleClose();
+          SwalHelper.MiniAlert(res.data.Message, "success");
+          fetchData();
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  };
 
   return (
     <div className="lg:w-[45%] w-screen bg-white relative rounded">
@@ -63,14 +84,14 @@ const DetailsJobAdmin = (props: any) => {
           <div className="flex items-center justify-between gap-5">
             <div>
               <img
-                src={job?.employerAvartar ? job?.employerAvartar : NON_USER}
+                src={job?.employer?.image ? job?.employer?.image : NON_USER}
                 className="w-24 h-24 rounded-full"
               />
             </div>
             <div className="text-right flex flex-col gap-1.5 text-sm text-gray-600 font">
-              <p className="font-medium">{job?.employerName}</p>
-              <p className="">{job?.employerEmail}</p>
-              <p className="">{job?.employerPhoneNumber}</p>
+              <p className="font-medium">{job?.employer?.name}</p>
+              <p className="">{job?.employer?.email}</p>
+              <p className="">{job?.employer?.phoneNumber}</p>
             </div>
           </div>
           <div className="bg-gray-400 h-[2px]" />
@@ -87,7 +108,7 @@ const DetailsJobAdmin = (props: any) => {
               <div className="">
                 <p className="">
                   <span className="font-semibold">Ngành nghề:&nbsp;&nbsp;</span>
-                  {job?.categoryName || "Khác"}
+                  {job?.category?.name || "Khác"}
                 </p>
               </div>
               <div className="">
@@ -140,13 +161,13 @@ const DetailsJobAdmin = (props: any) => {
                 <h5 className="font-medium">
                   Quy trình phỏng vấn:&nbsp;&nbsp;
                 </h5>
-                {job?.steps && (
+                {steps && (
                   <div className="relative wrap overflow-hidden mt-2.5">
                     <div className="absolute border-opacity-20 border-gray-700 h-full border lg:left-1/2 max-lg:mx-[17px]"></div>
-                    {job?.steps.map((item) => (
+                    {steps?.map((item: StepModel) => (
                       <div
                         className={`mb-2 flex justify-between items-center w-full ${
-                          (item.number + 1) % 2 == 0
+                          (item?.number! + 1) % 2 == 0
                             ? ""
                             : "lg:flex-row-reverse"
                         }`}
@@ -154,15 +175,15 @@ const DetailsJobAdmin = (props: any) => {
                         <div className="order-1 lg:w-5/12"></div>
                         <div className="z-20 flex items-center order-1 bg-gray-300  w-10 h-10 rounded-full max-lg:mr-2">
                           <h1 className="mx-auto font-semibold  text-white">
-                            {item.number + 1}
+                            {item?.number! + 1}
                           </h1>
                         </div>
                         <div className="order-1 bg-gray-100 rounded-lg w-full lg:w-5/12 px-4 py-3">
                           <h3 className="mb-1 font-semibold  text-base">
-                            {item.name}
+                            {item?.name}
                           </h3>
                           <p className="text-gray-800 leading-tight text-sm italic">
-                            {item.description}
+                            {item?.description}
                           </p>
                         </div>
                       </div>
@@ -172,8 +193,8 @@ const DetailsJobAdmin = (props: any) => {
               </div>
               <div className="mt-2.5 flex gap-2">
                 <h5 className="font-medium">Danh sách nhãn:&nbsp;&nbsp;</h5>
-                {job?.tags &&
-                  job?.tags.map((tag: any) => (
+                {tags &&
+                  tags?.map((tag: TagModel) => (
                     <div
                       className="inline-block relative py-1 text-xs"
                       key={tag.id}
@@ -220,7 +241,8 @@ const DetailsJobAdmin = (props: any) => {
         )}
 
         {(job?.status === DataConstants.STATUS_DATA.ACTIVE ||
-          job?.status === DataConstants.STATUS_DATA.PENDING) && (
+          job?.status === DataConstants.STATUS_DATA.PENDING ||
+          job?.status === DataConstants.STATUS_DATA.PAUSED) && (
           <button
             className="flex items-center gap-2 w-max h-max px-4 py-2  text-white rounded-md bg-red-600 hover:bg-red-600/90 font-[450]"
             onClick={() => {

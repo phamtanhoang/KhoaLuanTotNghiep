@@ -99,6 +99,9 @@ const ChangeExpSkillInfoCandidate = (props: any) => {
 
   const _onClickDelete = (item: any) => {
     const updatedData = items.filter((i: any) => i.id !== item.id);
+    updatedData.forEach((item: any, index: number) => {
+      item.sequence = index;
+    });
     setItems(updatedData);
   };
 
@@ -249,7 +252,7 @@ const ChangeExpSkillInfoCandidate = (props: any) => {
         });
     }
   };
-  console.log("item, ", items);
+  console.log("items, ", items);
   return (
     <div className="lg:w-[40%] w-screen bg-white relative rounded">
       <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-orangetext rounded-t">

@@ -5,9 +5,11 @@ const jobsService = {
   async getList_Public(
     keyword?: string,
     location?: string,
-    fromSalary?: string,
-    toSalary?: string,
     category?: string,
+    tag?: string,
+    dateNumber?: string,
+    experience?: string,
+    isVip?: string,
     currentPage?: number,
     itemPerPage?: number
   ) {
@@ -15,9 +17,11 @@ const jobsService = {
       JobAPI.getList_Public(
         keyword,
         location,
-        fromSalary,
-        toSalary,
         category,
+        tag,
+        dateNumber,
+        experience,
+        isVip,
         currentPage,
         itemPerPage
       )
@@ -101,7 +105,15 @@ const jobsService = {
     const body = {
       status: status,
     };
-    return await axiosConfig.patch(JobAPI.jobById(id), body, {
+    return await axiosConfig.patch(JobAPI.updateStatus_Admin(id), body, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
+  async updateStatus_Employer(id: string, status: string) {
+    const body = {
+      status: status,
+    };
+    return await axiosConfig.patch(JobAPI.updateStatus_Employer(id), body, {
       headers: { "Content-Type": "application/json" },
     });
   },

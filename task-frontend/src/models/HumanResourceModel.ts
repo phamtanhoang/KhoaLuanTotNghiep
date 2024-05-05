@@ -2,6 +2,7 @@ interface HumanResourceModel {
   id?: string;
   created?: Date;
   updated?: Date;
+  name?: string;
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;

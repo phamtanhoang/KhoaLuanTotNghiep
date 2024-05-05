@@ -49,7 +49,7 @@ const ModalBase = (props: any) => {
     ),
 
     [ModalConstants.APPLICATION_KEYS.applyJob]: (
-      <ApplyJob handleClose={handleClose} />
+      <ApplyJob id={id} fetchData={fetchData} handleClose={handleClose} />
     ),
     [ModalConstants.CANDIDATE_KEYS.changeInfoCandidate]: (
       <ChangeInfoCandidate fetchData={fetchData} handleClose={handleClose} />

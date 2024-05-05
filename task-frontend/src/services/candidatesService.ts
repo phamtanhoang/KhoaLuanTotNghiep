@@ -24,7 +24,7 @@ const candidatesService = {
     });
   },
   async saveEducations(items: EducationlModel[]) {
-    const body = { educationList: items };
+    const body = { educations: items };
     return await axiosConfig.post(CandidateAPI.saveEducations, body, {
       headers: { "Content-Type": "application/json" },
     });

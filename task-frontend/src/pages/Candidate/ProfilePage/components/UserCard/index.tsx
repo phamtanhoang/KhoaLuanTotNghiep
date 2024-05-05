@@ -6,8 +6,6 @@ interface UserCardProps {
   job?: string;
   description?: string;
   _onClickChangeImage?: () => void;
-  isFindJob?: boolean;
-  _onClickFindJob?: () => void;
 }
 
 const UserCard: React.FC<UserCardProps> = ({
@@ -16,12 +14,10 @@ const UserCard: React.FC<UserCardProps> = ({
   job,
   description,
   _onClickChangeImage,
-  isFindJob,
-  _onClickFindJob,
 }) => {
   return (
     <div className="bg-white p-5 border-t-4 border-orangetext shadow-sm rounded-sm">
-      <div className="overflow-hidden  flex justify-center">
+      <div className="overflow-hidden  flex justify-center align-">
         <div className="relative">
           <img
             className="h-[200px] w-[200px] rounded-full border-2 border-borderColor"
@@ -43,41 +39,9 @@ const UserCard: React.FC<UserCardProps> = ({
         {job}
       </h3>
 
-      <p className="text-sm text-gray-500 hover:text-gray-600 leading-6 mt-3">
+      <p className="text-sm text-gray-500 hover:text-gray-600 leading-6 mt-3 text-justify">
         &nbsp;&nbsp;&nbsp;&nbsp;{description}
       </p>
-      <div className="mt-4">
-        <div
-          className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in"
-          onClick={_onClickFindJob}
-        >
-          <input
-            type="checkbox"
-            name="toggle"
-            id="toggle"
-            className={`toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer ${
-              isFindJob ? "right-0 border-orangetext" : "left-0"
-            }`}
-            checked={isFindJob}
-            readOnly
-          />
-          <label
-            htmlFor="toggle"
-            className={`toggle-label block overflow-hidden h-6 rounded-full cursor-pointer ${
-              isFindJob ? "bg-orangetext" : "bg-gray-300"
-            }`}
-          ></label>
-        </div>
-        <label
-          className={`text-gray-400 text-base font-semibold ${
-            isFindJob ? "text-orangetext" : "text-gray-300"
-          }`}
-        >
-          {isFindJob
-            ? "Đang bật tìm kiếm việc làm."
-            : "Đã tắt tìm kiếm việc làm."}
-        </label>
-      </div>
     </div>
   );
 };

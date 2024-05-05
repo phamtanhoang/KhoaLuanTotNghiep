@@ -57,7 +57,7 @@ const ItemTSX: React.FC<{
       <td className="table-cell">
         <div className="flex items-center px-5 w-full gap-2 justify-center">
           <p className="text-base leading-8 text-gray-600 text-center">
-            {item.categoryName|| "Khác"}
+            {item.category?.name || "Khác"}
           </p>
         </div>
       </td>

@@ -177,17 +177,33 @@ const JobAPI = {
   getList_Public: (
     keyword?: string,
     location?: string,
-    fromSalary?: string,
-    toSalary?: string,
     category?: string,
+    tag?: string,
+    dateNumber?: string,
+    experience?: string,
+    isVip?: string,
     currentPage?: number,
     itemPerPage?: number
   ) => {
-    return `/jobs?keyword=${keyword}&location=${location}&fromSalary=${fromSalary}&toSalary=${toSalary}&categoryId=${category}&page=${currentPage}&size=${itemPerPage}`;
+    return `/jobs?keyword=${keyword}&location=${location}&experience=${experience}&dateNumber=${dateNumber}&categoryId=${category}&isVip=${isVip}&tag=${tag}&page=${currentPage}&size=${itemPerPage}`;
   },
 
-  updateStatus_Admin: "/jobs/updateStatus-admin",
-  updateStatus_Employer: "/jobs/updateStatus-employer",
+  updateStatus_Admin: (id: string) => {
+    return `/jobs/updateStatus-admin/${id}`;
+  },
+  updateStatus_Employer: (id: string) => {
+    return `/jobs/updateStatus-employer/${id}`;
+  },
+};
+
+const ApplicationAPI = {
+  applyJob_File: (id: string) => {
+    return `/applications/applyWithCV/${id}`;
+  },
+
+  applyJob_Link: (id: string) => {
+    return `/applications/applyWithLink/${id}`;
+  },
 };
 export {
   AuthAPI,
@@ -199,4 +215,5 @@ export {
   HumanResourceAPI,
   ProcedureAPI,
   JobAPI,
+  ApplicationAPI,
 };

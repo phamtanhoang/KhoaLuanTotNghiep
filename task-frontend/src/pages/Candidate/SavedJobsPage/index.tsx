@@ -1,8 +1,11 @@
 import { Hero } from "@/components/ui";
 import { GreatJobs, JobCard, Pagination, SearchJobs } from "@/components/ui";
 import { PathConstants } from "@/utils/constants";
+import { useState } from "react";
 
 const SavedJobsPage = () => {
+  const [name, setName] = useState<string>("");
+  const [location, setLocation] = useState<string>("");
   return (
     <>
       <Hero
@@ -12,7 +15,12 @@ const SavedJobsPage = () => {
       />
       <section className="pb-10 pt-8">
         <div className="w-full lg:w-[80%] px-5 lg:px-0 mx-auto flex flex-col lg:gap-5  rounded-md">
-          <SearchJobs />
+          <SearchJobs
+            name={name}
+            location={location}
+            setName={setName}
+            setLocation={setLocation}
+          />
           <div className=" grid grid-cols-1 lg:grid-cols-2 gap-5">
             <JobCard
               image="https://source.unsplash.com/random/400x400"
