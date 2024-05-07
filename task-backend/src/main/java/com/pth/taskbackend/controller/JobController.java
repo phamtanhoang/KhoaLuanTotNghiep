@@ -1532,7 +1532,7 @@ public class JobController {
                     false,
                     !job.getToDate().isBefore(LocalDateTime.now()),
                     false,
-                    
+
                     categoryResponse,
                     jobEmployerResponse,
                     jobHrResponse,

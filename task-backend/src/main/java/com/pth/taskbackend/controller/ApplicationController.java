@@ -263,19 +263,24 @@ public class ApplicationController {
             }
 
 
-            Page<ApplicationResponse> responseList = pendingApplications.map(application -> new ApplicationResponse(
+            Page<ApplicationForEmployerResponse> responseList = pendingApplications.map(application -> new ApplicationForEmployerResponse(
                     application.getId(),
-                    application.getCandidate().getId(),
+                    application.getCandidate().getFirstName() + " " + application.getCandidate().getLastName(),
                     application.getCandidate().getUser().getEmail(),
-                    application.getCandidate().getFirstName() + application.getCandidate().getLastName(),
-                    application.getCandidate().getAvatar(),
                     application.getCreated(),
                     application.getStatus(),
-                    application.getJob().getId(),
-                    application.getJob().getName(),
-                    application.getJob().getHumanResource().getEmployer().getId(),
-                    application.getJob().getHumanResource().getEmployer().getName(),
-                    application.getCV()
+                    new JobApplicationResponse(
+                            application.getJob().getId(),
+                            application.getJob().getName(),
+                            application.getJob().getFromSalary(),
+                            application.getJob().getToSalary(),
+                            application.getJob().getLocation(),
+
+                            new CategoryApplicationResponse(
+                                    application.getJob().getCategory().getId(),
+                                    application.getJob().getCategory().getName()
+                            )
+                    )
             ));
 
 
