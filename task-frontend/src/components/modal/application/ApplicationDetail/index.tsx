@@ -75,13 +75,7 @@ const ApplicationDetail = (props: any) => {
         .then((res) => {
           if (res.status === 200 && res.data.Status === 200) {
             dispatch(ONCHANGE_APPLICATION_SINGLE(res.data.Data));
-            dispatch(
-              ONCHANGE_STEP_LIST(
-                res.data.Data?.job?.process?.steps.sort(
-                  (a: any, b: any) => a.number - b.number
-                )
-              )
-            );
+            dispatch(ONCHANGE_STEP_LIST(res.data.Data?.job?.process?.steps));
           } else {
             SwalHelper.MiniAlert(res.data.Message, "error");
           }
@@ -233,14 +227,14 @@ const ApplicationDetail = (props: any) => {
                         {/* Hồ sơ phù hợp */}
                       </td>
                       <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
-                        <p
+                        {/* <p
                           className="text-blue-600 hover:text-blue-600/85 cursor-pointer"
                           onClick={() => {
                             _onClickApplicationStep("1");
                           }}
                         >
                           Lịch hẹn
-                        </p>
+                        </p> */}
                       </td>
                     </tr>
                   ))}

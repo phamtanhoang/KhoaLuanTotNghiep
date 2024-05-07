@@ -497,7 +497,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/getApplication-candidate/{id}")
-    public ResponseEntity<?> getApplicationDetails(
+    public ResponseEntity<BaseResponse> getApplicationDetails(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") String id
     ) {
@@ -544,6 +544,7 @@ public class ApplicationController {
                 Page<Step> steps = stepService.findByProcessId(application.getJob().getProcess().getId(), Pageable.unpaged());
 
                 List<Step> stepList = steps.getContent();
+
                 stepResponses = stepList.stream()
                         .map(step -> new StepResponse(
                                 step.getId(),
@@ -553,6 +554,7 @@ public class ApplicationController {
                                 step.getProcess() != null ? step.getProcess().getId() : null
                         ))
                         .collect(Collectors.toList());
+                stepResponses.sort(Comparator.comparingInt(StepResponse::number));
             } else {
                 stepResponses = Collections.emptyList();
             }
@@ -608,7 +610,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/getApplication-employer/{id}")
-    public ResponseEntity<?> getApplicationDetailsEmployer(
+    public ResponseEntity<BaseResponse> getApplicationDetailsEmployer(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") String id
     ) {
@@ -702,6 +704,7 @@ public class ApplicationController {
                                 step.getProcess() != null ? step.getProcess().getId() : null
                         ))
                         .collect(Collectors.toList());
+                stepResponses.sort(Comparator.comparingInt(StepResponse::number));
             } else {
                 stepResponses = Collections.emptyList();
             }
