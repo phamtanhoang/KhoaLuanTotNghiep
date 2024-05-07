@@ -5,12 +5,12 @@ import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Application;
 import com.pth.taskbackend.repository.ApplicationRepository;
 import com.pth.taskbackend.service.ApplicationService;
-import io.jsonwebtoken.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Optional;
 @Service
 public class ApplicationServiceImpl implements ApplicationService {
@@ -54,9 +54,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public Page<Application> findByCandidateId(String candidateId, Pageable pageable) {
-        return applicationRepository.findByCandidateId(candidateId,pageable);
+    public Page<Application> findByCandidateId(String candidateId, String name, String location, EApplyStatus status, Pageable pageable) throws IOException {
+        return  applicationRepository.findByCandidateId(candidateId,name,location,status,pageable);
+
     }
+
 
     @Override
     public Page<Application> findByEmployerId(String employerId, Pageable pageable) {

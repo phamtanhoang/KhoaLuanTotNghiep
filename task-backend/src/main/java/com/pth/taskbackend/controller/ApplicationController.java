@@ -2,9 +2,7 @@ package com.pth.taskbackend.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pth.taskbackend.dto.request.ApplicationRequest;
-import com.pth.taskbackend.dto.response.ApplicationDetailResponse;
-import com.pth.taskbackend.dto.response.ApplicationResponse;
-import com.pth.taskbackend.dto.response.BaseResponse;
+import com.pth.taskbackend.dto.response.*;
 import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
@@ -41,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
@@ -130,7 +129,6 @@ public class ApplicationController {
                 );
 
             Application application = new Application();
-            System.out.println(cVFile.getContentType());
             String uploadCV = fileUploadFunc.uploadCV(cVFile);
             uploadCV = fileUploadFunc.getFullImagePath(uploadCV);
             application.setCV(uploadCV);
@@ -335,23 +333,26 @@ public class ApplicationController {
             }
 
 
-            Page<ApplicationResponse> responseList = applications.map(application -> {
-                ApplicationResponse response = new ApplicationResponse(
-                        application.getId(),
-                        application.getCandidate().getId(),
-                        application.getCandidate().getUser().getEmail(),
-                        application.getCandidate().getFirstName() + application.getCandidate().getLastName(),
-                        application.getCandidate().getAvatar(),
-                        application.getCreated(),
-                        application.getStatus(),
-                        application.getJob().getId(),
-                        application.getJob().getName(),
-                        application.getJob().getHumanResource().getEmployer().getId(),
-                        application.getJob().getHumanResource().getEmployer().getName(),
-                        application.getCV()
-                );
-                return response;
-            });
+            Page<ApplicationForEmployerResponse> responseList = applications.map(application -> new ApplicationForEmployerResponse(
+                    application.getId(),
+                    application.getCandidate().getFirstName() + " " + application.getCandidate().getLastName(),
+                    application.getCandidate().getUser().getEmail(),
+                    application.getCreated(),
+                    application.getStatus(),
+                    new JobApplicationResponse(
+                            application.getJob().getId(),
+                            application.getJob().getName(),
+                            application.getJob().getFromSalary(),
+                            application.getJob().getToSalary(),
+                            application.getJob().getLocation(),
+
+                            new CategoryApplicationResponse(
+                                    application.getJob().getCategory().getId(),
+                                    application.getJob().getCategory().getName()
+                            )
+                    )
+            ));
+
 
             return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc cho nhà tuyển dụng", HttpStatus.OK.value(), responseList));
 
@@ -367,7 +368,10 @@ public class ApplicationController {
     @GetMapping("/getApplications-candidate")
     public ResponseEntity<?> getApplicationsByCandidate(
             Pageable pageable,
-            @RequestHeader("Authorization") String token
+            @RequestHeader("Authorization") String token,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) EApplyStatus status,
+            @RequestParam(required = false) String location
     ) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
@@ -380,23 +384,25 @@ public class ApplicationController {
             if (optionalCandidate.isEmpty()) {
                 return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null));
             }
-            Page<Application> applications = applicationService.findByCandidateId(optionalCandidate.get().getId(), pageable);
+            Page<Application> applications = applicationService.findByCandidateId(optionalCandidate.get().getId(),title,location,status,pageable);
             if (applications.isEmpty())
                 return ResponseEntity.ok(new BaseResponse("Bạn chưa ứng tuyển công việc nào", HttpStatus.OK.value(), null));
 
-            Page<ApplicationResponse> candidateApplications = applications.map(application -> new ApplicationResponse(
+            Page<CandidateApplicationResponse> candidateApplications = applications.map(application -> new CandidateApplicationResponse(
                     application.getId(),
-                    application.getCandidate().getId(),
-                    application.getCandidate().getUser().getEmail(),
-                    application.getFullName(),
-                    application.getCandidate().getAvatar(),
                     application.getCreated(),
-                    application.getStatus(),
-                    application.getJob().getId(),
-                    application.getJob().getName(),
-                    application.getJob().getHumanResource().getEmployer().getId(),
-                    application.getJob().getHumanResource().getEmployer().getName(),
-                    application.getCV()
+                    new JobApplicationResponse(
+                            application.getJob().getId(),
+                            application.getJob().getName(),
+                            application.getJob().getFromSalary(),
+                            application.getJob().getFromSalary(),
+                            application.getJob().getLocation(),
+                            new CategoryApplicationResponse(
+                                    application.getJob().getCategory().getId(),
+                                    application.getJob().getCategory().getName() )),
+
+                    new EmployerApplicationResponse( application.getJob().getHumanResource().getEmployer().getId(),
+                            application.getJob().getHumanResource().getEmployer().getName())
             ));
             return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc của ứng viên", HttpStatus.OK.value(), candidateApplications));
 
@@ -404,6 +410,7 @@ public class ApplicationController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
@@ -478,17 +485,23 @@ public class ApplicationController {
                         new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
                 );
             Application application = optionalApplication.get();
-            ApplicationDetailResponse response = new ApplicationDetailResponse(
-                    application.getJob().getName(),
-                    application.getEmail(),
+            CandidateDetailApplicationResponse response = new CandidateDetailApplicationResponse(
+                    application.getId(),
                     application.getFullName(),
-                    application.getCandidate().getAvatar(),
-                    application.getCandidate().getDateOfBirth(),
-                    application.getCandidate().getSex(),
-                    application.getCreated(),
-                    application.getCV(),
+                    application.getEmail(),
+                    application.getPhoneNumber(),
                     application.getLetter(),
-                    application.getStatus()
+                    application.getCV(),
+                    application.getApplicationSteps().stream().map(applicationStep ->
+                            new ApplicationStepResponse(
+                                    applicationStep.getId(),
+                                    applicationStep.getName(),
+                                    applicationStep.getNumber(),
+                                    applicationStep.getStatus(),
+                                    applicationStep.getResult(),
+                                    applicationStep.getApplication().getId()
+                            )).collect(Collectors.toList())
+
             );
             return ResponseEntity.ok(
                     new BaseResponse("Chi tiết đơn ứng tuyển", HttpStatus.OK.value(), response)
@@ -563,17 +576,23 @@ public class ApplicationController {
                     );
             }
 
-            ApplicationDetailResponse response = new ApplicationDetailResponse(
-                    application.getJob().getName(),
-                    application.getEmail(),
+            CandidateDetailApplicationResponse response = new CandidateDetailApplicationResponse(
+                    application.getId(),
                     application.getFullName(),
-                    application.getCandidate().getAvatar(),
-                    application.getCandidate().getDateOfBirth(),
-                    application.getCandidate().getSex(),
-                    application.getCreated(),
-                    application.getCV(),
+                    application.getEmail(),
+                    application.getPhoneNumber(),
                     application.getLetter(),
-                    application.getStatus()
+                    application.getCV(),
+                    application.getApplicationSteps().stream().map(applicationStep ->
+                            new ApplicationStepResponse(
+                                    applicationStep.getId(),
+                                    applicationStep.getName(),
+                                    applicationStep.getNumber(),
+                                    applicationStep.getStatus(),
+                                    applicationStep.getResult(),
+                                    applicationStep.getApplication().getId()
+                            )).collect(Collectors.toList())
+
             );
             return ResponseEntity.ok(
                     new BaseResponse("Chi tiết đơn ứng tuyển", HttpStatus.OK.value(), response)
@@ -610,17 +629,23 @@ public class ApplicationController {
                         new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
                 );
             Application application = optionalApplication.get();
-            ApplicationDetailResponse response = new ApplicationDetailResponse(
-                    application.getJob().getName(),
-                    application.getEmail(),
+            CandidateDetailApplicationResponse response = new CandidateDetailApplicationResponse(
+                    application.getId(),
                     application.getFullName(),
-                    application.getCandidate().getAvatar(),
-                    application.getCandidate().getDateOfBirth(),
-                    application.getCandidate().getSex(),
-                    application.getCreated(),
-                    application.getCV(),
+                    application.getEmail(),
+                    application.getPhoneNumber(),
                     application.getLetter(),
-                    application.getStatus()
+                    application.getCV(),
+                    application.getApplicationSteps().stream().map(applicationStep ->
+                            new ApplicationStepResponse(
+                                    applicationStep.getId(),
+                                    applicationStep.getName(),
+                                    applicationStep.getNumber(),
+                                    applicationStep.getStatus(),
+                                    applicationStep.getResult(),
+                                    applicationStep.getApplication().getId()
+                            )).collect(Collectors.toList())
+
             );
             return ResponseEntity.ok(
                     new BaseResponse("Chi tiết đơn ứng tuyển", HttpStatus.OK.value(), response)
@@ -684,21 +709,26 @@ public class ApplicationController {
             }
 
 
-            Page<ApplicationResponse> candidateApplications = applications.map(application -> new ApplicationResponse(
+            Page<ApplicationForEmployerResponse> responseList = applications.map(application -> new ApplicationForEmployerResponse(
                     application.getId(),
-                    application.getCandidate().getId(),
+                    application.getCandidate().getFirstName() + " " + application.getCandidate().getLastName(),
                     application.getCandidate().getUser().getEmail(),
-                    application.getFullName(),
-                    application.getCandidate().getAvatar(),
                     application.getCreated(),
                     application.getStatus(),
-                    application.getJob().getId(),
-                    application.getJob().getName(),
-                    application.getJob().getHumanResource().getEmployer().getId(),
-                    application.getJob().getHumanResource().getEmployer().getName(),
-                    application.getCV()
+                    new JobApplicationResponse(
+                            application.getJob().getId(),
+                            application.getJob().getName(),
+                            application.getJob().getFromSalary(),
+                            application.getJob().getToSalary(),
+                            application.getJob().getLocation(),
+
+                            new CategoryApplicationResponse(
+                                    application.getJob().getCategory().getId(),
+                                    application.getJob().getCategory().getName()
+                            )
+                    )
             ));
-            return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc của ứng viên", HttpStatus.OK.value(), candidateApplications));
+            return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc của ứng viên", HttpStatus.OK.value(), responseList));
 
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

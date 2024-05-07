@@ -17,6 +17,8 @@ public record CandidateResponse(String id,
                                 String introduction,
                                 String job,
                                 String link,
+
+                                Boolean isFindJob,
                                 EStatus status,
                                 String email,
                                 String userId) {

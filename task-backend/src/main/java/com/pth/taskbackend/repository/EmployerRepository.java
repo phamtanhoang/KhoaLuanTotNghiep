@@ -40,6 +40,7 @@ public interface EmployerRepository extends JpaRepository<Employer, String> {
             "JOIN  User a on e.user.id=a.id "+
             "JOIN VipEmployer v ON e.id = v.employer.id " +
             "WHERE DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE()" +
-            "And a.status='ACTIVE'")
+            "And a.status='ACTIVE'" +
+            " order by RAND()")
     Page<Employer> findVipEmployers(Pageable pageable);
 }

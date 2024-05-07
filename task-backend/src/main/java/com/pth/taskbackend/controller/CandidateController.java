@@ -14,6 +14,7 @@ import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.*;
 import com.pth.taskbackend.util.func.CheckPermission;
+import com.pth.taskbackend.util.func.FileUploadFunc;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -74,7 +75,8 @@ public class CandidateController {
 
     @Autowired VipEmployerService vipEmployerService;
 
-
+    @Autowired
+    FileUploadFunc fileUploadFunc;
     @Autowired
     EmployerService employerService;
     @Autowired HumanResourceService humanResourceService;
@@ -114,6 +116,7 @@ public class CandidateController {
                     candidate.getIntroduction(),
                     candidate.getJob(),
                     candidate.getLink(),
+                    candidate.getIsFindJob(),
                     candidate.getUser().getStatus(),
                     candidate.getUser().getEmail(),
                     candidate.getUser().getId()
@@ -136,6 +139,66 @@ public class CandidateController {
         }
     }
 
+    @Operation(summary = "update status", description = "", tags = {})
+    @PatchMapping("/updateIsFindJob/{id}")
+    public ResponseEntity<BaseResponse> updateIsFindJob(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody Boolean isFindJob) {
+        try {
+
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Candidate> optionalCandidate = candidateService.findById(id);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+
+            Candidate candidate = optionalCandidate.get();
+            if (isFindJob)
+            {
+                    if(candidate.getIsFindJob())
+                        return ResponseEntity.ok(
+                                new BaseResponse("Đã bật tìm công việc rồi", HttpStatus.OK.value(), null)
+                        );
+
+                    candidate.setIsFindJob(true);
+                    candidateService.update(candidate);
+
+                    return ResponseEntity.ok(
+                            new BaseResponse("Bật tìm công việc thành công", HttpStatus.OK.value(), null)
+                    );
+            }
+            else
+            {
+                if(!candidate.getIsFindJob())
+                    return ResponseEntity.ok(
+                            new BaseResponse("Đã tắt tìm công việc rồi", HttpStatus.OK.value(), null)
+                    );
+
+                candidate.setIsFindJob(false);
+                candidateService.update(candidate);
+
+                return ResponseEntity.ok(
+                        new BaseResponse("Tắt tìm công việc thành công", HttpStatus.OK.value(), null)
+                );
+            }
+
+
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên cần xóa!", HttpStatus.NOT_FOUND.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
     @Operation(summary = "update status", description = "", tags = {})
     @PatchMapping("/{id}")
     public ResponseEntity<BaseResponse> updateCandidate(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody String status) {
@@ -289,6 +352,7 @@ public class CandidateController {
                     candidate.getIntroduction(),
                     candidate.getJob(),
                     candidate.getLink(),
+                    candidate.getIsFindJob(),
                     candidate.getUser().getStatus(),
                     candidate.getUser().getEmail(),
                     candidate.getUser().getId());
@@ -351,6 +415,7 @@ public class CandidateController {
                     candidate.getIntroduction(),
                     candidate.getJob(),
                     candidate.getLink(),
+                    candidate.getIsFindJob(),
                     candidate.getUser().getStatus(),
                     candidate.getUser().getEmail(),
                     candidate.getUser().getId()
@@ -404,7 +469,9 @@ public class CandidateController {
                         candidate.getIntroduction(),
                         candidate.getAvatar(),
                         candidate.getSex(),
-                        isVip);
+                        isVip,
+                        candidate.getIsFindJob(),
+                        candidate.getCV());
 
                 return ResponseEntity.ok(
                         new BaseResponse( "Hiện thông tin ứng viên", HttpStatus.OK.value(), profile)
@@ -497,6 +564,84 @@ public class CandidateController {
         }
     }
 
+    @Operation(summary = "Update Avatar", description = "", tags = {})
+    @PatchMapping("/uploadCV")
+    public ResponseEntity<BaseResponse> uploadCandidateCV(@RequestHeader("Authorization")String token,@RequestPart MultipartFile cVFile) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            if (cVFile.isEmpty() ||
+                    (!Objects.equals(cVFile.getContentType(), "application/pdf") &&
+                            !Objects.equals(cVFile.getContentType(), "application/vnd.openxmlformats-officedocument.wordprocessingml.document") &&
+                            !Objects.equals(cVFile.getContentType(), "application/msword"))) {
+                return ResponseEntity.ok(
+                        new BaseResponse("File không hợp lệ", HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), null)
+                );
+            }
+
+            Candidate update = optionalCandidate.get();
+
+            String uploadCV = fileUploadFunc.uploadCV(cVFile);
+            String fullPath = fileUploadFunc.getFullImagePath(uploadCV);
+            System.out.println(fullPath);
+            update.setCV(fullPath);
+            candidateService.update(update);
+            return ResponseEntity.ok(
+                    new BaseResponse( "Cập nhật CV thành công", HttpStatus.OK.value(), update)
+            );
+
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "Update Avatar", description = "", tags = {})
+    @PatchMapping("/deleteCV")
+    public ResponseEntity<BaseResponse> deleteCandidateCV(@RequestHeader("Authorization")String token) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Candidate update = optionalCandidate.get();
+            update.setCV(null);
+            candidateService.update(update);
+            return ResponseEntity.ok(
+                    new BaseResponse( "Xóa CV thành công", HttpStatus.OK.value(), update)
+            );
+
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 
 
 

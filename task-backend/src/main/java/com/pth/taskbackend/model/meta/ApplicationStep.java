@@ -1,10 +1,9 @@
 package com.pth.taskbackend.model.meta;
 
+import com.pth.taskbackend.enums.EStatus;
+import com.pth.taskbackend.enums.EStepStatus;
 import com.pth.taskbackend.model.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,6 +20,10 @@ public class ApplicationStep extends BaseEntity {
     String name;
     @Column(nullable = false)
     int number;
+
+    @Enumerated(EnumType.STRING)
+    private EStepStatus status;
+
     @Column(columnDefinition = "TEXT")
     String result;
 

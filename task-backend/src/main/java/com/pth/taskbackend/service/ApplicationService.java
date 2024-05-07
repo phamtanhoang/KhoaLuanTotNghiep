@@ -20,7 +20,7 @@ public interface ApplicationService {
     Optional<Application> findByJobIdAndCandidateId(String jobId, String candidateId)throws IOException;
     Optional<Application> findByIdAndCandidateId(String id, String candidateId)throws IOException;
 
-    Page<Application> findByCandidateId(String candidateId, Pageable pageable)throws IOException;
+    Page<Application> findByCandidateId(String candidateId,String name, String location, EApplyStatus status, Pageable pageable)throws IOException;
 
     Page<Application> findByEmployerId(String employerId, Pageable pageable)throws IOException;
 
