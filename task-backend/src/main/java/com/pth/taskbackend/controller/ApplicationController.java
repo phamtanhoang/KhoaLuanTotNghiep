@@ -78,6 +78,8 @@ public class ApplicationController {
     @Autowired
     HumanResourceService humanResourceService;
 
+    @Autowired
+    VipEmployerService vipEmployerService;
     @PostMapping("/applyWithCV/{id}")
     public ResponseEntity<BaseResponse> applyJobWithNewCV(
             @RequestHeader("Authorization") String token,
@@ -262,18 +264,6 @@ public class ApplicationController {
 
 
             Page<ApplicationResponse> responseList = pendingApplications.map(application -> new ApplicationResponse(
-//                    application.getId(),
-//                    application.getCandidate().getId(),
-//                    application.getCandidate().getUser().getEmail(),
-//                    application.getCandidate().getFirstName() + application.getCandidate().getLastName(),
-//                    application.getCandidate().getAvatar(),
-//                    application.getCreated(),
-//                    application.getStatus(),
-//                    application.getJob().getId(),
-//                    application.getJob().getName(),
-//                    application.getJob().getHumanResource().getEmployer().getId(),
-//                    application.getJob().getHumanResource().getEmployer().getName(),
-//                    application.getCV()
                     application.getId(),
                     application.getCreated(),
                     application.getCV(),
@@ -464,8 +454,8 @@ public class ApplicationController {
                         application.getJob().getToSalary(),
                         application.getJob().getLocation(),
                         application.getJob().getStatus(),
-                        false,
-                        false,
+                        vipEmployerService.isVip(application.getJob().getHumanResource().getEmployer().getId()),
+                        optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), application.getJob().getId()).isPresent()).isPresent(),
                         DateFunc.isExpired(application.getJob().getToDate()),
                         false,
                         categoryResponse,
@@ -580,8 +570,8 @@ public class ApplicationController {
                     application.getJob().getToSalary(),
                     application.getJob().getLocation(),
                     application.getJob().getStatus(),
-                    false,
-                    false,
+                    vipEmployerService.isVip(application.getJob().getHumanResource().getEmployer().getId()),
+                    optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), application.getJob().getId()).isPresent()).isPresent(),
                     DateFunc.isExpired(application.getJob().getToDate()),
                     true,
                     null,
