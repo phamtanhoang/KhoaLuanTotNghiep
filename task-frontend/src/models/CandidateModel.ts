@@ -16,5 +16,5 @@ interface CandidateModel {
   userId?: string;
   isVip?: boolean;
   isFindJob?: boolean;
-  cv?: string;
+  cV?: string;
 }

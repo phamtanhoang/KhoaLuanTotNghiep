@@ -40,6 +40,12 @@ const CandidateAPI = {
   saveSkills: "candidates/saveSkills",
   saveExperiences: "/candidates/saveExperiences",
   saveEducations: "/candidates/saveEducations",
+
+  updateIsFindJob: "/candidates/updateIsFindJob",
+
+  uploadCV: "/candidates/uploadCV",
+
+  clearCV: "/candidates/deleteCV",
 };
 
 const EmployerAPI = {

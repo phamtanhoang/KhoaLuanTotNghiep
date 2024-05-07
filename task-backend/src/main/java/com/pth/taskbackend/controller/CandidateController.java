@@ -141,7 +141,7 @@ public class CandidateController {
 
     @Operation(summary = "update status", description = "", tags = {})
     @PatchMapping("/updateIsFindJob")
-    public ResponseEntity<BaseResponse> updateIsFindJob(@RequestHeader("Authorization")String token,@RequestBody Boolean isFindJob) {
+    public ResponseEntity<BaseResponse> updateIsFindJob(@RequestHeader("Authorization")String token) {
         try {
 
             String email = jwtService.extractUsername(token.substring(7));
@@ -159,34 +159,12 @@ public class CandidateController {
 
 
             Candidate candidate = optionalCandidate.get();
-            if (isFindJob)
-            {
-                    if(candidate.getIsFindJob())
-                        return ResponseEntity.ok(
-                                new BaseResponse("Đã bật tìm công việc rồi", HttpStatus.OK.value(), null)
-                        );
+            candidate.setIsFindJob(!candidate.getIsFindJob());
+            candidateService.update(candidate);
+            return ResponseEntity.ok(
+                 new BaseResponse("Thao tác thành công", HttpStatus.OK.value(), null)
+            );
 
-                    candidate.setIsFindJob(true);
-                    candidateService.update(candidate);
-
-                    return ResponseEntity.ok(
-                            new BaseResponse("Bật tìm công việc thành công", HttpStatus.OK.value(), null)
-                    );
-            }
-            else
-            {
-                if(!candidate.getIsFindJob())
-                    return ResponseEntity.ok(
-                            new BaseResponse("Đã tắt tìm công việc rồi", HttpStatus.OK.value(), null)
-                    );
-
-                candidate.setIsFindJob(false);
-                candidateService.update(candidate);
-
-                return ResponseEntity.ok(
-                        new BaseResponse("Tắt tìm công việc thành công", HttpStatus.OK.value(), null)
-                );
-            }
 
 
         } catch (ExpiredJwtException e) {

@@ -10,7 +10,7 @@ import {
   SettingAccount,
 } from "./components";
 import { GreatJobs } from "@/components/ui";
-import { useContext, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import ModalBase from "@/components/modal";
 import { LoadingContext } from "@/App";
 import { candidatesService } from "@/services";
@@ -100,9 +100,71 @@ const ProfilePage = () => {
     fetchData();
   }, []);
 
-  const [isFindJob, setIsFindJob] = useState<boolean>(false);
   const _onClickFindJob = () => {
-    setIsFindJob(!isFindJob);
+    context.handleOpenLoading();
+    candidatesService
+      .updateIsFindJob()
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          fetchProfileData();
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  };
+
+  const _onClickChangeMyCV = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      context.handleOpenLoading();
+      candidatesService
+        .uploadCV(e.target.files[0])
+        .then((res) => {
+          if (res.status === 200 && res.data.Status === 200) {
+            SwalHelper.MiniAlert("Tải lên CV thành công", "success");
+            fetchProfileData();
+          } else {
+            SwalHelper.MiniAlert(res.data.Message, "error");
+          }
+        })
+        .catch(() => {
+          SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+        })
+        .finally(() => {
+          context.handleCloseLoading();
+        });
+    }
+  };
+  const _onClickDeleteCV = () => {
+    SwalHelper.Confirm(
+      "Xác nhận xóa CV này?",
+      "question",
+      () => {
+        context.handleOpenLoading();
+        candidatesService
+          .clearCV()
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              SwalHelper.MiniAlert("Xóa CV thành công", "success");
+              fetchProfileData();
+            } else {
+              SwalHelper.MiniAlert(res.data.Message, "error");
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
+      },
+      () => {}
+    );
   };
 
   return (
@@ -130,9 +192,10 @@ const ProfilePage = () => {
               _onClickChangeImage={_onClickChangeImage}
             />
             <SettingAccount
-              myCV={currentCandidate?.myCV}
-              _onClickChangeMyCV={_onClickChangeImage}
-              isFindJob={isFindJob}
+              myCV={currentCandidate?.cV}
+              _onClickChangeMyCV={_onClickChangeMyCV}
+              _onClickDeleteCV={_onClickDeleteCV}
+              isFindJob={currentCandidate?.isFindJob}
               _onClickFindJob={_onClickFindJob}
             />
           </div>

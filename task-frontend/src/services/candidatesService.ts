@@ -72,6 +72,24 @@ const candidatesService = {
     });
   },
 
+  async updateIsFindJob() {
+    return await axiosConfig.patch(CandidateAPI.updateIsFindJob, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
+  async clearCV() {
+    return await axiosConfig.patch(CandidateAPI.clearCV, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
+  async uploadCV(file: File | null) {
+    const formData = new FormData();
+    if (file) formData.append("cVFile", file);
+    return await axiosConfig.patch(CandidateAPI.uploadCV, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+
   async updateProfile(
     firstName?: string,
     lastName?: string,

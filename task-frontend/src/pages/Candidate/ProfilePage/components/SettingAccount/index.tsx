@@ -1,10 +1,11 @@
-import NON_USER from "@/assets/images/non-user.jpg";
-import { AiFillDelete, AiFillEye } from "react-icons/ai";
+import { ChangeEvent } from "react";
+import { AiFillDelete } from "react-icons/ai";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { IoCameraSharp, IoSettings } from "react-icons/io5";
+import { IoSettings } from "react-icons/io5";
 interface SettingAccountProps {
   myCV?: string;
-  _onClickChangeMyCV?: () => void;
+  _onClickChangeMyCV?: (e: ChangeEvent<HTMLInputElement>) => void;
+  _onClickDeleteCV?: () => void;
   isFindJob?: boolean;
   _onClickFindJob?: () => void;
 }
@@ -12,6 +13,7 @@ interface SettingAccountProps {
 const SettingAccount: React.FC<SettingAccountProps> = ({
   myCV,
   _onClickChangeMyCV,
+  _onClickDeleteCV,
   isFindJob,
   _onClickFindJob,
 }) => {
@@ -25,10 +27,7 @@ const SettingAccount: React.FC<SettingAccountProps> = ({
       </h2>
       <div className="mt-4 flex flex-col gap-4">
         <div className="">
-          <div
-            className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in"
-            onClick={_onClickFindJob}
-          >
+          <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
             <input
               type="checkbox"
               name="toggle"
@@ -38,10 +37,11 @@ const SettingAccount: React.FC<SettingAccountProps> = ({
               }`}
               checked={isFindJob}
               readOnly
+              onClick={_onClickFindJob}
             />
             <label
               htmlFor="toggle"
-              className={`toggle-label block overflow-hidden h-6 rounded-full cursor-pointer ${
+              className={`toggle-label block overflow-hidden h-6 rounded-full ${
                 isFindJob ? "bg-orangetext" : "bg-gray-300"
               }`}
             ></label>
@@ -57,19 +57,24 @@ const SettingAccount: React.FC<SettingAccountProps> = ({
           </label>
         </div>
         <div className="flex flex-col ">
-          <div className="">
-            <label className="font-medium">CV của bạn:</label>
-            <div className="flex gap-2">
-              <p className="truncate text-blue-500 my-auto">
-                https://react-icons.github.io/react-icons/search/#q=upload
-              </p>
-              <AiFillDelete
-                className=" cursor-pointer hover:text-red-500 text-3xl"
-                // onClick={_onClickDelete}
-              />
-            </div>
+          <div className="mb-0.5">
+            <p className="font-medium mb-1">CV của bạn:</p>
+            {myCV && (
+              <div className="flex gap-2">
+                <p
+                  className="truncate text-bgBlue hover:text-bgBlue/85 my-auto cursor-pointer w-full"
+                  onClick={() => window.open(myCV, "_blank")}
+                >
+                  {myCV}
+                </p>
+                <AiFillDelete
+                  className=" cursor-pointer text-gray-700 hover:text-red-500 text-2xl my-auto w-max"
+                  onClick={_onClickDeleteCV}
+                />
+              </div>
+            )}
           </div>
-          <label className="flex  cursor-pointer appearance-none justify-center rounded-md border border-dashed border-gray-300 bg-white px-2 py-5 text-sm transition hover:border-gray-400 focus:border-solid focus:border-orangetext focus:outline-none focus:ring-1 focus:ring-orangetext disabled:cursor-not-allowed disabled:bg-gray-200 disabled:opacity-75 gap-1.5">
+          <label className="flex cursor-pointer appearance-none justify-center rounded-md border border-dashed border-gray-300 bg-white px-2 py-5 text-sm transition hover:border-gray-400 focus:border-solid focus:border-orangetext focus:outline-none focus:ring-1 focus:ring-orangetext disabled:cursor-not-allowed disabled:bg-gray-200 disabled:opacity-75 gap-1.5">
             <FaCloudUploadAlt className="text-xl" />
             <span className="flex items-center">
               <span className="text-sm font-medium text-gray-600">
@@ -81,6 +86,7 @@ const SettingAccount: React.FC<SettingAccountProps> = ({
               type="file"
               className="sr-only"
               accept=".doc,docx,.pdf"
+              onChange={_onClickChangeMyCV}
             />
           </label>
         </div>
