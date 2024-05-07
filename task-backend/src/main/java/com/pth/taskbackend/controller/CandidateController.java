@@ -140,18 +140,18 @@ public class CandidateController {
     }
 
     @Operation(summary = "update status", description = "", tags = {})
-    @PatchMapping("/updateIsFindJob/{id}")
-    public ResponseEntity<BaseResponse> updateIsFindJob(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody Boolean isFindJob) {
+    @PatchMapping("/updateIsFindJob")
+    public ResponseEntity<BaseResponse> updateIsFindJob(@RequestHeader("Authorization")String token,@RequestBody Boolean isFindJob) {
         try {
 
             String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
             if (!permission)
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
 
-            Optional<Candidate> optionalCandidate = candidateService.findById(id);
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
             if (optionalCandidate.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
