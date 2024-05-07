@@ -21,9 +21,10 @@ const JobsPage: React.FC = () => {
   const { state } = useLocation();
 
   const dispatch = useDispatch();
-  const { totalPages, currentPage, itemPerPage, isEmpty } = useSelector(
+  const { totalPages, currentPage, isEmpty } = useSelector(
     (state: any) => state.paginationReducer
   );
+  const itemPerPage = 20;
   const { jobs } = useSelector((state: any) => state.listDataReducer);
   const { job } = useSelector((state: any) => state.singleDataReducer);
 
@@ -40,10 +41,9 @@ const JobsPage: React.FC = () => {
   const [tag, setTag] = useState<string | null>(null);
   const [experience, setExperience] = useState<string | null>(null);
   const [dateSubmit, setDateSubmit] = useState<string | null>(null);
-  const [type, setType] = useState<string | null>(null);
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(true);
 
   const fetchSingleData = (job: JobModel) => {
     setIsLoadingDetail(true);
@@ -74,8 +74,7 @@ const JobsPage: React.FC = () => {
         tag || "",
         dateSubmit || "",
         experience || "",
-        type || "",
-        currentPage,
+        currentPage - 1,
         itemPerPage
       )
       .then((res) => {
@@ -98,20 +97,13 @@ const JobsPage: React.FC = () => {
   };
 
   useEffect(() => {
+    dispatch(ONCHANGE_JOB_SINGLE(null));
+    dispatch(ONCHANGE_JOB_LIST([]));
     dispatch(CLEAR_PAGINATION_STATE());
   }, []);
   useEffect(() => {
     fetchListData();
-  }, [
-    name,
-    location,
-    currentPage,
-    experience,
-    category,
-    tag,
-    type,
-    dateSubmit,
-  ]);
+  }, [name, location, currentPage, experience, category, tag, dateSubmit]);
 
   const _onClickApplyJob = (id: string) => {
     setId(id);
@@ -147,7 +139,6 @@ const JobsPage: React.FC = () => {
         setDateSubmit={setDateSubmit}
         setExperience={setExperience}
         setTag={setTag}
-        setType={setType}
       />
       <section className="pb-10 pt-8 ">
         {isLoading ? (
@@ -171,8 +162,8 @@ const JobsPage: React.FC = () => {
                       status={job?.status}
                       employerName={job?.employer?.name}
                       employerId={job?.employer?.id}
-                      fromDate={DateHelper.formatDate(job?.fromDate)}
-                      toDate={DateHelper.formatDate(job?.toDate)}
+                      fromDate={DateHelper.formatDate(job?.created)}
+                      toDate={DateHelper.formatDate(new Date(job?.toDate!))}
                       category={job?.category?.name || "Khác"}
                       image={job?.employer?.image}
                       experience={job?.experience}
@@ -207,7 +198,9 @@ const JobsPage: React.FC = () => {
                           id={item?.id}
                           image={item?.employer?.image}
                           name={item?.name}
-                          dateline={DateHelper.formatDate(job?.toDate)}
+                          dateline={DateHelper.formatDate(
+                            new Date(item?.toDate!)
+                          )}
                           employer={item?.employer?.name}
                           location={item?.location}
                           salary={TextHelper.SalaryText(
@@ -215,6 +208,7 @@ const JobsPage: React.FC = () => {
                             item?.toSalary
                           )}
                           isVip={item.isVip}
+                          fetchData={fetchListData}
                         />
                       </div>
                     ))}

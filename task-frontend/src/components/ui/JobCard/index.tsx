@@ -90,18 +90,28 @@ const JobCard: React.FC<JobCardProps> = ({
         <div className="w-full flex flex-col gap-2 text-sm">
           <p className="flex gap-1 text-gray-500 font-lato font-normal">
             <CiClock2 className="my-auto" />
-            &nbsp;Thời hạn:&nbsp;&nbsp;
-            {dateline}
+
+            <p className="line-clamp-1">
+              &nbsp;Thời hạn:&nbsp;&nbsp;
+              {dateline}
+            </p>
           </p>
           <p className="flex gap-1 text-gray-500 font-lato font-normal">
             <MdOutlineAttachMoney className="my-auto" />
-            &nbsp;Mức lương:&nbsp;&nbsp;{salary}
+
+            <p className="line-clamp-1">&nbsp;Mức lương:&nbsp;&nbsp;{salary}</p>
           </p>
 
-          <p className="flex gap-1 text-gray-500  font-lato font-normal ">
-            <IoLocationOutline className="my-auto " />
-            &nbsp;Địa điểm:&nbsp;&nbsp;
-            {location}
+          <p className="flex gap-1 text-gray-500  font-lato font-normal">
+            <IoLocationOutline className="text-sm my-auto" />
+
+            <p
+              className="line-clamp-1"
+              data-tooltip-id="tooltip"
+              data-tooltip-content={location}
+            >
+              &nbsp;Địa điểm:&nbsp;{location}
+            </p>
           </p>
         </div>
         <div className="flex flex-col gap-2 justify-end">

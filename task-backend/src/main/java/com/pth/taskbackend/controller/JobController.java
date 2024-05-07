@@ -75,36 +75,33 @@ public class JobController {
                                                 @RequestParam(required = false) String experience,
                                                 @RequestParam(required = false) Integer dateNumber,
                                                 @RequestParam(required = false) String categoryId,
-                                                @RequestParam(required = false) Boolean isVip,
-                                                @RequestParam(required = false) String tag,
+                                                @RequestParam(required = false) String tagId,
                                                 Pageable pageable) {
         try {
             Optional<Candidate> optionalCandidate;
-                if(token!=null) {
-                    String email = jwtService.extractUsername(token.substring(7));
-                    boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
-                    if (!permission)
-                        return ResponseEntity.ok(
-                                new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-                        );
 
+            if(token!=null) {
+                String email = jwtService.extractUsername(token.substring(7));
+                boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+                if (permission){
                     optionalCandidate = candidateService.findByUserEmail(email);
                     if (optionalCandidate.isEmpty())
                         return ResponseEntity.ok(
                                 new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
                         );
-                } else {
+                }else{
                     optionalCandidate = null;
                 }
+            } else {
+                optionalCandidate = null;
+            }
+
             LocalDateTime fromDate = null;
             if (dateNumber != null) {
                 fromDate = LocalDateTime.now().minusDays(dateNumber);
             }
-            if (isVip==null)
-            {
-                isVip=false;
-            }
-            Page<Job> jobs = jobService.searchJobs(keyword, location, experience, fromDate, categoryId,isVip,tag , pageable);
+
+            Page<Job> jobs = jobService.searchJobs(keyword, location, experience, fromDate, categoryId,tagId , pageable);
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
@@ -168,9 +165,9 @@ public class JobController {
                             job.getLocation(),
                             job.getStatus(),
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                            token != null && (optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), job.getId()).isPresent()).isPresent()),
+                            optionalCandidate != null && (optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), job.getId()).isPresent()).isPresent()),
                             DateFunc.isExpired(job.getToDate()),
-                            token != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
+                            optionalCandidate != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -216,8 +213,6 @@ public class JobController {
             } else {
                 optionalCandidate = null;
             }
-
-            System.out.println(optionalCandidate);
 
             Page<Job> jobs = jobService.findByEmployerIdAndNameAndLocation(id, name, location, pageable);
             if (jobs.isEmpty()) {
@@ -283,9 +278,9 @@ public class JobController {
                             job.getLocation(),
                             job.getStatus(),
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                            optionalCandidate != null ? optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), job.getId()).isPresent()).isPresent():false,
+                            optionalCandidate != null && optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), job.getId()).isPresent()).isPresent(),
                             false,
-                            optionalCandidate != null ? optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent():false,
+                            optionalCandidate != null && optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent(),
 
                             categoryResponse,
                             jobEmployerResponse,
@@ -313,19 +308,19 @@ public class JobController {
                                                 Pageable pageable) {
         try {
             Optional<Candidate> optionalCandidate;
+
             if(token!=null) {
                 String email = jwtService.extractUsername(token.substring(7));
                 boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
-                if (!permission)
-                    return ResponseEntity.ok(
-                            new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-                    );
-
-                optionalCandidate = candidateService.findByUserEmail(email);
-                if (optionalCandidate.isEmpty())
-                    return ResponseEntity.ok(
-                            new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
-                    );
+                if (permission){
+                    optionalCandidate = candidateService.findByUserEmail(email);
+                    if (optionalCandidate.isEmpty())
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                }else{
+                    optionalCandidate = null;
+                }
             } else {
                 optionalCandidate = null;
             }
@@ -394,9 +389,9 @@ public class JobController {
                             job.getLocation(),
                             job.getStatus(),
                             true,
-                            token != null && (optionalCandidate.filter(candidate -> jobService.findByCandidateIdAndJobId(candidate.getId(), job.getId()).isPresent()).isPresent()),
+                            optionalCandidate != null && (optionalCandidate.filter(candidate -> jobService.findByCandidateIdAndJobId(candidate.getId(), job.getId()).isPresent()).isPresent()),
                             false,
-                            token != null && (optionalCandidate.filter(value -> applicationService.findByJobIdAndCandidateId(job.getId(), value.getId()).isPresent()).isPresent()),
+                            optionalCandidate != null && (optionalCandidate.filter(value -> applicationService.findByJobIdAndCandidateId(job.getId(), value.getId()).isPresent()).isPresent()),
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -947,18 +942,17 @@ public class JobController {
             if(token!=null) {
                 String email = jwtService.extractUsername(token.substring(7));
                 boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
-                if (!permission)
-                    return ResponseEntity.ok(
-                            new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-                    );
-
-                optionalCandidate = candidateService.findByUserEmail(email);
-                if (optionalCandidate.isEmpty())
-                    return ResponseEntity.ok(
-                            new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
-                    );
+                if (permission){
+                    optionalCandidate = candidateService.findByUserEmail(email);
+                    if (optionalCandidate.isEmpty())
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                }else{
+                    optionalCandidate = null;
+                }
             } else {
-                optionalCandidate = Optional.empty();
+                optionalCandidate = null;
             }
             Optional<Job> optionalJob = jobService.findByIdAndStatus(id, EStatus.ACTIVE).isEmpty() ?jobService.findByIdAndStatus(id, EStatus.PAUSED): jobService.findByIdAndStatus(id, EStatus.ACTIVE);
 
@@ -1023,9 +1017,9 @@ public class JobController {
                         job.getLocation(),
                         job.getStatus(),
                         vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                        token != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
+                        optionalCandidate != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
                         job.getToDate().isBefore(LocalDateTime.now()),
-                        token != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
+                        optionalCandidate != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
                         categoryResponse,
                         jobEmployerResponse,
                         jobHrResponse,

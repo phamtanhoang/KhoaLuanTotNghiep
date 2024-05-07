@@ -181,11 +181,10 @@ const JobAPI = {
     tag?: string,
     dateNumber?: string,
     experience?: string,
-    isVip?: string,
     currentPage?: number,
     itemPerPage?: number
   ) => {
-    return `/jobs?keyword=${keyword}&location=${location}&experience=${experience}&dateNumber=${dateNumber}&categoryId=${category}&isVip=${isVip}&tag=${tag}&page=${currentPage}&size=${itemPerPage}`;
+    return `/jobs?keyword=${keyword}&location=${location}&experience=${experience}&dateNumber=${dateNumber}&categoryId=${category}&tagId=${tag}&page=${currentPage}&size=${itemPerPage}`;
   },
 
   updateStatus_Admin: (id: string) => {

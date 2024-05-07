@@ -9,7 +9,6 @@ const jobsService = {
     tag?: string,
     dateNumber?: string,
     experience?: string,
-    isVip?: string,
     currentPage?: number,
     itemPerPage?: number
   ) {
@@ -21,7 +20,6 @@ const jobsService = {
         tag,
         dateNumber,
         experience,
-        isVip,
         currentPage,
         itemPerPage
       )

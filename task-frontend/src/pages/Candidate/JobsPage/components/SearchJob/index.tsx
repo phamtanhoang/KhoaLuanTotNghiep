@@ -23,7 +23,6 @@ interface SearchJobProps {
   setTag?: any;
   setExperience?: any;
   setDateSubmit?: any;
-  setType?: any;
 }
 const SearchJob: React.FC<SearchJobProps> = ({
   name,
@@ -34,7 +33,6 @@ const SearchJob: React.FC<SearchJobProps> = ({
   setTag,
   setDateSubmit,
   setExperience,
-  setType,
 }) => {
   const context = useContext(LoadingContext);
   const [hideFilter, setHideFilter] = useState<boolean>(false);
@@ -45,7 +43,6 @@ const SearchJob: React.FC<SearchJobProps> = ({
   const [tempTag, setTempTag] = useState<string | null>(null);
   const [tempExperience, setTempExperience] = useState<string | null>(null);
   const [tempDateSubmit, setTempDateSubmit] = useState<string | null>(null);
-  const [tempType, setTempType] = useState<string | null>(null);
   const [categories, setCategories] = useState<CategoryModel[]>([
     { id: "", name: "Tất cả ngành nghề" },
   ]);
@@ -59,7 +56,6 @@ const SearchJob: React.FC<SearchJobProps> = ({
       setTempTag(null);
       setTempExperience(null);
       setTempDateSubmit(null);
-      setTempType(null);
     }
     setHideFilter(!hideFilter);
   };
@@ -70,7 +66,6 @@ const SearchJob: React.FC<SearchJobProps> = ({
     setCategory(tempCategory);
     setExperience(tempExperience);
     setTag(tempTag);
-    setType(tempType);
     setDateSubmit(tempDateSubmit);
   };
 
@@ -156,7 +151,7 @@ const SearchJob: React.FC<SearchJobProps> = ({
 
           {hideFilter && (
             <>
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-2 lg:gap-1.5 border border-white p-1.5 rounded transition-all duration-300">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 lg:gap-1.5 border border-white p-1.5 rounded transition-all duration-300">
                 <div className="content-center w-full">
                   <SelectCustom
                     value={
@@ -216,20 +211,6 @@ const SearchJob: React.FC<SearchJobProps> = ({
                     onChange={(e: any) => setTempDateSubmit(e ? e.value : null)}
                     isMulti={false}
                     placeholder="Chọn ngày đăng..."
-                    theme={ConfigSelect.customTheme}
-                  />
-                </div>
-                <div className="content-center w-full">
-                  <SelectCustom
-                    value={
-                      DataConstants.TYPEJOB_DROPDOWN.find(
-                        (item) => item.value == tempType
-                      ) || null
-                    }
-                    options={DataConstants.TYPEJOB_DROPDOWN}
-                    onChange={(e: any) => setTempType(e ? e.value : null)}
-                    isMulti={false}
-                    placeholder="Chọn loại tin..."
                     theme={ConfigSelect.customTheme}
                   />
                 </div>
