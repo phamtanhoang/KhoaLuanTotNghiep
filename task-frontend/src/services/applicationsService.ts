@@ -38,5 +38,48 @@ const applicationsService = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+
+  async getApplications_Employer(
+    name?: string,
+    status?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) {
+    return await axiosConfig.get(
+      ApplicationAPI.getApplication_Employer(
+        name,
+        status,
+        currentPage,
+        itemPerPage
+      )
+    );
+  },
+  async getApplications_Candidate(
+    name?: string,
+    location?: string,
+    status?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) {
+    return await axiosConfig.get(
+      ApplicationAPI.getApplication_Candidate(
+        name,
+        location,
+        status,
+        currentPage,
+        itemPerPage
+      )
+    );
+  },
+  async getApplicationDetail_Candidate(id: string) {
+    return await axiosConfig.get(
+      ApplicationAPI.getApplicationDetail_Candidate(id)
+    );
+  },
+  async getApplicationDetail_Employer(id: string) {
+    return await axiosConfig.get(
+      ApplicationAPI.getApplicationDetail_Employer(id)
+    );
+  },
 };
 export default applicationsService;

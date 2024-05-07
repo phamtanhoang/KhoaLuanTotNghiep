@@ -1,7 +1,7 @@
 import { Schedule } from "@/components/ui";
 
 const ScheduleEmployerPage = () => {
-  const eventList: Event[] = [
+  const eventList: any[] = [
     {
       event_id: "1",
       start: new Date(
@@ -106,12 +106,6 @@ const ScheduleEmployerPage = () => {
       ),
       title: "Project Review",
       color: "#0000ff",
-    },
-    {
-      start: new Date("2024-03-24T12:00:00"),
-      end: new Date("2024-03-24T13:00:00"),
-      title: "Lunch Break",
-      color: "#ffff00",
     },
   ];
   const fetchScheduleData = () => {};

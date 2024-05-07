@@ -12,6 +12,7 @@ interface SingleDataReducerState {
   skill: SkillModel | null;
   step: StepModel | null;
   tag: TagModel | null;
+  application: ApplicationModel | null;
 }
 
 const initialState: SingleDataReducerState = {
@@ -26,6 +27,7 @@ const initialState: SingleDataReducerState = {
   skill: null,
   step: null,
   tag: null,
+  application: null,
 };
 export const listDataReducer = createSlice({
   name: "listDataReducer",
@@ -90,6 +92,12 @@ export const listDataReducer = createSlice({
     ONCHANGE_TAG_SINGLE: (state, action: PayloadAction<TagModel | null>) => {
       state.tag = action.payload;
     },
+    ONCHANGE_APPLICATION_SINGLE: (
+      state,
+      action: PayloadAction<ApplicationModel | null>
+    ) => {
+      state.application = action.payload;
+    },
   },
 });
 
@@ -105,6 +113,7 @@ export const {
   ONCHANGE_SKILL_SINGLE,
   ONCHANGE_STEP_SINGLE,
   ONCHANGE_TAG_SINGLE,
+  ONCHANGE_APPLICATION_SINGLE,
 } = listDataReducer.actions;
 
 export default listDataReducer.reducer;

@@ -36,7 +36,7 @@ const JobsEmployerPage = () => {
   );
   const { jobs } = useSelector((state: any) => state.listDataReducer);
   const context = useContext(LoadingContext);
-  const location = useLocation();
+
   const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
 
   const [open, setOpen] = useState(false);

@@ -22,8 +22,8 @@ const CANDIDATE_KEYS = {
 };
 const APPLICATION_KEYS = {
   applyJob: "ApplyJob",
-
   applycationDetail: "ApplycationDetail",
+  applycationStep: "ApplycationStep",
 };
 const HUMANRESOURCE_KEYS = {
   createHumanResource: "CreateHumanResource",
@@ -44,6 +44,9 @@ const PROCEDURE_KEYS = {
   createProcedure: "CreateProcedure",
   updateProcedure: "UpdateProcedure",
 };
+const CHAT_KEYS = {
+  chatApplication: "chatApplication",
+};
 export const ModalConstants = {
   COMMON_KEYS,
   AUTH_KEYS,
@@ -55,4 +58,5 @@ export const ModalConstants = {
   TAG_KEYS,
   CATEGORY_KEYS,
   PROCEDURE_KEYS,
+  CHAT_KEYS,
 };

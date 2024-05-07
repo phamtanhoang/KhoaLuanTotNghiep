@@ -8,7 +8,6 @@ import { humanResourcesService } from "@/services";
 import { SwalHelper } from "@/utils/helpers";
 import ModalBase from "@/components/modal";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
 import { ONCLEAR_FILTER } from "@/store/reducers/searchReducer";
 import { ModalConstants } from "@/utils/constants";
 import {

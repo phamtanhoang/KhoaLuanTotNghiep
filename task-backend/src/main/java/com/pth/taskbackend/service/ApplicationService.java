@@ -31,6 +31,7 @@ public interface ApplicationService {
     Optional<Application>findByIdAndJobHumanResourceEmployerId(String id, String employerId)throws IOException;
 
     Page<Application> findByEmployerIdAndStatusAndNameContaining(String employerId, EApplyStatus status, String keyword, Pageable pageable)throws IOException;
+    Page<Application> findByCandidateIdAndNameContainingAndLocationContainingAndStatus(String candidateId, EApplyStatus status, String keyword,String location, Pageable pageable)throws IOException;
     Page<Application> findByHRIdAndStatusAndNameContaining(String hrId, EApplyStatus status, String keyword, Pageable pageable) throws  IOException;
     Page<Application>findByEmployerIdAndStatus(String employerId, EApplyStatus status, Pageable pageable)throws IOException;
     Page<Application> findByHrIdAndStatus(String hrId, EApplyStatus status, Pageable pageable)throws IOException;

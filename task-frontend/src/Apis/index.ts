@@ -204,6 +204,33 @@ const ApplicationAPI = {
   applyJob_Link: (id: string) => {
     return `/applications/applyWithLink/${id}`;
   },
+
+  getApplication_Employer: (
+    name?: string,
+    status?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/applications/getApplications-employer?title=${name}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
+  },
+
+  getApplicationDetail_Employer: (id: string) => {
+    return `/applications/getApplication-employer/${id}`;
+  },
+
+  getApplicationDetail_Candidate: (id: string) => {
+    return `/applications/getApplication-candidate/${id}`;
+  },
+
+  getApplication_Candidate: (
+    name?: string,
+    location?: string,
+    status?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/applications/getApplications-candidate?title=${name}&location=${location}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
+  },
 };
 export {
   AuthAPI,

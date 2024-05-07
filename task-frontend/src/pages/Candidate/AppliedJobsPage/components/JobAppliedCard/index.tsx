@@ -25,7 +25,7 @@ interface JobAppliedCardProps {
   category?: string;
   isVip?: boolean;
   state?: string;
-  _onClickDetail?: () => void;
+  _onClickDetail: (id: string) => void;
 }
 
 const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
@@ -92,7 +92,9 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
           <p className="flex gap-1 text-gray-500 font-lato font-normal">
             <BiCategoryAlt className="text-base my-auto" />
             &nbsp;
-            <p className="line-clamp-1">Ngành nghề:&nbsp;{category}</p>
+            <p className="line-clamp-1">
+              Ngành nghề:&nbsp;{category || "Khác"}
+            </p>
           </p>
           <p className="flex gap-1 text-gray-500  font-lato font-normal">
             <IoLocationOutline className="text-base my-auto" />
@@ -131,7 +133,7 @@ const JobAppliedCard: React.FC<JobAppliedCardProps> = ({
         </p>
         <button
           className="text-xl p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext"
-          onClick={_onClickDetail}
+          onClick={() => _onClickDetail(id!)}
         >
           <AiFillEye />
         </button>

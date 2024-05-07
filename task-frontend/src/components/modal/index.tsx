@@ -8,7 +8,7 @@ import {
   ChangeExpSkillInfoCandidate,
   ChangeInfoCandidate,
 } from "./candidate";
-import { ApplicationDetail, ApplyJob } from "./application";
+import { ApplicationDetail, ApplicationStep, ApplyJob } from "./application";
 import { ChangeInfoEmployer, EmployerUpdate } from "./employer";
 import { CreateTag, UpdateTag } from "./tag";
 import { CreateCategory, UpdateCategory } from "./category";
@@ -19,6 +19,7 @@ import {
 } from "./humanResource";
 import { CreateProcedure, UpdateProcedure } from "./procedure";
 import { ModalConstants } from "@/utils/constants";
+import { ChatApplication } from "./chat";
 
 const ModalBase = (props: any) => {
   // take props
@@ -62,7 +63,7 @@ const ModalBase = (props: any) => {
       />
     ),
     [ModalConstants.APPLICATION_KEYS.applycationDetail]: (
-      <ApplicationDetail handleClose={handleClose} />
+      <ApplicationDetail id={id} handleClose={handleClose} />
     ),
 
     [ModalConstants.AUTH_KEYS.registerEmployer]: (
@@ -162,6 +163,13 @@ const ModalBase = (props: any) => {
         fetchData={fetchData}
         handleClose={handleClose}
       />
+    ),
+
+    [ModalConstants.CHAT_KEYS.chatApplication]: (
+      <ChatApplication handleClose={handleClose} />
+    ),
+    [ModalConstants.APPLICATION_KEYS.applycationStep]: (
+      <ApplicationStep id={id} handleClose={handleClose} />
     ),
   };
 

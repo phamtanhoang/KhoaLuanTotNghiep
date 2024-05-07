@@ -11,6 +11,7 @@ import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.*;
 import com.pth.taskbackend.util.func.CheckPermission;
+import com.pth.taskbackend.util.func.DateFunc;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -167,7 +168,7 @@ public class JobController {
                             job.getStatus(),
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                             token != null && (optionalCandidate.isEmpty() ? false : jobService.findByCandidateIdAndJobId(optionalCandidate.get().getId(), job.getId()).isPresent()),
-                            false,
+                            DateFunc.isExpired(job.getToDate()),
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,

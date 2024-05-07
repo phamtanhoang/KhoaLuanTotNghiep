@@ -1,60 +1,57 @@
-
 import { ApplicationsTableMobile, ApplicationsTableWeb } from "./components";
-import { Pagination } from "@/components/ui";
+import { Pagination, PaginationCustom } from "@/components/ui";
 import { FiFilter } from "react-icons/fi";
-import { MODAL_KEYS } from "@/utils/constants/modalConstants";
 
 import { SwalHelper } from "@/utils/helpers/swalHelper";
+import { ModalConstants } from "@/utils/constants";
+import ModalBase from "@/components/modal";
+import { useContext, useEffect, useState } from "react";
+import { ONCLEAR_FILTER } from "@/store/reducers/searchReducer";
+import {
+  CLEAR_PAGINATION_STATE,
+  ONCHANGE_CURRENTPAGE,
+  ONCHANGE_PAGINATION,
+} from "@/store/reducers/paginationState";
+import { useDispatch, useSelector } from "react-redux";
+import { LoadingContext } from "@/App";
+import applicationsService from "@/services/applicationsService";
+import { ONCHANGE_APPLICATION_LIST } from "@/store/reducers/listDataReducer";
 
-const sampleData = [
-  {
-    image: "",
-    personName: "Phạm Tấn Hoàng",
-    email: "phamtanhoang3202@gmail.com",
-    jobTitle: "[HCM][DL] Lập trình viên front end",
-    applyDate: "2024-03-01",
-    state: "PENDING",
-  },
-  {
-    image: "",
-    personName: "Phạm Tấn Hoàng2",
-    email: "phamtanhoang3202@gmail.com2",
-    jobTitle: "Job 2",
-    applyDate: "2024-03-01",
-    state: "DISAPPROVE",
-  },
-  {
-    image: "",
-    personName: "Phạm Tấn Hoàng3",
-    email: "phamtanhoang3202@gmail.com3",
-    jobTitle: "Job 3",
-    applyDate: "2024-03-01",
-    state: "APPROVE",
-  },
-  {
-    image: "",
-    personName: "Phạm Tấn Hoàng2",
-    email: "phamtanhoang3202@gmail.com2",
-    jobTitle: "Job 2",
-    applyDate: "2024-03-01",
-    state: "FAILED",
-  },
-  {
-    image: "",
-    personName: "Phạm Tấn Hoàng3",
-    email: "phamtanhoang3202@gmail.com3",
-    jobTitle: "Job 3",
-    applyDate: "2024-03-01",
-    state: "SUCCESS",
-  },
-];
+export interface ApplicationTableProps {
+  value: ApplicationModel[];
+  _onClickDetail: (item: ApplicationModel) => void;
+  _onClickDelete: (item: ApplicationModel) => void;
+  isLoading: boolean;
+  isEmpty: boolean;
+  currentPage: number;
+  itemPerpage: number;
+}
+
 const ApplicationsEmployerPage = () => {
+  const dispatch = useDispatch();
+  const searchReducer = useSelector((state: any) => state.searchReducer);
+  const { currentPage, itemPerPage, totalPages, isEmpty } = useSelector(
+    (state: any) => state.paginationReducer
+  );
+  const { applications } = useSelector((state: any) => state.listDataReducer);
+
+  const context = useContext(LoadingContext);
+
+  const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
+
+  const [open, setOpen] = useState<boolean>(false);
+  const [funcs, setFuncs] = useState<string>("");
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const [id, setId] = useState<string>("");
 
   const _onClickFilter = () => {
-    // context.setFuncs(MODAL_KEYS.filter);
-    // context.handleOpen();
+    setFuncs(ModalConstants.COMMON_KEYS.filter);
+    handleOpen();
   };
-  const _onClickDelete = () => {
+
+  const _onClickDelete = (item: ApplicationModel) => {
     SwalHelper.Confirm(
       "Xóa đơn ứng tuyển này?",
       "warning",
@@ -66,9 +63,54 @@ const ApplicationsEmployerPage = () => {
       }
     );
   };
-  const _onClickDetail = () => {};
+  const _onClickDetail = (item: ApplicationModel) => {
+    setId(item.id);
+    setFuncs(ModalConstants.APPLICATION_KEYS.applycationDetail);
+    handleOpen();
+  };
+
+  const fetchListData = () => {
+    setIsLoadingTable(true);
+    applicationsService
+      .getApplications_Employer(
+        searchReducer.keyword,
+        searchReducer.status,
+        currentPage - 1,
+        itemPerPage
+      )
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          dispatch(ONCHANGE_APPLICATION_LIST(res.data.Data?.content || []));
+          dispatch(ONCHANGE_PAGINATION(res.data.Data));
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+      })
+      .finally(() => {
+        setIsLoadingTable(false);
+      });
+  };
+
+  useEffect(() => {
+    dispatch(ONCLEAR_FILTER());
+    dispatch(CLEAR_PAGINATION_STATE());
+  }, []);
+
+  useEffect(() => {
+    fetchListData();
+  }, [searchReducer.keyword, searchReducer.status, currentPage]);
   return (
     <>
+      <ModalBase
+        id={id}
+        open={open}
+        handleClose={handleClose}
+        funcs={funcs}
+        fetchData={fetchListData}
+      />
       <div className="bg-white p-4 rounded relative w-full mt-8">
         <div className="-mt-12 flex justify-between relative p-4 lg:py-4 lg:px-8 place-items-center rounded-xl bg-orangetext bg-clip-border text-white shadow-md shadow-orange-500/40">
           <div className="items-center text-lg lg:text-2xl font-bold text-white">
@@ -89,23 +131,37 @@ const ApplicationsEmployerPage = () => {
         <div className="bg-white lg:px-4 rounded relative w-full  mt-2 lg:mt-5">
           <div className="max-lg:hidden">
             <ApplicationsTableWeb
-              value={sampleData}
+              value={applications}
               _onClickDelete={_onClickDelete}
-              // _onClickEdit={_onClickEdit}
               _onClickDetail={_onClickDetail}
+              isLoading={isLoadingTable}
+              currentPage={currentPage}
+              itemPerpage={itemPerPage}
+              isEmpty={isEmpty}
             />
           </div>
           <div className="lg:hidden">
             <ApplicationsTableMobile
-              value={sampleData}
+              value={applications}
               _onClickDelete={_onClickDelete}
               _onClickDetail={_onClickDetail}
+              isLoading={isLoadingTable}
+              currentPage={currentPage}
+              itemPerpage={itemPerPage}
+              isEmpty={isEmpty}
             />
           </div>
         </div>
 
         <div className="w-max mx-auto mt-5">
-          <Pagination />
+          <PaginationCustom
+            currentPage={currentPage}
+            setCurrentPage={(page: number) =>
+              dispatch(ONCHANGE_CURRENTPAGE(page))
+            }
+            totalPages={totalPages}
+            type={true}
+          />
         </div>
       </div>
     </>

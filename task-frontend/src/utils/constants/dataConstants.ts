@@ -42,10 +42,9 @@ const TYPEJOB_DROPDOWN = [
 const APPLY_STATE_DROPDOWN = [
   { id: "", name: "Toàn bộ", color: "" },
   { id: "PENDING", name: "Chờ xét duyệt", color: "#FFC300" },
-  { id: "DISAPPROVE", name: "Hồ sơ chưa phù hợp", color: "#C0C0C0" },
-  { id: "APPROVE", name: "Hồ sơ phù hợp", color: "#0000FF" },
-  { id: "FAILED", name: "Rớt phỏng vấn", color: "#FF0000" },
-  { id: "SUCCESS", name: "Đậu phỏng vấn", color: "#169C46" },
+  { id: "PROCESSING", name: "Trong quá trình", color: "#0000FF" },
+  { id: "REJECTED", name: "Thất bại", color: "#FF0000" },
+  { id: "APPROVED", name: "Thành công", color: "#169C46" },
 ];
 
 const JOB_STATE_DROPDOWN = [

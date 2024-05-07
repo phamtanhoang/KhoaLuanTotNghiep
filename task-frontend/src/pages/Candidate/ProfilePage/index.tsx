@@ -166,105 +166,111 @@ const ProfilePage = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              <div className="bg-white p-5 shadow-sm rounded-sm h-max">
-                <div className="flex items-center font-semibold text-gray-900 leading-8 mb-3 justify-between gap-3">
-                  <h2 className="tracking-wide text-lg flex">
-                    <span className="text-orangetext text-xl my-auto">
-                      <GiSkills />
-                    </span>
-                    &nbsp;&nbsp;Kĩ năng
-                  </h2>
-                  <button
-                    className="text-gray-800 hover:text-orangetext p-1.5"
-                    onClick={() =>
-                      _onClickChange(DataConstants.TYPE_EXTRA_DATA.SKILL)
-                    }
-                  >
-                    <FaEdit className="text-xl" />
-                  </button>
+              <div className="flex flex-col gap-5">
+                <div className="bg-white p-5 shadow-sm rounded-sm h-max">
+                  <div className="flex items-center font-semibold text-gray-900 leading-8 mb-3 justify-between gap-3">
+                    <h2 className="tracking-wide text-lg flex">
+                      <span className="text-orangetext text-xl my-auto">
+                        <IoNewspaperOutline />
+                      </span>
+                      &nbsp;&nbsp;Kinh nghiệm làm việc
+                    </h2>
+                    <button
+                      className="text-gray-800 hover:text-orangetext p-1.5"
+                      onClick={() =>
+                        _onClickChange(DataConstants.TYPE_EXTRA_DATA.EXP)
+                      }
+                    >
+                      <FaEdit className="text-xl" />
+                    </button>
+                  </div>
+                  <ul className="list-inside space-y-2">
+                    {experiences?.map(
+                      (item: ExperienceModel, index: number) => (
+                        <li key={index}>
+                          <SkillExpEduProps
+                            name={item?.experience}
+                            fromDate={DateHelper.formatDate(
+                              new Date(item?.fromDate!)
+                            )}
+                            toDate={
+                              item?.toDate == "now"
+                                ? "Hiện tại"
+                                : DateHelper.formatDate(new Date(item?.toDate!))
+                            }
+                            description={item?.description}
+                          />
+                        </li>
+                      )
+                    )}
+                  </ul>
                 </div>
-                <ul className="list-inside space-y-2">
-                  {skills?.map((item: SkillModel, index: number) => (
-                    <li key={index}>
-                      <SkillExpEduProps
-                        name={item.skill}
-                        description={item.description}
-                      />
-                    </li>
-                  ))}
-                </ul>
+                <div className="bg-white p-5 shadow-sm rounded-sm h-max">
+                  <div className="flex items-center space-x-2 font-semibold text-gray-900 leading-8 mb-3 justify-between gap-3">
+                    <h2 className="tracking-wide text-lg flex">
+                      <span className="text-orangetext text-2xl my-auto">
+                        <GiGraduateCap />
+                      </span>
+                      &nbsp;&nbsp;Trình độ học vấn
+                    </h2>
+                    <button
+                      className="text-gray-800 hover:text-orangetext p-1.5"
+                      onClick={() =>
+                        _onClickChange(DataConstants.TYPE_EXTRA_DATA.EDU)
+                      }
+                    >
+                      <FaEdit className="text-xl" />
+                    </button>
+                  </div>
+                  <ul className="list-inside space-y-2">
+                    {educations?.map((item: EducationlModel, index: number) => (
+                      <li key={index}>
+                        <SkillExpEduProps
+                          name={item?.education}
+                          fromDate={DateHelper.formatDate(
+                            new Date(item?.fromDate!)
+                          )}
+                          toDate={
+                            item?.toDate == "now"
+                              ? "Hiện tại"
+                              : DateHelper.formatDate(new Date(item?.toDate!))
+                          }
+                          description={item?.description}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <div className="bg-white p-5 shadow-sm rounded-sm h-max">
-                <div className="flex items-center font-semibold text-gray-900 leading-8 mb-3 justify-between gap-3">
-                  <h2 className="tracking-wide text-lg flex">
-                    <span className="text-orangetext text-xl my-auto">
-                      <IoNewspaperOutline />
-                    </span>
-                    &nbsp;&nbsp;Kinh nghiệm làm việc
-                  </h2>
-                  <button
-                    className="text-gray-800 hover:text-orangetext p-1.5"
-                    onClick={() =>
-                      _onClickChange(DataConstants.TYPE_EXTRA_DATA.EXP)
-                    }
-                  >
-                    <FaEdit className="text-xl" />
-                  </button>
+              <div>
+                <div className="bg-white p-5 shadow-sm rounded-sm h-max">
+                  <div className="flex items-center font-semibold text-gray-900 leading-8 mb-3 justify-between gap-3">
+                    <h2 className="tracking-wide text-lg flex">
+                      <span className="text-orangetext text-xl my-auto">
+                        <GiSkills />
+                      </span>
+                      &nbsp;&nbsp;Kĩ năng
+                    </h2>
+                    <button
+                      className="text-gray-800 hover:text-orangetext p-1.5"
+                      onClick={() =>
+                        _onClickChange(DataConstants.TYPE_EXTRA_DATA.SKILL)
+                      }
+                    >
+                      <FaEdit className="text-xl" />
+                    </button>
+                  </div>
+                  <ul className="list-inside space-y-2">
+                    {skills?.map((item: SkillModel, index: number) => (
+                      <li key={index}>
+                        <SkillExpEduProps
+                          name={item.skill}
+                          description={item.description}
+                        />
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="list-inside space-y-2">
-                  {experiences?.map((item: ExperienceModel, index: number) => (
-                    <li key={index}>
-                      <SkillExpEduProps
-                        name={item?.experience}
-                        fromDate={DateHelper.formatDate(
-                          new Date(item?.fromDate!)
-                        )}
-                        toDate={
-                          item?.toDate == "now"
-                            ? "Hiện tại"
-                            : DateHelper.formatDate(new Date(item?.toDate!))
-                        }
-                        description={item?.description}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="bg-white p-5 shadow-sm rounded-sm h-max">
-                <div className="flex items-center space-x-2 font-semibold text-gray-900 leading-8 mb-3 justify-between gap-3">
-                  <h2 className="tracking-wide text-lg flex">
-                    <span className="text-orangetext text-2xl my-auto">
-                      <GiGraduateCap />
-                    </span>
-                    &nbsp;&nbsp;Trình độ học vấn
-                  </h2>
-                  <button
-                    className="text-gray-800 hover:text-orangetext p-1.5"
-                    onClick={() =>
-                      _onClickChange(DataConstants.TYPE_EXTRA_DATA.EDU)
-                    }
-                  >
-                    <FaEdit className="text-xl" />
-                  </button>
-                </div>
-                <ul className="list-inside space-y-2">
-                  {educations?.map((item: EducationlModel, index: number) => (
-                    <li key={index}>
-                      <SkillExpEduProps
-                        name={item?.education}
-                        fromDate={DateHelper.formatDate(
-                          new Date(item?.fromDate!)
-                        )}
-                        toDate={
-                          item?.toDate == "now"
-                            ? "Hiện tại"
-                            : DateHelper.formatDate(new Date(item?.toDate!))
-                        }
-                        description={item?.description}
-                      />
-                    </li>
-                  ))}
-                </ul>
               </div>
             </div>
           </div>

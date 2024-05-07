@@ -43,7 +43,7 @@ import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 @SecurityRequirement(name = "javainuseapi")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = {BASE_URL + "/categories"})
+    @RequestMapping(value = {BASE_URL + "/categories"})
 public class CategoryController {
 
     @Autowired
@@ -296,4 +296,5 @@ public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
 }

@@ -70,6 +70,22 @@ public interface ApplicationRepository extends JpaRepository<Application, String
                                                                  @Param("keyword") String keyword,
                                                                  Pageable pageable);
     @Query("SELECT app FROM Application app " +
+            "JOIN FETCH app.candidate c " +
+            "JOIN FETCH app.job j " +
+            "WHERE c.id = :candidateId " +
+            "AND (:status IS NULL OR app.status = :status) " +
+            "AND j.name LIKE %:keyword% " +
+            "AND j.location LIKE %:location% " +
+            "AND app.status != 'DELETED' " +
+            "ORDER BY app.created DESC")
+    Page<Application> findByCandidateIdAndNameContainingAndLocationContainingAndStatus(
+            @Param("candidateId") String candidateId,
+            @Param("status") EApplyStatus status,
+            @Param("keyword") String keyword,
+            @Param("location") String location,
+            Pageable pageable);
+
+    @Query("SELECT app FROM Application app " +
             "JOIN FETCH app.job job " +
             "JOIN FETCH job.humanResource hr " +
             "WHERE hr.id = :hrId " +

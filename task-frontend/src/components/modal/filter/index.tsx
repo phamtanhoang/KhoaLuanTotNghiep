@@ -65,6 +65,11 @@ const FilterModal = (props: any) => {
       dispatch(ONCHANGE_CATEGORY(category));
       return;
     }
+    if (location.pathname === PathConstants.EMPLOYER_PATHS.applys) {
+      dispatch(ONCHANGE_STATUS(status));
+      dispatch(ONCHANGE_KEYWORD(keyword));
+      return;
+    }
   };
   const _onClear = () => {
     setKeyword("");
@@ -147,7 +152,8 @@ const FilterModal = (props: any) => {
             </div>
           )}
           {(location.pathname === PathConstants.EMPLOYER_PATHS.hr ||
-            location.pathname === PathConstants.EMPLOYER_PATHS.jobs) && (
+            location.pathname === PathConstants.EMPLOYER_PATHS.jobs ||
+            location.pathname === PathConstants.EMPLOYER_PATHS.applys) && (
             <div className="w-full">
               <label className="block mb-1.5 text-base font-medium text-gray-600">
                 Tình trạng:
@@ -169,6 +175,12 @@ const FilterModal = (props: any) => {
                   ))}
                 {location.pathname === PathConstants.EMPLOYER_PATHS.jobs &&
                   DataConstants.JOB_STATE_DROPDOWN.map((item, index) => (
+                    <option key={index} value={item.id} className="py-2">
+                      {item.name}
+                    </option>
+                  ))}
+                {location.pathname === PathConstants.EMPLOYER_PATHS.applys &&
+                  DataConstants.APPLY_STATE_DROPDOWN.map((item, index) => (
                     <option key={index} value={item.id} className="py-2">
                       {item.name}
                     </option>

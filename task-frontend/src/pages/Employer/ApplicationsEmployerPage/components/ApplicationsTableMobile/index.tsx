@@ -3,28 +3,19 @@ import { useEffect, useRef, useState } from "react";
 import { IoMdMore } from "react-icons/io";
 import NON_USER from "@/assets/images/non-user.jpg";
 import { AiFillDelete, AiFillEye } from "react-icons/ai";
-
-interface ApplicationProps {
-  image: string;
-  personName: string;
-  email: string;
-  jobTitle: string;
-  applyDate: string;
-  state: string;
-}
-interface ApplicationsTableMobileProps {
-  value: ApplicationProps[];
-  _onClickDelete: () => void;
-  _onClickDetail: () => void;
-}
+import { ListEmpty, Loading } from "@/components/ui";
+import { ApplicationTableProps } from "../..";
+import { DateHelper } from "@/utils/helpers";
 
 const ItemTSX: React.FC<{
-  item: ApplicationProps;
+  item: ApplicationModel;
   index: number;
-  _onClickDelete: () => void;
-  _onClickDetail: () => void;
+  _onClickDetail: (item: ApplicationModel) => void;
+  _onClickDelete: (item: ApplicationModel) => void;
+  currentPage: number;
+  itemPerpage: number;
 }> = ({ item, index, _onClickDelete, _onClickDetail }) => {
-  let data = ConstantsHelper.findApplicationStateById(item.state);
+  let data = ConstantsHelper.findApplicationStateById(item.status);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const trigger = useRef<any>(null);
@@ -65,7 +56,7 @@ const ItemTSX: React.FC<{
             <div className="flex items-center gap-3">
               <img
                 className="object-cover w-10 h-10 rounded-full"
-                src={item.image ? item.image : NON_USER}
+                src={item.candidate?.avatar ? item.candidate?.avatar : NON_USER}
                 alt="logo"
               />
               <div>
@@ -73,10 +64,10 @@ const ItemTSX: React.FC<{
                   className="text-base font-semibold text-gray-800 cursor-pointer hover:text-orangetext line-clamp-2"
                   onClick={() => {}}
                 >
-                  {item.personName}
+                  {item.candidate?.firstName} {item.candidate?.lastName}
                 </h2>
                 <p className="text-sm font-normal text-gray-600 line-clamp-1">
-                  {item.email}
+                  {item.candidate?.email}
                 </p>
               </div>
             </div>
@@ -87,14 +78,14 @@ const ItemTSX: React.FC<{
           <p className="font-normal text-base text-gray-600 w-max mb-auto mt-1">
             Tên công việc:&nbsp;&nbsp;
           </p>
-          <p className="">{item.jobTitle}</p>
+          <p className="">{item.job?.name}</p>
         </div>
         <div className="flex items-center w-full justify-start ">
           <p className="text-base leading-8 font-medium text-gray-800">
             <span className="font-normal text-base text-gray-600">
               Ngày ứng tuyển:&nbsp;&nbsp;
             </span>
-            {item.applyDate}
+            {DateHelper.formatDateTime(item.applyDate)}
           </p>
         </div>
         <div className="flex justify-between gap-4">
@@ -131,22 +122,16 @@ const ItemTSX: React.FC<{
             >
               <a
                 className="flex px-6 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2"
-                onClick={_onClickDetail}
+                onClick={() => _onClickDetail(item)}
               >
-                <AiFillEye
-                  className="text-orangetext text-lg"
-                  onClick={_onClickDetail}
-                />
+                <AiFillEye className="text-orangetext text-lg" />
                 Chi tiết
               </a>
               <a
                 className="flex px-6 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2"
-                onClick={_onClickDelete}
+                onClick={() => _onClickDelete(item)}
               >
-                <AiFillDelete
-                  className="text-red-500 text-lg"
-                  onClick={_onClickDelete}
-                />
+                <AiFillDelete className="text-red-500 text-lg" />
                 Xóa
               </a>
             </div>
@@ -157,25 +142,51 @@ const ItemTSX: React.FC<{
   );
 };
 
-const ApplicationsTableMobile: React.FC<ApplicationsTableMobileProps> = ({
+const ApplicationsTableMobile: React.FC<ApplicationTableProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,
+  isLoading,
+  isEmpty,
+  currentPage,
+  itemPerpage,
 }) => {
   return (
     <>
       <table className="w-full text-gray-600">
         <tbody className="flex flex-col gap-2">
-          {value.map((item, index) => (
+          {isLoading ? (
+            <tr className="bg-white flex align-center justify-center">
+              <td className="p-6 whitespace-no-wrap">
+                <Loading />
+              </td>
+            </tr>
+          ) : (
             <>
-              <ItemTSX
-                item={item}
-                index={index}
-                _onClickDelete={_onClickDelete}
-                _onClickDetail={_onClickDetail}
-              />
+              {isEmpty ? (
+                <tr className="bg-white flex align-center justify-center">
+                  <td className="pt-6 whitespace-no-wrap">
+                    <ListEmpty />
+                  </td>
+                </tr>
+              ) : (
+                <>
+                  {value?.map((item: ApplicationModel, index: number) => (
+                    <>
+                      <ItemTSX
+                        item={item}
+                        index={index}
+                        _onClickDelete={_onClickDelete}
+                        _onClickDetail={_onClickDetail}
+                        currentPage={currentPage}
+                        itemPerpage={itemPerpage}
+                      />
+                    </>
+                  ))}
+                </>
+              )}
             </>
-          ))}
+          )}
         </tbody>
       </table>
     </>

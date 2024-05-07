@@ -1,4 +1,4 @@
-import { Hero } from "@/components/ui";
+import { EmptyData, Hero, Loading, PaginationCustom } from "@/components/ui";
 
 import { GreatEmployers, Pagination, SearchJobs } from "@/components/ui";
 import {
@@ -11,12 +11,29 @@ import ModalBase from "@/components/modal";
 
 import { JobAppliedCard } from "./components";
 import { MdArrowDropDown } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  CLEAR_PAGINATION_STATE,
+  ONCHANGE_CURRENTPAGE,
+  ONCHANGE_PAGINATION,
+} from "@/store/reducers/paginationState";
+import { DateHelper, SwalHelper } from "@/utils/helpers";
+import { ONCHANGE_APPLICATION_LIST } from "@/store/reducers/listDataReducer";
+import applicationsService from "@/services/applicationsService";
 
 const AppliedJobsPage = () => {
+  const dispatch = useDispatch();
+  const { totalPages, currentPage, itemPerPage, isEmpty } = useSelector(
+    (state: any) => state.paginationReducer
+  );
+  const { applications } = useSelector((state: any) => state.listDataReducer);
+
   const [open, setOpen] = useState<boolean>(false);
   const [funcs, setFuncs] = useState<string>("");
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [id, setId] = useState<string>("");
 
@@ -42,10 +59,46 @@ const AppliedJobsPage = () => {
     }
   };
 
-  const _onClickDetail = () => {
+  const _onClickDetail = (id: string) => {
+    setId(id);
     setFuncs(ModalConstants.APPLICATION_KEYS.applycationDetail);
     handleOpen();
   };
+
+  const fetchListData = () => {
+    setIsLoading(false);
+    applicationsService
+      .getApplications_Candidate(
+        name,
+        location,
+        status?.id,
+        currentPage - 1,
+        itemPerPage
+      )
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          dispatch(ONCHANGE_APPLICATION_LIST(res.data.Data?.content || []));
+          dispatch(ONCHANGE_PAGINATION(res.data.Data));
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    dispatch(CLEAR_PAGINATION_STATE());
+    dispatch(ONCHANGE_APPLICATION_LIST([]));
+  }, []);
+
+  useEffect(() => {
+    fetchListData();
+  }, [name, location, currentPage, status]);
 
   return (
     <>
@@ -94,29 +147,53 @@ const AppliedJobsPage = () => {
             )}
           </div>
 
-          <div className=" grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <JobAppliedCard
-              id=""
-              employerId=""
-              image="https://source.unsplash.com/random/400x400"
-              name="[NA] Web Designer[HCM] Web Designer[HCM] Web Designer[HCM]
-                    Web Designer[HCM] Web Designer."
-              appliedDate="03/02/2002"
-              employer="Công ty dược phẩm Phúc
-                    Long Công ty dược phẩm Phúc Long"
-              location="Thành phố Hồ Chí Minh"
-              fromSalary="30"
-              toSalary=""
-              category="Công nghệ thông tin"
-              isVip
-              state="PENDING"
-              _onClickDetail={_onClickDetail}
-            />
-          </div>
+          {isLoading ? (
+            <Loading />
+          ) : (
+            <>
+              {isEmpty ? (
+                <div className="px-5 lg:px-28 justify-between mx-auto">
+                  <EmptyData text="Danh sách rỗng..." />
+                </div>
+              ) : (
+                <>
+                  <div className=" grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    {applications.map(
+                      (item: ApplicationModel, index: number) => (
+                        <JobAppliedCard
+                          key={index}
+                          id={item.job?.id}
+                          employerId={item.job?.employer?.id}
+                          image={item.job?.employer?.image}
+                          name={item.job?.name}
+                          appliedDate={DateHelper.formatDate(item.applyDate)}
+                          employer={item.job?.employer?.name}
+                          location={item.job?.location}
+                          fromSalary={item.job?.fromSalary}
+                          toSalary={item.job?.toSalary}
+                          category={item.job?.category?.name}
+                          isVip={item.job?.isVip}
+                          state={item.status}
+                          _onClickDetail={() => _onClickDetail(item?.id)}
+                        />
+                      )
+                    )}
+                  </div>
 
-          <div className="w-max mx-auto mt-5">
-            <Pagination />
-          </div>
+                  <div className="px-2 lg:px-28 justify-between mx-auto w-max">
+                    <PaginationCustom
+                      currentPage={currentPage}
+                      setCurrentPage={(page: number) =>
+                        dispatch(ONCHANGE_CURRENTPAGE(page))
+                      }
+                      totalPages={totalPages}
+                      type={true}
+                    />
+                  </div>
+                </>
+              )}
+            </>
+          )}
         </div>
       </section>
       <GreatEmployers />
