@@ -1,5 +1,5 @@
 const convertCategoriesToOptions = (categories: CategoryModel[]) => {
-  return categories.map((category) => ({
+  return categories?.map((category) => ({
     value: category.id,
     label: category.name,
   }));
@@ -7,14 +7,14 @@ const convertCategoriesToOptions = (categories: CategoryModel[]) => {
 
 const findOptionByCategoryId = (id: string, categories: CategoryModel[]) => {
   return (
-    convertCategoriesToOptions(categories).find(
+    convertCategoriesToOptions(categories)?.find(
       (option) => option.value === id
     ) || null
   );
 };
 
 const convertProceduresToOptions = (procedures: ProcedureModel[]) => {
-  return procedures.map((procedure) => ({
+  return procedures?.map((procedure) => ({
     value: procedure.id,
     label: procedure.name,
   }));
@@ -22,14 +22,14 @@ const convertProceduresToOptions = (procedures: ProcedureModel[]) => {
 
 const findOptionByProcedureId = (id: string, procedures: ProcedureModel[]) => {
   return (
-    convertProceduresToOptions(procedures).find(
+    convertProceduresToOptions(procedures)?.find(
       (option) => option.value === id
     ) || null
   );
 };
 
 const convertTagsToOptions = (tags: TagModel[]) => {
-  return tags.map((tag) => ({
+  return tags?.map((tag) => ({
     value: tag.id,
     label: tag.name,
     color: tag.color,
@@ -37,18 +37,18 @@ const convertTagsToOptions = (tags: TagModel[]) => {
 };
 
 const convertHrsToOptions = (hrs: HumanResourceModel[]) => {
-  return hrs.map((procedure) => ({
+  return hrs?.map((procedure) => ({
     value: procedure.id,
     label: `${procedure.firstName} ${procedure.lastName}`,
   }));
 };
 
 const findOptionByHrId = (id: string, hrs: HumanResourceModel[]) => {
-  return convertHrsToOptions(hrs).find((option) => option.value === id) || null;
+  return convertHrsToOptions(hrs)?.find((option) => option.value === id) || null;
 };
 const findOptionByTagId = (id: string, tags: TagModel[]) => {
   return (
-    convertTagsToOptions(tags).find((option) => option.value === id) || null
+    convertTagsToOptions(tags)?.find((option) => option.value === id) || null
   );
 };
 

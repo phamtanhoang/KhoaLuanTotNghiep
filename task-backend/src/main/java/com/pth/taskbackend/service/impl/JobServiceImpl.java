@@ -49,8 +49,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Page<Job> findByEmployerIdAndNameAndLocation(String keyword, String location, Pageable pageable) {
-        return jobRepository.findByEmployerIdAndNameAndLocation(keyword,location,pageable);
+    public Page<Job> findByEmployerIdAndNameAndLocation(String id,String keyword, String location, Pageable pageable) {
+        return jobRepository.findByEmployerIdAndNameAndLocation(id, keyword,location,pageable);
     }
 
     @Override

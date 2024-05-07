@@ -410,6 +410,9 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
             <Link
               to={PathConstants.EMPLOYER_PATHS.profile}
               className="block px-5 py-2.5 text-base font-medium hover:bg-gray-500/10 hover:text-orangetext"
+              onClick={() => {
+                setDropdownOpen(false);
+              }}
             >
               Quản lý tài khoản
             </Link>
@@ -419,6 +422,9 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
               <Link
                 to={PathConstants.EMPLOYER_PATHS.upgrade}
                 className="block px-5 py-2.5 text-base font-medium hover:bg-gray-500/10 hover:text-orangetext"
+                onClick={() => {
+                  setDropdownOpen(false);
+                }}
               >
                 Nâng cấp tài khoản
               </Link>
@@ -429,7 +435,10 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
           <li>
             <div
               className="block px-5 py-2.5 text-base font-medium hover:bg-gray-500/10 hover:text-orangetext cursor-pointer"
-              onClick={_onClickChangePassword}
+              onClick={() => {
+                _onClickChangePassword();
+                setDropdownOpen(false);
+              }}
             >
               Đổi mật khẩu
             </div>
@@ -437,7 +446,10 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
           <li>
             <div
               className="block px-5 py-2.5 text-base font-medium hover:bg-gray-500/10 hover:text-orangetext cursor-pointer"
-              onClick={_onClickLogout}
+              onClick={() => {
+                _onClickLogout();
+                setDropdownOpen(false);
+              }}
             >
               Đăng xuất
             </div>

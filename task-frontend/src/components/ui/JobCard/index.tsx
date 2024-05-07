@@ -18,6 +18,8 @@ interface JobCardProps {
   location?: string;
   dateline?: string;
   isVip?: boolean;
+  isSave?: boolean;
+  fetchData: () => void;
 }
 
 const JobCard: React.FC<JobCardProps> = ({
@@ -29,9 +31,17 @@ const JobCard: React.FC<JobCardProps> = ({
   location,
   dateline,
   isVip,
+  isSave,
+  fetchData,
 }) => {
   const urlLink = window.location.pathname;
   const navigate = useNavigate();
+  const _onClickSave = () => {
+    fetchData();
+  };
+  const _onClickUnSave = () => {
+    fetchData();
+  };
   return (
     <div
       className={`w-full cursor-pointer bg-white transition-all duration-300 rounded-l-md p-4 border-2 hover:shadow-md hover:border-orangetext ${
@@ -96,11 +106,26 @@ const JobCard: React.FC<JobCardProps> = ({
         </div>
         <div className="flex flex-col gap-2 justify-end">
           {urlLink !== PathConstants.CANDIDATE_PATHS.savedJobs ? (
-            <button className="p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext">
-              <FaBookmark />
-            </button>
+            isSave ? (
+              <button
+                className="p-2 text-white rounded-full bg-orangetext"
+                onClick={_onClickUnSave}
+              >
+                <FaBookmark />
+              </button>
+            ) : (
+              <button
+                className="p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext"
+                onClick={_onClickSave}
+              >
+                <FaBookmark />
+              </button>
+            )
           ) : (
-            <button className="p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext">
+            <button
+              className="p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext"
+              onClick={_onClickUnSave}
+            >
               <FaRegTrashCan />
             </button>
           )}

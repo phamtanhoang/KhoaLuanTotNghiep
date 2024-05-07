@@ -205,6 +205,9 @@ const Header = () => {
                               <Link
                                 to={PathConstants.CANDIDATE_PATHS.myProfile}
                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
+                                onClick={() => {
+                                  setOpenInfo(false);
+                                }}
                               >
                                 Quản lý hồ sơ
                               </Link>
@@ -213,6 +216,9 @@ const Header = () => {
                               <Link
                                 to={PathConstants.CANDIDATE_PATHS.appliedJobs}
                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
+                                onClick={() => {
+                                  setOpenInfo(false);
+                                }}
                               >
                                 Công việc đã ứng tuyển
                               </Link>
@@ -221,6 +227,9 @@ const Header = () => {
                               <Link
                                 to={PathConstants.CANDIDATE_PATHS.savedJobs}
                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
+                                onClick={() => {
+                                  setOpenInfo(false);
+                                }}
                               >
                                 Công việc đã lưu
                               </Link>
@@ -228,7 +237,10 @@ const Header = () => {
                             <li>
                               <a
                                 className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
-                                onClick={_onClickChangePassword}
+                                onClick={() => {
+                                  _onClickChangePassword();
+                                  setOpenInfo(false);
+                                }}
                               >
                                 Đổi mật khẩu
                               </a>
@@ -236,7 +248,10 @@ const Header = () => {
                             <li>
                               <a
                                 className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
-                                onClick={_onClickSignout}
+                                onClick={() => {
+                                  _onClickSignout();
+                                  setOpenInfo(false);
+                                }}
                               >
                                 Đăng xuất
                               </a>

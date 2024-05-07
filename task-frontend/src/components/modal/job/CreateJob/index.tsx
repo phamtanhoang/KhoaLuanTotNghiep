@@ -58,7 +58,9 @@ const CreateJob = (props: any) => {
       !location ||
       !experience ||
       (AuthHelper.isEmployer() && !humanResourceId) ||
-      (checkSalary && !fromSalary && !toSalary)
+      (checkSalary && !fromSalary && !toSalary) ||
+      !procedureId ||
+      !humanResourceId
     ) {
       SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "warning");
       return;

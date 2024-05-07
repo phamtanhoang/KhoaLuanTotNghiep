@@ -59,7 +59,10 @@ const EmployerDetailPage = () => {
                 />
               </div>
               <div className="w-full lg:w-8/12 flex flex-col mx-auto bg-white rounded-sm ">
-                <RightPage image={employer?.backgroundImage} />
+                <RightPage
+                  id={employer?.id}
+                  image={employer?.backgroundImage}
+                />
               </div>
             </>
           ) : (

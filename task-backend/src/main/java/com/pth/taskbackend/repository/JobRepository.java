@@ -52,12 +52,14 @@ public interface JobRepository extends JpaRepository<Job, String> {
     @Query("SELECT j FROM Job j " +
             "INNER JOIN j.humanResource hr " +
             "INNER JOIN hr.employer e " +
-            "WHERE (:keyword IS NULL OR LOWER(j.name) LIKE %:keyword%) " +
-            "AND (:location IS NULL OR :location = '' OR LOWER(e.location) LIKE %:location%) " +
+            "WHERE e.id = :id " +
+            "AND (:keyword IS NULL OR :keyword = '' OR LOWER(j.name) LIKE CONCAT('%', :keyword, '%')) " +
+            "AND (:location IS NULL OR :location = '' OR LOWER(j.location) LIKE CONCAT('%', :location, '%')) " +
             "AND j.status = 'ACTIVE' " +
             "AND j.toDate > CURRENT_TIMESTAMP " +
             "ORDER BY j.created DESC")
     Page<Job> findByEmployerIdAndNameAndLocation(
+            @Param("id") String id,
             @Param("keyword") String keyword,
             @Param("location") String location,
             Pageable pageable);

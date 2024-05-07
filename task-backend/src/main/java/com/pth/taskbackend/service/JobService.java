@@ -25,6 +25,7 @@ public interface JobService {
     Optional<Job> findById(String jobId)throws IOException;
 
     Page<Job> findByEmployerIdAndNameAndLocation(
+            String id,
           String keyword,
          String location,
             Pageable pageable);

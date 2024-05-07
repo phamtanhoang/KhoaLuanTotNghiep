@@ -190,6 +190,8 @@ const JobsPage: React.FC = () => {
                       _onClickUnSaveJob={_onClickUnSaveJob}
                       isLoading={isLoadingDetail}
                       isTimeUp={job?.isTimeUp}
+                      isApply={job?.isApply}
+                      isSave={job?.isSave}
                     />
                   </div>
                   <div className="w-full inline-block align-top lg:w-[45%]">

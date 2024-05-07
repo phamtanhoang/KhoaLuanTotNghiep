@@ -193,31 +193,33 @@ public class JobController {
     }
 
     @Operation(summary = "Get list", description = "", tags = {})
-    @GetMapping("getJobs/{employerId}")
+    @GetMapping("getJobs/{id}")
     public ResponseEntity<BaseResponse> getJobsByEmployerId(@RequestHeader(value = "Authorization",required = false)String token,
-                                                @RequestParam(required = false) String name,
-                                                @RequestParam(required = false) String location,
-                                                Pageable pageable) {
+                                                            @PathVariable String id,
+                                                            @RequestParam(required = false) String name,
+                                                            @RequestParam(required = false) String location,
+                                                            Pageable pageable) {
         try {
             Optional<Candidate> optionalCandidate;
             if(token!=null) {
                 String email = jwtService.extractUsername(token.substring(7));
                 boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
-                if (!permission)
-                    return ResponseEntity.ok(
-                            new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-                    );
-
-                optionalCandidate = candidateService.findByUserEmail(email);
-                if (optionalCandidate.isEmpty())
-                    return ResponseEntity.ok(
-                            new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
-                    );
+                if (permission){
+                    optionalCandidate = candidateService.findByUserEmail(email);
+                    if (optionalCandidate.isEmpty())
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                }else{
+                    optionalCandidate = null;
+                }
             } else {
                 optionalCandidate = null;
             }
 
-            Page<Job> jobs = jobService.findByEmployerIdAndNameAndLocation(name, location, pageable);
+            System.out.println(optionalCandidate);
+
+            Page<Job> jobs = jobService.findByEmployerIdAndNameAndLocation(id, name, location, pageable);
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
@@ -281,9 +283,9 @@ public class JobController {
                             job.getLocation(),
                             job.getStatus(),
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                            token != null && (optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), job.getId()).isPresent()).isPresent()),
+                            optionalCandidate != null ? optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), job.getId()).isPresent()).isPresent():false,
                             false,
-                            token != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
+                            optionalCandidate != null ? optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent():false,
 
                             categoryResponse,
                             jobEmployerResponse,

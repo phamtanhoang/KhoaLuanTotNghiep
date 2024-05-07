@@ -55,6 +55,17 @@ const jobsService = {
       JobAPI.getList_Admin(keyword, category, status, currentPage, itemPerPage)
     );
   },
+  async getJobsByEmployerID(
+    id: string,
+    name?: string,
+    location?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) {
+    return await axiosConfig.get(
+      JobAPI.getJobsByEmployerID(id, name, location, currentPage, itemPerPage)
+    );
+  },
   async create(
     name: string,
     description: string,

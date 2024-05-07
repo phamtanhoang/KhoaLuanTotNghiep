@@ -194,6 +194,15 @@ const JobAPI = {
   updateStatus_Employer: (id: string) => {
     return `/jobs/updateStatus-employer/${id}`;
   },
+  getJobsByEmployerID: (
+    id: string,
+    name?: string,
+    location?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/jobs/getJobs/${id}?name=${name}&location=${location}&page=${currentPage}&size=${itemPerPage}`;
+  },
 };
 
 const ApplicationAPI = {
