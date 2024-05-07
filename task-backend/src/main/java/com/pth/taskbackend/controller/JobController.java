@@ -66,6 +66,7 @@ public class JobController {
     @Autowired CandidateService candidateService;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired ApplicationService applicationService;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("")
     public ResponseEntity<BaseResponse> getJobs(@RequestHeader(value = "Authorization",required = false)String token,
@@ -167,8 +168,233 @@ public class JobController {
                             job.getLocation(),
                             job.getStatus(),
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                            token != null && (optionalCandidate.isEmpty() ? false : jobService.findByCandidateIdAndJobId(optionalCandidate.get().getId(), job.getId()).isPresent()),
+                            token != null && (optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), job.getId()).isPresent()).isPresent()),
                             DateFunc.isExpired(job.getToDate()),
+                            token != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
+                            categoryResponse,
+                            jobEmployerResponse,
+                            jobHrResponse,
+                            jobProcessResponse,
+                            tagList
+                    );
+                }).collect(Collectors.toList());
+
+                Page<JobResponse> jobResponsePage = new PageImpl<>(jobResponses, jobs.getPageable(), jobs.getTotalElements());
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobResponsePage)
+                );
+
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "Get list", description = "", tags = {})
+    @GetMapping("getJobs/{employerId}")
+    public ResponseEntity<BaseResponse> getJobsByEmployerId(@RequestHeader(value = "Authorization",required = false)String token,
+                                                @RequestParam(required = false) String name,
+                                                @RequestParam(required = false) String location,
+                                                Pageable pageable) {
+        try {
+            Optional<Candidate> optionalCandidate;
+            if(token!=null) {
+                String email = jwtService.extractUsername(token.substring(7));
+                boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+                if (!permission)
+                    return ResponseEntity.ok(
+                            new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                    );
+
+                optionalCandidate = candidateService.findByUserEmail(email);
+                if (optionalCandidate.isEmpty())
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                    );
+            } else {
+                optionalCandidate = null;
+            }
+
+            Page<Job> jobs = jobService.findByEmployerIdAndNameAndLocation(name, location, pageable);
+            if (jobs.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
+                );
+            } else {
+                List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
+                    List<StepResponse> stepResponses;
+
+                    if (job.getProcess() != null) {
+                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(),null);
+
+                        List<Step> stepList = steps.getContent();
+
+                        stepResponses = stepList.stream()
+                                .map(step -> new StepResponse(
+                                        step.getId(),
+                                        step.getName(),
+                                        step.getNumber(),
+                                        step.getDescription(),
+                                        step.getProcess() != null ? step.getProcess().getId() : null
+                                ))
+                                .collect(Collectors.toList());
+                    } else {
+                        stepResponses = Collections.emptyList();
+                    }
+                    List<com.pth.taskbackend.model.meta.Tag> tagList = tagService.findByJobId(job.getId(), null).toList();
+
+                    JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                            job.getCategory()!=null ? job.getCategory().getId():null,
+                            job.getCategory()!=null ? job.getCategory().getName():null);
+
+                    JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                            job.getHumanResource().getEmployer().getName(),
+                            job.getHumanResource().getEmployer().getId(),
+                            job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            job.getHumanResource().getEmployer().getPhoneNumber());
+
+                    JobProcessResponse jobProcessResponse = new JobProcessResponse(
+                            job.getProcess() != null ? job.getProcess().getId() : null,
+                            job.getProcess() != null ? job.getProcess().getName() : null,
+                            stepResponses
+                    );
+
+                    JobHrResponse jobHrResponse = new JobHrResponse(
+                            job.getHumanResource().getId(),
+                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
+                    );
+
+
+                    return new JobResponse(
+                            job.getId(),
+                            job.getCreated(),
+                            job.getUpdated(),
+                            job.getToDate(),
+                            job.getName(),
+                            job.getDescription(),
+                            job.getExperience(),
+                            job.getFromSalary(),
+                            job.getToSalary(),
+                            job.getLocation(),
+                            job.getStatus(),
+                            vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
+                            token != null && (optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), job.getId()).isPresent()).isPresent()),
+                            false,
+                            token != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
+
+                            categoryResponse,
+                            jobEmployerResponse,
+                            jobHrResponse,
+                            jobProcessResponse,
+                            tagList
+                    );
+                }).collect(Collectors.toList());
+
+                Page<JobResponse> jobResponsePage = new PageImpl<>(jobResponses, jobs.getPageable(), jobs.getTotalElements());
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobResponsePage)
+                );
+
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "Get list", description = "", tags = {})
+    @GetMapping("/getVipJobs")
+    public ResponseEntity<BaseResponse> getVipJobs(@RequestHeader(value = "Authorization",required = false)String token,
+                                                Pageable pageable) {
+        try {
+            Optional<Candidate> optionalCandidate;
+            if(token!=null) {
+                String email = jwtService.extractUsername(token.substring(7));
+                boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+                if (!permission)
+                    return ResponseEntity.ok(
+                            new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                    );
+
+                optionalCandidate = candidateService.findByUserEmail(email);
+                if (optionalCandidate.isEmpty())
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                    );
+            } else {
+                optionalCandidate = null;
+            }
+
+            Page<Job> jobs = jobService.findVipJob(pageable);
+            if (jobs.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
+                );
+            } else {
+                List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
+                    List<StepResponse> stepResponses;
+
+                    if (job.getProcess() != null) {
+                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(),null);
+
+                        List<Step> stepList = steps.getContent();
+
+                        stepResponses = stepList.stream()
+                                .map(step -> new StepResponse(
+                                        step.getId(),
+                                        step.getName(),
+                                        step.getNumber(),
+                                        step.getDescription(),
+                                        step.getProcess() != null ? step.getProcess().getId() : null
+                                ))
+                                .collect(Collectors.toList());
+                    } else {
+                        stepResponses = Collections.emptyList();
+                    }
+                    List<com.pth.taskbackend.model.meta.Tag> tagList = tagService.findByJobId(job.getId(), null).toList();
+
+                    JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                            job.getCategory()!=null ? job.getCategory().getId():null,
+                            job.getCategory()!=null ? job.getCategory().getName():null);
+
+                    JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                            job.getHumanResource().getEmployer().getName(),
+                            job.getHumanResource().getEmployer().getId(),
+                            job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            job.getHumanResource().getEmployer().getPhoneNumber());
+
+                    JobProcessResponse jobProcessResponse = new JobProcessResponse(
+                            job.getProcess() != null ? job.getProcess().getId() : null,
+                            job.getProcess() != null ? job.getProcess().getName() : null,
+                            stepResponses
+                    );
+
+                    JobHrResponse jobHrResponse = new JobHrResponse(
+                            job.getHumanResource().getId(),
+                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
+                    );
+
+
+                    return new JobResponse(
+                            job.getId(),
+                            job.getCreated(),
+                            job.getUpdated(),
+                            job.getToDate(),
+                            job.getName(),
+                            job.getDescription(),
+                            job.getExperience(),
+                            job.getFromSalary(),
+                            job.getToSalary(),
+                            job.getLocation(),
+                            job.getStatus(),
+                            true,
+                            token != null && (optionalCandidate.filter(candidate -> jobService.findByCandidateIdAndJobId(candidate.getId(), job.getId()).isPresent()).isPresent()),
+                            false,
+                            token != null && (optionalCandidate.filter(value -> applicationService.findByJobIdAndCandidateId(job.getId(), value.getId()).isPresent()).isPresent()),
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -313,6 +539,7 @@ public class JobController {
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                             false,
                             job.getToDate().isBefore(LocalDateTime.now()),
+                            false,
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -448,6 +675,7 @@ public class JobController {
                             false,
                             false,
                             false,
+                            false,
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -550,6 +778,8 @@ public class JobController {
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                             false,
                             job.getToDate().isBefore(LocalDateTime.now()),
+                            false,
+
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -680,6 +910,8 @@ public class JobController {
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                             false,
                             job.getToDate().isBefore(LocalDateTime.now()),
+                            false,
+
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -707,9 +939,25 @@ public class JobController {
 
     @Operation(summary = "Get detail", description = "", tags = {})
     @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse> getJob(@PathVariable String id) {
+    public ResponseEntity<BaseResponse> getJob(@RequestHeader("Authorization")String token, @PathVariable String id) {
         try {
+            Optional<Candidate> optionalCandidate;
+            if(token!=null) {
+                String email = jwtService.extractUsername(token.substring(7));
+                boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+                if (!permission)
+                    return ResponseEntity.ok(
+                            new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                    );
 
+                optionalCandidate = candidateService.findByUserEmail(email);
+                if (optionalCandidate.isEmpty())
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                    );
+            } else {
+                optionalCandidate = Optional.empty();
+            }
             Optional<Job> optionalJob = jobService.findByIdAndStatus(id, EStatus.ACTIVE).isEmpty() ?jobService.findByIdAndStatus(id, EStatus.PAUSED): jobService.findByIdAndStatus(id, EStatus.ACTIVE);
 
             if (optionalJob.isEmpty()) {
@@ -773,8 +1021,9 @@ public class JobController {
                         job.getLocation(),
                         job.getStatus(),
                         vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                        false,
+                        token != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
                         job.getToDate().isBefore(LocalDateTime.now()),
+                        token != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
                         categoryResponse,
                         jobEmployerResponse,
                         jobHrResponse,
@@ -895,6 +1144,7 @@ public class JobController {
                         vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                         false,
                         !job.getToDate().isBefore(LocalDateTime.now()),
+                        false,
                         categoryResponse,
                         jobEmployerResponse,
                         jobHrResponse,
@@ -994,6 +1244,8 @@ public class JobController {
                         vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                         false,
                         !job.getToDate().isBefore(LocalDateTime.now()),
+                        false,
+
                         categoryResponse,
                         jobEmployerResponse,
                         jobHrResponse,
@@ -1126,6 +1378,8 @@ public class JobController {
                     vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                     false,
                     !job.getToDate().isBefore(LocalDateTime.now()),
+                    false,
+
                     categoryResponse,
                     jobEmployerResponse,
                     jobHrResponse,
@@ -1277,6 +1531,8 @@ public class JobController {
                     vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                     false,
                     !job.getToDate().isBefore(LocalDateTime.now()),
+                    false,
+
                     categoryResponse,
                     jobEmployerResponse,
                     jobHrResponse,

@@ -28,12 +28,10 @@ public class FileUploadFunc {
 
             File file = convertToFile(multipartFile, fileName);
             String uploadedFileName = uploadFile(file, fileName);
-            System.out.println(uploadedFileName);
             file.delete();
 
             return uploadedFileName;
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -46,7 +44,6 @@ public class FileUploadFunc {
             file.delete();
             return uploadedFileName;
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -80,7 +77,6 @@ public class FileUploadFunc {
         BlobId blobId = BlobId.of(STORAGE_BUCKET_NAME, fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(contentType).build();
         storage.create(blobInfo, Files.readAllBytes(file.toPath()));
-        System.out.println(fileName+"is that true?");
         return fileName;
     }
 
@@ -99,7 +95,6 @@ public class FileUploadFunc {
 
             return outputStream.toByteArray();
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -114,9 +109,7 @@ public class FileUploadFunc {
 
 
     private String getFileExtension(String fileName) {
-        System.out.println(fileName + "hello");
         int dotIndex = fileName.lastIndexOf('.');
-        System.out.println(fileName.substring(dotIndex));
         return dotIndex == -1 ? "" : fileName.substring(dotIndex);
     }
 }

@@ -23,10 +23,17 @@ public interface JobService {
     void deleteById(String jobId)throws IOException;
     void delete(Job job)throws IOException;
     Optional<Job> findById(String jobId)throws IOException;
+
+    Page<Job> findByEmployerIdAndNameAndLocation(
+          String keyword,
+         String location,
+            Pageable pageable);
+
     Page<Job>findByProcessId(String id, Pageable pageable)throws IOException;
     Page<Job>findByNameContainingAndCategoryIdAndStatus(String name,String categoryId,EStatus status,Pageable pageable)throws IOException;
     Page<Job>findByStatusOrderByCreatedDesc(EStatus status, Pageable pageable)throws IOException;
 
+    Page<Job>findVipJob(Pageable pageable)throws  IOException;
     Page<Job> findAll(Pageable pageable)throws IOException;
 
     Page<Job> searchJobs(String keyword, String address, String location, LocalDateTime fromDate, String categoryId, boolean isVip,String tag, Pageable pageable) throws java.io.IOException ;

@@ -49,6 +49,33 @@ public interface JobRepository extends JpaRepository<Job, String> {
             @Param("tag") String tag,
             Pageable pageable);
 
+    @Query("SELECT j FROM Job j " +
+            "INNER JOIN j.humanResource hr " +
+            "INNER JOIN hr.employer e " +
+            "WHERE (:keyword IS NULL OR LOWER(j.name) LIKE %:keyword%) " +
+            "AND (:location IS NULL OR :location = '' OR LOWER(e.location) LIKE %:location%) " +
+            "AND j.status = 'ACTIVE' " +
+            "AND j.toDate > CURRENT_TIMESTAMP " +
+            "ORDER BY j.created DESC")
+    Page<Job> findByEmployerIdAndNameAndLocation(
+            @Param("keyword") String keyword,
+            @Param("location") String location,
+            Pageable pageable);
+
+    @Query("SELECT DISTINCT j FROM Job j " +
+            "INNER JOIN j.humanResource hr " +
+            "INNER JOIN hr.employer e " +
+            "WHERE j.status = 'ACTIVE' " +
+            "AND j.toDate > CURRENT_TIMESTAMP " +
+            "AND e IN (SELECT DISTINCT e FROM Employer e " +
+            "JOIN VipEmployer v ON e.id = v.employer.id " +
+            "JOIN User a ON e.user.id = a.id " +
+            "WHERE DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE() " +
+            "AND a.status = 'ACTIVE') " +
+            "ORDER BY RAND()")
+    Page<Job> findVipJob(
+            Pageable pageable);
+
 
     @Query("SELECT j FROM Job j " +
             "WHERE (:keyword IS NULL OR " +

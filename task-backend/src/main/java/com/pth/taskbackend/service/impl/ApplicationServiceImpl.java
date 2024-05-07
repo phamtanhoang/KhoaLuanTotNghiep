@@ -54,9 +54,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public Page<Application> findByCandidateId(String candidateId, Pageable pageable) {
-        return applicationRepository.findByCandidateId(candidateId,pageable);
+    public Page<Application> findByCandidateId(String candidateId, String name, String location, EApplyStatus status, Pageable pageable) throws IOException {
+        return  applicationRepository.findByCandidateId(candidateId,name,location,status,pageable);
+
     }
+
 
     @Override
     public Page<Application> findByEmployerId(String employerId, Pageable pageable) {

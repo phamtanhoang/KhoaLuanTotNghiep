@@ -271,7 +271,7 @@ public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization
     }
 
     @Operation(summary = "Get top categories", description = "", tags = {})
-    @GetMapping("/topCategoies")
+    @GetMapping("/topCategories")
     public ResponseEntity<BaseResponse> getTopCategories(Pageable pageable) {
         try {
            Page<Object[]> categories = categoryService.findCategoriesByJobCount(pageable);

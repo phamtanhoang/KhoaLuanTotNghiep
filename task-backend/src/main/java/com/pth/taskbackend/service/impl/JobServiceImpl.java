@@ -49,6 +49,11 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public Page<Job> findByEmployerIdAndNameAndLocation(String keyword, String location, Pageable pageable) {
+        return jobRepository.findByEmployerIdAndNameAndLocation(keyword,location,pageable);
+    }
+
+    @Override
     public Page<Job> findByProcessId(String id, Pageable pageable) {
         return jobRepository.findByProcessId(id,pageable);
     }
@@ -63,6 +68,11 @@ public class JobServiceImpl implements JobService {
     @Override
     public Page<Job> findByStatusOrderByCreatedDesc(EStatus status, Pageable pageable) throws IOException {
         return jobRepository.findByStatusOrderByCreatedDesc(status,pageable);
+    }
+
+    @Override
+    public Page<Job> findVipJob(Pageable pageable) throws java.io.IOException {
+        return jobRepository.findVipJob(pageable);
     }
 
     @Override

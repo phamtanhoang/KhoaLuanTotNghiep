@@ -2,10 +2,12 @@ package com.pth.taskbackend.repository;
 
 import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.model.meta.Application;
+import jakarta.persistence.QueryHint;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -26,11 +28,20 @@ public interface ApplicationRepository extends JpaRepository<Application, String
 
 
     @Query("SELECT app FROM Application app " +
-            "JOIN FETCH app.candidate c " +
+            "JOIN app.candidate c " +
+            "JOIN app.job j " +
             "WHERE c.id = :candidateId " +
-            "And app.status!='DELETED' " +
+            "AND (COALESCE(:name, '') = '' OR j.name LIKE CONCAT('%', :name, '%')) " +
+            "AND (COALESCE(:location, '') = '' OR j.location LIKE CONCAT('%', :location, '%')) " +
+            "AND (COALESCE(:status, '') = '' OR app.status = :status) " +
+            "AND app.status != 'DELETED' " +
             "ORDER BY app.created DESC")
-    Page<Application> findByCandidateId(String candidateId, Pageable pageable);
+    Page<Application> findByCandidateId(
+            @Param("candidateId") String candidateId,
+            @Param("name") String name,
+            @Param("location") String location,
+            @Param("status") EApplyStatus status,
+            Pageable pageable);
 
     @Query("SELECT app FROM Application app " +
             "JOIN FETCH app.job job " +
