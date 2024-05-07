@@ -56,7 +56,7 @@ public class Candidate extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(columnDefinition = "b'0'")
+    @Column
     private Boolean isFindJob;
 
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
