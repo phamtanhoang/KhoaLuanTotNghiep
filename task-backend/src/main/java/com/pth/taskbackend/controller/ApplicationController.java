@@ -6,6 +6,7 @@ import com.pth.taskbackend.dto.response.*;
 import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
+import com.pth.taskbackend.enums.EStepStatus;
 import com.pth.taskbackend.model.meta.*;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
@@ -803,15 +804,21 @@ public class ApplicationController {
 
             ApplicationStep applicationStep = new ApplicationStep();
             applicationStep.setApplication(application);
+            List<ApplicationStep> updatedSteps = applicationStepService.findAllByApplicationId(application.getId());
+            for (ApplicationStep updatedStep : updatedSteps) {
+                updatedStep.setStatus(EStepStatus.PASS);
+                applicationStepService.update(updatedStep);
+            }
+
             Optional<Step> optionalStep = stepService.findByProcessIdAndNumber(application.getJob().getProcess().getId(), application.getCurrentStep());
             if (optionalStep.isPresent()) {
                 Step step = optionalStep.get();
                 applicationStep.setName(step.getName());
                 applicationStep.setNumber(step.getNumber());
                 applicationStep.setResult(result);
+                applicationStep.setStatus(EStepStatus.PROGRESS);
                 applicationStepService.create(applicationStep);
 
-                System.out.println(applicationStep);
             } else {
                 return ResponseEntity.ok(new BaseResponse("Không tìm thấy bước tiếp theo", HttpStatus.NOT_FOUND.value(), null));
             }
