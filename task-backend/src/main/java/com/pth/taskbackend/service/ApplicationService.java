@@ -17,7 +17,7 @@ public interface ApplicationService {
     void deleteById(String id)throws IOException;
     void delete(Application application)throws IOException;
     Optional<Application>findById(String id);
-    Optional<Application> findByJobIdAndCandidateId(String jobId, String candidateId)throws IOException;
+    Optional<Application> findByJobIdAndCandidateId(String jobId, String candidateId);
     Optional<Application> findByIdAndCandidateId(String id, String candidateId)throws IOException;
 
     Page<Application> findByCandidateId(String candidateId,String name, String location, EApplyStatus status, Pageable pageable)throws IOException;

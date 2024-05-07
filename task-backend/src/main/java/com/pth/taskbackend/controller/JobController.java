@@ -65,6 +65,7 @@ public class JobController {
     @Autowired CandidateService candidateService;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired ApplicationService applicationService;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("")
     public ResponseEntity<BaseResponse> getJobs(@RequestHeader(value = "Authorization",required = false)String token,
@@ -166,8 +167,9 @@ public class JobController {
                             job.getLocation(),
                             job.getStatus(),
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                            token != null && (optionalCandidate.isEmpty() ? false : jobService.findByCandidateIdAndJobId(optionalCandidate.get().getId(), job.getId()).isPresent()),
+                            token != null && (optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), job.getId()).isPresent()).isPresent()),
                             false,
+                            token != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -278,8 +280,10 @@ public class JobController {
                             job.getLocation(),
                             job.getStatus(),
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                            token != null && (optionalCandidate.isEmpty() ? false : jobService.findByCandidateIdAndJobId(optionalCandidate.get().getId(), job.getId()).isPresent()),
+                            token != null && (optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), job.getId()).isPresent()).isPresent()),
                             false,
+                            token != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
+
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -389,6 +393,8 @@ public class JobController {
                             true,
                             token != null && (optionalCandidate.filter(candidate -> jobService.findByCandidateIdAndJobId(candidate.getId(), job.getId()).isPresent()).isPresent()),
                             false,
+                            token != null && (optionalCandidate.filter(value -> applicationService.findByJobIdAndCandidateId(job.getId(), value.getId()).isPresent()).isPresent()),
+
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -533,6 +539,7 @@ public class JobController {
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                             false,
                             job.getToDate().isBefore(LocalDateTime.now()),
+                            false,
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -668,6 +675,7 @@ public class JobController {
                             false,
                             false,
                             false,
+                            false,
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -770,6 +778,8 @@ public class JobController {
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                             false,
                             job.getToDate().isBefore(LocalDateTime.now()),
+                            false,
+
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -900,6 +910,8 @@ public class JobController {
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                             false,
                             job.getToDate().isBefore(LocalDateTime.now()),
+                            false,
+
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -927,9 +939,25 @@ public class JobController {
 
     @Operation(summary = "Get detail", description = "", tags = {})
     @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse> getJob(@PathVariable String id) {
+    public ResponseEntity<BaseResponse> getJob(@RequestHeader("Authorization")String token, @PathVariable String id) {
         try {
+            Optional<Candidate> optionalCandidate;
+            if(token!=null) {
+                String email = jwtService.extractUsername(token.substring(7));
+                boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+                if (!permission)
+                    return ResponseEntity.ok(
+                            new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                    );
 
+                optionalCandidate = candidateService.findByUserEmail(email);
+                if (optionalCandidate.isEmpty())
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                    );
+            } else {
+                optionalCandidate = Optional.empty();
+            }
             Optional<Job> optionalJob = jobService.findByIdAndStatus(id, EStatus.ACTIVE).isEmpty() ?jobService.findByIdAndStatus(id, EStatus.PAUSED): jobService.findByIdAndStatus(id, EStatus.ACTIVE);
 
             if (optionalJob.isEmpty()) {
@@ -993,8 +1021,9 @@ public class JobController {
                         job.getLocation(),
                         job.getStatus(),
                         vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                        false,
+                        token != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
                         job.getToDate().isBefore(LocalDateTime.now()),
+                        token != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
                         categoryResponse,
                         jobEmployerResponse,
                         jobHrResponse,
@@ -1115,6 +1144,7 @@ public class JobController {
                         vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                         false,
                         !job.getToDate().isBefore(LocalDateTime.now()),
+                        false,
                         categoryResponse,
                         jobEmployerResponse,
                         jobHrResponse,
@@ -1214,6 +1244,8 @@ public class JobController {
                         vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                         false,
                         !job.getToDate().isBefore(LocalDateTime.now()),
+                        false,
+
                         categoryResponse,
                         jobEmployerResponse,
                         jobHrResponse,
@@ -1346,6 +1378,8 @@ public class JobController {
                     vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                     false,
                     !job.getToDate().isBefore(LocalDateTime.now()),
+                    false,
+
                     categoryResponse,
                     jobEmployerResponse,
                     jobHrResponse,
@@ -1497,6 +1531,8 @@ public class JobController {
                     vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                     false,
                     !job.getToDate().isBefore(LocalDateTime.now()),
+                    false,
+                    
                     categoryResponse,
                     jobEmployerResponse,
                     jobHrResponse,

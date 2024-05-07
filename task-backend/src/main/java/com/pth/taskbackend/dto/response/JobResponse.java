@@ -21,6 +21,7 @@ public record JobResponse (
         boolean isVip,
         boolean isSave,
         boolean isTimeUp,
+        boolean isApply,
         JobCategoryResponse category,
         JobEmployerResponse employer,
         JobHrResponse humanResource,
