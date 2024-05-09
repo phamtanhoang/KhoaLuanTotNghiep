@@ -100,7 +100,7 @@ const ApplyJob = (props: any) => {
           email,
           phoneNumber,
           coverLetter,
-          currentCandidate?.cv
+          currentCandidate?.cV
         )
         .then((res) => {
           if (res.status === 200 && res.data.Status === 200) {
@@ -206,19 +206,19 @@ const ApplyJob = (props: any) => {
                 <div
                   className="flex gap-2 cursor-pointer"
                   onClick={() => {
-                    currentCandidate?.cv && setChecked(false);
+                    currentCandidate?.cV && setChecked(false);
                   }}
                 >
                   <input
                     type="checkbox"
                     className="cursor-pointer relative h-4 w-4 rounded-md border my-auto accent-bgBlue"
                     checked={checked == false ? true : false}
-                    disabled={currentCandidate?.cv ? false : true}
+                    disabled={currentCandidate?.cV ? false : true}
                   />
                   <label
                     htmlFor="isExChange"
                     className={`cursor-pointer  flex justify-center items-center font-bold pl-2 pr-2  uppercase text-xs py-0.5 ${
-                      currentCandidate?.cv
+                      currentCandidate?.cV
                         ? "text-slate-500 bg-slate-200"
                         : "text-slate-300 bg-slate-100"
                     }`}
@@ -227,13 +227,13 @@ const ApplyJob = (props: any) => {
                   </label>{" "}
                   <AiFillEye
                     className={`cursor-pointer  text-xl  ${
-                      currentCandidate?.cv
+                      currentCandidate?.cV
                         ? "hover:text-orangetext"
                         : "text-slate-300 "
                     }`}
                     onClick={() =>
-                      currentCandidate?.cv &&
-                      window.open(currentCandidate?.cv, "_blank")
+                      currentCandidate?.cV &&
+                      window.open(currentCandidate?.cV, "_blank")
                     }
                   />
                 </div>

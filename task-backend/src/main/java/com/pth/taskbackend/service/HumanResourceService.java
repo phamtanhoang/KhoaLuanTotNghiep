@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface HumanResourceService {
     Optional<HumanResource>findByEmail(String email) throws IOException;
-    Optional<HumanResource>findById(String id)throws IOException;
+    Optional<HumanResource> findById(String id)throws IOException;
     Page<HumanResource>findByEmployerId(String id, Pageable pageable)throws IOException;
     Page<HumanResource>findByKeywordAndStatus(String keyword, EStatus status,Pageable pageable)throws IOException;
     Optional<HumanResource>findByIdAndEmployerId(String id, String employerId)throws IOException;

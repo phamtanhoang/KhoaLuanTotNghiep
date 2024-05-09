@@ -13,8 +13,8 @@ const Confirm = (
     icon: icon,
     title: title,
     showCancelButton: true,
-    cancelButtonText: confirmButtonText || "Hủy bỏ",
-    confirmButtonText: cancelButtonText || "Đồng ý",
+    cancelButtonText: cancelButtonText || "Hủy bỏ",
+    confirmButtonText: confirmButtonText || "Đồng ý",
     customClass: {
       title: "title-confirm",
     },

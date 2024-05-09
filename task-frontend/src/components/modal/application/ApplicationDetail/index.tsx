@@ -2,16 +2,18 @@ import { TextEditor } from "@/components/form";
 import { useContext, useEffect, useRef, useState } from "react";
 import { AiFillMessage, AiOutlineClose } from "react-icons/ai";
 import { IoMdExit } from "react-icons/io";
-import { IoSend } from "react-icons/io5";
-import { MdAttachFile } from "react-icons/md";
 import ModalBase from "../..";
-import { ModalConstants } from "@/utils/constants";
+import { DataConstants, ModalConstants } from "@/utils/constants";
 import { LoadingContext } from "@/App";
 import { useDispatch, useSelector } from "react-redux";
 import { ONCHANGE_APPLICATION_SINGLE } from "@/store/reducers/singleDataReducer";
 import applicationsService from "@/services/applicationsService";
-import { AuthHelper, SwalHelper } from "@/utils/helpers";
-import { ONCHANGE_STEP_LIST } from "@/store/reducers/listDataReducer";
+import { AuthHelper, DateHelper, SwalHelper } from "@/utils/helpers";
+import {
+  ONCHANGE_MESSAGE_LIST,
+  ONCHANGE_STEP_LIST,
+} from "@/store/reducers/listDataReducer";
+import { ChatUI } from "@/components/ui";
 
 const ApplicationDetail = (props: any) => {
   const [openSub, setOpenSub] = useState<boolean>(false);
@@ -22,22 +24,20 @@ const ApplicationDetail = (props: any) => {
   const fetchListData = props.fetchData;
   const handleClose = props.handleClose;
 
-  const chatContainerRef = useRef<any>(null);
-
   const context = useContext(LoadingContext);
   const dispatch = useDispatch();
   const { application } = useSelector((state: any) => state.singleDataReducer);
-  const { steps } = useSelector((state: any) => state.listDataReducer);
+  const { steps, messages } = useSelector(
+    (state: any) => state.listDataReducer
+  );
+  const [content, setContent] = useState<string>("");
+  const [file, setFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   useEffect(() => {
     dispatch(ONCHANGE_APPLICATION_SINGLE(null));
     dispatch(ONCHANGE_STEP_LIST([]));
-  }, []);
-
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
-    }
+    dispatch(ONCHANGE_MESSAGE_LIST([]));
   }, []);
 
   const _onClickChat = () => {
@@ -88,14 +88,64 @@ const ApplicationDetail = (props: any) => {
         });
     }
   };
+  const fetchMessageData = (id: string) => {
+    setIsLoading(true);
+    applicationsService
+      .getMessagesApplication(id)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          dispatch(ONCHANGE_MESSAGE_LIST(res.data.Data));
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   useEffect(() => {
     fetchData();
+    fetchMessageData(id);
   }, [id]);
+
+  const _onClickSend = () => {
+    if (!content && file) {
+      return;
+    }
+    setIsLoading(true);
+    applicationsService
+      .sendMessagesApplication(id, content, file)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          setContent("");
+          setFile(null);
+          fetchMessageData(id);
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   return (
     <>
       <ModalBase open={openSub} handleClose={handleCloseSub} funcs={funcsSub} />
-      <div className="lg:w-[75%] w-screen bg-white relative rounded">
+      <div
+        className={`w-screen bg-white relative rounded ${
+          application?.status == DataConstants.STATUS_DATA.PENDING
+            ? "lg:w-[45%]"
+            : "lg:w-[75%]"
+        }`}
+      >
         <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-orangetext rounded-t">
           <h2 className="text-xl font-semibold  line-clamp-1 my-auto">
             Thông tin ứng tuyển
@@ -109,7 +159,13 @@ const ApplicationDetail = (props: any) => {
         </div>
 
         <div className="h-max max-h-[75vh] my-2 mx-1 flex">
-          <div className="mr-1 px-3 text-gray-700 flex flex-col gap-4 overflow-auto scrollbar-custom lg:w-[55%]">
+          <div
+            className={`mr-1 px-3 text-gray-700 flex flex-col gap-4 overflow-auto scrollbar-custom ${
+              application?.status == DataConstants.STATUS_DATA.PENDING
+                ? "lg:w-full"
+                : "lg:w-[55%]"
+            }`}
+          >
             <div className="content-center flex flex-col gap-2.5 text-sm ">
               <div className="lg:flex justify-between gap-4 content-center">
                 <div className="content-center w-full">
@@ -242,110 +298,26 @@ const ApplicationDetail = (props: any) => {
               </table>
             </div>
           </div>
-          <div className="border border-orangetext/50 max-lg:hidden"></div>
-          <div className="ml-1  text-gray-700 flex flex-col gap-2 lg:w-[45%] max-lg:hidden">
-            <label className="font-medium tracking-wide text-lg px-2">
-              Thông tin trao đổi:
-            </label>
+          {application?.status != DataConstants.STATUS_DATA.PENDING && (
+            <>
+              <div className="border border-orangetext/50 max-lg:hidden"></div>
+              <div className="ml-1  text-gray-700 flex flex-col gap-2 lg:w-[45%] max-lg:hidden">
+                <label className="font-medium tracking-wide text-lg px-2">
+                  Thông tin trao đổi:
+                </label>
 
-            <div
-              ref={chatContainerRef}
-              className="w-full px-2 h-full overflow-y-auto scrollbar-custom flex flex-col gap-3"
-            >
-              <div className="w-full flex flex-start">
-                <div className="w-[80%]">
-                  <div className="flex items-center gap-3">
-                    <img
-                      className="h-5 w-5 overflow-hidden rounded-full"
-                      src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnN8ZW58MHwyfDB8fA%3D%3D&auto=format&fit=crop&w=500"
-                      alt=""
-                    />
-                    <p className="font-semibold  text-sm text-slate-600">
-                      Mircel Jones&nbsp;
-                      <span className="text-slate-400 text-xs">3:21 PM</span>
-                    </p>
-                  </div>
-
-                  <div className="mt-3 w-full bg-body p-4 rounded-b-xl rounded-tr-xl">
-                    <p className=" text-sm text-slate-500">
-                      Hey all, <br />
-                      There are many variation of passages of Lorem ipsum
-                      avaliable, but the jority have alternation in some form ,
-                      by injected humor, or randomise words which don't look
-                      even slightly believable.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="w-full flex justify-end">
-                <div className="w-[80%]">
-                  <div className="flex items-center gap-3 justify-end">
-                    <p className="font-semibold text-sm text-slate-600">
-                      Me&nbsp;
-                      <span className="text-slate-400 text-xs font-normal">
-                        3:25 PM
-                      </span>
-                    </p>
-
-                    <img
-                      className="h-5 w-5 overflow-hidden rounded-full"
-                      src="https://source.unsplash.com/random/500x500/?face"
-                      alt=""
-                    />
-                  </div>
-
-                  <div className="mt-3 w-full bg-orangetext p-4 rounded-b-xl rounded-tl-xl">
-                    <p className=" text-sm text-white">
-                      Hey, <br />
-                      we are own hidden lake forest which is netural lake are
-                      generaly found in mountain.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="w-full flex flex-start">
-                <div className="w-[80%]">
-                  <div className="flex items-center gap-3">
-                    <img
-                      className="h-5 w-5 overflow-hidden rounded-full"
-                      src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=60&raw_url=true&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnN8ZW58MHwyfDB8fA%3D%3D&auto=format&fit=crop&w=500"
-                      alt=""
-                    />
-                    <p className="font-semibold  text-sm text-slate-600">
-                      Mircel Jones&nbsp;
-                      <span className="text-slate-400 text-xs">3:21 PM</span>
-                    </p>
-                  </div>
-
-                  <div className="mt-3 w-full bg-body p-4 rounded-b-xl rounded-tr-xl">
-                    <p className=" text-sm text-slate-500">
-                      Hey all, <br />
-                      There are many variation of passages of Lorem ipsum
-                      avaliable, but the jority have alternation in some form ,
-                      by injected humor, or randomise words which don't look
-                      even slightly believable.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className=" w-full  px-2  bg-white">
-              <div className="h-12 flex gap-4 justify-between px-3 items-center border border-transparent bg-body2 focus-within:border-borderColor rounded-lg">
-                <button className="text-slate-600 text-lg">
-                  <MdAttachFile />
-                </button>
-                <input
-                  type="text"
-                  className="w-full bg-transparent outline-none text-slate-600"
-                  placeholder="Nhập tin nhắn.."
+                <ChatUI
+                  messages={messages}
+                  content={content}
+                  setContent={setContent}
+                  file={file}
+                  setFile={setFile}
+                  _onClickSend={_onClickSend}
+                  isLoading={isLoading}
                 />
-                <button className="text-slate-600 text-lg hover:text-orangetext">
-                  <IoSend />
-                </button>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
 
         <div className="flex justify-end gap-4 px-4 py-3 border-t  ">

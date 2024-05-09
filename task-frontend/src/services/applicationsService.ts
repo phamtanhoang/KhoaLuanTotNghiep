@@ -81,5 +81,34 @@ const applicationsService = {
       ApplicationAPI.getApplicationDetail_Employer(id)
     );
   },
+
+  async getMessagesApplication(id: string) {
+    return await axiosConfig.get(ApplicationAPI.getMessagesApplication(id));
+  },
+  async sendMessagesApplication(
+    id: string,
+    content: string,
+    file: File | null
+  ) {
+    const formData = new FormData();
+    formData.append("content", content.trim());
+    if (file) formData.append("file", file);
+    return await axiosConfig.post(
+      ApplicationAPI.sendMessagesApplication(id),
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+  },
+  async updateStatus(id: string, status: string, result: string) {
+    const body = {
+      status: status,
+      result: result,
+    };
+    return await axiosConfig.patch(ApplicationAPI.updateStatus(id), body, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
 };
 export default applicationsService;

@@ -1,6 +1,7 @@
 package com.pth.taskbackend.dto.response;
 
-import com.pth.taskbackend.enums.EMessage;
 
-public record MessageResponse (String content, String applicationId, EMessage type){
+import java.time.LocalDateTime;
+
+public record MessageResponse(String id, LocalDateTime created, String content, String file, String userId, String userName, String avatar, boolean isYourMessage) {
 }

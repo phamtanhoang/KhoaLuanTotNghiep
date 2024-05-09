@@ -1,5 +1,7 @@
 package com.pth.taskbackend.model.meta;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.ESex;
 import com.pth.taskbackend.enums.EStatus;
@@ -20,25 +22,19 @@ import java.util.Set;
 @AllArgsConstructor
 public class Message extends BaseEntity {
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_candidate_id")
-    private Candidate senderCandidate;
+    @Column(columnDefinition = "TEXT")
+    private String file;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_candidate_id")
-    private Candidate receiverCandidate;
+    @JoinColumn(name = "user_id")
+    @JsonProperty("user")
+    private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_hr_id")
-    private HumanResource senderHR;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_hr_id")
-    private HumanResource receiverHR;
-
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "application_id")
     private Application application;

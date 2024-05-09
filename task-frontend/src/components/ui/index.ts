@@ -1,4 +1,5 @@
 import Breadcumbs from "./Breadcumbs";
+import ChatUI from "./ChatUI";
 import EmptyData from "./EmptyData";
 import ErrorPage from "./ErrorPage";
 import GreatEmployerCard from "./GreatEmployerCard";
@@ -37,5 +38,6 @@ export {
   ProtectedRoute,
   ImageCropper,
   Hero,
-  EmptyData
+  EmptyData,
+  ChatUI,
 };

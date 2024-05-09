@@ -87,6 +87,9 @@ const STATUS_DATA = {
   PENDING: "PENDING",
   DELETED: "DELETED",
   PAUSED: "PAUSED",
+  PROCESSING: "PROCESSING",
+  REJECTED: "REJECTED",
+  APPROVED: "APPROVED",
 };
 
 export const DataConstants = {

@@ -40,6 +40,5 @@ public class HumanResource extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    // Các trường và phương thức khác
 }
 

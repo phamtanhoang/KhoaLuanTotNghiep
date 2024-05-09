@@ -245,6 +245,16 @@ const ApplicationAPI = {
   ) => {
     return `/applications/getApplications-candidate?title=${name}&location=${location}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
   },
+
+  getMessagesApplication: (id?: string) => {
+    return `/chats/${id}`;
+  },
+  sendMessagesApplication: (id?: string) => {
+    return `/chats/${id}/sendMessage`;
+  },
+  updateStatus: (id?: string) => {
+    return `/applications/updateStatus/${id}`;
+  },
 };
 export {
   AuthAPI,
