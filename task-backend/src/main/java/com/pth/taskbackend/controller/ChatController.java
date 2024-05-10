@@ -24,16 +24,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.security.Principal;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -69,9 +65,8 @@ public class ChatController {
     @Autowired
     HumanResourceService humanResourceService;
     FileUploadFunc fileUploadFunc = new FileUploadFunc();
-
     @Autowired
-    private WebSocketController webSocketController;
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @GetMapping("/{applicationId}")
     public ResponseEntity<BaseResponse> getChatMessages(@RequestHeader("Authorization")String token, @PathVariable String applicationId, Pageable pageable) throws IOException {
@@ -208,7 +203,7 @@ public class ChatController {
                     Message message = chatService.sendMessage(content,path,application, user);
 
                     // Sent to client by WebSocket
-                    webSocketController.sendMessage(applicationId, message.getId());
+                    simpMessagingTemplate.convertAndSend("/topic/applications/" + applicationId, message);
 
                     return ResponseEntity.ok(
                             new BaseResponse("Gửi tin nhắn thành công", HttpStatus.OK.value(), message)
