@@ -3,6 +3,7 @@ interface EmployerModel {
   created?: Date;
   updated?: Date;
   image?: string;
+  avatar?: string;
   backgroundImage?: string;
   name?: string;
   location?: string;

@@ -8,6 +8,7 @@ const authsService = {
       password: password.trim(),
       role: role.trim(),
     };
+    console.log(userData);
     return await axiosConfig.post(AuthAPI.signin, userData, {
       headers: { "Content-Type": "application/json" },
     });

@@ -1,6 +1,6 @@
 import { RiVipCrown2Line } from "react-icons/ri";
 import NON_USER from "@/assets/images/non-user.jpg";
-import NON_BG from "@/assets/images/image-background.png";
+import NON_BG from "@/assets/images/non-bg.jpg";
 import { IoCameraSharp } from "react-icons/io5";
 
 interface BaseInfoProps {
@@ -43,7 +43,7 @@ const BaseInfo: React.FC<BaseInfoProps> = ({
         <div className="relative">
           <img
             src={image ? image : NON_USER}
-            className="w-40 h-40 border-4 border-white rounded-full"
+            className="w-40 h-40 border-4 border-white rounded-full bg-white"
           />
           <button
             className="absolute bottom-2 right-2 text-2xl p-2 rounded-full bg-body hover:bg-body/90 text-black/90 hover:text-black ring-2 ring-white"

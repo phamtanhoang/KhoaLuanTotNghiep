@@ -1,6 +1,11 @@
 import { TextEditor } from "@/components/form";
 import { useContext, useEffect, useRef, useState } from "react";
-import { AiFillMessage, AiOutlineClose } from "react-icons/ai";
+import {
+  AiFillCheckCircle,
+  AiFillCloseCircle,
+  AiFillMessage,
+  AiOutlineClose,
+} from "react-icons/ai";
 import { IoMdExit } from "react-icons/io";
 import ModalBase from "../..";
 import { DataConstants, ModalConstants } from "@/utils/constants";
@@ -8,12 +13,137 @@ import { LoadingContext } from "@/App";
 import { useDispatch, useSelector } from "react-redux";
 import { ONCHANGE_APPLICATION_SINGLE } from "@/store/reducers/singleDataReducer";
 import applicationsService from "@/services/applicationsService";
-import { AuthHelper, DateHelper, SwalHelper } from "@/utils/helpers";
+import { AuthHelper, SwalHelper } from "@/utils/helpers";
 import {
   ONCHANGE_MESSAGE_LIST,
   ONCHANGE_STEP_LIST,
 } from "@/store/reducers/listDataReducer";
 import { ChatUI } from "@/components/ui";
+import { MdSkipNext } from "react-icons/md";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { GrSchedulePlay } from "react-icons/gr";
+import { BiDetail } from "react-icons/bi";
+
+interface StepItemProps {
+  index: number;
+  item: StepModel;
+  stepResult: any;
+  stepSchedule: any;
+  _onClickCreateStepSchedule: (id: string) => void;
+  _onClickDetailStepSchedule: (id: string) => void;
+}
+
+const StepItem: React.FC<StepItemProps> = ({
+  index,
+  item,
+  stepResult,
+  stepSchedule,
+  _onClickCreateStepSchedule,
+}) => {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const trigger = useRef<any>(null);
+  const dropdown = useRef<any>(null);
+
+  useEffect(() => {
+    const clickHandler = ({ target }: MouseEvent) => {
+      if (!dropdown.current) return;
+      if (
+        !dropdownOpen ||
+        dropdown.current.contains(target) ||
+        trigger.current.contains(target)
+      )
+        return;
+      setDropdownOpen(false);
+    };
+    document.addEventListener("click", clickHandler);
+    return () => document.removeEventListener("click", clickHandler);
+  });
+
+  useEffect(() => {
+    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+      if (!dropdownOpen || keyCode !== 27) return;
+      setDropdownOpen(false);
+    };
+    document.addEventListener("keydown", keyHandler);
+    return () => document.removeEventListener("keydown", keyHandler);
+  });
+
+  return (
+    <tr
+      key={index}
+      className="bg-white table-row flex-row flex-no-wrap mb-10 lg:mb-0"
+    >
+      <td className="w-auto p-3 text-gray-800 text-center border border-b table-cell static">
+        {item?.number! + 1}
+      </td>
+
+      <td className="w-auto p-3 text-gray-800 text-center border border-b table-cell static">
+        {item?.name!}
+      </td>
+
+      <td className="w-auto p-3 text-gray-800 text-center border border-b table-cell static">
+        {stepResult?.status == DataConstants.STATUS_DATA.PASS ? (
+          <span className="rounded bg-green-400 py-1 px-3 text-sm font-medium text-white ">
+            Pass
+          </span>
+        ) : stepResult?.status == DataConstants.STATUS_DATA.FAIL ? (
+          <span className="rounded bg-red-400 py-1 px-3 text-sm font-medium text-white ">
+            Fail
+          </span>
+        ) : (
+          ""
+        )}
+      </td>
+      <td className="w-auto p-3 text-gray-800 text-center border border-b table-cell static">
+        {stepResult?.result!}
+      </td>
+      <td className="w-auto p-3 text-gray-800 text-center border border-b btable-cell static">
+        {AuthHelper.isCandidate() && !stepSchedule ? (
+          <></>
+        ) : (
+          <button
+            ref={trigger}
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className={`text-lg  ${
+              dropdownOpen ? "bg-gray-100" : "bg-white"
+            } hover:bg-gray-100 p-1.5 rounded relative`}
+          >
+            <BsThreeDotsVertical className="my-auto" />
+            <div
+              ref={dropdown}
+              onFocus={() => setDropdownOpen(true)}
+              onBlur={() => setDropdownOpen(false)}
+              className={` text-sm z-[1] absolute bottom-0 right-[100%] w-max rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-0.5 group ${
+                dropdownOpen ? "block" : "hidden"
+              }`}
+            >
+              {(AuthHelper.isEmployer() || AuthHelper.isHR()) &&
+                !stepSchedule && (
+                  <a
+                    className="flex px-6 py-2 text-gray-700 hover:bg-gray-100 gap-1.5"
+                    onClick={() => _onClickCreateStepSchedule(item?.id!)}
+                  >
+                    <GrSchedulePlay className="my-auto text-base" />
+                    Tạo lịch
+                  </a>
+                )}
+              {stepSchedule && (
+                <a
+                  className="flex px-6 py-2 text-gray-700 hover:bg-gray-100 gap-1.5"
+                  // onClick={() => _onClickCreateStepSchedule(item?.id!)}
+                >
+                  <BiDetail className="my-auto text-base" />
+                  Chi tiết lịch
+                </a>
+              )}
+            </div>
+          </button>
+        )}
+      </td>
+    </tr>
+  );
+};
 
 const ApplicationDetail = (props: any) => {
   const [openSub, setOpenSub] = useState<boolean>(false);
@@ -23,6 +153,7 @@ const ApplicationDetail = (props: any) => {
   const id = props.id;
   const fetchListData = props.fetchData;
   const handleClose = props.handleClose;
+  const [currentPage, setCurrentPage] = useState<number>(0);
 
   const context = useContext(LoadingContext);
   const dispatch = useDispatch();
@@ -33,6 +164,8 @@ const ApplicationDetail = (props: any) => {
   const [content, setContent] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [stepId, setStepId] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
 
   useEffect(() => {
     dispatch(ONCHANGE_APPLICATION_SINGLE(null));
@@ -44,13 +177,9 @@ const ApplicationDetail = (props: any) => {
     setFuncsSub(ModalConstants.CHAT_KEYS.chatApplication);
     handleOpenSub();
   };
-  const _onClickApplicationStep = (id: string) => {
-    setFuncsSub(ModalConstants.APPLICATION_KEYS.applycationStep);
-    handleOpenSub();
-  };
 
   const fetchData = () => {
-    if (AuthHelper.isEmployer()) {
+    if (AuthHelper.isEmployer() || AuthHelper.isHR()) {
       context.handleOpenLoading();
       applicationsService
         .getApplicationDetail_Employer(id)
@@ -123,6 +252,7 @@ const ApplicationDetail = (props: any) => {
         if (res.status === 200 && res.data.Status === 200) {
           setContent("");
           setFile(null);
+
           fetchMessageData(id);
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
@@ -136,16 +266,86 @@ const ApplicationDetail = (props: any) => {
       });
   };
 
+  // useEffect(() => {
+  //   console.log("da vao day");
+  //   const client = new Client({
+  //     webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+  //     onConnect: () => {
+  //       console.log("Connected");
+
+  //       client.subscribe(`/topic/applications/${id}`, (message) => {
+  //         if (message.body) {
+  //           console.log("Received message:", message.body);
+  //         }
+  //       });
+  //     },
+  //   });
+
+  //   client.activate();
+
+  //   return () => {
+  //     if (client.connected) {
+  //       client.deactivate();
+  //     }
+  //   };
+  // }, [id]);
+
+  const _onClickUpDateStep = (status: string, result: string) => {
+    context.handleOpenLoading();
+    applicationsService
+      .updateStatus(id, status, result)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          if (status == DataConstants.STATUS_DATA.APPROVED) {
+            SwalHelper.MiniAlert("Duyệt thành công!", "success");
+          } else if (status == DataConstants.STATUS_DATA.REJECTED) {
+            SwalHelper.MiniAlert("Không duyệt thành công!", "success");
+          } else {
+            SwalHelper.MiniAlert("Chuyển bước thành công!", "success");
+          }
+          fetchData();
+          fetchListData();
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  };
+
+  const _onClick = (status: string) => {
+    setStatus(status);
+    setFuncsSub(ModalConstants.APPLICATION_KEYS.handleApplication);
+    handleOpenSub();
+  };
+  const _onClickDetailStepSchedule = (id: string) => {
+    setStepId(id);
+    setFuncsSub(ModalConstants.APPLICATION_KEYS.applycationStep);
+    handleOpenSub();
+  };
+  const _onClickCreateStepSchedule = (id: string) => {
+    setStepId(id);
+    setFuncsSub(ModalConstants.APPLICATION_KEYS.createStepSchedule);
+    handleOpenSub();
+  };
+
   return (
     <>
-      <ModalBase open={openSub} handleClose={handleCloseSub} funcs={funcsSub} />
-      <div
-        className={`w-screen bg-white relative rounded ${
-          application?.status == DataConstants.STATUS_DATA.PENDING
-            ? "lg:w-[45%]"
-            : "lg:w-[75%]"
-        }`}
-      >
+      <ModalBase
+        id={id}
+        stepId={stepId}
+        fetchData={fetchData}
+        open={openSub}
+        handleClose={handleCloseSub}
+        funcs={funcsSub}
+        _onClickUpDateStep={_onClickUpDateStep}
+        status={status}
+      />
+      <div className="w-screen bg-white relative rounded lg:w-[75%]">
         <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-orangetext rounded-t">
           <h2 className="text-xl font-semibold  line-clamp-1 my-auto">
             Thông tin ứng tuyển
@@ -159,13 +359,7 @@ const ApplicationDetail = (props: any) => {
         </div>
 
         <div className="h-max max-h-[75vh] my-2 mx-1 flex">
-          <div
-            className={`mr-1 px-3 text-gray-700 flex flex-col gap-4 overflow-auto scrollbar-custom ${
-              application?.status == DataConstants.STATUS_DATA.PENDING
-                ? "lg:w-full"
-                : "lg:w-[55%]"
-            }`}
-          >
+          <div className="mr-1 px-3 text-gray-700 flex flex-col gap-4 overflow-auto scrollbar-custom lg:w-[55%]">
             <div className="content-center flex flex-col gap-2.5 text-sm ">
               <div className="lg:flex justify-between gap-4 content-center">
                 <div className="content-center w-full">
@@ -175,13 +369,12 @@ const ApplicationDetail = (props: any) => {
                   <input
                     className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
                     type="text"
-                    placeholder="Nguyễn Văn A..."
                     disabled
                     value={application?.fullName}
                   />
                 </div>
               </div>
-              <div className="lg:flex justify-between gap-4 content-center">
+              <div className="lg:flex justify-between gap-4 content-center ">
                 <div className="content-center w-full">
                   <label className="font-medium tracking-wide text-sm">
                     Email
@@ -189,7 +382,6 @@ const ApplicationDetail = (props: any) => {
                   <input
                     className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
                     type="text"
-                    placeholder="candidate@gmail.com"
                     disabled
                     value={application?.email}
                   />
@@ -201,7 +393,6 @@ const ApplicationDetail = (props: any) => {
                   <input
                     className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
                     type="text"
-                    placeholder="(+84) xxxxxxxx"
                     disabled
                     value={application?.phoneNumber}
                   />
@@ -239,97 +430,111 @@ const ApplicationDetail = (props: any) => {
               <table className="border-collapse w-full mt-1 text-sm">
                 <thead>
                   <tr>
-                    <th className="px-1 py-1.5 font-semibold uppercase bg-gray-100 text-gray-600 border border-borderColor htable-cell">
+                    <th className="px-1 py-1.5 font-semibold uppercase bg-gray-100 text-gray-600 border border-borderColor table-cell w-[10%]">
                       STT
                     </th>
 
-                    <th className="px-1 py-1.5 font-semibold   bg-gray-100 text-gray-600 border border-borderColor htable-cell">
+                    <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell w-[35%]">
                       Tên bước
                     </th>
-                    <th className="px-1 py-1.5 font-semibold   bg-gray-100 text-gray-600 border border-borderColor table-cell">
+                    <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell w-[10%]">
                       Kết quả
                     </th>
-                    <th className="px-1 py-1.5 font-semibold   bg-gray-100 text-gray-600 border border-borderColor table-cell">
+                    <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell w-[35%]">
                       Đánh giá
                     </th>
 
-                    <th className="px-1 py-1.5 font-semibold   bg-gray-100 text-gray-600 border border-borderColor table-cell"></th>
+                    <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell w-[10%]"></th>
                   </tr>
                 </thead>
 
                 <tbody>
                   {steps?.map((item: StepModel, index: number) => (
-                    <tr
-                      key={index}
-                      className="bg-white flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
-                    >
-                      <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
-                        {item?.number! + 1}
-                      </td>
-
-                      <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
-                        {item?.name!}
-                      </td>
-
-                      <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
-                        {/* <span className="rounded bg-green-400 py-1 px-3 text-sm font-medium text-white ">
-                          Pass
-                        </span>
-                        <span className="rounded bg-red-400 py-1 px-3 text-sm font-medium text-white ">
-                        Fail
-                      </span> */}
-                      </td>
-                      <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
-                        {/* Hồ sơ phù hợp */}
-                      </td>
-                      <td className="w-full lg:w-auto p-3 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
-                        {/* <p
-                          className="text-blue-600 hover:text-blue-600/85 cursor-pointer"
-                          onClick={() => {
-                            _onClickApplicationStep("1");
-                          }}
-                        >
-                          Lịch hẹn
-                        </p> */}
-                      </td>
-                    </tr>
+                    <StepItem
+                      index={index}
+                      item={item}
+                      stepResult={
+                        application?.stepResults?.find(
+                          (item1: any) => item1?.stepNumber == item?.number
+                        ) || null
+                      }
+                      stepSchedule={
+                        application?.stepSchedules?.find(
+                          (item1: any) => item1?.stepNumber == item?.number
+                        ) || null
+                      }
+                      _onClickCreateStepSchedule={_onClickCreateStepSchedule}
+                      _onClickDetailStepSchedule={_onClickDetailStepSchedule}
+                    />
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
-          {application?.status != DataConstants.STATUS_DATA.PENDING && (
-            <>
-              <div className="border border-orangetext/50 max-lg:hidden"></div>
-              <div className="ml-1  text-gray-700 flex flex-col gap-2 lg:w-[45%] max-lg:hidden">
-                <label className="font-medium tracking-wide text-lg px-2">
-                  Thông tin trao đổi:
-                </label>
 
-                <ChatUI
-                  messages={messages}
-                  content={content}
-                  setContent={setContent}
-                  file={file}
-                  setFile={setFile}
-                  _onClickSend={_onClickSend}
-                  isLoading={isLoading}
-                />
-              </div>
-            </>
-          )}
+          <div className="border border-orangetext/50 max-lg:hidden"></div>
+          <div className="ml-1  text-gray-700 flex flex-col gap-2 lg:w-[45%] max-lg:hidden">
+            <label className="font-medium tracking-wide text-lg px-2">
+              Thông tin trao đổi:
+            </label>
+
+            <ChatUI
+              messages={messages}
+              content={content}
+              setContent={setContent}
+              file={file}
+              setFile={setFile}
+              _onClickSend={_onClickSend}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
 
         <div className="flex justify-end gap-4 px-4 py-3 border-t  ">
           <button
-            className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-600/90 font-medium lg:hidden"
+            className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-600/90 font-medium lg:hidden"
             onClick={_onClickChat}
           >
             <AiFillMessage className="text-lg" />
             <p>Trao đổi</p>
           </button>
+
+          {(AuthHelper.isHR() || AuthHelper.isEmployer()) &&
+            application?.status != DataConstants.STATUS_DATA.APPROVED &&
+            application?.status != DataConstants.STATUS_DATA.REJECTED && (
+              <>
+                <button
+                  className="flex items-center gap-2 w-max h-max px-4 py-2 bg-red-500 text-white rounded hover:bg-red-500/90 font-medium"
+                  onClick={() => _onClick(DataConstants.STATUS_DATA.REJECTED)}
+                >
+                  <AiFillCloseCircle className="text-lg" />
+                  <p>Không duyệt</p>
+                </button>
+                {application?.currentStep == steps.length - 1 && (
+                  <button
+                    className="flex items-center gap-2 w-max h-max px-4 py-2 bg-green-500 text-white rounded hover:bg-green-500/90 font-medium"
+                    onClick={() => _onClick(DataConstants.STATUS_DATA.APPROVED)}
+                  >
+                    <AiFillCheckCircle className="text-lg" />
+                    <p>Duyệt</p>
+                  </button>
+                )}
+                {application?.currentStep != steps.length - 1 && (
+                  <button
+                    className="flex items-center gap-2 w-max h-max px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-500/90 font-medium "
+                    onClick={() =>
+                      _onClick(DataConstants.STATUS_DATA.PROCESSING)
+                    }
+                  >
+                    <MdSkipNext className="text-xl" />
+                    <p>Chuyển bước</p>
+                  </button>
+                )}
+              </>
+            )}
+
           <button
-            className="flex items-center gap-2 w-max h-max px-4 py-2 bg-slate-300 text-white rounded-md hover:bg-slate-300/90 font-medium"
+            className="flex items-center gap-2 w-max h-max px-4 py-2 bg-slate-300 text-white rounded hover:bg-slate-300/90 font-medium"
             onClick={handleClose}
           >
             <IoMdExit className="text-lg" />

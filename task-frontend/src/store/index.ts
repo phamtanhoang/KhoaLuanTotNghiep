@@ -15,6 +15,7 @@ import searchReducer from "./reducers/searchReducer";
 import listDataReducer from "./reducers/listDataReducer";
 import paginationReducer from "./reducers/paginationState";
 import singleDataReducer from "./reducers/singleDataReducer";
+import scheduleReducer from "./reducers/scheduleReducer";
 
 const persistConfig = {
   key: "root",
@@ -28,6 +29,7 @@ const rootReducer = combineReducers({
   listDataReducer: listDataReducer,
   singleDataReducer: singleDataReducer,
   paginationReducer: paginationReducer,
+  scheduleReducer: scheduleReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

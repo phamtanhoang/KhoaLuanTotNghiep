@@ -11,6 +11,7 @@ const CANDIDATE_PATHS = {
   myProfile: "/profile",
   savedJobs: "/saved-jobs",
   appliedJobs: "/applied-jobs",
+  schedule: "/schedule",
 };
 const EMPLOYER_PATHS = {
   default: "/employer",

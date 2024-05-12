@@ -658,6 +658,10 @@ body {
   border-width: 0;
 }
 
+.static{
+  position: static;
+}
+
 .fixed{
   position: fixed;
 }
@@ -751,6 +755,10 @@ body {
   bottom: 1.25rem;
 }
 
+.bottom-\[110\%\]{
+  bottom: 110%;
+}
+
 .left-0{
   left: 0px;
 }
@@ -789,6 +797,10 @@ body {
 
 .right-\[0\.25rem\]{
   right: 0.25rem;
+}
+
+.right-\[100\%\]{
+  right: 100%;
 }
 
 .top-0{
@@ -977,6 +989,11 @@ body {
 .my-auto{
   margin-top: auto;
   margin-bottom: auto;
+}
+
+.my-6{
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .-mb-8{
@@ -1252,6 +1269,10 @@ body {
   display: table-cell;
 }
 
+.table-row{
+  display: table-row;
+}
+
 .grid{
   display: grid;
 }
@@ -1302,6 +1323,10 @@ body {
 
 .h-3{
   height: 0.75rem;
+}
+
+.h-32{
+  height: 8rem;
 }
 
 .h-36{
@@ -1445,6 +1470,10 @@ body {
   min-height: 6rem;
 }
 
+.min-h-32{
+  min-height: 8rem;
+}
+
 .min-h-\[90vh\]{
   min-height: 90vh;
 }
@@ -1503,6 +1532,10 @@ body {
 
 .w-32{
   width: 8rem;
+}
+
+.w-36{
+  width: 9rem;
 }
 
 .w-4{
@@ -1621,6 +1654,10 @@ body {
   width: 6rem;
 }
 
+.w-\[70\%\]{
+  width: 70%;
+}
+
 .w-\[70px\]{
   width: 70px;
 }
@@ -1643,6 +1680,10 @@ body {
 
 .w-\[90\%\]{
   width: 90%;
+}
+
+.w-auto{
+  width: auto;
 }
 
 .w-full{
@@ -2341,6 +2382,11 @@ body {
   background-color: rgb(255 254 254 / var(--tw-bg-opacity));
 }
 
+.bg-amber-500{
+  --tw-bg-opacity: 1;
+  background-color: rgb(245 158 11 / var(--tw-bg-opacity));
+}
+
 .bg-bgBlue{
   --tw-bg-opacity: 1;
   background-color: rgb(77 77 255 / var(--tw-bg-opacity));
@@ -2365,6 +2411,10 @@ body {
   background-color: rgb(59 130 246 / var(--tw-bg-opacity));
 }
 
+.bg-blue-500\/85{
+  background-color: rgb(59 130 246 / 0.85);
+}
+
 .bg-blue-600{
   --tw-bg-opacity: 1;
   background-color: rgb(37 99 235 / var(--tw-bg-opacity));
@@ -2373,6 +2423,10 @@ body {
 .bg-body{
   --tw-bg-opacity: 1;
   background-color: rgb(241 245 249 / var(--tw-bg-opacity));
+}
+
+.bg-body\/85{
+  background-color: rgb(241 245 249 / 0.85);
 }
 
 .bg-body2{
@@ -2421,6 +2475,11 @@ body {
 .bg-green-400{
   --tw-bg-opacity: 1;
   background-color: rgb(74 222 128 / var(--tw-bg-opacity));
+}
+
+.bg-green-500{
+  --tw-bg-opacity: 1;
+  background-color: rgb(34 197 94 / var(--tw-bg-opacity));
 }
 
 .bg-green-500\/10{
@@ -2777,6 +2836,11 @@ body {
 .px-6{
   padding-left: 1.5rem;
   padding-right: 1.5rem;
+}
+
+.px-7{
+  padding-left: 1.75rem;
+  padding-right: 1.75rem;
 }
 
 .px-8{
@@ -3731,6 +3795,10 @@ body {
   border-color: rgb(242 153 74 / var(--tw-border-opacity));
 }
 
+.hover\:bg-amber-500\/90:hover{
+  background-color: rgb(245 158 11 / 0.9);
+}
+
 .hover\:bg-bgBlue:hover{
   --tw-bg-opacity: 1;
   background-color: rgb(77 77 255 / var(--tw-bg-opacity));
@@ -3786,6 +3854,10 @@ body {
 
 .hover\:bg-gray-500\/10:hover{
   background-color: rgb(107 114 128 / 0.1);
+}
+
+.hover\:bg-green-500\/90:hover{
+  background-color: rgb(34 197 94 / 0.9);
 }
 
 .hover\:bg-green-600\/85:hover{
@@ -3873,10 +3945,6 @@ body {
   color: rgb(37 99 235 / var(--tw-text-opacity));
 }
 
-.hover\:text-blue-600\/85:hover{
-  color: rgb(37 99 235 / 0.85);
-}
-
 .hover\:text-gray-600:hover{
   --tw-text-opacity: 1;
   color: rgb(75 85 99 / var(--tw-text-opacity));
@@ -3933,6 +4001,10 @@ body {
 .hover\:text-white:hover{
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.hover\:text-white\/85:hover{
+  color: rgb(255 255 255 / 0.85);
 }
 
 .hover\:underline:hover{
@@ -4429,11 +4501,6 @@ body {
     margin: 1.25rem;
   }
 
-  .lg\:-my-4{
-    margin-top: -1rem;
-    margin-bottom: -1rem;
-  }
-
   .lg\:mx-0{
     margin-left: 0px;
     margin-right: 0px;
@@ -4497,10 +4564,6 @@ body {
     margin-top: 0px;
   }
 
-  .lg\:mt-0\.5{
-    margin-top: 0.125rem;
-  }
-
   .lg\:mt-1{
     margin-top: 0.25rem;
   }
@@ -4553,14 +4616,6 @@ body {
 
   .lg\:flex{
     display: flex;
-  }
-
-  .lg\:table-cell{
-    display: table-cell;
-  }
-
-  .lg\:table-row{
-    display: table-row;
   }
 
   .lg\:grid{
@@ -4705,10 +4760,6 @@ body {
 
   .lg\:w-\[90\%\]{
     width: 90%;
-  }
-
-  .lg\:w-auto{
-    width: auto;
   }
 
   .lg\:w-full{

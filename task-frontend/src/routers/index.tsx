@@ -19,6 +19,7 @@ import {
   JobsPage,
   ProfilePage,
   SavedJobsPage,
+  SchedulePage,
 } from "@/pages/Candidate";
 import {
   ApplicationsEmployerPage,
@@ -118,6 +119,10 @@ const Routers = () => {
             <Route
               path={PathConstants.CANDIDATE_PATHS.myProfile}
               element={<ProfilePage />}
+            />
+            <Route
+              path={PathConstants.CANDIDATE_PATHS.schedule}
+              element={<SchedulePage />}
             />
           </Route>
         </Route>

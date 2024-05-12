@@ -244,6 +244,7 @@ public class AuthController {
             candidate.setSex(request.sex());
             candidate.setDateOfBirth(request.dateOfBirth());
             candidate.setPhoneNumber(request.phoneNumber());
+            candidate.setIsFindJob(false);
             candidate.setUser(user.get());
             candidateService.create(candidate,null);
 

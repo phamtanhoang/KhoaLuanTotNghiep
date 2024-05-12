@@ -87,7 +87,7 @@ const ApplicationsEmployerPage = () => {
         }
       })
       .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
         setIsLoadingTable(false);

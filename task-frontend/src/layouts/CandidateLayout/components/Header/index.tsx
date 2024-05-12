@@ -107,7 +107,7 @@ const Header = () => {
         }
       })
       .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
         context.handleCloseLoading();
@@ -223,6 +223,7 @@ const Header = () => {
                                 Công việc đã ứng tuyển
                               </Link>
                             </li>
+
                             <li>
                               <Link
                                 to={PathConstants.CANDIDATE_PATHS.savedJobs}
@@ -232,6 +233,17 @@ const Header = () => {
                                 }}
                               >
                                 Công việc đã lưu
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                to={PathConstants.CANDIDATE_PATHS.schedule}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orangetext"
+                                onClick={() => {
+                                  setOpenInfo(false);
+                                }}
+                              >
+                                Lịch
                               </Link>
                             </li>
                             <li>

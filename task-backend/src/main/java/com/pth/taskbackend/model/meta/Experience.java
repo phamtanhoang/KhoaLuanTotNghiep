@@ -20,13 +20,13 @@ public class Experience extends BaseEntity  {
     @Column(nullable = false)
     private String experience;
 
-
     @Column(nullable = false)
     private int sequence;
 
+    @Column(nullable = false)
     private String fromDate;
 
-
+    @Column(nullable = false)
     private String toDate;
 
     @Column(columnDefinition = "TEXT")

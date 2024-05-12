@@ -16,7 +16,7 @@ const SkillExpEduProps: React.FC<SkillExpEduPropsProps> = ({
       <div className="lg:flex justify-between gap-3">
         <p className="font-medium">{name}</p>
         {fromDate && toDate && (
-          <p className="text-gray-500 text-xs my-auto max-lg:mt-1 max-lg:text-end">
+          <p className="text-gray-500 text-xs my-auto max-lg:mt-1 max-lg:text-end w-36">
             {fromDate} - {toDate}
           </p>
         )}

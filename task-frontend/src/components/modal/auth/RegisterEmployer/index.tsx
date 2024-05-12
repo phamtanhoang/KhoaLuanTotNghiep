@@ -114,25 +114,25 @@ const RegisterEmployer = (props: any) => {
 
       <div className="my-2 mx-1 overflow-auto scrollbar-custom h-max max-h-[70vh]">
         <div className="mx-3">
-          <div className="mt-2 content-center">
-            <label className="text-sm font-semibold text-gray-700 tracking-wide">
+          <div className="mt-1 content-center">
+            <label className="text-sm font-medium text-gray-700 tracking-wide">
               Email <span className="text-red-500">*</span>
             </label>
             <input
-              className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext mt-1 rounded"
+              className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext text-sm mt-1 rounded"
               type="text"
               placeholder="employer@example.com"
               value={email}
               onChange={_onChangeEmail}
             />
           </div>
-          <div className="mt-2 content-center lg:flex gap-4">
+          <div className="mt-1 content-center lg:flex gap-4">
             <div className="w-full">
-              <label className="text-sm font-semibold text-gray-700 tracking-wide">
+              <label className="text-sm font-medium text-gray-700 tracking-wide">
                 Mật khẩu <span className="text-red-500">*</span>
               </label>
               <input
-                className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext mt-1 rounded"
+                className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext text-sm mt-1 rounded"
                 type="password"
                 placeholder="********"
                 value={password}
@@ -140,11 +140,11 @@ const RegisterEmployer = (props: any) => {
               />
             </div>
             <div className="w-full">
-              <label className="text-sm font-semibold text-gray-700 tracking-wide">
+              <label className="text-sm font-medium text-gray-700 tracking-wide">
                 Nhập lại mật khẩu <span className="text-red-500">*</span>
               </label>
               <input
-                className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext mt-1 rounded"
+                className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext text-sm mt-1 rounded"
                 type="password"
                 placeholder="********"
                 value={confirmPassword}
@@ -152,25 +152,25 @@ const RegisterEmployer = (props: any) => {
               />
             </div>
           </div>
-          <div className="mt-2 content-center">
-            <label className="text-sm font-semibold text-gray-700 tracking-wide">
+          <div className="mt-1 content-center">
+            <label className="text-sm font-medium text-gray-700 tracking-wide">
               Tên công ty <span className="text-red-500">*</span>
             </label>
             <input
-              className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext mt-1 rounded"
+              className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext text-sm mt-1 rounded"
               type="text"
               placeholder="Nhập tên công ty..."
               value={name}
               onChange={_onChangeName}
             />
           </div>
-          <div className="mt-2 content-center lg:flex gap-4">
+          <div className="mt-1 content-center lg:flex gap-4">
             <div className="w-full">
-              <label className="text-sm font-semibold text-gray-700 tracking-wide">
+              <label className="text-sm font-medium text-gray-700 tracking-wide">
                 Mã số kinh doanh <span className="text-red-500">*</span>
               </label>
               <input
-                className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext mt-1 rounded"
+                className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext text-sm mt-1 rounded"
                 type="text"
                 placeholder="Nhập MSKD công ty..."
                 value={businessCode}
@@ -178,11 +178,11 @@ const RegisterEmployer = (props: any) => {
               />
             </div>
             <div className="w-full">
-              <label className="text-sm font-semibold text-gray-700 tracking-wide">
+              <label className="text-sm font-medium text-gray-700 tracking-wide">
                 Số điện thoại <span className="text-red-500">*</span>
               </label>
               <input
-                className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext mt-1 rounded"
+                className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext text-sm mt-1 rounded"
                 type="text"
                 placeholder="Nhập số điện thoại công ty..."
                 value={phoneNumber}
@@ -190,25 +190,25 @@ const RegisterEmployer = (props: any) => {
               />
             </div>
           </div>
-          <div className="mt-2 content-center">
-            <label className="text-sm font-semibold text-gray-700 tracking-wide">
+          <div className="mt-1 content-center">
+            <label className="text-sm font-medium text-gray-700 tracking-wide">
               Địa chỉ công ty (theo ĐKKD){" "}
               <span className="text-red-500">*</span>
             </label>
             <input
-              className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext mt-1 rounded"
+              className="w-full content-center text-base p-2 border border-borderColor focus:outline-none focus:border-orangetext text-sm mt-1 rounded"
               type="text"
               placeholder="Nhập địa chỉ theo giấy tờ đăng kí..."
               value={address}
               onChange={_onChangeAddress}
             />
           </div>
-          <div className="mt-2 content-center">
-            <label className="text-sm font-semibold text-gray-700 tracking-wide">
+          <div className="mt-1 content-center">
+            <label className="text-sm font-medium text-gray-700 tracking-wide">
               Mô tả ngắn gọn về công ty <span className="text-red-500">*</span>
             </label>
             <textarea
-              className="w-full text-base p-2 mt-1 border rounded border-borderColor focus:outline-none focus:border-orangetext h-24"
+              className="w-full text-base p-2 mt-1 border rounded border-borderColor focus:outline-none focus:border-orangetext text-sm h-24"
               placeholder="Nhập mô tả ngắn gọn về công ty..."
               value={description}
               onChange={_onChangeDescription}

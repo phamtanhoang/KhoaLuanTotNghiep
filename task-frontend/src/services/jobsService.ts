@@ -2,6 +2,12 @@ import axiosConfig from "@/configs/axiosConfig";
 import { JobAPI } from "@/Apis";
 
 const jobsService = {
+  async saveJob(id: string) {
+    return await axiosConfig.post(JobAPI.saveJobs(id));
+  },
+  async unSaveJob(id: string) {
+    return await axiosConfig.delete(JobAPI.unSaveJobs(id));
+  },
   async getList_Public(
     keyword?: string,
     location?: string,
@@ -62,6 +68,16 @@ const jobsService = {
   ) {
     return await axiosConfig.get(
       JobAPI.getJobsByEmployerID(id, name, location, currentPage, itemPerPage)
+    );
+  },
+  async getSavedJobs(
+    name?: string,
+    location?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) {
+    return await axiosConfig.get(
+      JobAPI.getSavedJobs(name, location, currentPage, itemPerPage)
     );
   },
   async create(

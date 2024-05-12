@@ -4,7 +4,7 @@ import { SwalHelper, DateHelper } from "@/utils/helpers";
 import { useContext, useEffect, useState } from "react";
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
 import { IoMdExit } from "react-icons/io";
-import NON_BG from "@/assets/images/image-background.png";
+import NON_BG from "@/assets/images/non-bg.jpg";
 import NON_USER from "@/assets/images/non-user.jpg";
 import { MdOutlineNotStarted, MdPauseCircleOutline } from "react-icons/md";
 import { DataConstants } from "@/utils/constants";
@@ -89,7 +89,7 @@ const EmployerUpdate = (props: any) => {
               <div className="flex flex-col items-center -mt-20 relative">
                 <img
                   src={employer?.image ? employer?.image : NON_USER}
-                  className="w-40 h-40 border-4 border-white rounded-full"
+                  className="w-40 h-40 border-4 border-white rounded-full bg-white"
                 />
               </div>
             </div>
@@ -98,7 +98,7 @@ const EmployerUpdate = (props: any) => {
                 Tên công ty
               </label>
               <input
-                className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                 type="text"
                 value={employer?.name}
                 disabled
@@ -107,7 +107,7 @@ const EmployerUpdate = (props: any) => {
             <div className="content-center">
               <label className="font-medium tracking-wide text-sm">Mô tả</label>
               <textarea
-                className="w-full  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue min-h-24"
+                className="w-full  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue min-h-32 h-max text-sm"
                 value={employer?.description}
                 disabled
               />
@@ -118,7 +118,7 @@ const EmployerUpdate = (props: any) => {
                   Email
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={employer?.email}
                   disabled
@@ -129,7 +129,7 @@ const EmployerUpdate = (props: any) => {
                   Tình trạng
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={
                     employer?.status === DataConstants.STATUS_DATA.ACTIVE
@@ -148,7 +148,7 @@ const EmployerUpdate = (props: any) => {
                   Số điện thoại
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={employer?.phoneNumber}
                   disabled
@@ -159,7 +159,7 @@ const EmployerUpdate = (props: any) => {
                   Mã số kinh doanh
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={employer?.businessCode}
                   disabled
@@ -171,7 +171,7 @@ const EmployerUpdate = (props: any) => {
                 Địa chỉ
               </label>
               <input
-                className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                 type="text"
                 value={employer?.location}
                 disabled
@@ -184,7 +184,7 @@ const EmployerUpdate = (props: any) => {
                   Ngày tạo
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={
                     employer?.created
@@ -199,7 +199,7 @@ const EmployerUpdate = (props: any) => {
                   Chỉnh sửa gần đây
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={
                     employer?.updated

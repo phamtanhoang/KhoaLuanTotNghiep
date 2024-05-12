@@ -8,7 +8,13 @@ import {
   ChangeExpSkillInfoCandidate,
   ChangeInfoCandidate,
 } from "./candidate";
-import { ApplicationDetail, ApplicationStep, ApplyJob } from "./application";
+import {
+  ApplicationDetail,
+  ApplicationStep,
+  ApplyJob,
+  CreateStepSchedule,
+  HandleApplication,
+} from "./application";
 import { ChangeInfoEmployer, EmployerUpdate } from "./employer";
 import { CreateTag, UpdateTag } from "./tag";
 import { CreateCategory, UpdateCategory } from "./category";
@@ -24,6 +30,7 @@ import { ChatApplication } from "./chat";
 const ModalBase = (props: any) => {
   // take props
   const id = props.id;
+  const stepId = props.stepId;
   const type = props.type;
   const funcs = props.funcs;
   const setFuncs = props.setFuncs;
@@ -33,10 +40,11 @@ const ModalBase = (props: any) => {
   const setCroppedImg = props.setCroppedImg;
   const fetchData = props.fetchData;
   const data = props.data;
-  const setData = props.setData;
-
   const email = props.email;
   const password = props.password;
+
+  const status = props.status;
+  const _onClickUpDateStep = props._onClickUpDateStep;
 
   const modalComponents: { [key: string]: React.ReactNode } = {
     [ModalConstants.AUTH_KEYS.signin]: (
@@ -63,7 +71,11 @@ const ModalBase = (props: any) => {
       />
     ),
     [ModalConstants.APPLICATION_KEYS.applycationDetail]: (
-      <ApplicationDetail id={id} handleClose={handleClose} />
+      <ApplicationDetail
+        id={id}
+        fetchData={fetchData}
+        handleClose={handleClose}
+      />
     ),
 
     [ModalConstants.AUTH_KEYS.registerEmployer]: (
@@ -169,7 +181,22 @@ const ModalBase = (props: any) => {
       <ChatApplication handleClose={handleClose} />
     ),
     [ModalConstants.APPLICATION_KEYS.applycationStep]: (
-      <ApplicationStep id={id} handleClose={handleClose} />
+      <ApplicationStep id={id} stepId={stepId} handleClose={handleClose} />
+    ),
+    [ModalConstants.APPLICATION_KEYS.createStepSchedule]: (
+      <CreateStepSchedule
+        id={id}
+        stepId={stepId}
+        fetchData={fetchData}
+        handleClose={handleClose}
+      />
+    ),
+    [ModalConstants.APPLICATION_KEYS.handleApplication]: (
+      <HandleApplication
+        status={status}
+        _onClickUpDateStep={_onClickUpDateStep}
+        handleClose={handleClose}
+      />
     ),
   };
 

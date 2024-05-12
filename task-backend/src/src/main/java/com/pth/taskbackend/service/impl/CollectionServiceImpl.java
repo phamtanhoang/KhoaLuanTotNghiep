@@ -1,6 +1,5 @@
 package com.pth.taskbackend.service.impl;
 
-import com.pth.taskbackend.model.meta.Collection;
 import com.pth.taskbackend.repository.CollectionRepository;
 import com.pth.taskbackend.service.CollectionService;
 import org.springframework.beans.factory.annotation.Autowired;

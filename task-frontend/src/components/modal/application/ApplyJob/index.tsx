@@ -11,7 +11,6 @@ import applicationsService from "@/services/applicationsService";
 
 const ApplyJob = (props: any) => {
   const context = useContext(LoadingContext);
-  const dispatch = useDispatch();
   const id = props.id;
   const fetchData = props.fetchData;
 
@@ -75,8 +74,6 @@ const ApplyJob = (props: any) => {
       applicationsService
         .applyJob_File(id, name, email, phoneNumber, coverLetter, cvFile)
         .then((res) => {
-          fetchData(id);
-          handleClose();
           if (res.status === 200 && res.data.Status === 200) {
             handleClose();
             fetchData(id);

@@ -40,12 +40,12 @@ const ItemTSX: React.FC<{
       </td>
       <td className="table-cell">
         <div className="flex items-center px-5 w-full gap-2 justify-center">
-          {DateHelper.formatDateTime(new Date(item.created))}
+          {DateHelper.formatDateTime(new Date(item.created!))}
         </div>
       </td>
       <td className="table-cell">
         <div className="flex items-center px-5 w-full gap-2  justify-center">
-          {DateHelper.formatDateTime(new Date(item.updated))}
+          {DateHelper.formatDateTime(new Date(item.updated!))}
         </div>
       </td>
       <td className="table-cell">
@@ -78,6 +78,7 @@ const ProceduresTableWeb: React.FC<ProceduresTableProps> = ({
   isLoading,
   currentPage,
   itemPerpage,
+  isEmpty,
 }) => {
   return (
     <>
@@ -99,7 +100,7 @@ const ProceduresTableWeb: React.FC<ProceduresTableProps> = ({
             </tr>
           ) : (
             <>
-              {!value ? (
+              {isEmpty ? (
                 <tr className="bg-white">
                   <td className="pt-6 whitespace-no-wrap" colSpan={6}>
                     <ListEmpty />

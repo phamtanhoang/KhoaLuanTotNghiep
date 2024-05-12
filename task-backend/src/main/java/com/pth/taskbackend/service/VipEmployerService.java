@@ -1,12 +1,8 @@
 package com.pth.taskbackend.service;
 
-import com.pth.taskbackend.model.meta.VipCandidate;
 import com.pth.taskbackend.model.meta.VipEmployer;
-import com.pth.taskbackend.repository.VipEmployerRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 
 import java.io.IOException;
 import java.util.List;

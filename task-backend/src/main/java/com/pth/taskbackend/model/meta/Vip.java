@@ -27,6 +27,7 @@ public class Vip extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private EType type;
+
     @Column(nullable = false)
     private String color;
 
@@ -39,8 +40,8 @@ public class Vip extends BaseEntity {
     @OneToMany(mappedBy = "vip", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<VipEmployer> vipEmployers = new HashSet<>();
 
-    @OneToMany(mappedBy = "vip", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<VipCandidate> vipCandidates = new HashSet<>();
+//    @OneToMany(mappedBy = "vip", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Set<VipCandidate> vipCandidates = new HashSet<>();
 
 
 }

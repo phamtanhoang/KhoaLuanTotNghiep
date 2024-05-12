@@ -6,5 +6,4 @@ interface MessageModel {
   userId: string;
   userName: string;
   avatar: string;
-  isYourMessage: boolean;
 }

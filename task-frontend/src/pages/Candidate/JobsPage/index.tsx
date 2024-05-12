@@ -1,7 +1,7 @@
 import { GreatJobs, JobCard, Loading, PaginationCustom } from "@/components/ui";
 import { JobDetailCard, SearchJob } from "./components";
 import "react-tooltip/dist/react-tooltip.css";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ModalBase from "@/components/modal";
 import { jobsService } from "@/services";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,10 +16,12 @@ import {
 } from "@/store/reducers/paginationState";
 import { ONCHANGE_JOB_SINGLE } from "@/store/reducers/singleDataReducer";
 import { useLocation } from "react-router-dom";
+import { LoadingContext } from "@/App";
 
 const JobsPage: React.FC = () => {
   const { state } = useLocation();
 
+  const context = useContext(LoadingContext);
   const dispatch = useDispatch();
   const { totalPages, currentPage, isEmpty } = useSelector(
     (state: any) => state.paginationReducer
@@ -45,10 +47,10 @@ const JobsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(true);
 
-  const fetchSingleData = (job: JobModel) => {
+  const fetchSingleData = (id: string) => {
     setIsLoadingDetail(true);
     jobsService
-      .getDetail_Public(job.id!)
+      .getDetail_Public(id)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           dispatch(ONCHANGE_JOB_SINGLE(res.data.Data || null));
@@ -57,14 +59,14 @@ const JobsPage: React.FC = () => {
         }
       })
       .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
         setIsLoadingDetail(false);
       });
   };
 
-  const fetchListData = () => {
+  const fetchListData = (type?: boolean) => {
     setIsLoading(false);
     jobsService
       .getList_Public(
@@ -81,15 +83,18 @@ const JobsPage: React.FC = () => {
         if (res.status === 200 && res.data.Status === 200) {
           dispatch(ONCHANGE_JOB_LIST(res.data.Data?.content || []));
           dispatch(ONCHANGE_PAGINATION(res.data.Data));
-          if (res.data.Data) {
-            fetchSingleData(res.data.Data.content[0]);
+          if (res?.data?.Data?.content?.length > 0 && !type) {
+            fetchSingleData(res.data.Data.content[0]?.id);
+          }
+          if (type) {
+            fetchSingleData(job?.id!);
           }
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
       })
       .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
         setIsLoading(false);
@@ -111,10 +116,42 @@ const JobsPage: React.FC = () => {
     setFuncs(ModalConstants.APPLICATION_KEYS.applyJob);
   };
   const _onClickSaveJob = (id: string) => {
-    alert(1);
+    context.handleOpenLoading();
+    jobsService
+      .saveJob(id!)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          fetchListData(true);
+          SwalHelper.MiniAlert(res.data.Message, "success");
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
   };
   const _onClickUnSaveJob = (id: string) => {
-    alert(1);
+    context.handleOpenLoading();
+    jobsService
+      .unSaveJob(id!)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          fetchListData(true);
+          SwalHelper.MiniAlert(res.data.Message, "success");
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
   };
   const _onClickLogin = () => {
     handleOpen();
@@ -165,7 +202,7 @@ const JobsPage: React.FC = () => {
                       fromDate={DateHelper.formatDate(job?.created)}
                       toDate={DateHelper.formatDate(new Date(job?.toDate!))}
                       category={job?.category?.name || "Khác"}
-                      image={job?.employer?.image}
+                      image={job?.employer?.avatar}
                       experience={job?.experience}
                       salary={TextHelper.SalaryText(
                         job?.fromSalary,
@@ -192,11 +229,11 @@ const JobsPage: React.FC = () => {
                         className={` ${
                           index != jobs.length - 1 && "mb-[4px]"
                         }  `}
-                        onClick={() => fetchSingleData(item)}
+                        onClick={() => fetchSingleData(item.id!)}
                       >
                         <JobCard
                           id={item?.id}
-                          image={item?.employer?.image}
+                          image={item?.employer?.avatar}
                           name={item?.name}
                           dateline={DateHelper.formatDate(
                             new Date(item?.toDate!)
@@ -207,8 +244,9 @@ const JobsPage: React.FC = () => {
                             item?.fromSalary,
                             item?.toSalary
                           )}
-                          isVip={item.isVip}
-                          fetchData={fetchListData}
+                          isVip={item?.isVip}
+                          fetchData={() => fetchListData(true)}
+                          isSave={item?.isSave}
                         />
                       </div>
                     ))}

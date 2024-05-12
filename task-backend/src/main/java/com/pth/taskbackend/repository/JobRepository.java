@@ -16,11 +16,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job, String> {
-//    @Query("SELECT j FROM Job j " +
+    //    @Query("SELECT j FROM Job j " +
 //            "INNER JOIN j.humanResource hr " +
 //            "INNER JOIN hr.employer e " +
 //            "LEFT JOIN j.tags jt " +
@@ -40,15 +41,15 @@ public interface JobRepository extends JpaRepository<Job, String> {
 //            "WHERE DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE())) " +
 //            "ORDER BY j.created DESC")
     @Query("SELECT j FROM Job j " +
-        "WHERE (:keyword IS NULL OR LOWER(j.name) LIKE CONCAT('%', :keyword, '%')) " +
-        "AND (:location IS NULL OR LOWER(j.location) LIKE CONCAT('%', :location, '%')) " +
-        "AND (:experience IS NULL OR :experience = '' OR j.experience = :experience) " +
-        "AND (:fromDate IS NULL OR :fromDate <= j.created) " +
-        "AND (:categoryId IS NULL OR :categoryId = '' OR j.category.id = :categoryId) " +
-        "AND (:tagId IS NULL OR :tagId = '' OR EXISTS (SELECT 1 FROM j.tags t WHERE t.id = :tagId)) " +
-        "AND j.status = 'ACTIVE' " +
-        "AND j.toDate > CURRENT_TIMESTAMP " +
-        "ORDER BY j.created DESC")
+            "WHERE (:keyword IS NULL OR LOWER(j.name) LIKE CONCAT('%', :keyword, '%')) " +
+            "AND (:location IS NULL OR LOWER(j.location) LIKE CONCAT('%', :location, '%')) " +
+            "AND (:experience IS NULL OR :experience = '' OR j.experience = :experience) " +
+            "AND (:fromDate IS NULL OR :fromDate <= j.created) " +
+            "AND (:categoryId IS NULL OR :categoryId = '' OR j.category.id = :categoryId) " +
+            "AND (:tagId IS NULL OR :tagId = '' OR EXISTS (SELECT 1 FROM j.tags t WHERE t.id = :tagId)) " +
+            "AND j.status = 'ACTIVE' " +
+            "AND j.toDate > CURRENT_TIMESTAMP " +
+            "ORDER BY j.created DESC")
     Page<Job> findBySorting(
             @Param("keyword") String keyword,
             @Param("location") String location,
@@ -96,15 +97,16 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "AND (:status IS NULL OR:status = ''  OR j.status = :status) " +
             "AND j.toDate > CURRENT_TIMESTAMP " +
             "ORDER BY j.created DESC")
-    Page<Job>findByNameContainingAndCategoryIdAndStatus(String keyword,String categoryId,EStatus status,Pageable pageable);
+    Page<Job> findByNameContainingAndCategoryIdAndStatus(String keyword, String categoryId, EStatus status, Pageable pageable);
 
 
     @Query("SELECT j FROM Job j " +
             "WHERE (:status IS NULL OR j.status = :status) " +
             "And j.humanResource.employer.id=:employerId " +
             "ORDER BY j.created DESC")
-    Page<Job>findByEmployerIdAndStatus(String employerId,EStatus status,Pageable pageable);
-    Page<Job>findByStatusOrderByCreatedDesc(EStatus status, Pageable pageable);
+    Page<Job> findByEmployerIdAndStatus(String employerId, EStatus status, Pageable pageable);
+
+    Page<Job> findByStatusOrderByCreatedDesc(EStatus status, Pageable pageable);
 
     @Query("SELECT j FROM Job j " +
             "left JOIN j.category c " +
@@ -139,7 +141,7 @@ public interface JobRepository extends JpaRepository<Job, String> {
     Page<Job> findByKeywordAndCategoryIdAndHRId(
             @Param("keyword") String keyword,
             @Param("categoryId") String categoryId,
-            @Param("hRId")String hRId,
+            @Param("hRId") String hRId,
             Pageable pageable);
 
     @Query("SELECT j FROM Job j " +
@@ -172,13 +174,14 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "WHERE j.id = :id " +
             "AND j.humanResource.id = :hrId " +
             "AND j.status != 'DELETED'")
-    Optional<Job>findByIdAndHRId(String id,String hrId);
+    Optional<Job> findByIdAndHRId(String id, String hrId);
 
     @Query("SELECT j FROM Job j " +
             "WHERE j.id = :id " +
             "AND (:status IS NULL OR :status = '' OR j.status = :status) " +
             "AND j.status != 'DELETED'")
-    Optional<Job>findByIdAndStatus(String id,EStatus status);
+    Optional<Job> findByIdAndStatus(String id, EStatus status);
+
     @Query("SELECT j FROM Job j " +
             "LEFT JOIN j.category c " +
             "WHERE (:keyword IS NULL OR " +
@@ -196,29 +199,47 @@ public interface JobRepository extends JpaRepository<Job, String> {
             @Param("employerId") String employerId,
             Pageable pageable);
 
-    Page<Job>findByCategoryId(String id, Pageable pageable);
+    Page<Job> findByCategoryId(String id, Pageable pageable);
 
-    Page<Job>findByProcessId(String id, Pageable pageable);
+    Page<Job> findByProcessId(String id, Pageable pageable);
 
     @Query("SELECT j, (SELECT COUNT(a) FROM Application a WHERE a.job.id = j.id) AS applicationCount " +
             "FROM Job j " +
             "WHERE j.status = 'ACTIVE' " +
             "ORDER BY j.created DESC")
     Page<Object[]> findActiveJobsWithApplicationCount(Pageable pageable);
+
     @Query("SELECT COUNT(e) FROM Job e")
     Long countAll();
 
 
     @Query("SELECT j FROM Job j INNER JOIN j.candidates c WHERE c.id = :candidateId")
     Page<Job> findByCandidateId(String candidateId, Pageable pageable);
+
     @Query("SELECT j FROM Job j INNER JOIN j.candidates c WHERE c.id = :candidateId and j.id = :jobId")
-    Optional<Job> findByCandidateIdAndJobId(String candidateId,String jobId);
+    Optional<Job> findByCandidateIdAndJobId(String candidateId, String jobId);
+
+    @Transactional
     @Modifying
     @Query(value = "DELETE FROM saved_job WHERE job_id = :jobId and candidate_id = :candidateId ", nativeQuery = true)
-    void deleteSavedJobByJobIdAndCandidateId(@Param("jobId") String jobId,@Param("candidateId")String candidateId);
+    void deleteSavedJobByJobIdAndCandidateId(String jobId, String candidateId);
 
+    @Transactional
     @Modifying
     @Query(value = "INSERT INTO saved_job(job_id, candidate_id) VALUES (:jobId, :candidateId)", nativeQuery = true)
     void saveJob(@Param("jobId") String jobId, @Param("candidateId") String candidateId);
+
+    @Query("SELECT COUNT(j) > 0 FROM Job j INNER JOIN j.candidates c WHERE c.id = :candidateId and j.id = :jobId")
+    boolean checkIsSavedJob(String candidateId, String jobId);
+
+
+    @Query("SELECT j FROM Job j INNER JOIN j.candidates c " +
+            "WHERE (:candidateId IS NULL OR c.id = :candidateId) " +
+            "AND (:keyword IS NULL OR LOWER(j.name) LIKE CONCAT('%', :keyword, '%')) " +
+            "AND (:location IS NULL OR LOWER(j.location) LIKE CONCAT('%', :location, '%'))")
+    Page<Job> getJobsSaved(@Param("candidateId") String candidateId,
+                           @Param("keyword") String keyword,
+                           @Param("location") String location,
+                           Pageable pageable);
 }
 

@@ -60,8 +60,8 @@ public class CandidateController {
 
     @Autowired
     ObjectMapper objectMapper;
-    @Autowired
-    VipCandidateService vipCandidateService;
+//    @Autowired
+//    VipCandidateService vipCandidateService;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -159,6 +159,9 @@ public class CandidateController {
 
 
             Candidate candidate = optionalCandidate.get();
+            if(candidate.getIsFindJob()==null) {
+                candidate.setIsFindJob(false);
+            }
             candidate.setIsFindJob(!candidate.getIsFindJob());
             candidateService.update(candidate);
             return ResponseEntity.ok(
@@ -219,7 +222,7 @@ public class CandidateController {
                     userRepository.save(candidate);
 
                     return ResponseEntity.ok(
-                            new BaseResponse("Duyệt ứng viên dụng thành công", HttpStatus.OK.value(), null)
+                            new BaseResponse("Duyệt ứng viên thành công", HttpStatus.OK.value(), null)
                     );
                 case INACTIVE:
                     if(candidate.getStatus().equals(EStatus.INACTIVE))
@@ -433,7 +436,7 @@ public class CandidateController {
                         new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
                 );
                 Candidate candidate = optionalCandidate.get();
-                boolean isVip = vipCandidateService.isVip(candidate.getId());
+//                boolean isVip = vipCandidateService.isVip(candidate.getId());
                 GetCandidateProfileResponse profile = new GetCandidateProfileResponse(
                         candidate.getId(),
                         candidate.getUser().getEmail(),
@@ -447,7 +450,6 @@ public class CandidateController {
                         candidate.getIntroduction(),
                         candidate.getAvatar(),
                         candidate.getSex(),
-                        isVip,
                         candidate.getIsFindJob(),
                         candidate.getCV());
 

@@ -328,7 +328,7 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
           }
         })
         .catch(() => {
-          SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+          SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
         })
         .finally(() => {
           context.handleCloseLoading();
@@ -345,7 +345,7 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
           }
         })
         .catch(() => {
-          SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+          SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
         })
         .finally(() => {
           context.handleCloseLoading();

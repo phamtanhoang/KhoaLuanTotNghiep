@@ -82,12 +82,14 @@ public class CandidateServiceImpl implements CandidateService {
 
     @Override
     public Page<Candidate> findVipCandidates(Pageable pageable) throws IOException {
-        return  candidateRepository.findVipCandidates(pageable);
+        return  null;
+//        return  candidateRepository.findVipCandidates(pageable);
     }
 
     @Override
     public Page<Candidate> findVipCandidateByKeyword(String keyword, Pageable pageable) throws IOException {
-        return candidateRepository.findVipCandidateByKeyword(keyword,pageable);
+        return null;
+//        return candidateRepository.findVipCandidateByKeyword(keyword,pageable);
     }
 
     @Override

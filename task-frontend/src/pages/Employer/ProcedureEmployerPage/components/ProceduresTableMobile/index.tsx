@@ -69,7 +69,7 @@ const ItemTSX: React.FC<{
             <span className="font-normal text-base text-gray-600">
               Ngày tạo:&nbsp;&nbsp;
             </span>
-            {DateHelper.formatDateTime(new Date(item.created))}
+            {DateHelper.formatDateTime(new Date(item.created!))}
           </p>
         </div>
         <div className="flex items-center w-full justify-start ">
@@ -77,7 +77,7 @@ const ItemTSX: React.FC<{
             <span className="font-normal text-base text-gray-600">
               Cập nhật gần nhất:&nbsp;&nbsp;
             </span>
-            {DateHelper.formatDateTime(new Date(item.updated))}
+            {DateHelper.formatDateTime(new Date(item.updated!))}
           </p>
         </div>
         <div className="flex justify-between gap-4">
@@ -132,6 +132,7 @@ const ProceduresTableMobile: React.FC<ProceduresTableProps> = ({
   isLoading,
   currentPage,
   itemPerpage,
+  isEmpty,
 }) => {
   return (
     <>
@@ -145,7 +146,7 @@ const ProceduresTableMobile: React.FC<ProceduresTableProps> = ({
             </tr>
           ) : (
             <>
-              {!value ? (
+              {isEmpty ? (
                 <tr className="bg-white flex align-center justify-center">
                   <td className="pt-6 whitespace-no-wrap text-center flex justify-center">
                     <ListEmpty />

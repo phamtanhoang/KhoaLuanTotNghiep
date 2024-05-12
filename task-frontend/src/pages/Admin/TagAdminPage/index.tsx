@@ -60,7 +60,7 @@ const TagsAdminPage = () => {
             }
           })
           .catch(() => {
-            SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
           })
           .finally(() => {
             context.handleCloseLoading();
@@ -89,7 +89,7 @@ const TagsAdminPage = () => {
         }
       })
       .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
         setIsLoadingTable(false);

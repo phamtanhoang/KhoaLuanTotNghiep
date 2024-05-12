@@ -1,6 +1,5 @@
 package com.pth.taskbackend.model.meta;
 
-
 import com.pth.taskbackend.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

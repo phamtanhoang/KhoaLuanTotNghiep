@@ -24,11 +24,11 @@ public class Education  extends BaseEntity  {
     @Column(nullable = false)
     private String education;
 
-
+    @Column(nullable = false)
     private String fromDate;
 
+    @Column(nullable = false)
     private String toDate;
-
 
     @Column(columnDefinition = "TEXT")
     private String description;

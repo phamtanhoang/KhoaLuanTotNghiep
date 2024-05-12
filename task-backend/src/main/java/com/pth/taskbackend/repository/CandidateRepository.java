@@ -21,18 +21,18 @@ public interface CandidateRepository extends JpaRepository<Candidate, String> {
             "AND u.status <> 'DELETED'")
     Page<Candidate> findByKeywordAndUserStatus(String keyword, EStatus status, Pageable pageable);
 
-    @Query("SELECT DISTINCT c " +
-            "FROM Candidate c " +
-            "JOIN User a ON c.user.id = a.id " +
-            "JOIN VipCandidate v ON c.id = v.candidate.id " +
-            "JOIN c.skills s " +
-            "WHERE (DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE()) " +
-            "AND a.status = 'ACTIVE' " +
-            "AND a.status != 'DELETE' " +
-            "AND (:keyword IS NULL OR " +
-            "     LOWER(c.job) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "     OR LOWER(s.skill) LIKE LOWER(CONCAT('%', :keyword, '%'))) ")
-    Page<Candidate> findVipCandidateByKeyword(@Param("keyword") String keyword, Pageable pageable);
+//    @Query("SELECT DISTINCT c " +
+//            "FROM Candidate c " +
+//            "JOIN User a ON c.user.id = a.id " +
+//            "JOIN VipCandidate v ON c.id = v.candidate.id " +
+//            "JOIN c.skills s " +
+//            "WHERE (DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE()) " +
+//            "AND a.status = 'ACTIVE' " +
+//            "AND a.status != 'DELETE' " +
+//            "AND (:keyword IS NULL OR " +
+//            "     LOWER(c.job) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+//            "     OR LOWER(s.skill) LIKE LOWER(CONCAT('%', :keyword, '%'))) ")
+//    Page<Candidate> findVipCandidateByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     @Query("SELECT DISTINCT c " +
             "FROM Candidate c " +
@@ -48,11 +48,11 @@ public interface CandidateRepository extends JpaRepository<Candidate, String> {
 
 
     Optional<Candidate>findByUserEmail(String email);
-    @Query("SELECT distinct c FROM Candidate c " +
-            "JOIN  User a on c.user.id=a.id "+
-            "JOIN VipCandidate v ON c.id = v.candidate.id " +
-            "WHERE DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE()" +
-            "And a.status='ACTIVE'")
-    Page<Candidate> findVipCandidates(Pageable pageable);
+//    @Query("SELECT distinct c FROM Candidate c " +
+//            "JOIN  User a on c.user.id=a.id "+
+//            "JOIN VipCandidate v ON c.id = v.candidate.id " +
+//            "WHERE DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE()" +
+//            "And a.status='ACTIVE'")
+//    Page<Candidate> findVipCandidates(Pageable pageable);
 
 }

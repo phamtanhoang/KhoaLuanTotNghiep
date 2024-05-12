@@ -84,7 +84,7 @@ const CandidateUpdate = (props: any) => {
               <div className="content-center w-full">
                 <label className="font-medium tracking-wide text-sm">Họ</label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={candidate?.firstName}
                   disabled
@@ -93,7 +93,7 @@ const CandidateUpdate = (props: any) => {
               <div className="content-center w-full">
                 <label className="font-medium tracking-wide text-sm">Tên</label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={candidate?.lastName}
                   disabled
@@ -103,7 +103,7 @@ const CandidateUpdate = (props: any) => {
             <div className="content-center">
               <label className="font-medium tracking-wide text-sm">Mô tả</label>
               <textarea
-                className="w-full  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue min-h-24"
+                className="w-full  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm min-h-24"
                 value={candidate?.introduction}
                 disabled
               />
@@ -114,7 +114,7 @@ const CandidateUpdate = (props: any) => {
                   Email
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={candidate?.email}
                   disabled
@@ -125,7 +125,7 @@ const CandidateUpdate = (props: any) => {
                   Tình trạng
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={
                     candidate?.status === DataConstants.STATUS_DATA.ACTIVE
@@ -142,7 +142,7 @@ const CandidateUpdate = (props: any) => {
                   Số điện thoại
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={candidate?.phoneNumber}
                   disabled
@@ -153,7 +153,7 @@ const CandidateUpdate = (props: any) => {
                   Ngày sinh
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={
                     candidate?.dateOfBirth
@@ -170,7 +170,7 @@ const CandidateUpdate = (props: any) => {
                   Công việc
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={candidate?.job}
                   disabled
@@ -181,7 +181,7 @@ const CandidateUpdate = (props: any) => {
                   Giới tính
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={ConstantsHelper.findSexById(candidate?.sex!)?.name}
                   disabled
@@ -194,7 +194,7 @@ const CandidateUpdate = (props: any) => {
                   Liên kết
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={candidate?.link}
                   disabled
@@ -208,7 +208,7 @@ const CandidateUpdate = (props: any) => {
                   Ngày tạo
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={
                     candidate?.created
@@ -223,7 +223,7 @@ const CandidateUpdate = (props: any) => {
                   Chỉnh sửa gần đây
                 </label>
                 <input
-                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue"
+                  className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-bgBlue text-sm"
                   type="text"
                   value={
                     candidate?.updated

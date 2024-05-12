@@ -9,6 +9,10 @@ import { LuSendHorizonal } from "react-icons/lu";
 import { TbVip } from "react-icons/tb";
 import { PathConstants } from "@/utils/constants";
 import { useNavigate } from "react-router-dom";
+import { jobsService } from "@/services";
+import { SwalHelper } from "@/utils/helpers";
+import { useContext } from "react";
+import { LoadingContext } from "@/App";
 interface JobCardProps {
   id?: string;
   image?: string;
@@ -34,13 +38,49 @@ const JobCard: React.FC<JobCardProps> = ({
   isSave,
   fetchData,
 }) => {
+  const context = useContext(LoadingContext);
   const urlLink = window.location.pathname;
   const navigate = useNavigate();
-  const _onClickSave = () => {
-    fetchData();
+
+  const _onClickSave = (e: any) => {
+    e.stopPropagation();
+    context.handleOpenLoading();
+    jobsService
+      .saveJob(id!)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          fetchData();
+          SwalHelper.MiniAlert(res.data.Message, "success");
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
   };
-  const _onClickUnSave = () => {
-    fetchData();
+  const _onClickUnSave = (e: any) => {
+    e.stopPropagation();
+    context.handleOpenLoading();
+    jobsService
+      .unSaveJob(id!)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          fetchData();
+          SwalHelper.MiniAlert(res.data.Message, "success");
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
   };
   return (
     <div
@@ -125,7 +165,7 @@ const JobCard: React.FC<JobCardProps> = ({
               </button>
             ) : (
               <button
-                className="p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext"
+                className="p-2 text-orangetext rounded-full bg-orangebackground"
                 onClick={_onClickSave}
               >
                 <FaBookmark />

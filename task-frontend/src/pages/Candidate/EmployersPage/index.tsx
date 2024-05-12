@@ -44,7 +44,7 @@ const EmployersPage: React.FC = () => {
         }
       })
       .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
         setIsLoading(false);

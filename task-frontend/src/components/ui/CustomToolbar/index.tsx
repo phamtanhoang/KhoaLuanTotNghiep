@@ -7,15 +7,19 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { HiDotsVertical } from "react-icons/hi";
 import { GrNext, GrPrevious } from "react-icons/gr";
+import { DateHelper } from "@/utils/helpers";
+import { ONCHANGE_VIEW } from "@/store/reducers/scheduleReducer";
 
 const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
-  const { eventList, fromDate, toDate, optionList, selectedUser, view } =
-    useSelector((state: any) => state.scheduleReducer);
+  const { fromDate, toDate, view } = useSelector(
+    (state: any) => state.scheduleReducer
+  );
   const dropdownRef = useRef<any>(null);
   const dispatch = useDispatch();
   const [openDropdown, setOpenDropdown] = useState<boolean>(false);
 
   function addMonths(date: any, months: any) {
+    // alert(1);
     const d = date.getDate();
     date.setMonth(date.getMonth() + months);
     if (date.getDate() !== d) {
@@ -38,6 +42,7 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
   }
 
   function addWeeks(date: any, weeks: any) {
+    // alert(2);
     date.setDate(date.getDate() + 7 * weeks);
 
     const firstDayOfWeek = startOfWeek(new Date(date), { weekStartsOn: 0 });
@@ -53,6 +58,7 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
   }
 
   function addDays(date: any, days: any) {
+    // alert(3);
     date.setDate(date.getDate() + days);
     const first = new Date(date);
 
@@ -66,6 +72,7 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
   }
 
   const goToDayView = () => {
+    // alert(4);
     const first = new Date(props.date);
 
     const end = new Date(props.date);
@@ -78,6 +85,7 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
   };
 
   const goToWeekView = () => {
+    // alert(5);
     const first = startOfWeek(new Date(props.date), {
       weekStartsOn: 0,
     });
@@ -93,6 +101,7 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
   };
 
   const goToMonthView = () => {
+    // alert(6);
     const newDate = new Date(props.date);
     newDate.setMonth(newDate.getMonth());
     const first = startOfWeek(new Date(startOfMonth(newDate)), {
@@ -109,6 +118,7 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
   };
 
   const goToBack = () => {
+    // alert(7);
     if (view === "day") {
       props.onNavigate("prev", addDays(props.date, -1));
     } else if (view === "week") {
@@ -119,6 +129,7 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
   };
 
   const goToNext = () => {
+    // alert(8);
     if (view === "day") {
       props.onNavigate("next", addDays(props.date, +1));
     } else if (view === "week") {
@@ -129,6 +140,7 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
   };
 
   const goToToday = () => {
+    // alert(9);
     const now = new Date();
     props.date.setMonth(now.getMonth());
     props.date.setYear(now.getFullYear());
@@ -183,31 +195,31 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
   }, []);
 
   return (
-    <div className="lg:flex gap-5 justify-between  px-4 lg:px-0 bg-body pb-2">
+    <div className="lg:flex gap-3 justify-between  px-4 lg:px-0 bg-body pb-2">
       <div className="flex justify-between">
         <div className="flex gap-2 lg:gap-3">
           <button
             onClick={goToToday}
-            className="py-1 px-3 lg:px-5  font-semibold border border-borderColor rounded-md bg-white w-max lg:mx-0 flex"
+            className="py-1 px-3 lg:px-5  font-semibold border border-borderColor rounded bg-white w-max lg:mx-0 flex"
           >
             Hôm nay
           </button>
           <button
             onClick={goToBack}
-            className="w-[36px] h-[36px] font-semibold border-borderColor border rounded-full bg-white text-4xl flex justify-center items-center"
+            className="w-[36px] h-[36px] font-semibold border-borderColor border rounded bg-white text-4xl flex justify-center items-center"
           >
             <GrPrevious className="p-2.5 lg:p-2" />
           </button>
 
           <button
             onClick={goToNext}
-            className="w-[36px] h-[36px] font-semibold border-borderColor border rounded-full bg-white text-4xl flex justify-center items-center"
+            className="w-[36px] h-[36px] font-semibold border-borderColor border rounded bg-white text-4xl flex justify-center items-center"
           >
             <GrNext className="p-2.5 lg:p-2" />
           </button>
         </div>
         <div
-          className="border border-borderColor rounded-md bg-white lg:hidden relative"
+          className="border border-borderColor rounded bg-white lg:hidden relative"
           ref={dropdownRef}
         >
           <button
@@ -219,7 +231,7 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
             <HiDotsVertical className="text-lg lg:text-xl my-auto" />
           </button>
           {openDropdown && (
-            <div className="absolute top-10 right-0 w-max rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-0.5 group z-10">
+            <div className="absolute top-10 right-0 w-max rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-0.5 group z-10">
               <a
                 className="flex px-6 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2"
                 onClick={goToMonthView}
@@ -242,10 +254,10 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
           )}
         </div>
       </div>
-      <div className="text-center w-full lg:w-max mt-2 mb-2 lg:mt-0 ">
-        <h1 className="text-xl font-semibold lg:mt-0.5">
-          {moment(props.date).format("DD/MM/YYYY")}
-        </h1>
+      <div className="w-full flex flex-col">
+        <div className="font-semibold my-auto py-1 px-7 max-lg:mt-1 border border-gray-300 rounded-md bg-white w-max h-full max-lg:mx-auto">
+          {DateHelper.formatDate(props.date)}
+        </div>
       </div>
       <div className=" border border-borderColor rounded-md bg-white w-max mx-auto lg:mx-0 hidden lg:flex">
         <button

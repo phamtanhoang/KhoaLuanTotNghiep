@@ -39,7 +39,7 @@ const ProfileEmployerPage = () => {
           }
         })
         .catch(() => {
-          SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+          SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
         })
         .finally(() => {
           context.handleCloseLoading();
@@ -56,7 +56,7 @@ const ProfileEmployerPage = () => {
           }
         })
         .catch(() => {
-          SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+          SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
         })
         .finally(() => {
           context.handleCloseLoading();

@@ -2,8 +2,11 @@ package com.pth.taskbackend.dto.response;
 
 import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.enums.ESex;
+import com.pth.taskbackend.model.meta.StepResult;
+import com.pth.taskbackend.model.meta.StepSchedule;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record ApplicationDetailResponse(String id,
                                         LocalDateTime applyDate,
@@ -15,5 +18,7 @@ public record ApplicationDetailResponse(String id,
                                         String phoneNumber,
                                         EApplyStatus status,
                                         CandidateResponse candidate,
-                                        JobResponse job) {
+                                        JobResponse job,
+                                        List<StepResult> stepResults,
+                                        List<StepSchedule> stepSchedules) {
 }

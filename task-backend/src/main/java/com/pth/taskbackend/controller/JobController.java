@@ -278,10 +278,9 @@ public class JobController {
                             job.getLocation(),
                             job.getStatus(),
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                            optionalCandidate != null && optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), job.getId()).isPresent()).isPresent(),
-                            false,
-                            optionalCandidate != null && optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent(),
-
+                            optionalCandidate.isPresent() && jobService.checkIsSaveJob(optionalCandidate.get().getId(), job.getId()),
+                            DateFunc.isExpired(job.getToDate()),
+                            optionalCandidate.isPresent() && optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent(),
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -390,7 +389,7 @@ public class JobController {
                             job.getStatus(),
                             true,
                             optionalCandidate != null && (optionalCandidate.filter(candidate -> jobService.findByCandidateIdAndJobId(candidate.getId(), job.getId()).isPresent()).isPresent()),
-                            false,
+                            DateFunc.isExpired(job.getToDate()),
                             optionalCandidate != null && (optionalCandidate.filter(value -> applicationService.findByJobIdAndCandidateId(job.getId(), value.getId()).isPresent()).isPresent()),
                             categoryResponse,
                             jobEmployerResponse,
@@ -536,7 +535,7 @@ public class JobController {
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                             false,
                             job.getToDate().isBefore(LocalDateTime.now()),
-                            false,
+                            DateFunc.isExpired(job.getToDate()),
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -671,7 +670,7 @@ public class JobController {
                             job.getStatus(),
                             false,
                             false,
-                            false,
+                            DateFunc.isExpired(job.getToDate()),
                             false,
                             categoryResponse,
                             jobEmployerResponse,
@@ -774,7 +773,7 @@ public class JobController {
                             job.getStatus(),
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                             false,
-                            job.getToDate().isBefore(LocalDateTime.now()),
+                            DateFunc.isExpired(job.getToDate()),
                             false,
 
                             categoryResponse,
@@ -906,7 +905,7 @@ public class JobController {
                             job.getStatus(),
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                             false,
-                            job.getToDate().isBefore(LocalDateTime.now()),
+                            DateFunc.isExpired(job.getToDate()),
                             false,
 
                             categoryResponse,
@@ -936,7 +935,7 @@ public class JobController {
 
     @Operation(summary = "Get detail", description = "", tags = {})
     @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse> getJob(@RequestHeader("Authorization")String token, @PathVariable String id) {
+    public ResponseEntity<BaseResponse> getJob(@RequestHeader(name="Authorization", required = false) String token, @PathVariable String id) {
         try {
             Optional<Candidate> optionalCandidate;
             if(token!=null) {
@@ -1017,8 +1016,8 @@ public class JobController {
                         job.getLocation(),
                         job.getStatus(),
                         vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                        optionalCandidate != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
-                        job.getToDate().isBefore(LocalDateTime.now()),
+                        optionalCandidate.isPresent() && jobService.checkIsSaveJob(optionalCandidate.get().getId(), job.getId()),
+                        DateFunc.isExpired(job.getToDate()),
                         optionalCandidate != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
                         categoryResponse,
                         jobEmployerResponse,
@@ -1139,7 +1138,7 @@ public class JobController {
                         job.getStatus(),
                         vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                         false,
-                        !job.getToDate().isBefore(LocalDateTime.now()),
+                        DateFunc.isExpired(job.getToDate()),
                         false,
                         categoryResponse,
                         jobEmployerResponse,
@@ -1239,7 +1238,7 @@ public class JobController {
                         job.getStatus(),
                         vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                         false,
-                        !job.getToDate().isBefore(LocalDateTime.now()),
+                        DateFunc.isExpired(job.getToDate()),
                         false,
 
                         categoryResponse,
@@ -1282,7 +1281,6 @@ public class JobController {
             job.setStatus(EStatus.PENDING);
             job.setExperience(request.experience());
             job.setDescription(request.description());
-            System.out.println(request.categoryId()+"oke");
             job.setCategory(request.categoryId()==null? null: categoryService.findById(request.categoryId()).isEmpty()?null:categoryService.findById(request.categoryId()).get());
             job.setFromSalary(request.fromSalary());
             job.setToSalary(request.toSalary());
@@ -1373,7 +1371,7 @@ public class JobController {
                     job.getStatus(),
                     vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                     false,
-                    !job.getToDate().isBefore(LocalDateTime.now()),
+                    DateFunc.isExpired(job.getToDate()),
                     false,
 
                     categoryResponse,
@@ -1526,9 +1524,8 @@ public class JobController {
                     job.getStatus(),
                     vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
                     false,
-                    !job.getToDate().isBefore(LocalDateTime.now()),
+                    DateFunc.isExpired(job.getToDate()),
                     false,
-
                     categoryResponse,
                     jobEmployerResponse,
                     jobHrResponse,
@@ -1799,6 +1796,239 @@ public class JobController {
         }
     }
 
+    @Operation(summary = "save job", description = "", tags = {})
+    @PostMapping("/save-job/{id}")
+    public ResponseEntity<BaseResponse> saveJob(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Job> optionalJob = jobService.findById(id);
+            if (optionalJob.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy công việc!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            Job job = optionalJob.get();
+            if(!job.getStatus().equals(EStatus.ACTIVE))
+                return ResponseEntity.ok(
+                        new BaseResponse("Công việc không hoạt động!", HttpStatus.BAD_REQUEST.value(), null)
+                );
+
+            Optional<Candidate> candidate = candidateService.findByUserEmail(optionalUser.get().getEmail());
+            if(candidate.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            if(!jobService.checkIsSaveJob(candidate.get().getId(), job.getId())){
+                jobService.saveJob(job.getId(), candidate.get().getId());
+                return ResponseEntity.ok(
+                        new BaseResponse("Lưu thành công", HttpStatus.OK.value(), false)
+                );
+            }
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Công việc đã được lưu trước đó!", HttpStatus.BAD_REQUEST.value(), true)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn!", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "unsave job", description = "", tags = {})
+    @DeleteMapping("/unsave-job/{id}")
+    public ResponseEntity<BaseResponse> unSaveJob(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Job> optionalJob = jobService.findById(id);
+            if (optionalJob.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy công việc!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            Job job = optionalJob.get();
+            if(!job.getStatus().equals(EStatus.ACTIVE))
+                return ResponseEntity.ok(
+                        new BaseResponse("Công việc không hoạt động!", HttpStatus.BAD_REQUEST.value(), null)
+                );
+
+            Optional<Candidate> candidate = candidateService.findByUserEmail(optionalUser.get().getEmail());
+            if(candidate.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            if(jobService.checkIsSaveJob(candidate.get().getId(), job.getId())){
+                jobService.deleteSavedJobByJobIdAndCandidateId(job.getId(), candidate.get().getId());
+                return ResponseEntity.ok(
+                        new BaseResponse("Bỏ lưu thành công", HttpStatus.OK.value(), false)
+                );
+            }
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Công việc chưa được lưu trước đó!", HttpStatus.BAD_REQUEST.value(), true)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "get saved job", description = "", tags = {})
+    @GetMapping("/jobsSaved")
+    public ResponseEntity<BaseResponse> jobsSaved(@RequestHeader("Authorization") String token,
+                                                  @RequestParam(required = false) String keyword,
+                                                  @RequestParam(required = false) String location,
+                                                  Pageable pageable) {
+        try {
+
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Candidate> candidate = candidateService.findByUserEmail(optionalUser.get().getEmail());
+            if(candidate.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            };
+
+            Page<Job> jobs = jobService.getJobsSaved(candidate.get().getId(), keyword, location, pageable);
+            if (jobs.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
+                );
+            } else {
+                List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
+                    List<StepResponse> stepResponses;
+
+                    if (job.getProcess() != null) {
+                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(),null);
+
+                        List<Step> stepList = steps.getContent();
+
+                        stepResponses = stepList.stream()
+                                .map(step -> new StepResponse(
+                                        step.getId(),
+                                        step.getName(),
+                                        step.getNumber(),
+                                        step.getDescription(),
+                                        step.getProcess() != null ? step.getProcess().getId() : null
+                                ))
+                                .collect(Collectors.toList());
+                    } else {
+                        stepResponses = Collections.emptyList();
+                    }
+                    List<com.pth.taskbackend.model.meta.Tag> tagList = tagService.findByJobId(job.getId(), null).toList();
+
+                    JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                            job.getCategory()!=null ? job.getCategory().getId():null,
+                            job.getCategory()!=null ? job.getCategory().getName():null);
+
+                    JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                            job.getHumanResource().getEmployer().getName(),
+                            job.getHumanResource().getEmployer().getId(),
+                            job.getHumanResource().getEmployer().getUser().getEmail(),
+                            job.getHumanResource().getEmployer().getImage(),
+                            job.getHumanResource().getEmployer().getPhoneNumber());
+
+                    JobProcessResponse jobProcessResponse = new JobProcessResponse(
+                            job.getProcess() != null ? job.getProcess().getId() : null,
+                            job.getProcess() != null ? job.getProcess().getName() : null,
+                            stepResponses
+                    );
+
+                    JobHrResponse jobHrResponse = new JobHrResponse(
+                            job.getHumanResource().getId(),
+                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
+                    );
+
+
+                    return new JobResponse(
+                            job.getId(),
+                            job.getCreated(),
+                            job.getUpdated(),
+                            job.getToDate(),
+                            job.getName(),
+                            job.getDescription(),
+                            job.getExperience(),
+                            job.getFromSalary(),
+                            job.getToSalary(),
+                            job.getLocation(),
+                            job.getStatus(),
+                            vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
+                            candidate != null && jobService.checkIsSaveJob(candidate.get().getId(),job.getId()),
+                            DateFunc.isExpired(job.getToDate()),
+                            candidate != null && candidate.filter(
+                                    value -> applicationService.findByJobIdAndCandidateId(
+                                            job.getId(), candidate.get().getId()
+                                    ).isPresent()).isPresent(),
+                            categoryResponse,
+                            jobEmployerResponse,
+                            jobHrResponse,
+                            jobProcessResponse,
+                            tagList
+                    );
+                }).collect(Collectors.toList());
+
+                Page<JobResponse> jobResponsePage = new PageImpl<>(jobResponses, jobs.getPageable(), jobs.getTotalElements());
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobResponsePage)
+                );
+
+            }
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 }
 
 

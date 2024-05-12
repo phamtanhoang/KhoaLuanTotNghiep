@@ -171,6 +171,17 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void saveJob(String jobId, String candidateId) {
+        System.out.println(jobId + "     " + candidateId);
         jobRepository.saveJob(jobId,candidateId);
+    }
+
+    @Override
+    public boolean checkIsSaveJob(String candidateId, String jobId) {
+        return jobRepository.checkIsSavedJob(candidateId, jobId);
+    }
+
+    @Override
+    public Page<Job> getJobsSaved(String CandidateId, String keyword, String location, Pageable pageable) {
+        return jobRepository.getJobsSaved(CandidateId, keyword, location, pageable);
     }
 }

@@ -110,5 +110,53 @@ const applicationsService = {
       headers: { "Content-Type": "application/json" },
     });
   },
+
+  async createStepSchedule(
+    id: string,
+    name: string,
+    startDate: string,
+    hour: number,
+    color: string,
+    stepNumber: number
+  ) {
+    const body = {
+      name: name.trim(),
+      startDate: startDate.trim(),
+      hour: hour,
+      color: color.trim(),
+      stepNumber: stepNumber,
+    };
+    console.log("body,  ", body);
+
+    return await axiosConfig.post(ApplicationAPI.createStepSchedule(id), body, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
+
+  async updateStepSchedule(
+    id: string,
+    name: string,
+    startDate: string,
+    hour: number,
+    color: string
+  ) {
+    const body = {
+      name: name,
+      startDate: startDate,
+      hour: hour,
+      color: color,
+    };
+
+    return await axiosConfig.patch(
+      ApplicationAPI.updateStepSchedule(id),
+      body,
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  },
+  async deleteStepSchedule(id: string) {
+    return await axiosConfig.delete(ApplicationAPI.deleteStepSchedule(id));
+  },
 };
 export default applicationsService;

@@ -90,7 +90,7 @@ public class ChatController {
             if(Objects.equals(user.getId(), application.getCandidate().getUser().getId())
                     || Objects.equals(user.getId(), application.getJob().getHumanResource().getUser().getId())
                     || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())){
-                if(application.getStatus()!= EApplyStatus.PENDING&&application.getStatus()!= EApplyStatus.DELETED) {
+                if(application.getStatus()!= EApplyStatus.DELETED) {
 
                     Page<Message> messages = chatService.findByApplication(applicationId, pageable);
                     List<MessageResponse> messagesResponses = messages.getContent().stream().map(message -> {
@@ -138,8 +138,7 @@ public class ChatController {
                                 message.getFile(),
                                 message.getUser().getId(),
                                 userName,
-                                avatar,
-                                message.getUser().getId().equals(user.getId())
+                                avatar
                         );
                     }).collect(Collectors.toList());
                     return ResponseEntity.ok(
@@ -187,7 +186,7 @@ public class ChatController {
             if(Objects.equals(user.getId(), application.getCandidate().getUser().getId())
                     || Objects.equals(user.getId(), application.getJob().getHumanResource().getUser().getId())
                     || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())){
-                if(application.getStatus()!= EApplyStatus.PENDING&&application.getStatus()!= EApplyStatus.DELETED) {
+                if(application.getStatus()!= EApplyStatus.DELETED) {
 
                     if ((content == null || content.isBlank()) && (file == null || file.isEmpty())) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(

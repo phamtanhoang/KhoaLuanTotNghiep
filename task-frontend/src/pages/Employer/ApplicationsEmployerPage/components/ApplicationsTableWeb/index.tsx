@@ -115,8 +115,8 @@ const ApplicationsTableWeb: React.FC<ApplicationTableProps> = ({
       <table className="w-full text-gray-600 table-fixed">
         <thead>
           <th className="px-5 w-[5%]">STT</th>
-          <th className="px-5 w-[25%] text-left">Ứng viên</th>
-          <th className="px-5 w-[25%] text-left">Tên công việc</th>
+          <th className="px-5 w-[20%] text-left">Ứng viên</th>
+          <th className="px-5 w-[30%] text-left">Tên công việc</th>
           <th className="px-5 w-[20%] text-left">Tình trạng</th>
           <th className="px-5 w-[15%]">Ngày ứng tuyển</th>
           <th className="px-5 w-[10%]"></th>

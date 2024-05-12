@@ -1,3 +1,7 @@
+const VERSION = "/v1";
+const URL = "http://localhost:8080";
+const BASE_URL = URL + "/api" + VERSION;
+
 const AuthAPI = {
   signin: "/auths/login",
   signupCandidate: "/auths/registerCandidate",
@@ -144,6 +148,20 @@ const ProcedureAPI = {
 };
 
 const JobAPI = {
+  saveJobs: (id: string) => {
+    return `/jobs/save-job/${id}`;
+  },
+  unSaveJobs: (id: string) => {
+    return `/jobs/unsave-job/${id}`;
+  },
+  getSavedJobs: (
+    keyword?: string,
+    location?: string,
+    page?: number,
+    size?: number
+  ) => {
+    return `/jobs/jobsSaved?keyword=${keyword}&location=${location}&page=${page}&size=${size}`;
+  },
   getList_Employer: (
     keyword?: string,
     category?: string,
@@ -255,8 +273,26 @@ const ApplicationAPI = {
   updateStatus: (id?: string) => {
     return `/applications/updateStatus/${id}`;
   },
+
+  createStepSchedule: (id?: string) => {
+    return `/applications/createStepSchedule/${id}`;
+  },
+  updateStepSchedule: (id?: string) => {
+    return `/applications/updateStepSchedule/${id}`;
+  },
+  deleteStepSchedule: (id?: string) => {
+    return `/applications/deleteStepSchedule/${id}`;
+  },
+};
+const ScheduleAPI = {
+  getDataSchedule: (id?: string, fromDate?: string, toDate?: string) => {
+    return `/schedule?userId=${id}&fromDate=${fromDate}&toDate=${toDate}`;
+  },
 };
 export {
+  URL,
+  BASE_URL,
+  VERSION,
   AuthAPI,
   TagAPI,
   CategoryAPI,
@@ -267,4 +303,5 @@ export {
   ProcedureAPI,
   JobAPI,
   ApplicationAPI,
+  ScheduleAPI,
 };

@@ -1,118 +1,66 @@
+import { LoadingContext } from "@/App";
+import ModalBase from "@/components/modal";
 import { Schedule } from "@/components/ui";
+import { scheduleService } from "@/services";
+import { ONLOAD_EVENTLIST } from "@/store/reducers/scheduleReducer";
+import { SwalHelper } from "@/utils/helpers";
+import { useContext, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const ScheduleEmployerPage = () => {
-  const eventList: any[] = [
-    {
-      event_id: "1",
-      start: new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        new Date().getDate(),
-        9,
-        0,
-        0
-      ),
-      end: new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        new Date().getDate(),
-        10,
-        0,
-        0
-      ),
-      title: "Meeting with Client A",
-      color: "#ff0000",
-    },
-    {
-      event_id: "1",
-      start: new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        new Date().getDate(),
-        9,
-        0,
-        0
-      ),
-      end: new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        new Date().getDate(),
-        10,
-        0,
-        0
-      ),
-      title: "Meeting with Client A",
-      color: "#ff0000",
-    },
-    {
-      event_id: "1",
-      start: new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        new Date().getDate(),
-        9,
-        0,
-        0
-      ),
-      end: new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        new Date().getDate(),
-        10,
-        0,
-        0
-      ),
-      title: "Meeting with Client A",
-      color: "#ff0000",
-    },
-    {
-      event_id: "2",
-      start: new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        new Date().getDate() - 2,
-        9,
-        0,
-        0
-      ),
-      end: new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        new Date().getDate(),
-        10,
-        0,
-        0
-      ),
-      title: "Team Standup",
-      color: "#00ff00",
-    },
-    {
-      event_id: "3",
-      start: new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        new Date().getDate() - 2,
-        9,
-        0,
-        0
-      ),
-      end: new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        new Date().getDate() - 5,
-        10,
-        0,
-        0
-      ),
-      title: "Project Review",
-      color: "#0000ff",
-    },
-  ];
-  const fetchScheduleData = () => {};
+  const context = useContext(LoadingContext);
+  const dispatch = useDispatch();
+  const { eventList, fromDate, toDate } = useSelector(
+    (state: any) => state.scheduleReducer
+  );
+
+  const [open, setOpen] = useState(false);
+  const [funcs, setFuncs] = useState<string>("");
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const [userId, setUserId] = useState<string>("");
+  const fetchScheduleData = () => {
+    context.handleOpenLoading();
+    scheduleService
+      .getDataSchedule(userId, fromDate, toDate)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          const convertedData = res?.data?.Data?.map((item: any) => ({
+            event_id: item.id,
+            start: new Date(item.startDate),
+            end: new Date(item.endDate),
+            title: item.name,
+            color: item.color,
+          }));
+          dispatch(ONLOAD_EVENTLIST(convertedData));
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  };
+  useEffect(() => {
+    fetchScheduleData();
+  }, []);
+
   return (
-    <div className="bg-white relative w-full lg:-my-4 scale-employer">
-      <Schedule value={eventList} fetchScheduleData={fetchScheduleData} />
-    </div>
+    <>
+      <ModalBase
+        open={open}
+        handleClose={handleClose}
+        funcs={funcs}
+        setFuncs={setFuncs}
+        fetchData={fetchScheduleData}
+      />
+      <div className="relative w-full l scale-employer">
+        <Schedule value={eventList} fetchScheduleData={fetchScheduleData} />
+      </div>
+    </>
   );
 };
 export default ScheduleEmployerPage;

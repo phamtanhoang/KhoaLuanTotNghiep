@@ -66,7 +66,7 @@ const AppliedJobsPage = () => {
   };
 
   const fetchListData = () => {
-    setIsLoading(false);
+    setIsLoading(true);
     applicationsService
       .getApplications_Candidate(
         name,
@@ -84,7 +84,7 @@ const AppliedJobsPage = () => {
         }
       })
       .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
         setIsLoading(false);

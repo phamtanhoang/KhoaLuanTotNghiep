@@ -2,11 +2,16 @@ package com.pth.taskbackend.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pth.taskbackend.dto.request.ApplicationRequest;
+import com.pth.taskbackend.dto.request.StepResultRequest;
+import com.pth.taskbackend.dto.request.StepScheduleRequest;
 import com.pth.taskbackend.dto.response.*;
 import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
+import com.pth.taskbackend.enums.EStepStatus;
 import com.pth.taskbackend.model.meta.*;
+import com.pth.taskbackend.repository.ApplicationRepository;
+import com.pth.taskbackend.repository.StepScheduleRepository;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.*;
@@ -36,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,15 +54,12 @@ import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 @RestController
 @RequestMapping(value = {BASE_URL + "/applications"})
 public class ApplicationController {
-
     @Autowired
-    private CandidateService candidateService;
+    CandidateService candidateService;
     @Autowired
     ApplicationService applicationService;
     @Autowired
     JobService jobService;
-    @Autowired
-    CollectionService collectionService;
     @Autowired
     JwtService jwtService;
     @Autowired
@@ -64,22 +67,22 @@ public class ApplicationController {
     @Autowired
     EmployerService employerService;
     private final CheckPermission checkPermission;
-
-    @Autowired
-    ApplicationStepService applicationStepService;
-
     @Autowired
     StepService stepService;
-
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    ApplicationRepository applicationRepository;
     FileUploadFunc fileUploadFunc = new FileUploadFunc();
-
     @Autowired
     HumanResourceService humanResourceService;
-
     @Autowired
     VipEmployerService vipEmployerService;
+    @Autowired
+    StepScheduleService stepScheduleService;
+    @Autowired
+    StepResultService stepResultService;
+
     @PostMapping("/applyWithCV/{id}")
     public ResponseEntity<BaseResponse> applyJobWithNewCV(
             @RequestHeader("Authorization") String token,
@@ -175,32 +178,31 @@ public class ApplicationController {
             String username = jwtService.extractUsername(token.substring(7));
             boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
             if (!hasPermission) {
-                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null));
             }
 
             Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(username);
             if (optionalCandidate.isEmpty()) {
-                return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null));
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null));
             }
 
             Optional<Job> optionalJob = jobService.findById(id);
             if (optionalJob.isEmpty()) {
-                return ResponseEntity.ok(new BaseResponse("Không tìm thấy công việc ", HttpStatus.NOT_FOUND.value(), null));
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy công việc!", HttpStatus.NOT_FOUND.value(), null));
             }
             Job job = optionalJob.get();
             if (!job.getStatus().equals(EStatus.ACTIVE))
-                return ResponseEntity.ok(new BaseResponse("Công việc đang không được tuyển ", HttpStatus.BAD_REQUEST.value(), null));
+                return ResponseEntity.ok(new BaseResponse("Công việc đang không được tuyển!", HttpStatus.BAD_REQUEST.value(), null));
 
 
             if (applicationService.findByJobIdAndCandidateId(id, optionalCandidate.get().getId()).isPresent())
                 return ResponseEntity.ok(
-                        new BaseResponse("Đã ứng tuyển vào công việc này!!!", HttpStatus.BAD_REQUEST.value(), null)
+                        new BaseResponse("Đã ứng tuyển vào công việc này!", HttpStatus.BAD_REQUEST.value(), null)
                 );
 
             Application application = new Application();
 
             application.setCV(cVFile);
-
             application.setPhoneNumber(phoneNumber);
             application.setCandidate(optionalCandidate.get());
             application.setEmail(email);
@@ -209,6 +211,7 @@ public class ApplicationController {
             application.setJob(job);
             application.setFullName(fullName);
             application.setCurrentStep(0);
+            System.out.println(application);
             applicationService.create(application);
 
 
@@ -592,7 +595,9 @@ public class ApplicationController {
                     application.getPhoneNumber(),
                     application.getStatus(),
                     candidateResponse,
-                    jobResponse
+                    jobResponse,
+                    stepResultService.findByApplicationId(application.getId()),
+                    stepScheduleService.findByApplicationId(application.getId())
             );
             return ResponseEntity.ok(
                     new BaseResponse("Chi tiết đơn ứng tuyển", HttpStatus.OK.value(), response)
@@ -733,6 +738,7 @@ public class ApplicationController {
                     null
             );
 
+
             ApplicationDetailResponse response = new ApplicationDetailResponse(
                     application.getId(),
                     application.getCreated(),
@@ -744,7 +750,9 @@ public class ApplicationController {
                     application.getPhoneNumber(),
                     application.getStatus(),
                     candidateResponse,
-                    jobResponse
+                    jobResponse,
+                    stepResultService.findByApplicationId(application.getId()),
+                    stepScheduleService.findByApplicationId(application.getId())
             );
             return ResponseEntity.ok(
                     new BaseResponse("Chi tiết đơn ứng tuyển", HttpStatus.OK.value(), response)
@@ -923,51 +931,51 @@ public class ApplicationController {
                                                               @PathVariable("id") String id,
                                                               @RequestParam String result) {
         try {
-            String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
-            if (!permission)
-                return ResponseEntity.ok(
-                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-                );
-
-            Optional<HumanResource> humanResource = humanResourceService.findByEmail(email);
-            if (humanResource.isEmpty())
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
-                );
-
-            Optional<Application> optionalApplication = applicationService.findById(id);
-            if (optionalApplication.isEmpty())
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
-                );
-
-            Application application = optionalApplication.get();
-            if (stepService.countAllByProcessId(application.getJob().getProcess().getId()) == application.getCurrentStep()) {
-                return ResponseEntity.ok(
-                        new BaseResponse("Đã tới bước cuối", HttpStatus.BAD_REQUEST.value(), null)
-                );
-            }
-            System.out.println(application.getStatus());
-            if (application.getStatus().equals(EApplyStatus.PENDING))
-                application.setStatus(EApplyStatus.PROCESSING);
-            application.setCurrentStep(application.getCurrentStep() + 1);
-
-            ApplicationStep applicationStep = new ApplicationStep();
-            applicationStep.setApplication(application);
-            Optional<Step> optionalStep = stepService.findByProcessIdAndNumber(application.getJob().getProcess().getId(), application.getCurrentStep());
-            if (optionalStep.isPresent()) {
-                Step step = optionalStep.get();
-                applicationStep.setName(step.getName());
-                applicationStep.setNumber(step.getNumber());
-                applicationStep.setResult(result);
-                applicationStepService.create(applicationStep);
-
-                System.out.println(applicationStep);
-            } else {
-                return ResponseEntity.ok(new BaseResponse("Không tìm thấy bước tiếp theo", HttpStatus.NOT_FOUND.value(), null));
-            }
-            System.out.println(applicationStep);
+//            String email = jwtService.extractUsername(token.substring(7));
+//            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+//            if (!permission)
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+//                );
+//
+//            Optional<HumanResource> humanResource = humanResourceService.findByEmail(email);
+//            if (humanResource.isEmpty())
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+//                );
+//
+//            Optional<Application> optionalApplication = applicationService.findById(id);
+//            if (optionalApplication.isEmpty())
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
+//                );
+//
+//            Application application = optionalApplication.get();
+//            if (stepService.countAllByProcessId(application.getJob().getProcess().getId()) == application.getCurrentStep()) {
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Đã tới bước cuối", HttpStatus.BAD_REQUEST.value(), null)
+//                );
+//            }
+//            System.out.println(application.getStatus());
+//            if (application.getStatus().equals(EApplyStatus.PENDING))
+//                application.setStatus(EApplyStatus.PROCESSING);
+//            application.setCurrentStep(application.getCurrentStep() + 1);
+//
+//            ApplicationStep applicationStep = new ApplicationStep();
+//            applicationStep.setApplication(application);
+//            Optional<Step> optionalStep = stepService.findByProcessIdAndNumber(application.getJob().getProcess().getId(), application.getCurrentStep());
+//            if (optionalStep.isPresent()) {
+//                Step step = optionalStep.get();
+//                applicationStep.setName(step.getName());
+//                applicationStep.setNumber(step.getNumber());
+//                applicationStep.setResult(result);
+//                applicationStepService.create(applicationStep);
+//
+//                System.out.println(applicationStep);
+//            } else {
+//                return ResponseEntity.ok(new BaseResponse("Không tìm thấy bước tiếp theo", HttpStatus.NOT_FOUND.value(), null));
+//            }
+//            System.out.println(applicationStep);
             return ResponseEntity.ok(new BaseResponse("Cập nhật bước thành công", HttpStatus.OK.value(), null));
 
         } catch (ExpiredJwtException e) {
@@ -985,18 +993,16 @@ public class ApplicationController {
     @PatchMapping("/updateStatus/{id}")
     public ResponseEntity<BaseResponse> updateApplicationStatus(@RequestHeader("Authorization") String token,
                                                                 @PathVariable("id") String id,
-                                                                @RequestBody String status,
-                                                                @RequestBody(required = false) String result) {
+                                                                @RequestBody StepResultRequest stepResultRequest) {
         try {
-            Map<String, String> jsonMap = objectMapper.readValue(status, new TypeReference<Map<String, String>>() {
-            });
+            EApplyStatus statusEnum=stepResultRequest.status();
+            String result=stepResultRequest.result();
 
-            String statusValue = jsonMap.get("status");
-            EApplyStatus statusEnum = EApplyStatus.fromString(statusValue);
             String email = jwtService.extractUsername(token.substring(7));
 
+
             Optional<User> userOptional = userRepository.findByEmail(email);
-            if (userOptional.isEmpty())  {
+            if (userOptional.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm người dùng!", HttpStatus.NOT_FOUND.value(), null)
                 );
@@ -1004,25 +1010,31 @@ public class ApplicationController {
             User user = userOptional.get();
 
             Optional<Application> applicationOptional = applicationService.findById(id);
-            if (applicationOptional.isEmpty())  {
+            if (applicationOptional.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy đơn ứng  tuyển!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
+
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
+                );
             Application application = applicationOptional.get();
-            if(Objects.equals(user.getId(), application.getJob().getHumanResource().getUser().getId())
-                    || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())){
-                if(application.getStatus() == EApplyStatus.DELETED) {
+            if (Objects.equals(user.getId(), application.getJob().getHumanResource().getUser().getId())
+                    || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())) {
+                if (application.getStatus() == EApplyStatus.DELETED) {
                     return ResponseEntity.ok(
                             new BaseResponse("Đơn ứng tuyển đã bị xóa!", HttpStatus.FORBIDDEN.value(), null)
                     );
                 }
-                if(application.getStatus() == EApplyStatus.APPROVED) {
+                if (application.getStatus() == EApplyStatus.APPROVED) {
                     return ResponseEntity.ok(
                             new BaseResponse("Đơn ứng tuyển đã được duyệt!", HttpStatus.FORBIDDEN.value(), null)
                     );
                 }
-                if(application.getStatus() == EApplyStatus.REJECTED) {
+                if (application.getStatus() == EApplyStatus.REJECTED) {
                     return ResponseEntity.ok(
                             new BaseResponse("Đơn ứng tuyển đã bị từ chối!", HttpStatus.FORBIDDEN.value(), null)
                     );
@@ -1032,155 +1044,288 @@ public class ApplicationController {
                 int currentStep = application.getCurrentStep();
                 System.out.println("Total step: " + totalStep);
                 System.out.println("Current step: " + currentStep);
-                if(currentStep==0){
-                    if(currentStep==totalStep-1){
-                        if(statusEnum!=EApplyStatus.REJECTED&&statusEnum!=EApplyStatus.APPROVED){
+                System.out.println("application, " + application);
+
+                if (currentStep == 0) {
+
+                    if (currentStep == totalStep - 1) {
+                        if (statusEnum != EApplyStatus.REJECTED && statusEnum != EApplyStatus.APPROVED) {
                             return ResponseEntity.ok(
-                                    new BaseResponse("Trạng thái không hợp lệ!", HttpStatus.FORBIDDEN.value(), null)
+                                    new BaseResponse("Trạng thái không hợp lệ!", HttpStatus.FORBIDDEN.value(), application)
                             );
                         }
-                    }
-                    if(statusEnum!=EApplyStatus.REJECTED&&statusEnum!=EApplyStatus.PROCESSING){
+                        System.out.println("so 1");
+                        application.setStatus(statusEnum);
+                        applicationRepository.save(application);
+
+                        stepResultService.create(
+                                result,
+                                statusEnum == EApplyStatus.REJECTED ? EStepStatus.FAIL : EStepStatus.PASS,
+                                currentStep,
+                                application);
                         return ResponseEntity.ok(
-                                new BaseResponse("Trạng thái không hợp lệ!", HttpStatus.FORBIDDEN.value(), null)
+                                new BaseResponse("Cập nhật thành công!", HttpStatus.OK.value(), application)
                         );
                     }
-                }
-                if(currentStep==totalStep-1){
-                    if(statusEnum!=EApplyStatus.REJECTED&&statusEnum!=EApplyStatus.APPROVED){
+                    if (statusEnum != EApplyStatus.REJECTED && statusEnum != EApplyStatus.PROCESSING) {
                         return ResponseEntity.ok(
-                                new BaseResponse("Trạng thái không hợp lệ!", HttpStatus.FORBIDDEN.value(), null)
+                                new BaseResponse("Trạng thái không hợp lệ!", HttpStatus.FORBIDDEN.value(), application)
                         );
                     }
-                }
-                if(statusEnum!=EApplyStatus.REJECTED&&statusEnum!=EApplyStatus.APPROVED){
+                    System.out.println("so 2");
+                    application.setStatus(statusEnum);
+                    application.setCurrentStep(statusEnum != EApplyStatus.REJECTED ? application.getCurrentStep() + 1 : application.getCurrentStep());
+                    applicationRepository.save(application);
+                    stepResultService.create(
+                            result,
+                            statusEnum == EApplyStatus.REJECTED ? EStepStatus.FAIL : EStepStatus.PASS,
+                            currentStep,
+                            application);
                     return ResponseEntity.ok(
-                            new BaseResponse("Trạng thái không hợp lệ!", HttpStatus.FORBIDDEN.value(), null)
+                            new BaseResponse("Cập nhật thành công!", HttpStatus.OK.value(), application)
+                    );
+
+                }
+
+                if (currentStep == totalStep - 1) {
+                    if (statusEnum != EApplyStatus.REJECTED && statusEnum != EApplyStatus.APPROVED) {
+                        return ResponseEntity.ok(
+                                new BaseResponse("Trạng thái không hợp lệ!", HttpStatus.FORBIDDEN.value(), application)
+                        );
+                    }
+
+                    System.out.println("so 3");
+                    application.setStatus(statusEnum);
+                    applicationRepository.save(application);
+                    stepResultService.create(
+                            result,
+                            statusEnum == EApplyStatus.REJECTED ? EStepStatus.FAIL : EStepStatus.PASS,
+                            currentStep,
+                            application);
+                    return ResponseEntity.ok(
+                            new BaseResponse("Cập nhật thành công!", HttpStatus.OK.value(), application)
                     );
                 }
 
+                if (statusEnum != EApplyStatus.REJECTED && statusEnum != EApplyStatus.PROCESSING) {
+                    return ResponseEntity.ok(
+                            new BaseResponse("Trạng thái không hợp lệ!", HttpStatus.FORBIDDEN.value(), application)
+                    );
+                }
+                System.out.println("so 4");
+                application.setStatus(statusEnum);
+                application.setCurrentStep(statusEnum != EApplyStatus.REJECTED ? application.getCurrentStep() + 1 : application.getCurrentStep());
+                applicationRepository.save(application);
+                stepResultService.create(
+                        result,
+                        statusEnum == EApplyStatus.REJECTED ? EStepStatus.FAIL : EStepStatus.PASS,
+                        currentStep,
+                        application);
                 return ResponseEntity.ok(
-                        new BaseResponse("Cập nhật thành công!", HttpStatus.OK.value(), null)
+                        new BaseResponse("Cập nhật thành công!", HttpStatus.OK.value(), application)
                 );
             }
 
             return ResponseEntity.ok(
                     new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
             );
-        }catch (ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
-//            User user = userOptional.get();
-//            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
-//            if (!permission)
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-//                );
-//
-//            Optional<HumanResource> humanResource = humanResourceService.findByEmail(email);
-//            if (humanResource.isEmpty())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
-//                );
-//
-//
-//            Optional<Application> optionalApplication = applicationService.findByIdAndJobHumanResourceId(id,humanResource.get().getId());
-//            if (optionalApplication.isEmpty())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
-//                );
-//
-//            Application application = optionalApplication.get();
-//
-//            switch (statusEnum) {
-//                case PENDING:
-//                    return ResponseEntity.ok(
-//                            new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
-//                    );
-//                case APPROVED:
-//                    if (stepService.countAllByProcessId(application.getJob().getProcess().getId()) != application.getCurrentStep())
-//                        return ResponseEntity.ok(
-//                                new BaseResponse("Chưa đủ quá trình duyệt đơn", HttpStatus.BAD_REQUEST.value(), null)
-//                        );
-//                    if (application.getStatus() == EApplyStatus.APPROVED)
-//                        return ResponseEntity.ok(
-//                                new BaseResponse("Không thể duyệt lại đơn đã nhận", HttpStatus.BAD_REQUEST.value(), null)
-//                        );
-//                    application.setStatus(EApplyStatus.APPROVED);
-//                    return ResponseEntity.ok(
-//                            new BaseResponse("Duyệt đơn thành công", HttpStatus.BAD_REQUEST.value(), null)
-//                    );
-//                case REJECTED:
-//                    if (application.getStatus() == EApplyStatus.REJECTED)
-//                        return ResponseEntity.ok(
-//                                new BaseResponse("Không thể duyệt lại đơn đã từ chối", HttpStatus.BAD_REQUEST.value(), null)
-//                        );
-//                    application.setStatus(EApplyStatus.REJECTED);
-//                case PROCESSING:
-//                    return ResponseEntity.ok(
-//                            new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
-//                    );
-//                default:
-//                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                            .body(new BaseResponse("Trạng thái không hợp lệ", HttpStatus.BAD_REQUEST.value(), null));
-//            }
-//
-//
-//        } catch (ExpiredJwtException e) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-//        } catch (EmptyResultDataAccessException e) {
-//            return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên cần xóa!", HttpStatus.NOT_FOUND.value(), null));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
     }
 
+    @Operation(summary = "create step status", description = "", tags = {})
+    @PostMapping("/createStepSchedule/{id}")
+    public ResponseEntity<BaseResponse> createSchedule(@RequestHeader("Authorization") String token,
+                                                       @PathVariable("id") String id,
+                                                       @RequestBody StepScheduleRequest stepScheduleRequest
+                                                       ) {
+        try {
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
+                );
 
-    //
-//
-//    @PutMapping("/updateState")
-//    public ResponseEntity<String> updateApplicationState(
-//            @RequestHeader("Authorization") String token,
-//            @RequestBody UpdateApplicationStateRequest updateRequest
-//    ) {
-//        try {
-//            String employerName = jwtService.extractUsername(token.substring(7));
-//            Employer employer = employerService.findByAccountUsername(employerName);
-//
-//            if (employer != null) {
-//                Optional<Application> application = applicationService.findById(updateRequest.getApplicationId());
-//
-//                if (application.isPresent()) {
-//                    Application existingApplication = application.get();
-//
-//                    if (existingApplication.getState().equals("pending")) {
-//                        existingApplication.setState(updateRequest.getNewState());
-//                        applicationService.save(existingApplication);
-//                        Job optionalJob = jobRepository.getById(existingApplication.getJobId());
-//                        emailSenderService.sendEmail( existingApplication.getEmail(), existingApplication.getName(),
-//                                optionalJob.getTitle(), existingApplication.getJobId(), updateRequest.getNewState(), "MailForm");
-//                        return ResponseEntity.ok("Cập nhật thành công");
-//                    } else {
-//                        return ResponseEntity.badRequest().body("Không thể cập nhật với trạng thái 'refused'");
-//                    }
-//                } else {
-//                    return ResponseEntity.badRequest().body("Không tìm thấy ứng viên");
-//                }
-//            } else {
-//                return ResponseEntity.notFound().build();
-//            }
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi server vui lòng thử lại");
-//        }
-//    }
-//
-//
+            String email = jwtService.extractUsername(token.substring(7));
+
+
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            User user = userOptional.get();
+
+            Optional<Application> applicationOptional = applicationService.findById(id);
+            if (applicationOptional.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy đơn ứng  tuyển!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            Application application = applicationOptional.get();
+            int totalStep = Math.toIntExact(stepService.countAllByProcessId(application.getJob().getProcess().getId()));
+            if (Objects.equals(user.getId(), application.getJob().getHumanResource().getUser().getId())
+                    || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())) {
+
+
+
+                Optional<StepSchedule> stepSchedule = stepScheduleService.findByApplicationIdAndStepNumber(id, stepScheduleRequest.stepNumber());
+                if(stepSchedule.isPresent()){
+                    return ResponseEntity.ok(
+                            new BaseResponse("Lịch hẹn của bước này đã được tạo!", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+                }
+                if(stepScheduleRequest.stepNumber()>=totalStep){
+                    return ResponseEntity.ok(
+                            new BaseResponse("Số bước không hợp lệ!", HttpStatus.OK.value(), application)
+                    );
+                }
+                LocalDateTime endDate = stepScheduleRequest.startDate().plusHours(stepScheduleRequest.hour());
+                StepSchedule stepSchedule1 = stepScheduleService.create(
+                        stepScheduleRequest.name(),
+                        stepScheduleRequest.startDate(),
+                        endDate,stepScheduleRequest.color(),
+                        stepScheduleRequest.stepNumber(),
+                        application);
+
+                return ResponseEntity.ok(
+                        new BaseResponse("Tạo lịch hẹn thành công!", HttpStatus.OK.value(), stepSchedule1)
+                );
+            }
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
+            );
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "update step status", description = "", tags = {})
+    @PatchMapping("/updateStepSchedule/{id}")
+    public ResponseEntity<BaseResponse> updateSchedule(@RequestHeader("Authorization") String token,
+                                                                @PathVariable("id") String id,
+                                                                @RequestBody StepScheduleRequest stepScheduleRequest
+                                                                ) {
+        try {
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            String email = jwtService.extractUsername(token.substring(7));
+
+
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            User user = userOptional.get();
+
+            Optional<Application> applicationOptional = applicationService.findById(id);
+            if (applicationOptional.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy đơn ứng  tuyển!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            Application application = applicationOptional.get();
+            if (Objects.equals(user.getId(), application.getJob().getHumanResource().getUser().getId())
+                    || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())) {
+
+                Optional<StepSchedule> stepSchedule = stepScheduleService.findById(id);
+                if(stepSchedule.isEmpty()){
+                    return ResponseEntity.ok(
+                            new BaseResponse("Lịch hẹn của bước này chưa được tạo!", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+                }
+
+                LocalDateTime endDate = stepScheduleRequest.startDate().plusHours(stepScheduleRequest.hour());
+                StepSchedule stepSchedule1 = stepScheduleService.update(stepSchedule.get(),stepScheduleRequest.name(), stepScheduleRequest.startDate(),endDate,stepScheduleRequest.color());
+
+                return ResponseEntity.ok(
+                        new BaseResponse("Cập nhật lịch hẹn thành công thành công!", HttpStatus.OK.value(), stepSchedule1)
+                );
+            }
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
+            );
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "delete step status", description = "", tags = {})
+    @DeleteMapping("/deleteStepSchedule/{id}")
+    public ResponseEntity<BaseResponse> deleteSchedule(@RequestHeader("Authorization") String token, @PathVariable("id") String id) {
+        try {
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            String email = jwtService.extractUsername(token.substring(7));
+
+
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            User user = userOptional.get();
+
+            Optional<Application> applicationOptional = applicationService.findById(id);
+            if (applicationOptional.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy đơn ứng  tuyển!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            Application application = applicationOptional.get();
+            if (Objects.equals(user.getId(), application.getJob().getHumanResource().getUser().getId())
+                    || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())) {
+
+                Optional<StepSchedule> stepSchedule = stepScheduleService.findById(id);
+                if(stepSchedule.isEmpty()){
+                    return ResponseEntity.ok(
+                            new BaseResponse("Lịch hẹn của bước này chưa được tạo!", HttpStatus.BAD_REQUEST.value(), null)
+                    );
+                }
+
+                stepScheduleService.delete(stepSchedule.get());
+
+                return ResponseEntity.ok(
+                        new BaseResponse("Xóa lịch hẹn thành công thành công!", HttpStatus.OK.value(), null)
+                );
+            }
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
+            );
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
     @GetMapping("/isApplied/{id}")
     public ResponseEntity<?> isApplied(
             @RequestHeader("Authorization") String token,

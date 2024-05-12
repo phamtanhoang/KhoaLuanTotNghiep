@@ -48,8 +48,8 @@ public class BankingController {
     UserRepository userRepository;
     @Autowired
     CandidateService candidateService;
-    @Autowired
-    VipCandidateService vipCandidateService;
+//    @Autowired
+//    VipCandidateService vipCandidateService;
     @Autowired
     VipEmployerService vipEmployerService;
 
@@ -196,8 +196,8 @@ public class BankingController {
                         Candidate candidate = candidateService.findById(userId)
                                 .orElseThrow(() -> new Exception("Không tìm thấy Candidate"));
 
-                        VipCandidate vipCandidate = processVipCandidate(vip,candidate, vnpTransactionNo);
-                        vipCandidateService.create(vipCandidate);
+//                        VipCandidate vipCandidate = processVipCandidate(vip,candidate, vnpTransactionNo);
+//                        vipCandidateService.create(vipCandidate);
                     }
 
                     return new RedirectView("http://localhost:5173/employer/vipHistories", true);
@@ -239,31 +239,31 @@ public class BankingController {
         return vipEmployer;
     }
 
-    private VipCandidate processVipCandidate(Vip vip, Candidate candidate, String vnpTransactionNo) throws IOException {
-        Optional<VipCandidate> optionalVipCandidate = vipCandidateService.findByCandidateIdAndAvailable(candidate.getId());
-
-        VipCandidate vipCandidate = new VipCandidate();
-        vipCandidate.setCandidate(candidate);
-        vipCandidate.setVip(vip);
-        vipCandidate.setId(vnpTransactionNo);
-
-        if (optionalVipCandidate.isPresent()) {
-            VipCandidate existsEmployerVip = optionalVipCandidate.get();
-            vipCandidate.setPrice(existsEmployerVip.getPrice());
-
-            LocalDateTime toDate = existsEmployerVip.getToDate();
-            LocalDateTime newFromDate = toDate.plusDays(1);
-
-            vipCandidate.setFromDate(newFromDate);
-            vipCandidate.setToDate(newFromDate.plusMonths(1));
-        } else {
-            LocalDateTime now = LocalDateTime.now();
-            vipCandidate.setFromDate(now);
-            vipCandidate.setToDate(now.plusMonths(1));
-            vipCandidate.setPrice(vip.getPrice());
-        }
-        return vipCandidate;
-    }
+//    private VipCandidate processVipCandidate(Vip vip, Candidate candidate, String vnpTransactionNo) throws IOException {
+//        Optional<VipCandidate> optionalVipCandidate = vipCandidateService.findByCandidateIdAndAvailable(candidate.getId());
+//
+//        VipCandidate vipCandidate = new VipCandidate();
+//        vipCandidate.setCandidate(candidate);
+//        vipCandidate.setVip(vip);
+//        vipCandidate.setId(vnpTransactionNo);
+//
+//        if (optionalVipCandidate.isPresent()) {
+//            VipCandidate existsEmployerVip = optionalVipCandidate.get();
+//            vipCandidate.setPrice(existsEmployerVip.getPrice());
+//
+//            LocalDateTime toDate = existsEmployerVip.getToDate();
+//            LocalDateTime newFromDate = toDate.plusDays(1);
+//
+//            vipCandidate.setFromDate(newFromDate);
+//            vipCandidate.setToDate(newFromDate.plusMonths(1));
+//        } else {
+//            LocalDateTime now = LocalDateTime.now();
+//            vipCandidate.setFromDate(now);
+//            vipCandidate.setToDate(now.plusMonths(1));
+//            vipCandidate.setPrice(vip.getPrice());
+//        }
+//        return vipCandidate;
+//    }
 
 
 }

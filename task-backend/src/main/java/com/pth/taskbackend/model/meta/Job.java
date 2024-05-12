@@ -30,7 +30,7 @@ public class Job  extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column
+    @Column(nullable = false)
     private LocalDateTime toDate;
 
     @Column(nullable = false)
@@ -69,12 +69,12 @@ public class Job  extends BaseEntity {
     private Process process;
 
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {
                     CascadeType.PERSIST,
                     CascadeType.MERGE
             },
             mappedBy = "jobs")
-    @JsonIgnore
     private Set<Candidate> candidates = new HashSet<>();
 }

@@ -6,7 +6,6 @@ import com.pth.taskbackend.dto.response.GetCandidateProfileResponse;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Application;
 import com.pth.taskbackend.model.meta.Candidate;
-import com.pth.taskbackend.model.meta.Collection;
 import com.pth.taskbackend.model.meta.Job;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.ApplicationService;

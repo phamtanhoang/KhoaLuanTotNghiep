@@ -54,7 +54,7 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
           Giới thiệu
         </h3>
 
-        <p className="text-sm text-gray-500 p-5">{description}</p>
+        <p className="text-sm text-gray-500 p-5 text-justify">{description}</p>
       </div>
       <div className="w-full bg-white rounded-sm">
         <h3 className="font-semibold text-base uppercase leading-8 border-b-2 border-body  text-gray-600 px-5 py-1.5">

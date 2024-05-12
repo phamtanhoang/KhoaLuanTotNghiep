@@ -26,6 +26,7 @@ export interface ProceduresTableProps {
   isLoading: boolean;
   currentPage: number;
   itemPerpage: number;
+  isEmpty: boolean;
 }
 
 const ProceduresEmployerPage = () => {
@@ -70,7 +71,7 @@ const ProceduresEmployerPage = () => {
             }
           })
           .catch(() => {
-            SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
           })
           .finally(() => {
             context.handleCloseLoading();
@@ -101,7 +102,7 @@ const ProceduresEmployerPage = () => {
         }
       })
       .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
         setIsLoadingTable(false);
@@ -160,6 +161,7 @@ const ProceduresEmployerPage = () => {
               isLoading={isLoadingTable}
               currentPage={currentPage}
               itemPerpage={itemPerPage}
+              isEmpty={isEmpty}
             />
           </div>
           <div className="lg:hidden">
@@ -170,6 +172,7 @@ const ProceduresEmployerPage = () => {
               isLoading={isLoadingTable}
               currentPage={currentPage}
               itemPerpage={itemPerPage}
+              isEmpty={isEmpty}
             />
           </div>
         </div>

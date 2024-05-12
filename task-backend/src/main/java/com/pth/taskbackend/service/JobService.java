@@ -65,4 +65,7 @@ public interface JobService {
 
     void saveJob( String jobId,  String candidateId);
 
+    boolean checkIsSaveJob(String candidateId, String jobId);
+
+    Page<Job> getJobsSaved(String CandidateId, String keyword, String location, Pageable pageable) throws  IOException;
 }

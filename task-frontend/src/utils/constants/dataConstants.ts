@@ -90,6 +90,8 @@ const STATUS_DATA = {
   PROCESSING: "PROCESSING",
   REJECTED: "REJECTED",
   APPROVED: "APPROVED",
+  PASS: "PASS",
+  FAIL: "FAIL",
 };
 
 export const DataConstants = {

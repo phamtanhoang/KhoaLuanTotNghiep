@@ -1,11 +1,15 @@
-import { DateHelper, SwalHelper } from "@/utils/helpers";
-import { useEffect, useRef } from "react";
+import { AuthHelper, DateHelper, SwalHelper } from "@/utils/helpers";
+import { useEffect, useRef, useState } from "react";
 import { IoSend } from "react-icons/io5";
-import { MdAttachFile, MdOutlineAttachment } from "react-icons/md";
+import {
+  MdAttachFile,
+  MdOutlineAttachment,
+  MdOutlineEmojiEmotions,
+} from "react-icons/md";
 import NONE_USER from "@/assets/images/non-user.jpg";
 import { AiOutlineClose } from "react-icons/ai";
-import LoadingSpiner from "../LoadingSpiner";
-import Loading from "../Loading";
+import data from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
 
 interface ChatUIProps {
   messages: MessageModel[];
@@ -26,6 +30,17 @@ const ChatUI: React.FC<ChatUIProps> = ({
   isLoading,
 }) => {
   const chatContainerRef = useRef<any>(null);
+
+  const triggerEmoji = useRef<any>(null);
+  const dropdownEmoji = useRef<any>(null);
+
+  const [isEmojiPickerVisible, setEmojiPickerVisible] =
+    useState<boolean>(false);
+
+  const onEmojiClick = (emojiObject: any) => {
+    setContent(content + emojiObject.native);
+  };
+
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop =
@@ -41,6 +56,31 @@ const ChatUI: React.FC<ChatUIProps> = ({
   const _onClickChooseFile = () => {
     document.getElementById("file-input")?.click();
   };
+
+  useEffect(() => {
+    const clickHandler = ({ target }: MouseEvent) => {
+      if (!dropdownEmoji.current) return;
+      if (
+        !isEmojiPickerVisible ||
+        dropdownEmoji.current.contains(target) ||
+        triggerEmoji.current.contains(target)
+      )
+        return;
+      setEmojiPickerVisible(false);
+    };
+    document.addEventListener("click", clickHandler);
+    return () => document.removeEventListener("click", clickHandler);
+  });
+
+  useEffect(() => {
+    const keyHandler = ({ keyCode }: KeyboardEvent) => {
+      if (!isEmojiPickerVisible || keyCode !== 27) return;
+      setEmojiPickerVisible(false);
+    };
+    document.addEventListener("keydown", keyHandler);
+    return () => document.removeEventListener("keydown", keyHandler);
+  });
+
   return (
     <>
       <div
@@ -48,10 +88,10 @@ const ChatUI: React.FC<ChatUIProps> = ({
         className="w-full px-2 h-full overflow-y-auto scrollbar-custom flex flex-col gap-3"
       >
         {messages.map((item, index) => {
-          if (item?.isYourMessage) {
+          if (item?.userId === AuthHelper.getUser()?.id) {
             return (
               <div key={index} className="w-full flex justify-end">
-                <div className="w-[80%]">
+                <div className="w-[70%]">
                   <div className="flex items-center gap-1.5 justify-end">
                     <p className="font-medium text-sm text-slate-700">Tôi</p>
 
@@ -62,13 +102,13 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     />
                   </div>
 
-                  <div className="mt-1 w-full bg-orangetext py-2 px-3 rounded-b-md rounded-tl-md">
+                  <div className="mt-1 w-full bg-blue-500/85 py-2.5 px-3 rounded-b-md rounded-tl-md">
                     {item?.file && (
                       <div
-                        className="text-sm text-bgBlue hover:text-bgBlue/85  cursor-pointer mb-1 flex gap-1"
+                        className="text-sm text-white hover:text-white/85  cursor-pointer mb-1 flex gap-1"
                         onClick={() => window.open(item?.file, "_blank")}
                       >
-                        <MdOutlineAttachment className="w-max my-auto" />
+                        <MdOutlineAttachment className="w-max mt-1" />
 
                         <p className="truncate w-full">{item?.file}</p>
                       </div>
@@ -84,7 +124,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
           } else {
             return (
               <div key={index} className="w-full flex flex-start">
-                <div className="w-[80%]">
+                <div className="w-[70%]">
                   <div className="flex items-center gap-1.5">
                     <img
                       className="h-5 w-5 overflow-hidden rounded-full"
@@ -96,13 +136,13 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     </p>
                   </div>
 
-                  <div className="mt-1 w-full bg-body py-2 px-3 rounded-b-md rounded-tr-md">
+                  <div className="mt-1 w-full bg-body/85 py-2.5 px-3 rounded-b-md rounded-tr-md">
                     {item?.file && (
                       <div
                         className="text-sm text-bgBlue hover:text-bgBlue/85  cursor-pointer mb-1 flex gap-1"
                         onClick={() => window.open(item?.file, "_blank")}
                       >
-                        <MdOutlineAttachment className="w-max my-auto" />
+                        <MdOutlineAttachment className="w-max mt-1" />
 
                         <p className="truncate w-full">{item?.file}</p>
                       </div>
@@ -119,7 +159,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
           }
         })}
       </div>
-      <div className=" w-full  px-2  bg-white">
+      <div className=" w-full  px-2 bg-white ">
         <div className="h-10 flex gap-4 justify-between px-3 items-center border border-transparent bg-body2 focus-within:border-borderColor rounded">
           <button
             className="text-slate-600 text-lg relative"
@@ -146,11 +186,11 @@ const ChatUI: React.FC<ChatUIProps> = ({
               className="hidden"
               accept=".doc,.docx,.pdf, .jpg, .png, .jpeg"
               onChange={(e) => {
-                if (e.target.files) {
+                if (e?.target?.files) {
                   var maxFileSizeMB = 1;
                   var maxFileSizeBytes = maxFileSizeMB * 1024 * 1024;
 
-                  if (e.target.files[0].size > maxFileSizeBytes) {
+                  if (e.target.files[0]?.size > maxFileSizeBytes) {
                     SwalHelper.MiniAlert(
                       "Vui lòng chọn File dưới 1MB!",
                       "warning"
@@ -170,9 +210,28 @@ const ChatUI: React.FC<ChatUIProps> = ({
             onChange={(e) => setContent(e.target.value)}
             disabled={isLoading}
           />
+
+          <div className="relative">
+            <button
+              className="text-xl pt-1.5"
+              ref={triggerEmoji}
+              onClick={() => setEmojiPickerVisible(true)}
+            >
+              <MdOutlineEmojiEmotions />
+            </button>
+
+            {isEmojiPickerVisible && (
+              <div
+                ref={dropdownEmoji}
+                className="absolute bottom-[110%] right-0 z-[999] font-light"
+              >
+                <Picker data={data} onEmojiSelect={onEmojiClick} />
+              </div>
+            )}
+          </div>
           <button
             className={` text-lg  " ${
-              !isLoading && "text-slate-600 hover:text-orangetext"
+              !isLoading && "text-slate-600 hover:text-bgBlue"
             }`}
             onClick={_onClickSend}
             disabled={isLoading}

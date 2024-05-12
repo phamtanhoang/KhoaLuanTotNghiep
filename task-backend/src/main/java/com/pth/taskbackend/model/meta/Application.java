@@ -1,5 +1,6 @@
 package com.pth.taskbackend.model.meta;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.ESex;
@@ -25,15 +26,16 @@ public class Application extends BaseEntity {
     @Column(nullable = false)
     private String fullName;
 
-    @Column
+    @Column(nullable = false)
     private String phoneNumber;
 
-    @Column
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
     private String cV;
 
+    @Column(nullable = false)
     private int currentStep;
 
     @Enumerated(EnumType.STRING)
@@ -42,20 +44,23 @@ public class Application extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String letter;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "candidate_id")
     private Candidate candidate;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "job_id")
     private Job job;
 
-
-    @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ApplicationStep> applicationSteps = new HashSet<>();
-
-
     @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Message> messages = new HashSet<>();
+
+    @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<StepResult> stepResults = new HashSet<>();
+
+    @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<StepSchedule> stepSchedule = new HashSet<>();
 }
 

@@ -50,7 +50,7 @@ const RightPage: React.FC<RightPageProps> = ({ image, id }) => {
         }
       })
       .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra", "error");
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
         setIsLoading(false);
@@ -110,6 +110,9 @@ const RightPage: React.FC<RightPageProps> = ({ image, id }) => {
                         item?.toSalary
                       )}
                       fetchData={fetchListData}
+                      isVip={item?.isVip}
+                      // isApply={item?.isApply}
+                      isSave={item?.isSave}
                     />
                   ))}
                 </div>

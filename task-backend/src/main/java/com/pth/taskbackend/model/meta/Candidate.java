@@ -1,5 +1,6 @@
 package com.pth.taskbackend.model.meta;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.ESex;
 import com.pth.taskbackend.enums.EStatus;
@@ -52,6 +53,7 @@ public class Candidate extends BaseEntity {
     private String introduction;
 
     private String cV;
+
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -59,16 +61,16 @@ public class Candidate extends BaseEntity {
     @Column
     private Boolean isFindJob;
 
-    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<VipCandidate> vipCandidates = new HashSet<>();
     @OneToMany(mappedBy = "experience", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Experience> experiences = new HashSet<>();
+
     @OneToMany(mappedBy = "skill", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Skill> skills = new HashSet<>();
+
     @OneToMany(mappedBy = "education", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Education> educations = new HashSet<>();
 
-
+    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "saved_job",

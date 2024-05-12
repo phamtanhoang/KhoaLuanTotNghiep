@@ -6,6 +6,7 @@ import JobDetailPage from "./JobDetailPage";
 import JobsPage from "./JobsPage";
 import ProfilePage from "./ProfilePage";
 import SavedJobsPage from "./SavedJobsPage";
+import SchedulePage from "./SchedulePage";
 
 export {
   HomePage,
@@ -16,4 +17,5 @@ export {
   SavedJobsPage,
   ProfilePage,
   AppliedJobsPage,
+  SchedulePage,
 };
