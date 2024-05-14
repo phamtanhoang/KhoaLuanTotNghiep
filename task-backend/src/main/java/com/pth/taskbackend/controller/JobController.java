@@ -190,8 +190,8 @@ public class JobController {
     }
 
     @Operation(summary = "Get list", description = "", tags = {})
-    @GetMapping("getJobs/{id}")
-    public ResponseEntity<BaseResponse> getJobsByEmployerId(@RequestHeader(value = "Authorization",required = false)String token,
+    @GetMapping("/getJobs/{id}")
+    public ResponseEntity<BaseResponse> getJobsByEmployerId(@RequestHeader(value = "Authorization", required = false)String token,
                                                             @PathVariable String id,
                                                             @RequestParam(required = false) String name,
                                                             @RequestParam(required = false) String location,
@@ -278,9 +278,9 @@ public class JobController {
                             job.getLocation(),
                             job.getStatus(),
                             vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                            optionalCandidate.isPresent() && jobService.checkIsSaveJob(optionalCandidate.get().getId(), job.getId()),
+                            optionalCandidate !=null && jobService.checkIsSaveJob(optionalCandidate.get().getId(), job.getId()),
                             DateFunc.isExpired(job.getToDate()),
-                            optionalCandidate.isPresent() && optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent(),
+                            optionalCandidate !=null && optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent(),
                             categoryResponse,
                             jobEmployerResponse,
                             jobHrResponse,
@@ -1016,7 +1016,7 @@ public class JobController {
                         job.getLocation(),
                         job.getStatus(),
                         vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
-                        optionalCandidate.isPresent() && jobService.checkIsSaveJob(optionalCandidate.get().getId(), job.getId()),
+                        optionalCandidate != null && jobService.checkIsSaveJob(optionalCandidate.get().getId(), job.getId()),
                         DateFunc.isExpired(job.getToDate()),
                         optionalCandidate != null && (optionalCandidate.filter(candidate -> applicationService.findByJobIdAndCandidateId(job.getId(), candidate.getId()).isPresent()).isPresent()),
                         categoryResponse,

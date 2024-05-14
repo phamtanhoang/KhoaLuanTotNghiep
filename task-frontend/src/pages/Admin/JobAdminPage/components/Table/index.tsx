@@ -123,8 +123,8 @@ const Table: React.FC<JobTableProps> = ({
                         <img
                           className="object-cover w-10 h-10 rounded-full"
                           src={
-                            item?.employer?.image
-                              ? item?.employer?.image
+                            item?.employer?.avatar
+                              ? item?.employer?.avatar
                               : NON_USER
                           }
                           alt="logo"

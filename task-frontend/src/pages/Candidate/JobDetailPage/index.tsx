@@ -30,11 +30,43 @@ const JobDetailPage = () => {
     handleOpen();
     setFuncs(ModalConstants.AUTH_KEYS.signin);
   };
-  const _onClickSaveJob = () => {
-    alert(1);
+  const _onClickSaveJob = (id: string) => {
+    context.handleOpenLoading();
+    jobsService
+      .saveJob(id!)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          fetchData();
+          SwalHelper.MiniAlert(res.data.Message, "success");
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
   };
-  const _onClickUnSaveJob = () => {
-    alert(1);
+  const _onClickUnSaveJob = (id: string) => {
+    context.handleOpenLoading();
+    jobsService
+      .unSaveJob(id!)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          fetchData();
+          SwalHelper.MiniAlert(res.data.Message, "success");
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
   };
   const fetchData = async () => {
     context.handleOpenLoading();

@@ -155,6 +155,9 @@ const applicationsService = {
       }
     );
   },
+  async detailStepSchedule(id: string) {
+    return await axiosConfig.get(ApplicationAPI.detailStepSchedule(id));
+  },
   async deleteStepSchedule(id: string) {
     return await axiosConfig.delete(ApplicationAPI.deleteStepSchedule(id));
   },

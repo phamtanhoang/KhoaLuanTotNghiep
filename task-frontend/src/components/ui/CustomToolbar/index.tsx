@@ -1,21 +1,16 @@
-import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { endOfMonth, endOfWeek, startOfMonth, startOfWeek } from "date-fns";
+
 import { useEffect, useRef, useState } from "react";
 
 import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+
 import { HiDotsVertical } from "react-icons/hi";
 import { GrNext, GrPrevious } from "react-icons/gr";
 import { DateHelper } from "@/utils/helpers";
-import { ONCHANGE_VIEW } from "@/store/reducers/scheduleReducer";
 
 const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
-  const { fromDate, toDate, view } = useSelector(
-    (state: any) => state.scheduleReducer
-  );
+  const view = props.view;
   const dropdownRef = useRef<any>(null);
-  const dispatch = useDispatch();
   const [openDropdown, setOpenDropdown] = useState<boolean>(false);
 
   function addMonths(date: any, months: any) {
@@ -25,95 +20,29 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
     if (date.getDate() !== d) {
       date.setDate(0);
     }
-
-    const newDate = new Date(date);
-    newDate.setMonth(newDate.getMonth());
-    const first = startOfWeek(new Date(startOfMonth(newDate)), {
-      weekStartsOn: 0,
-    });
-
-    const end = endOfWeek(new Date(endOfMonth(newDate)), { weekStartsOn: 0 });
-    end.setDate(end.getDate() + 1);
-
-    // dispatch(ONCHANGE_FROMDATE(HandleDate.convertDateToISOString(first)));
-    // dispatch(ONCHANGE_TODATE(HandleDate.convertDateToISOString(end)));
-
     return date;
   }
 
   function addWeeks(date: any, weeks: any) {
-    // alert(2);
     date.setDate(date.getDate() + 7 * weeks);
 
-    const firstDayOfWeek = startOfWeek(new Date(date), { weekStartsOn: 0 });
-
-    const lastDayOfWeek = endOfWeek(new Date(date), { weekStartsOn: 0 });
-    lastDayOfWeek.setDate(lastDayOfWeek.getDate() + 1);
-
-    // dispatch(
-    //   ONCHANGE_FROMDATE(HandleDate.convertDateToISOString(firstDayOfWeek))
-    // );
-    // dispatch(ONCHANGE_TODATE(HandleDate.convertDateToISOString(lastDayOfWeek)));
     return date;
   }
 
   function addDays(date: any, days: any) {
-    // alert(3);
     date.setDate(date.getDate() + days);
-    const first = new Date(date);
-
-    const end = new Date(date);
-    end.setDate(end.getDate() + 1);
-
-    // dispatch(ONCHANGE_FROMDATE(HandleDate.convertDateToISOString(first)));
-    // dispatch(ONCHANGE_TODATE(HandleDate.convertDateToISOString(end)));
-
     return date;
   }
 
   const goToDayView = () => {
-    // alert(4);
-    const first = new Date(props.date);
-
-    const end = new Date(props.date);
-    end.setDate(end.getDate() + 1);
-
-    // dispatch(ONCHANGE_FROMDATE(HandleDate.convertDateToISOString(first)));
-    // dispatch(ONCHANGE_TODATE(HandleDate.convertDateToISOString(end)));
-    // dispatch(ONCHANGE_VIEW("day"));
     props.onView("day");
   };
 
   const goToWeekView = () => {
-    // alert(5);
-    const first = startOfWeek(new Date(props.date), {
-      weekStartsOn: 0,
-    });
-
-    const end = endOfWeek(new Date(props.date), { weekStartsOn: 0 });
-    end.setDate(end.getDate() + 1);
-
-    // dispatch(ONCHANGE_FROMDATE(HandleDate.convertDateToISOString(first)));
-    // dispatch(ONCHANGE_TODATE(HandleDate.convertDateToISOString(end)));
-    // dispatch(ONCHANGE_VIEW("week"));
-
     props.onView("week");
   };
 
   const goToMonthView = () => {
-    // alert(6);
-    const newDate = new Date(props.date);
-    newDate.setMonth(newDate.getMonth());
-    const first = startOfWeek(new Date(startOfMonth(newDate)), {
-      weekStartsOn: 0,
-    });
-
-    const end = endOfWeek(new Date(endOfMonth(newDate)), { weekStartsOn: 0 });
-    end.setDate(end.getDate() + 1);
-
-    // dispatch(ONCHANGE_FROMDATE(HandleDate.convertDateToISOString(first)));
-    // dispatch(ONCHANGE_TODATE(HandleDate.convertDateToISOString(end)));
-    // dispatch(ONCHANGE_VIEW("month"));
     props.onView("month");
   };
 
@@ -129,7 +58,6 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
   };
 
   const goToNext = () => {
-    // alert(8);
     if (view === "day") {
       props.onNavigate("next", addDays(props.date, +1));
     } else if (view === "week") {
@@ -140,45 +68,11 @@ const CustomToolbar = ({ fetchScheduleData, ...props }: any) => {
   };
 
   const goToToday = () => {
-    // alert(9);
     const now = new Date();
     props.date.setMonth(now.getMonth());
     props.date.setYear(now.getFullYear());
     props.date.setDate(now.getDate());
-    if (view === "day") {
-      const first = new Date(props.date);
-      const end = new Date(props.date);
-      end.setDate(end.getDate() + 1);
-      // dispatch(ONCHANGE_FROMDATE(HandleDate.convertDateToISOString(first)));
-      // dispatch(ONCHANGE_TODATE(HandleDate.convertDateToISOString(end)));
-    } else if (view === "week") {
-      const firstDayOfWeek = startOfWeek(new Date(props.date), {
-        weekStartsOn: 0,
-      });
-      const lastDayOfWeek = endOfWeek(new Date(props.date), {
-        weekStartsOn: 0,
-      });
-      lastDayOfWeek.setDate(lastDayOfWeek.getDate() + 1);
-      // dispatch(
-      //   ONCHANGE_FROMDATE(HandleDate.convertDateToISOString(firstDayOfWeek))
-      // );
-      // dispatch(
-      //   ONCHANGE_TODATE(HandleDate.convertDateToISOString(lastDayOfWeek))
-      // );
-    } else {
-      const newDate = new Date(props.date);
-      newDate.setMonth(newDate.getMonth());
-      const first = startOfWeek(new Date(startOfMonth(newDate)), {
-        weekStartsOn: 0,
-      });
 
-      const end = endOfWeek(new Date(endOfMonth(newDate)), {
-        weekStartsOn: 0,
-      });
-      end.setDate(end.getDate() + 1);
-      // dispatch(ONCHANGE_FROMDATE(HandleDate.convertDateToISOString(first)));
-      // dispatch(ONCHANGE_TODATE(HandleDate.convertDateToISOString(end)));
-    }
     props.onNavigate("current");
   };
 

@@ -23,4 +23,6 @@ public interface StepScheduleService {
     List<StepSchedule> getDataScheduleByCandidateId(String id, LocalDate fromDateTime, LocalDate toDateTime) throws IOException;
     List<StepSchedule> getDataScheduleByHRId(String id, LocalDate fromDateTime, LocalDate toDateTime) throws IOException;
     List<StepSchedule> getDataScheduleByEmployerId(String id, LocalDate fromDateTime, LocalDate toDateTime) throws IOException;
+
+
 }

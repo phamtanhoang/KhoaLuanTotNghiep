@@ -1210,6 +1210,116 @@ public class ApplicationController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
+    @Operation(summary = "detail step status", description = "", tags = {})
+    @GetMapping("/detailStepSchedule/{id}")
+    public ResponseEntity<BaseResponse> getDetailStepSchedule(@RequestHeader("Authorization") String token,
+                                                       @PathVariable("id") String id) {
+        try {
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR)
+                    || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER)
+                    || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
+                );
+            String email = jwtService.extractUsername(token.substring(7));
+
+
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            User user = userOptional.get();
+
+            Optional<StepSchedule> stepScheduleOptional = stepScheduleService.findById(id);
+            if(stepScheduleOptional.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy lịch hẹn!", HttpStatus.BAD_REQUEST.value(), null)
+                );
+            }
+
+            StepSchedule stepSchedule = stepScheduleOptional.get();
+
+            if (Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getUser().getId())
+                    || Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getEmployer().getUser().getId())
+                    || Objects.equals(user.getId(), stepSchedule.getApplication().getCandidate().getId())) {
+
+                List<StepResponse> stepResponses;
+                if (stepSchedule.getApplication().getJob().getProcess() != null) {
+                    Page<Step> steps = stepService.findByProcessId(stepSchedule.getApplication().getJob().getProcess().getId(), Pageable.unpaged());
+
+                    List<Step> stepList = steps.getContent();
+                    stepResponses = stepList.stream()
+                            .map(step -> new StepResponse(
+                                    step.getId(),
+                                    step.getName(),
+                                    step.getNumber(),
+                                    step.getDescription(),
+                                    step.getProcess() != null ? step.getProcess().getId() : null
+                            ))
+                            .collect(Collectors.toList());
+                    stepResponses.sort(Comparator.comparingInt(StepResponse::number));
+                } else {
+                    stepResponses = Collections.emptyList();
+                }
+                JobProcessResponse processResponse =new JobProcessResponse(
+                        stepSchedule.getApplication().getJob().getProcess().getId(),
+                        stepSchedule.getApplication().getJob().getProcess().getDescription(),
+                        stepResponses
+                );
+
+                JobResponse jobResponse = new JobResponse(
+                        stepSchedule.getApplication().getJob().getId(),
+                        stepSchedule.getApplication().getJob().getCreated(),
+                        stepSchedule.getApplication().getJob().getUpdated(),
+                        stepSchedule.getApplication().getJob().getToDate(),
+                        stepSchedule.getApplication().getJob().getName(),
+                        stepSchedule.getApplication().getJob().getDescription(),
+                        stepSchedule.getApplication().getJob().getExperience(),
+                        stepSchedule.getApplication().getJob().getFromSalary(),
+                        stepSchedule.getApplication().getJob().getToSalary(),
+                        stepSchedule.getApplication().getJob().getLocation(),
+                        stepSchedule.getApplication().getJob().getStatus(),
+                        false,
+                        false,
+                        DateFunc.isExpired(stepSchedule.getApplication().getJob().getToDate()),
+                        false,
+                        null,
+                        null,
+                        null,
+                        processResponse,
+                        null
+                );
+
+                StepScheduleResponse  stepScheduleResponse = new StepScheduleResponse(
+                        stepSchedule.getId(),
+                        stepSchedule.getName(),
+                        stepSchedule.getStepNumber(),
+                        stepSchedule.getColor(),
+                        stepSchedule.getStartDate(),
+                        stepSchedule.getEndDate(),
+                        stepSchedule.getApplication(),
+                        jobResponse
+                );
+                return ResponseEntity.ok(
+                        new BaseResponse("Chi tiết lịch hẹn!", HttpStatus.OK.value(), stepScheduleResponse)
+                );
+            }
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
+            );
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
     @Operation(summary = "update step status", description = "", tags = {})
     @PatchMapping("/updateStepSchedule/{id}")
     public ResponseEntity<BaseResponse> updateSchedule(@RequestHeader("Authorization") String token,
@@ -1234,25 +1344,18 @@ public class ApplicationController {
             }
             User user = userOptional.get();
 
-            Optional<Application> applicationOptional = applicationService.findById(id);
-            if (applicationOptional.isEmpty()) {
+            Optional<StepSchedule> stepScheduleOptional = stepScheduleService.findById(id);
+            if(stepScheduleOptional.isEmpty()){
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy đơn ứng  tuyển!", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy lịch hẹn!", HttpStatus.BAD_REQUEST.value(), null)
                 );
             }
-            Application application = applicationOptional.get();
-            if (Objects.equals(user.getId(), application.getJob().getHumanResource().getUser().getId())
-                    || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())) {
-
-                Optional<StepSchedule> stepSchedule = stepScheduleService.findById(id);
-                if(stepSchedule.isEmpty()){
-                    return ResponseEntity.ok(
-                            new BaseResponse("Lịch hẹn của bước này chưa được tạo!", HttpStatus.BAD_REQUEST.value(), null)
-                    );
-                }
+            StepSchedule stepSchedule = stepScheduleOptional.get();
+            if (Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getUser().getId())
+                    || Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getEmployer().getUser().getId())) {
 
                 LocalDateTime endDate = stepScheduleRequest.startDate().plusHours(stepScheduleRequest.hour());
-                StepSchedule stepSchedule1 = stepScheduleService.update(stepSchedule.get(),stepScheduleRequest.name(), stepScheduleRequest.startDate(),endDate,stepScheduleRequest.color());
+                StepSchedule stepSchedule1 = stepScheduleService.update(stepScheduleOptional.get(),stepScheduleRequest.name(), stepScheduleRequest.startDate(),endDate,stepScheduleRequest.color());
 
                 return ResponseEntity.ok(
                         new BaseResponse("Cập nhật lịch hẹn thành công thành công!", HttpStatus.OK.value(), stepSchedule1)
@@ -1291,25 +1394,16 @@ public class ApplicationController {
             }
             User user = userOptional.get();
 
-            Optional<Application> applicationOptional = applicationService.findById(id);
-            if (applicationOptional.isEmpty()) {
+            Optional<StepSchedule> stepScheduleOptional = stepScheduleService.findById(id);
+            if(stepScheduleOptional.isEmpty()){
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy đơn ứng  tuyển!", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy lịch hẹn!", HttpStatus.BAD_REQUEST.value(), null)
                 );
             }
-            Application application = applicationOptional.get();
-            if (Objects.equals(user.getId(), application.getJob().getHumanResource().getUser().getId())
-                    || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())) {
-
-                Optional<StepSchedule> stepSchedule = stepScheduleService.findById(id);
-                if(stepSchedule.isEmpty()){
-                    return ResponseEntity.ok(
-                            new BaseResponse("Lịch hẹn của bước này chưa được tạo!", HttpStatus.BAD_REQUEST.value(), null)
-                    );
-                }
-
-                stepScheduleService.delete(stepSchedule.get());
-
+            StepSchedule stepSchedule = stepScheduleOptional.get();
+            if (Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getUser().getId())
+                    || Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getEmployer().getUser().getId())) {
+                stepScheduleService.delete(stepSchedule);
                 return ResponseEntity.ok(
                         new BaseResponse("Xóa lịch hẹn thành công thành công!", HttpStatus.OK.value(), null)
                 );

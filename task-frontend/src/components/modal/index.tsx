@@ -13,6 +13,7 @@ import {
   ApplicationStep,
   ApplyJob,
   CreateStepSchedule,
+  DetailStepSchedule,
   HandleApplication,
 } from "./application";
 import { ChangeInfoEmployer, EmployerUpdate } from "./employer";
@@ -42,6 +43,8 @@ const ModalBase = (props: any) => {
   const data = props.data;
   const email = props.email;
   const password = props.password;
+
+  const setApplicationId = props.setApplicationId;
 
   const status = props.status;
   const _onClickUpDateStep = props._onClickUpDateStep;
@@ -189,6 +192,16 @@ const ModalBase = (props: any) => {
         stepId={stepId}
         fetchData={fetchData}
         handleClose={handleClose}
+      />
+    ),
+    [ModalConstants.APPLICATION_KEYS.detailStepSchedule]: (
+      <DetailStepSchedule
+        id={id}
+        stepId={stepId}
+        fetchData={fetchData}
+        handleClose={handleClose}
+        setApplicationId={setApplicationId}
+        setFuncs={setFuncs}
       />
     ),
     [ModalConstants.APPLICATION_KEYS.handleApplication]: (

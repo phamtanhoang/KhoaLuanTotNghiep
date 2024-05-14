@@ -13,6 +13,7 @@ interface SingleDataReducerState {
   step: StepModel | null;
   tag: TagModel | null;
   application: ApplicationModel | null;
+  vip: VipModel | null;
 }
 
 const initialState: SingleDataReducerState = {
@@ -28,6 +29,7 @@ const initialState: SingleDataReducerState = {
   step: null,
   tag: null,
   application: null,
+  vip: null,
 };
 export const listDataReducer = createSlice({
   name: "listDataReducer",
@@ -35,6 +37,9 @@ export const listDataReducer = createSlice({
   initialState,
 
   reducers: {
+    ONCHANGE_VIP_SINGLE: (state, action: PayloadAction<JobModel | null>) => {
+      state.job = action.payload;
+    },
     ONCHANGE_JOB_SINGLE: (state, action: PayloadAction<JobModel | null>) => {
       state.job = action.payload;
     },
@@ -114,6 +119,7 @@ export const {
   ONCHANGE_STEP_SINGLE,
   ONCHANGE_TAG_SINGLE,
   ONCHANGE_APPLICATION_SINGLE,
+  ONCHANGE_VIP_SINGLE,
 } = listDataReducer.actions;
 
 export default listDataReducer.reducer;

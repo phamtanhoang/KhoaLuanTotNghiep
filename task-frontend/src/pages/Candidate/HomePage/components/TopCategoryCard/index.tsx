@@ -1,3 +1,6 @@
+import { PathConstants } from "@/utils/constants";
+import { useNavigate } from "react-router-dom";
+
 interface TopCategoryCardProps {
   id: string;
   image: string;
@@ -11,7 +14,12 @@ const TopCategoryCard: React.FC<TopCategoryCardProps> = ({
   title,
   jobCount,
 }) => {
-  const _onClickDetail = () => {};
+  const navigate = useNavigate();
+  const _onClickDetail = () => {
+    navigate(PathConstants.CANDIDATE_PATHS.jobs, {
+      state: { category: id },
+    });
+  };
   return (
     <div
       className="relative overflow-hidden group rounded-xl cursor-pointer"

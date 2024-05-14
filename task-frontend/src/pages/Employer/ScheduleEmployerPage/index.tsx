@@ -50,13 +50,13 @@ const ScheduleEmployerPage = () => {
 
   return (
     <>
-      <ModalBase
+      {/* <ModalBase
         open={open}
         handleClose={handleClose}
         funcs={funcs}
         setFuncs={setFuncs}
         fetchData={fetchScheduleData}
-      />
+      /> */}
       <div className="relative w-full l scale-employer">
         <Schedule value={eventList} fetchScheduleData={fetchScheduleData} />
       </div>

@@ -44,6 +44,18 @@ function convertDateFormat(dateString: string): string {
 
   return formattedDate;
 }
+function calculateHours(startDateStr: string, endDateStr: string) {
+  const startDate = new Date(startDateStr);
+  const endDate = new Date(endDateStr);
+  console.log(endDate.getTime());
+  console.log(startDate.getTime());
+  const timeDiff = endDate.getTime() - startDate.getTime();
+
+  let hours = timeDiff / (1000 * 60 * 60);
+
+  return hours;
+}
+
 export const DateHelper = {
   formatDateTime,
   formatDate,
@@ -51,4 +63,5 @@ export const DateHelper = {
   convertDateFormat,
   getFirstDayOfMonth,
   getLastDayOfMonth,
+  calculateHours,
 };

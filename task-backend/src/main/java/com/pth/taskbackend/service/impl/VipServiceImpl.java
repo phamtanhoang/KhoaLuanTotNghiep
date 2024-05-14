@@ -18,8 +18,8 @@ public class VipServiceImpl implements VipService {
     @Autowired
     VipRepository vipRepository;
     @Override
-    public Page<Vip> findByStatusAndType(EType type, EVipStatus status, Pageable pageable) {
-        return vipRepository.findByStatusAndType(type,status,pageable);
+    public Page<Vip> findByNameContainningAndType(String name, EVipStatus status, Pageable pageable) {
+        return vipRepository.findByNameContainingAndType(name,status,pageable);
     }
 
     @Override

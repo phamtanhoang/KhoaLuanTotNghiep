@@ -13,6 +13,18 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/free-mode";
 import { FreeMode, Navigation, Pagination } from "swiper/modules";
+import { useContext, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { LoadingContext } from "@/App";
+import { SwalHelper } from "@/utils/helpers";
+import { categoriesService } from "@/services";
+import {
+  CLEAR_PAGINATION_STATE,
+  ONCHANGE_CURRENTPAGE,
+  ONCHANGE_PAGINATION,
+} from "@/store/reducers/paginationState";
+import { ONCHANGE_CATEGORY_LIST } from "@/store/reducers/listDataReducer";
+import { EmptyData, Loading } from "@/components/ui";
 
 const employers = [
   {
@@ -65,64 +77,42 @@ const employers = [
   },
 ];
 
-const categories = [
-  {
-    id: "1",
-    image: "https://source.unsplash.com/random/400x400",
-    title: "Công nghệ thông tin",
-    jobCount: 3,
-  },
-  {
-    id: "2",
-    image: "https://source.unsplash.com/random/400x400",
-    title: "title2",
-    jobCount: 2,
-  },
-  {
-    id: "3",
-    image: "https://source.unsplash.com/random/400x400",
-    title: "title3",
-    jobCount: 0,
-  },
-  {
-    id: "1",
-    image: "https://source.unsplash.com/random/400x400",
-    title: "title1",
-    jobCount: 3,
-  },
-  {
-    id: "2",
-    image: "https://source.unsplash.com/random/400x400",
-    title: "title2",
-    jobCount: 2,
-  },
-  {
-    id: "3",
-    image: "https://source.unsplash.com/random/400x400",
-    title: "title3",
-    jobCount: 0,
-  },
-  {
-    id: "1",
-    image: "https://source.unsplash.com/random/400x400",
-    title: "title1",
-    jobCount: 3,
-  },
-  {
-    id: "2",
-    image: "https://source.unsplash.com/random/400x400",
-    title: "title2",
-    jobCount: 2,
-  },
-  {
-    id: "3",
-    image: "https://source.unsplash.com/random/400x400",
-    title: "title3",
-    jobCount: 0,
-  },
-];
-
 const HomePage: React.FC = () => {
+  const context = useContext(LoadingContext);
+  const dispatch = useDispatch();
+  const [categories, setCategories] = useState<CategoryModel[]>([]);
+  const { totalPages, currentPage, isEmpty } = useSelector(
+    (state: any) => state.paginationReducer
+  );
+  useEffect(() => {
+    dispatch(CLEAR_PAGINATION_STATE());
+  }, []);
+  const fetchCategories = () => {
+    context.handleOpenLoading();
+    categoriesService
+      .getTopCategories(currentPage - 1, 8)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          const cates = categories.concat(res?.data?.Data?.content || []);
+          console.log("categories, ", categories);
+          console.log("cates, ", cates);
+          setCategories(cates);
+          dispatch(ONCHANGE_PAGINATION(res.data.Data));
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  };
+  useEffect(() => {
+    fetchCategories();
+  }, [currentPage]);
+
   return (
     <>
       <Hero />
@@ -194,22 +184,37 @@ const HomePage: React.FC = () => {
               hội mới và bắt đầu chặng đường sự nghiệp của bạn ngay hôm nay.
             </p>
           </div>
-          <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {categories.map((item, index) => (
-              <TopCategoryCard
-                key={index}
-                id={item.id}
-                image={item.image}
-                title={item.title}
-                jobCount={item.jobCount}
-              />
-            ))}
-          </div>
-          <div className="w-full flex justify-center items-center mt-12">
-            <button className="flex text-white justify-center items-center w-max min-w-max sm:w-max px-6 h-12 rounded-lg outline-none relative overflow-hidden border duration-300 ease-linear after:absolute after:inset-x-0 after:aspect-square after:scale-0 after:opacity-70 after:origin-center after:duration-300 after:ease-linear after:rounded-full after:top-0 after:left-0 after:bg-orange-500 hover:after:opacity-100 hover:after:scale-[2.5] bg-orangetext border-transparent hover:border-orange-500 mx-auto">
-              <span className="z-[1] font-medium">Xem thêm</span>
-            </button>
-          </div>
+
+          {isEmpty ? (
+            <div className="px-5 lg:px-28 justify-between mx-auto">
+              <EmptyData text="Danh sách rỗng..." />
+            </div>
+          ) : (
+            <>
+              <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {categories?.map((item: CategoryModel, index: number) => (
+                  <TopCategoryCard
+                    key={index}
+                    id={item.id!}
+                    image={item.image!}
+                    title={item.name!}
+                    jobCount={item.count!}
+                  />
+                ))}
+              </div>{" "}
+            </>
+          )}
+
+          {totalPages > currentPage && !isEmpty && (
+            <div className="w-full flex justify-center items-center mt-12">
+              <button
+                className="flex text-white justify-center items-center w-max min-w-max sm:w-max px-6 h-12 rounded-lg outline-none relative overflow-hidden border duration-300 ease-linear after:absolute after:inset-x-0 after:aspect-square after:scale-0 after:opacity-70 after:origin-center after:duration-300 after:ease-linear after:rounded-full after:top-0 after:left-0 after:bg-orange-500 hover:after:opacity-100 hover:after:scale-[2.5] bg-orangetext border-transparent hover:border-orange-500 mx-auto"
+                onClick={() => dispatch(ONCHANGE_CURRENTPAGE(currentPage + 1))}
+              >
+                <span className="z-[1] font-medium">Xem thêm</span>
+              </button>
+            </div>
+          )}
         </div>
       </section>
       <QuestionsAndAnswer />

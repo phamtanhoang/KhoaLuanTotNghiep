@@ -4,4 +4,5 @@ interface CategoryModel {
   updated?: Date;
   name?: string;
   image?: string;
+  count?: number;
 }

@@ -10,7 +10,8 @@ import java.io.IOException;
 import java.util.Optional;
 
 public interface VipService {
-    Page<Vip>findByStatusAndType(EType type, EVipStatus status, Pageable pageable) throws IOException;
+    Page<Vip>findByNameContainningAndType(String name, EVipStatus status, Pageable pageable) throws IOException;
+
     Optional<Vip>findById(String id)  throws IOException;
     Vip create(Vip vip) throws IOException;
     Vip update(Vip vip) throws IOException;

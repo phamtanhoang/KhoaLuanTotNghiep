@@ -10,7 +10,7 @@ import { TbVip } from "react-icons/tb";
 import { PathConstants } from "@/utils/constants";
 import { useNavigate } from "react-router-dom";
 import { jobsService } from "@/services";
-import { SwalHelper } from "@/utils/helpers";
+import { AuthHelper, SwalHelper } from "@/utils/helpers";
 import { useContext } from "react";
 import { LoadingContext } from "@/App";
 interface JobCardProps {
@@ -155,30 +155,31 @@ const JobCard: React.FC<JobCardProps> = ({
           </p>
         </div>
         <div className="flex flex-col gap-2 justify-end">
-          {urlLink !== PathConstants.CANDIDATE_PATHS.savedJobs ? (
-            isSave ? (
-              <button
-                className="p-2 text-white rounded-full bg-orangetext"
-                onClick={_onClickUnSave}
-              >
-                <FaBookmark />
-              </button>
+          {AuthHelper.isCandidate() &&
+            (urlLink !== PathConstants.CANDIDATE_PATHS.savedJobs ? (
+              isSave ? (
+                <button
+                  className="p-2 text-white rounded-full bg-orangetext"
+                  onClick={_onClickUnSave}
+                >
+                  <FaBookmark />
+                </button>
+              ) : (
+                <button
+                  className="p-2 text-orangetext rounded-full bg-orangebackground"
+                  onClick={_onClickSave}
+                >
+                  <FaBookmark />
+                </button>
+              )
             ) : (
               <button
-                className="p-2 text-orangetext rounded-full bg-orangebackground"
-                onClick={_onClickSave}
+                className="p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext"
+                onClick={_onClickUnSave}
               >
-                <FaBookmark />
+                <FaRegTrashCan />
               </button>
-            )
-          ) : (
-            <button
-              className="p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext"
-              onClick={_onClickUnSave}
-            >
-              <FaRegTrashCan />
-            </button>
-          )}
+            ))}
           <button
             className="p-2 text-orangetext rounded-full bg-orangebackground hover:text-orangebackground hover:bg-orangetext"
             onClick={() => {

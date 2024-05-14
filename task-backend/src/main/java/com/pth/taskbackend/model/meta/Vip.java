@@ -25,14 +25,14 @@ public class Vip extends BaseEntity {
     @Column(nullable = false)
     private Long price;
 
-    @Enumerated(EnumType.STRING)
-    private EType type;
-
     @Column(nullable = false)
     private String color;
 
     @Column(nullable = false)
     private int month;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     @Enumerated(EnumType.STRING)
     private EVipStatus status;

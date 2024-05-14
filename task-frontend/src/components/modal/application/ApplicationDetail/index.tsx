@@ -13,7 +13,7 @@ import { LoadingContext } from "@/App";
 import { useDispatch, useSelector } from "react-redux";
 import { ONCHANGE_APPLICATION_SINGLE } from "@/store/reducers/singleDataReducer";
 import applicationsService from "@/services/applicationsService";
-import { AuthHelper, SwalHelper } from "@/utils/helpers";
+import { AuthHelper, DateHelper, SwalHelper } from "@/utils/helpers";
 import {
   ONCHANGE_MESSAGE_LIST,
   ONCHANGE_STEP_LIST,
@@ -39,6 +39,7 @@ const StepItem: React.FC<StepItemProps> = ({
   stepResult,
   stepSchedule,
   _onClickCreateStepSchedule,
+  _onClickDetailStepSchedule,
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -68,7 +69,6 @@ const StepItem: React.FC<StepItemProps> = ({
     document.addEventListener("keydown", keyHandler);
     return () => document.removeEventListener("keydown", keyHandler);
   });
-
   return (
     <tr
       key={index}
@@ -80,6 +80,10 @@ const StepItem: React.FC<StepItemProps> = ({
 
       <td className="w-auto p-3 text-gray-800 text-center border border-b table-cell static">
         {item?.name!}
+      </td>
+      <td className="w-auto p-3 text-gray-800 text-center border border-b table-cell static">
+        {stepSchedule?.startDate &&
+          DateHelper.formatDateTime(stepSchedule?.startDate)}
       </td>
 
       <td className="w-auto p-3 text-gray-800 text-center border border-b table-cell static">
@@ -125,16 +129,16 @@ const StepItem: React.FC<StepItemProps> = ({
                     onClick={() => _onClickCreateStepSchedule(item?.id!)}
                   >
                     <GrSchedulePlay className="my-auto text-base" />
-                    Tạo lịch
+                    Tạo lịch hẹn
                   </a>
                 )}
               {stepSchedule && (
                 <a
                   className="flex px-6 py-2 text-gray-700 hover:bg-gray-100 gap-1.5"
-                  // onClick={() => _onClickCreateStepSchedule(item?.id!)}
+                  onClick={() => _onClickDetailStepSchedule(stepSchedule?.id!)}
                 >
                   <BiDetail className="my-auto text-base" />
-                  Chi tiết lịch
+                  Chi tiết lịch hẹn
                 </a>
               )}
             </div>
@@ -242,7 +246,7 @@ const ApplicationDetail = (props: any) => {
   }, [id]);
 
   const _onClickSend = () => {
-    if (!content && file) {
+    if (!content && !file) {
       return;
     }
     setIsLoading(true);
@@ -322,14 +326,15 @@ const ApplicationDetail = (props: any) => {
     setFuncsSub(ModalConstants.APPLICATION_KEYS.handleApplication);
     handleOpenSub();
   };
-  const _onClickDetailStepSchedule = (id: string) => {
-    setStepId(id);
-    setFuncsSub(ModalConstants.APPLICATION_KEYS.applycationStep);
-    handleOpenSub();
-  };
+
   const _onClickCreateStepSchedule = (id: string) => {
     setStepId(id);
     setFuncsSub(ModalConstants.APPLICATION_KEYS.createStepSchedule);
+    handleOpenSub();
+  };
+  const _onClickDetailStepSchedule = (id: string) => {
+    setStepId(id);
+    setFuncsSub(ModalConstants.APPLICATION_KEYS.detailStepSchedule);
     handleOpenSub();
   };
 
@@ -361,6 +366,19 @@ const ApplicationDetail = (props: any) => {
         <div className="h-max max-h-[75vh] my-2 mx-1 flex">
           <div className="mr-1 px-3 text-gray-700 flex flex-col gap-4 overflow-auto scrollbar-custom lg:w-[55%]">
             <div className="content-center flex flex-col gap-2.5 text-sm ">
+              <div className="lg:flex justify-between gap-4 content-center">
+                <div className="content-center w-full">
+                  <label className="font-medium tracking-wide text-sm">
+                    Công việc ứng tuyển
+                  </label>
+                  <input
+                    className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
+                    type="text"
+                    disabled
+                    value={application?.job?.name}
+                  />
+                </div>
+              </div>
               <div className="lg:flex justify-between gap-4 content-center">
                 <div className="content-center w-full">
                   <label className="font-medium tracking-wide text-sm">
@@ -434,13 +452,16 @@ const ApplicationDetail = (props: any) => {
                       STT
                     </th>
 
-                    <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell w-[35%]">
+                    <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell">
                       Tên bước
+                    </th>
+                    <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell">
+                      Lịch hẹn
                     </th>
                     <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell w-[10%]">
                       Kết quả
                     </th>
-                    <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell w-[35%]">
+                    <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell">
                       Đánh giá
                     </th>
 

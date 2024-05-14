@@ -30,12 +30,13 @@ interface LeftPageCardProps {
   isApplied?: boolean;
   isSaved?: boolean;
   _onClickApplyJob: () => void;
-  _onClickSaveJob: () => void;
-  _onClickUnSaveJob: () => void;
+  _onClickSaveJob: (id: string) => void;
+  _onClickUnSaveJob: (id: string) => void;
   _onClickLogin: () => void;
 }
 
 const LeftPage: React.FC<LeftPageCardProps> = ({
+  id,
   image,
   name,
   status,
@@ -154,14 +155,14 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
                     {isSaved ? (
                       <button
                         className="font-medium bg-transparent text-orangetext hover:text-orange-500 border-2 border-orangetext hover:border-orange-500 w-full lg:w-[35%] py-[6px] px-4 rounded flex  justify-center items-center min-w-max"
-                        onClick={() => _onClickUnSaveJob()}
+                        onClick={() => _onClickUnSaveJob(id)}
                       >
                         Bỏ lưu
                       </button>
                     ) : (
                       <button
                         className="font-medium bg-transparent text-orangetext hover:text-orange-500 border-2 border-orangetext hover:border-orange-500 w-full lg:w-[35%] py-[6px] px-4 rounded flex  justify-center items-center min-w-max"
-                        onClick={() => _onClickSaveJob()}
+                        onClick={() => _onClickSaveJob(id)}
                       >
                         Lưu tin
                       </button>
@@ -218,14 +219,14 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
               {isSaved ? (
                 <button
                   className="font-medium bg-transparent text-orangetext hover:text-orange-500 border-2 border-orangetext hover:border-orange-500 w-[35%] py-[6px] px-4 rounded flex  justify-center items-center min-w-max"
-                  onClick={() => _onClickUnSaveJob()}
+                  onClick={() => _onClickUnSaveJob(id)}
                 >
                   Bỏ lưu
                 </button>
               ) : (
                 <button
                   className="font-medium bg-transparent text-orangetext hover:text-orange-500 border-2 border-orangetext hover:border-orange-500 w-[35%] py-[6px] px-4 rounded flex  justify-center items-center min-w-max"
-                  onClick={() => _onClickSaveJob()}
+                  onClick={() => _onClickSaveJob(id)}
                 >
                   Lưu tin
                 </button>

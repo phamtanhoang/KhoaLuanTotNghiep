@@ -25,6 +25,7 @@ const APPLICATION_KEYS = {
   applycationDetail: "ApplycationDetail",
   applycationStep: "ApplycationStep",
   createStepSchedule: "CreateStepSchedule",
+  detailStepSchedule: "DetailStepSchedule",
   handleApplication: "HandleApplication",
 };
 const HUMANRESOURCE_KEYS = {

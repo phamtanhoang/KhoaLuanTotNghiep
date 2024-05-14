@@ -94,7 +94,7 @@ public class ScheduleController {
                             new BaseResponse("Không tìm thấy nhà tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
                     );
                 }
-                List<StepSchedule> stepScheduleList = stepScheduleService.getDataScheduleByCandidateId(employerOptional.get().getId(), fromDate, toDate);
+                List<StepSchedule> stepScheduleList = stepScheduleService.getDataScheduleByEmployerId(employerOptional.get().getId(), fromDate, toDate);
                 return ResponseEntity.ok(new BaseResponse("Tải danh sách lịch hẹn thành công", 200, stepScheduleList));
             }
             return ResponseEntity.ok(new BaseResponse("Tải danh sách lịch hẹn thất bại!", 400, null));

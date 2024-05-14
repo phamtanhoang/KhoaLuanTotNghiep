@@ -30,7 +30,6 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
             "FROM Category c " +
             "LEFT JOIN Job j ON c.id = j.category.id " +
             "GROUP BY c " +
-            "HAVING COUNT(j.id) > 0 " +
             "ORDER BY count DESC")
     Page<Object[]> findCategoriesOrderedByJobCount(Pageable pageable);
 }

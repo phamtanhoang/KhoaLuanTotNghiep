@@ -23,6 +23,7 @@ interface SearchJobProps {
   setTag?: any;
   setExperience?: any;
   setDateSubmit?: any;
+  categorySearch?: any;
 }
 const SearchJob: React.FC<SearchJobProps> = ({
   name,
@@ -33,13 +34,14 @@ const SearchJob: React.FC<SearchJobProps> = ({
   setTag,
   setDateSubmit,
   setExperience,
+  categorySearch,
 }) => {
   const context = useContext(LoadingContext);
-  const [hideFilter, setHideFilter] = useState<boolean>(false);
+  const [hideFilter, setHideFilter] = useState<boolean>(categorySearch ? true : false);
 
   const [tempName, setTempName] = useState<string>(name || "");
   const [tempLocation, setTempLocation] = useState<string>(location || "");
-  const [tempCategory, setTempCategory] = useState<string | null>(null);
+  const [tempCategory, setTempCategory] = useState<string | null>(categorySearch || null);
   const [tempTag, setTempTag] = useState<string | null>(null);
   const [tempExperience, setTempExperience] = useState<string | null>(null);
   const [tempDateSubmit, setTempDateSubmit] = useState<string | null>(null);

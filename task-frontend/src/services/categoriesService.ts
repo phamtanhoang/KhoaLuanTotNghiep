@@ -26,6 +26,11 @@ const categoriesService = {
       CategoryAPI.getList(name?.trim(), currentPage, itemPerPage)
     );
   },
+  async getTopCategories(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(
+      CategoryAPI.getTopCategories(currentPage, itemPerPage)
+    );
+  },
 
   async getList_Dropdown() {
     return await axiosConfig.get(CategoryAPI.getList_Dropdown);

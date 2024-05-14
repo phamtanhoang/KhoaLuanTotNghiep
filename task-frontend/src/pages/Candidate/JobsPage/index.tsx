@@ -39,7 +39,9 @@ const JobsPage: React.FC = () => {
   const [name, setName] = useState<string>(state?.name || "");
   const [location, setLocation] = useState<string>(state?.location || "");
 
-  const [category, setCategory] = useState<string | null>(null);
+  const [category, setCategory] = useState<string | null>(
+    state?.category || null
+  );
   const [tag, setTag] = useState<string | null>(null);
   const [experience, setExperience] = useState<string | null>(null);
   const [dateSubmit, setDateSubmit] = useState<string | null>(null);
@@ -176,6 +178,7 @@ const JobsPage: React.FC = () => {
         setDateSubmit={setDateSubmit}
         setExperience={setExperience}
         setTag={setTag}
+        categorySearch={state?.category}
       />
       <section className="pb-10 pt-8 ">
         {isLoading ? (

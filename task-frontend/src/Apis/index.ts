@@ -101,6 +101,8 @@ const TagAPI = {
 
 const CategoryAPI = {
   categories: "/categories",
+  getTopCategories: (currentPage?: number, itemPerPage?: number) =>
+    `categories/topCategories?page=${currentPage}&size=${itemPerPage}`,
   createCategory: "/categories/create",
 
   getList: (name?: string, currentPage?: number, itemPerPage?: number) => {
@@ -274,6 +276,9 @@ const ApplicationAPI = {
     return `/applications/updateStatus/${id}`;
   },
 
+  detailStepSchedule: (id?: string) => {
+    return `/applications/detailStepSchedule/${id}`;
+  },
   createStepSchedule: (id?: string) => {
     return `/applications/createStepSchedule/${id}`;
   },
@@ -287,6 +292,27 @@ const ApplicationAPI = {
 const ScheduleAPI = {
   getDataSchedule: (id?: string, fromDate?: string, toDate?: string) => {
     return `/schedule?userId=${id}&fromDate=${fromDate}&toDate=${toDate}`;
+  },
+};
+const ServiceAPI = {
+  base: "/vips",
+  vipById: (id: string) => {
+    return `/vips/${id}`;
+  },
+  getListByAdmin: (
+    name?: string,
+    status?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/vips/getVips-admin?name=${name}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
+  },
+  getListByEmployer: (
+    name?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/vips/getVips-employer?name=${name}&page=${currentPage}&size=${itemPerPage}`;
   },
 };
 export {
@@ -304,4 +330,5 @@ export {
   JobAPI,
   ApplicationAPI,
   ScheduleAPI,
+  ServiceAPI,
 };

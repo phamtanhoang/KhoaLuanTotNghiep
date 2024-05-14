@@ -13,5 +13,5 @@ public record VipResponse (String id,
                            String name,
                            Long price,
                            EVipStatus status,
-                           EType type){
+                           String description){
 }

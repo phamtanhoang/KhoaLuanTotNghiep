@@ -73,6 +73,11 @@ const CANDIDATE_STATE_DROPDOWN = [
   { id: "ACTIVE", name: "Hoạt động", color: "#0000FF" },
   { id: "INACTIVE", name: "Không hoạt động", color: "#FF0000" },
 ];
+const SERVICE_DROPDOWN = [
+  { id: "", name: "Toàn bộ", color: "" },
+  { id: "ACTIVE", name: "Hoạt động", color: "#0000FF" },
+  { id: "INACTIVE", name: "Không hoạt động", color: "#FF0000" },
+];
 
 const ROLE_DATA = {
   ADMIN: "ADMIN",
@@ -107,4 +112,5 @@ export const DataConstants = {
   DATESUBMIT_DROPDOWN,
   TYPEJOB_DROPDOWN,
   TYPE_EXTRA_DATA,
+  SERVICE_DROPDOWN,
 };

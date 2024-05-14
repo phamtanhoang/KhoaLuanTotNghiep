@@ -29,9 +29,7 @@ const CreateStepSchedule = (props: any) => {
       SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "warning");
       return;
     }
-
     context.handleOpenLoading();
-    console.log(applicationId, name, startDate, hour, color, step?.number);
     applicationsService
       .createStepSchedule(
         applicationId,
@@ -44,7 +42,7 @@ const CreateStepSchedule = (props: any) => {
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           handleClose();
-          // fetchData(id);
+          fetchData();
           SwalHelper.MiniAlert(res.data.Message, "success");
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");

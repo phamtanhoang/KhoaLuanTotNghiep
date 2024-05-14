@@ -12,10 +12,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VipRepository extends JpaRepository<Vip,String> {
-    @Query("SELECT v FROM Vip v WHERE " +
-            "(:type IS NULL OR v.type = :type) AND " +
-            "(:status IS NULL OR v.status = :status) AND " +
+    @Query("SELECT v FROM Vip v " +
+            "WHERE (:name IS NULL OR LOWER(v.name) LIKE CONCAT('%', :name, '%')) " +
+            "AND (:status IS NULL OR v.status = :status) AND " +
             "v.status != 'DELETED'")
-    Page<Vip> findByStatusAndType(@Param("type") EType type, @Param("status") EVipStatus status, Pageable pageable);
+    Page<Vip> findByNameContainingAndType(@Param("name") String name, @Param("status") EVipStatus status, Pageable pageable);
 
 }

@@ -52,16 +52,32 @@ const CreateJob = (props: any) => {
   const [procedures, setProcedures] = useState<ProcedureModel[]>([]);
 
   const _onClickSave = () => {
-    if (
-      !name ||
-      !description ||
-      !location ||
-      !experience ||
-      (AuthHelper.isEmployer() && !humanResourceId) ||
-      (checkSalary && !fromSalary && !toSalary) ||
-      !procedureId
-    ) {
-      SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "warning");
+    if (!name) {
+      SwalHelper.MiniAlert("Vui lòng nhập tên công việc!", "warning");
+      return;
+    }
+    if (!description) {
+      SwalHelper.MiniAlert("Vui lòng nhập mô tả công việc!", "warning");
+      return;
+    }
+    if (!location) {
+      SwalHelper.MiniAlert("Vui lòng nhập địa điểm!", "warning");
+      return;
+    }
+    // if (experience!=null) {
+    //   SwalHelper.MiniAlert("Vui lòng chọn kinh nghiệm!", "warning");
+    //   return;
+    // }
+    if (AuthHelper.isEmployer() && !humanResourceId) {
+      SwalHelper.MiniAlert("Vui lòng chọn cán bộ!", "warning");
+      return;
+    }
+    if (checkSalary && !fromSalary && !toSalary) {
+      SwalHelper.MiniAlert("Vui lòng nhập mức lương!", "warning");
+      return;
+    }
+    if (!procedureId) {
+      SwalHelper.MiniAlert("Vui lòng chọn quy trình!", "warning");
       return;
     }
 

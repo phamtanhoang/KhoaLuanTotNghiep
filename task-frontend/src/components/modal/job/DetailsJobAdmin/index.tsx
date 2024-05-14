@@ -84,7 +84,7 @@ const DetailsJobAdmin = (props: any) => {
           <div className="flex items-center justify-between gap-5">
             <div>
               <img
-                src={job?.employer?.image ? job?.employer?.image : NON_USER}
+                src={job?.employer?.avatar ? job?.employer?.avatar : NON_USER}
                 className="w-24 h-24 rounded-full"
               />
             </div>
