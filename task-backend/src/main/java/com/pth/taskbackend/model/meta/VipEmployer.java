@@ -16,14 +16,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class VipEmployer  {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+public class VipEmployer extends BaseEntity  {
 
     @Column(nullable = false)
     private LocalDateTime fromDate;
@@ -41,5 +38,8 @@ public class VipEmployer  {
     @ManyToOne
     @JoinColumn(name = "vip_id")
     private Vip vip;
+
+    @Column(nullable = false)
+    private String invoiceId;
 }
 

@@ -15,6 +15,7 @@ interface ListDataReducerState {
   applications: ApplicationModel[];
   messages: MessageModel[];
   vips: VipModel[];
+  trasaction: TrasactionModel[];
 }
 
 const initialState: ListDataReducerState = {
@@ -32,6 +33,7 @@ const initialState: ListDataReducerState = {
   applications: [],
   messages: [],
   vips: [],
+  trasaction: [],
 };
 export const listDataReducer = createSlice({
   name: "listDataReducer",
@@ -90,6 +92,12 @@ export const listDataReducer = createSlice({
     ONCHANGE_TAG_LIST: (state, action: PayloadAction<TagModel[]>) => {
       state.tags = action.payload;
     },
+    ONCHANGE_TRASACTION_LIST: (
+      state,
+      action: PayloadAction<TrasactionModel[]>
+    ) => {
+      state.trasaction = action.payload;
+    },
     ONCHANGE_MESSAGE_LIST: (state, action: PayloadAction<MessageModel[]>) => {
       state.messages = action.payload;
     },
@@ -128,6 +136,7 @@ export const {
   ONCHANGE_SKILL_LIST,
   ONCHANGE_STEP_LIST,
   ONCHANGE_TAG_LIST,
+  ONCHANGE_TRASACTION_LIST,
   ONCHANGE_SKILL_EXPERIENCE_EDUCATION_LIST,
   ONCHANGE_APPLICATION_LIST,
   ONCHANGE_MESSAGE_LIST,

@@ -3,6 +3,7 @@ import ModalBase from "@/components/modal";
 import {
   CLEAR_PAGINATION_STATE,
   ONCHANGE_CURRENTPAGE,
+  ONCHANGE_PAGINATION,
 } from "@/store/reducers/paginationState";
 import { ModalConstants } from "@/utils/constants";
 import { SwalHelper } from "@/utils/helpers";
@@ -12,6 +13,8 @@ import { MdOutlineAddCircleOutline } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { Table } from "./components";
 import { PaginationCustom } from "@/components/ui";
+import vipsService from "@/services/vipsService";
+import { ONCHANGE_VIP_LIST } from "@/store/reducers/listDataReducer";
 
 const ServiceAdminPage = () => {
   const dispatch = useDispatch();
@@ -29,6 +32,7 @@ const ServiceAdminPage = () => {
   const [id, setId] = useState<string>("");
   const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
   const [keyWord, setKeyWord] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
 
   const [open, setOpen] = useState(false);
   const [funcs, setFuncs] = useState<string>("");
@@ -36,61 +40,61 @@ const ServiceAdminPage = () => {
   const handleClose = () => setOpen(false);
 
   const _onClickAdd = () => {
-    setFuncs(ModalConstants.TAG_KEYS.createTag);
+    setFuncs(ModalConstants.VIP_KEYS.createVip);
     handleOpen();
   };
 
   const _onClickDelete = (item: VipModel) => {
     SwalHelper.Confirm(
-      "Xác nhận xóa nhãn này?",
+      "Xác nhận xóa dịch vụ này?",
       "question",
       () => {
-        // context.handleOpenLoading();
-        // tagsService
-        //   .deleteById(item.id!)
-        //   .then((res) => {
-        //     if (res.status === 200 && res.data.Status === 200) {
-        //       SwalHelper.MiniAlert(res.data.Message, "success");
-        //       fetchListData();
-        //     } else {
-        //       SwalHelper.MiniAlert(res.data.Message, "error");
-        //     }
-        //   })
-        //   .catch(() => {
-        //     SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-        //   })
-        //   .finally(() => {
-        //     context.handleCloseLoading();
-        //   });
+        context.handleOpenLoading();
+        vipsService
+          .deleteById(item.id)
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              SwalHelper.MiniAlert(res.data.Message, "success");
+              fetchListData();
+            } else {
+              SwalHelper.MiniAlert(res.data.Message, "error");
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
       },
       () => {}
     );
   };
 
   const _onClickDetail = (item: VipModel) => {
-    // setId(item.id);
-    // setFuncs(ModalConstants.TAG_KEYS.updateTag);
-    // handleOpen();
+    setId(item.id);
+    setFuncs(ModalConstants.VIP_KEYS.updateVip);
+    handleOpen();
   };
 
   const fetchListData = () => {
     setIsLoadingTable(true);
-    // tagsService
-    //   .getList(keyWord, currentPage - 1, itemPerPage)
-    //   .then((res) => {
-    //     if (res.status === 200 && res.data.Status === 200) {
-    //       dispatch(ONCHANGE_TAG_LIST(res.data.Data?.content || []));
-    //       dispatch(ONCHANGE_PAGINATION(res.data.Data));
-    //     } else {
-    //       SwalHelper.MiniAlert(res.data.Message, "error");
-    //     }
-    //   })
-    //   .catch(() => {
-    //     SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-    //   })
-    //   .finally(() => {
-    //     setIsLoadingTable(false);
-    //   });
+    vipsService
+      .getListByAdmin(keyWord, status, currentPage - 1, itemPerPage)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          dispatch(ONCHANGE_VIP_LIST(res.data.Data?.content || []));
+          dispatch(ONCHANGE_PAGINATION(res.data.Data));
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        setIsLoadingTable(false);
+      });
   };
   useEffect(() => {
     dispatch(CLEAR_PAGINATION_STATE());
@@ -98,7 +102,7 @@ const ServiceAdminPage = () => {
 
   useEffect(() => {
     fetchListData();
-  }, [keyWord, currentPage]);
+  }, [keyWord, status, currentPage]);
   return (
     <>
       <ModalBase
@@ -145,13 +149,15 @@ const ServiceAdminPage = () => {
       </section>
       <div className="overflow-auto border border-borderColor lg:rounded-lg  mt-2 lg:mt-4">
         <Table
-        // value={tags}
-        // _onClickDelete={_onClickDelete}
-        // _onClickDetail={_onClickDetail}
-        // isLoading={isLoadingTable}
-        // currentPage={currentPage}
-        // itemPerpage={itemPerPage}
-        // isEmpty={isEmpty}
+          value={vips}
+          _onClickDelete={_onClickDelete}
+          _onClickDetail={_onClickDetail}
+          status={status}
+          setStatus={setStatus}
+          isLoading={isLoadingTable}
+          currentPage={currentPage}
+          itemPerpage={itemPerPage}
+          isEmpty={isEmpty}
         />
       </div>
       <div className="w-max mx-auto mt-5">

@@ -417,7 +417,7 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
               Quản lý tài khoản
             </Link>
           </li>
-          {AuthHelper.isEmployer() && (
+          {AuthHelper.isEmployer() && !currentEmployer?.isVip && (
             <li>
               <Link
                 to={PathConstants.EMPLOYER_PATHS.upgrade}
@@ -427,6 +427,19 @@ const DropdownUser: React.FC<DropdownUserProps> = ({
                 }}
               >
                 Nâng cấp tài khoản
+              </Link>
+            </li>
+          )}
+          {AuthHelper.isEmployer() && (
+            <li>
+              <Link
+                to={PathConstants.EMPLOYER_PATHS.checkoutHistory}
+                className="block px-5 py-2.5 text-base font-medium hover:bg-gray-500/10 hover:text-orangetext"
+                onClick={() => {
+                  setDropdownOpen(false);
+                }}
+              >
+                Lịch sử thanh toán
               </Link>
             </li>
           )}
@@ -521,11 +534,11 @@ const Header = (props: {
         </div>
 
         <div className="flex items-center gap-3 lg:gap-6">
-          <ul className="flex items-center gap-2 lg:gap-3">
+          {/* <ul className="flex items-center gap-2 lg:gap-3">
             <DropdownNotification />
 
             <DropdownMessage />
-          </ul>
+          </ul> */}
 
           <DropdownUser
             _onClickChangePassword={_onClickChangePassword}

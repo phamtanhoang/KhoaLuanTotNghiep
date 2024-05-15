@@ -14,10 +14,7 @@ const ScheduleEmployerPage = () => {
     (state: any) => state.scheduleReducer
   );
 
-  const [open, setOpen] = useState(false);
-  const [funcs, setFuncs] = useState<string>("");
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+
   const [userId, setUserId] = useState<string>("");
   const fetchScheduleData = () => {
     context.handleOpenLoading();
@@ -50,14 +47,8 @@ const ScheduleEmployerPage = () => {
 
   return (
     <>
-      {/* <ModalBase
-        open={open}
-        handleClose={handleClose}
-        funcs={funcs}
-        setFuncs={setFuncs}
-        fetchData={fetchScheduleData}
-      /> */}
-      <div className="relative w-full l scale-employer">
+      
+      <div className="relative w-full l scale-employer bg-white">
         <Schedule value={eventList} fetchScheduleData={fetchScheduleData} />
       </div>
     </>

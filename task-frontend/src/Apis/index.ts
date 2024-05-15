@@ -70,6 +70,12 @@ const EmployerAPI = {
   ) => {
     return `/employers?keyword=${keyword}&page=${currentPage}&size=${itemPerPage}`;
   },
+  getTop: (
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/employers/topEmployer?page=${currentPage}&size=${itemPerPage}`;
+  },
 
   employerById: (id?: string) => {
     return `/employers/${id}`;
@@ -294,10 +300,13 @@ const ScheduleAPI = {
     return `/schedule?userId=${id}&fromDate=${fromDate}&toDate=${toDate}`;
   },
 };
-const ServiceAPI = {
+const VipAPI = {
   base: "/vips",
   vipById: (id: string) => {
     return `/vips/${id}`;
+  },
+  getById_Employer: (id: string) => {
+    return `/vips/getVip-employer/${id}`;
   },
   getListByAdmin: (
     name?: string,
@@ -307,12 +316,32 @@ const ServiceAPI = {
   ) => {
     return `/vips/getVips-admin?name=${name}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
   },
-  getListByEmployer: (
+  getListByEmployer: () => {
+    return `/vips/getVips-employer`;
+  },
+  pay: (id: string, bank: string) => {
+    return `/vips/pay?vipId=${id}&&bank=${bank}`;
+  },
+
+  getTrasactions_admin: (
     name?: string,
     currentPage?: number,
     itemPerPage?: number
   ) => {
-    return `/vips/getVips-employer?name=${name}&page=${currentPage}&size=${itemPerPage}`;
+    return `/vips/getTrasactions-admin?name=${name}&page=${currentPage}&size=${itemPerPage}`;
+  },
+  getTrasactionDetail_admin: (id: string) => {
+    return `/vips/getTrasactionDetail-Admin/${id}`;
+  },
+  getTrasactions_employer: (
+    name?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/vips/getTrasactions-employer?name=${name}&page=${currentPage}&size=${itemPerPage}`;
+  },
+  getTrasactionDetail_employer: (id: string) => {
+    return `/vips/getTrasactionDetail-Employer/${id}`;
   },
 };
 export {
@@ -330,5 +359,5 @@ export {
   JobAPI,
   ApplicationAPI,
   ScheduleAPI,
-  ServiceAPI,
+  VipAPI,
 };

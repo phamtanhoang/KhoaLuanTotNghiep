@@ -23,7 +23,7 @@ const EmployerCard: React.FC<EmployerCardProps> = ({
 }) => {
   return (
     <div
-      className="transition-all duration-150 cursor-pointer border rounded-lg w-full"
+      className="transition-all duration-150 cursor-pointer border rounded-lg w-full relative"
       onClick={_onClickDetail}
     >
       <div className="flex flex-col items-stretch duration-150 bg-white rounded-lg  transition-all hover:shadow-lg  focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none">

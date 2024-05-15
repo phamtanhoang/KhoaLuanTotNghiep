@@ -14,6 +14,7 @@ interface SingleDataReducerState {
   tag: TagModel | null;
   application: ApplicationModel | null;
   vip: VipModel | null;
+  trasaction: TrasactionModel | null;
 }
 
 const initialState: SingleDataReducerState = {
@@ -30,6 +31,7 @@ const initialState: SingleDataReducerState = {
   tag: null,
   application: null,
   vip: null,
+  trasaction: null,
 };
 export const listDataReducer = createSlice({
   name: "listDataReducer",
@@ -103,6 +105,12 @@ export const listDataReducer = createSlice({
     ) => {
       state.application = action.payload;
     },
+    ONCHANGE_TRASACTION_SINGLE: (
+      state,
+      action: PayloadAction<TrasactionModel | null>
+    ) => {
+      state.trasaction = action.payload;
+    },
   },
 });
 
@@ -120,6 +128,7 @@ export const {
   ONCHANGE_TAG_SINGLE,
   ONCHANGE_APPLICATION_SINGLE,
   ONCHANGE_VIP_SINGLE,
+  ONCHANGE_TRASACTION_SINGLE,
 } = listDataReducer.actions;
 
 export default listDataReducer.reducer;

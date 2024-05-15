@@ -50,6 +50,12 @@ const PROCEDURE_KEYS = {
 const CHAT_KEYS = {
   chatApplication: "chatApplication",
 };
+const VIP_KEYS = {
+  createVip: "CreateVip",
+  updateVip: "UpdateVip",
+  checkout: "Checkout",
+  detailTransaction: "DetailTransaction",
+};
 export const ModalConstants = {
   COMMON_KEYS,
   AUTH_KEYS,
@@ -62,4 +68,5 @@ export const ModalConstants = {
   CATEGORY_KEYS,
   PROCEDURE_KEYS,
   CHAT_KEYS,
+  VIP_KEYS,
 };

@@ -1,5 +1,7 @@
 package com.pth.taskbackend.service.impl;
 
+import com.pth.taskbackend.model.meta.Employer;
+import com.pth.taskbackend.model.meta.Vip;
 import com.pth.taskbackend.model.meta.VipEmployer;
 import com.pth.taskbackend.repository.VipEmployerRepository;
 import com.pth.taskbackend.service.VipEmployerService;
@@ -9,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,13 +26,19 @@ public class VipEmployerServiceImpl implements VipEmployerService {
     }
 
     @Override
+    public VipEmployer create(LocalDateTime fromDate, LocalDateTime toDate, Long price,
+                              Employer employer, Vip vip,String invoiceId) throws IOException {
+        VipEmployer vipEmployer=new VipEmployer(fromDate, toDate,price,employer,vip, invoiceId);
+        return vipEmployerRepository.save(vipEmployer);
+    }
+    @Override
     public Page<VipEmployer> findByVipId(String vipId, Pageable pageable) throws IOException {
         return null;
     }
 
     @Override
-    public Page<VipEmployer> findByEmployerNameContaining(String name, Pageable pageable) throws IOException {
-        return null;
+    public Page<VipEmployer> findByEmployerNameContaining(String keyword, Pageable pageable) throws IOException {
+        return vipEmployerRepository.findByEmployerNameContaining(keyword, pageable);
     }
 
     @Override
@@ -39,7 +48,7 @@ public class VipEmployerServiceImpl implements VipEmployerService {
 
     @Override
     public Optional<VipEmployer> findById(String id) throws IOException {
-        return Optional.empty();
+        return vipEmployerRepository.findById(id);
     }
 
     @Override
@@ -47,10 +56,7 @@ public class VipEmployerServiceImpl implements VipEmployerService {
         return Optional.empty();
     }
 
-    @Override
-    public VipEmployer create(VipEmployer vipEmployer) throws IOException {
-        return vipEmployerRepository.save(vipEmployer);
-    }
+
 
 
     @Override
@@ -59,8 +65,8 @@ public class VipEmployerServiceImpl implements VipEmployerService {
     }
 
     @Override
-    public Page<VipEmployer> findByEmployerId(String employerId, Pageable pageable) throws IOException {
-        return null;
+    public Page<VipEmployer> findByEmployerId(String employerId,String name, Pageable pageable) throws IOException {
+        return vipEmployerRepository.findByEmployerId(employerId, name, pageable);
     }
 
     @Override
@@ -77,4 +83,5 @@ public class VipEmployerServiceImpl implements VipEmployerService {
     public Long countValidVipEmployers() throws IOException {
         return  vipEmployerRepository.countValidVipEmployers();
     }
+
 }

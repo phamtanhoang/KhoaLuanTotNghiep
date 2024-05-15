@@ -1,43 +1,43 @@
-import { GrFormNextLink } from "react-icons/gr";
 import { useNavigate } from "react-router-dom";
-
+import NON_USER from "@/assets/images/non-user.jpg";
 interface TopEmployerCardProps {
   id: string;
   image: string;
   name: string;
+  description: string;
 }
 
 const TopEmployerCard: React.FC<TopEmployerCardProps> = ({
   id,
   image,
   name,
+  description,
 }) => {
   const navigate = useNavigate();
   const _onClickDetail = () => {
     navigate(`/employers/${id}`);
   };
   return (
-    <div className="flex flex-col gap-2 items-start p-10 lg:p-6 rounded-xl bg-body h-max cursor-grab">
-      <div
-        className="flex gap-1 hover:gap-2 text-[0.9rem] font-lato font-normal cursor-pointer hover:text-orangetext transition-all duration-300"
-        onClick={_onClickDetail}
-      >
-        <span>Xem chi tiết</span>
-        <GrFormNextLink className="text-xl" />
-      </div>
+    <div
+      className="max-w-lg mx-auto bg-white rounded-lg shadow-md p-4 cursor-pointer"
+      onClick={_onClickDetail}
+    >
       <img
-        src={image}
+        className="w-28 h-28 rounded-full mx-auto"
+        src={image ? image : NON_USER}
         alt={name}
-        className="w-full object-contain relative  overflow-hidden rounded bg-blue-gray-500 bg-clip-border text-white shadow-lg shadow-blue-gray-500/40"
       />
-
-      <div
-        className="font-bold text-base uppercase w-full text-center line-clamp-2 cursor-default"
+      <h2
+        className="text-center text-sm font-base font-medium mt-3 uppercase line-clamp-1"
         data-tooltip-id="tooltip"
         data-tooltip-content={name}
       >
         {name}
-      </div>
+      </h2>
+
+      <p className="text-gray-600 mt-2 line-clamp-3 italic text-justify text-sm">
+        {description}
+      </p>
     </div>
   );
 };

@@ -365,20 +365,15 @@ const ApplicationDetail = (props: any) => {
 
         <div className="h-max max-h-[75vh] my-2 mx-1 flex">
           <div className="mr-1 px-3 text-gray-700 flex flex-col gap-4 overflow-auto scrollbar-custom lg:w-[55%]">
-            <div className="content-center flex flex-col gap-2.5 text-sm ">
-              <div className="lg:flex justify-between gap-4 content-center">
-                <div className="content-center w-full">
-                  <label className="font-medium tracking-wide text-sm">
-                    Công việc ứng tuyển
-                  </label>
-                  <input
-                    className="w-full content-center  p-2 mt-1 border rounded focus:outline-none focus:border-orangetext"
-                    type="text"
-                    disabled
-                    value={application?.job?.name}
-                  />
-                </div>
+            <div className="content-center flex flex-col gap-2">
+              <div className="content-center w-full">
+                <label className="font-medium tracking-wide text-base uppercase">
+                  Ứng tuyển vị trí&nbsp;
+                  {application?.job?.name}
+                </label>
               </div>
+            </div>
+            <div className="content-center flex flex-col gap-2.5 text-sm p-2.5 border border-dotted border-orangetext rounded-lg">
               <div className="lg:flex justify-between gap-4 content-center">
                 <div className="content-center w-full">
                   <label className="font-medium tracking-wide text-sm">
@@ -429,14 +424,14 @@ const ApplicationDetail = (props: any) => {
                   </p>
                 </div>
               </div>
-            </div>
-            <div className="content-center">
-              <label className="font-medium tracking-wide">
-                Thư giới thiệu:&nbsp;
-              </label>
+              <div className="content-center">
+                <label className="font-medium tracking-wide">
+                  Thư giới thiệu:&nbsp;
+                </label>
 
-              <div className="text-sm mt-1">
-                <TextEditor value={application?.letter} disabled />
+                <div className="text-sm mt-1">
+                  <TextEditor value={application?.letter} disabled />
+                </div>
               </div>
             </div>
 

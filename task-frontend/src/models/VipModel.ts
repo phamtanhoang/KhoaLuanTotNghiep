@@ -1,5 +1,5 @@
 interface VipModel {
-  id: number;
+  id: string;
   created: Date;
   updated: Date;
   name: string;
@@ -8,5 +8,5 @@ interface VipModel {
   color: string;
   status: string;
   type: string;
-  decription: string;
+  description: string;
 }

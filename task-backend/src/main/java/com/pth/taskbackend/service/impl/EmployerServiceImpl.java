@@ -120,4 +120,9 @@ public class EmployerServiceImpl implements EmployerService {
     public Long countAll() throws IOException {
         return employerRepository.count();
     }
+
+    @Override
+    public Page<Employer> findTopEmployer(Pageable pageable) throws IOException {
+        return employerRepository.findVipEmployers(pageable);
+    }
 }

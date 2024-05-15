@@ -1245,7 +1245,7 @@ public class ApplicationController {
 
             if (Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getUser().getId())
                     || Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getEmployer().getUser().getId())
-                    || Objects.equals(user.getId(), stepSchedule.getApplication().getCandidate().getId())) {
+                    || Objects.equals(user.getId(), stepSchedule.getApplication().getCandidate().getUser().getId())) {
 
                 List<StepResponse> stepResponses;
                 if (stepSchedule.getApplication().getJob().getProcess() != null) {

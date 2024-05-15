@@ -13,76 +13,31 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/free-mode";
 import { FreeMode, Navigation, Pagination } from "swiper/modules";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LoadingContext } from "@/App";
 import { SwalHelper } from "@/utils/helpers";
-import { categoriesService } from "@/services";
+import { categoriesService, employersService } from "@/services";
 import {
   CLEAR_PAGINATION_STATE,
   ONCHANGE_CURRENTPAGE,
   ONCHANGE_PAGINATION,
 } from "@/store/reducers/paginationState";
-import { ONCHANGE_CATEGORY_LIST } from "@/store/reducers/listDataReducer";
-import { EmptyData, Loading } from "@/components/ui";
-
-const employers = [
-  {
-    id: "1",
-    image: "https://source.unsplash.com/random/400x400",
-    name: "Công ty dược phẩm Phúc Long Công ty dược phẩm Phúc Long",
-    jobCount: 3,
-  },
-  {
-    id: "2",
-    image: "https://source.unsplash.com/random/400x400",
-    name: "title2",
-    jobCount: 2,
-  },
-  {
-    id: "3",
-    image: "https://source.unsplash.com/random/400x400",
-    name: "title3",
-    jobCount: 0,
-  },
-  {
-    id: "1",
-    image: "https://source.unsplash.com/random/400x400",
-    name: "title1",
-    jobCount: 3,
-  },
-  {
-    id: "2",
-    image: "https://source.unsplash.com/random/400x400",
-    name: "title2",
-    jobCount: 2,
-  },
-  {
-    id: "3",
-    image: "https://source.unsplash.com/random/400x400",
-    name: "title3",
-    jobCount: 0,
-  },
-  {
-    id: "2",
-    image: "https://source.unsplash.com/random/400x400",
-    name: "title2",
-    jobCount: 2,
-  },
-  {
-    id: "3",
-    image: "https://source.unsplash.com/random/400x400",
-    name: "title3",
-    jobCount: 0,
-  },
-];
+import {
+  ONCHANGE_CATEGORY_LIST,
+  ONCHANGE_EMPLOYER_LIST,
+} from "@/store/reducers/listDataReducer";
+import { EmptyData } from "@/components/ui";
 
 const HomePage: React.FC = () => {
   const context = useContext(LoadingContext);
   const dispatch = useDispatch();
-  const [categories, setCategories] = useState<CategoryModel[]>([]);
+
   const { totalPages, currentPage, isEmpty } = useSelector(
     (state: any) => state.paginationReducer
+  );
+  const { categories, employers } = useSelector(
+    (state: any) => state.listDataReducer
   );
   useEffect(() => {
     dispatch(CLEAR_PAGINATION_STATE());
@@ -94,10 +49,26 @@ const HomePage: React.FC = () => {
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           const cates = categories.concat(res?.data?.Data?.content || []);
-          console.log("categories, ", categories);
-          console.log("cates, ", cates);
-          setCategories(cates);
+          dispatch(ONCHANGE_CATEGORY_LIST(cates));
           dispatch(ONCHANGE_PAGINATION(res.data.Data));
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  };
+  const fetchEmployers = () => {
+    context.handleOpenLoading();
+    employersService
+      .getTop(0, 10)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          dispatch(ONCHANGE_EMPLOYER_LIST(res?.data?.Data?.content || ""));
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -112,11 +83,14 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     fetchCategories();
   }, [currentPage]);
+  useEffect(() => {
+    fetchEmployers();
+  }, []);
 
   return (
     <>
       <Hero />
-      <section className="py-12 lg:py-16">
+      <section className="py-12 lg:py-16 bg-body">
         <div className="px-5 lg:px-28 flex justify-between mb-8">
           <div className="text-center lg:text-left w-full lg:w-[50%]">
             <h1 className="text-3xl lg:text-4xl  font-bold tracking-wider mb-4">
@@ -138,34 +112,40 @@ const HomePage: React.FC = () => {
           </div>
         </div>
 
-        <div className="px-5 lg:px-28">
-          <Swiper
-            className=""
-            modules={[FreeMode, Navigation, Pagination]}
-            direction="horizontal"
-            freeMode={true}
-            navigation={{
-              nextEl: ".button-next-slide",
-              prevEl: ".button-prev-slide",
-            }}
-            breakpoints={{
-              300: { slidesPerView: 1, spaceBetween: 4 },
-              400: { slidesPerView: 2, spaceBetween: 4 },
-              768: { slidesPerView: 3, spaceBetween: 8 },
-              1024: { slidesPerView: 4, spaceBetween: 8 },
-              1280: { slidesPerView: 5, spaceBetween: 8 },
-            }}
-          >
-            {employers.map((item, index) => (
-              <SwiperSlide key={index}>
-                <TopEmployerCard
-                  id={item.id}
-                  image={item.image}
-                  name={item.name}
-                />
-              </SwiperSlide>
-            ))}
-          </Swiper>
+        <div className="px-5 lg:px-28 ">
+          {employers.length === 0 ? (
+            <EmptyData text="Danh sách rỗng..." />
+          ) : (
+            <Swiper
+              className=""
+              modules={[FreeMode, Navigation, Pagination]}
+              direction="horizontal"
+              freeMode={true}
+              navigation={{
+                nextEl: ".button-next-slide",
+                prevEl: ".button-prev-slide",
+              }}
+              breakpoints={{
+                300: { slidesPerView: 1, spaceBetween: 4 },
+                400: { slidesPerView: 2, spaceBetween: 4 },
+                768: { slidesPerView: 3, spaceBetween: 8 },
+                1024: { slidesPerView: 4, spaceBetween: 8 },
+                1280: { slidesPerView: 5, spaceBetween: 8 },
+              }}
+            >
+              {employers.map((item: EmployerModel, index: number) => (
+                <SwiperSlide key={index}>
+                  <TopEmployerCard
+                  
+                    id={item?.id!}
+                    image={item?.image!}
+                    name={item?.name!}
+                    description={item?.description!}
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
         </div>
       </section>
 

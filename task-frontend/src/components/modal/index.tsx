@@ -27,6 +27,7 @@ import {
 import { CreateProcedure, UpdateProcedure } from "./procedure";
 import { ModalConstants } from "@/utils/constants";
 import { ChatApplication } from "./chat";
+import { Checkout, CreateVip, DetailTransaction, UpdateVip } from "./vip";
 
 const ModalBase = (props: any) => {
   // take props
@@ -210,6 +211,18 @@ const ModalBase = (props: any) => {
         _onClickUpDateStep={_onClickUpDateStep}
         handleClose={handleClose}
       />
+    ),
+    [ModalConstants.VIP_KEYS.createVip]: (
+      <CreateVip fetchData={fetchData} handleClose={handleClose} />
+    ),
+    [ModalConstants.VIP_KEYS.updateVip]: (
+      <UpdateVip id={id} fetchData={fetchData} handleClose={handleClose} />
+    ),
+    [ModalConstants.VIP_KEYS.checkout]: (
+      <Checkout id={id} handleClose={handleClose} />
+    ),
+    [ModalConstants.VIP_KEYS.detailTransaction]: (
+      <DetailTransaction id={id} handleClose={handleClose} />
     ),
   };
 

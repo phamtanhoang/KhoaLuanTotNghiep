@@ -6,6 +6,7 @@ import JobAdminPage from "./JobAdminPage";
 import ServiceAdminPage from "./ServiceAdminPage";
 import SigninAdminPage from "./SigninAdminPage";
 import TagsAdminPage from "./TagAdminPage";
+import TrasactionAdminPage from "./TrasactionAdminPage";
 
 export {
   SigninAdminPage,
@@ -16,4 +17,5 @@ export {
   EmployerAdminPage,
   CandidateAdminPage,
   JobAdminPage,
+  TrasactionAdminPage,
 };

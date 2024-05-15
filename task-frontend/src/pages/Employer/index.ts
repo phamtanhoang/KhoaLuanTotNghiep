@@ -8,6 +8,7 @@ import ProcedureEmployerPage from "./ProcedureEmployerPage";
 import ProfileEmployerPage from "./ProfileEmployerPage";
 import ScheduleEmployerPage from "./ScheduleEmployerPage";
 import SigninEmployerPage from "./SigninEmployerPage";
+import TrasactionEmployerPage from "./TrasactionEmployerPage";
 import UpgradeAccountEmployer from "./UpgradeAccountEmployer";
 
 export {
@@ -22,4 +23,5 @@ export {
   HREmployerPage,
   ProfileEmployerPage,
   UpgradeAccountEmployer,
+  TrasactionEmployerPage,
 };

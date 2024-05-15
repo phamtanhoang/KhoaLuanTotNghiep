@@ -1,5 +1,7 @@
 const OTHER_PATHS = {
   all: "*",
+  paymentSuccess: "/payment-success",
+  paymentError: "/payment-error",
 };
 const CANDIDATE_PATHS = {
   default: "/",
@@ -28,6 +30,7 @@ const EMPLOYER_PATHS = {
   schedule: "/employer/schedule",
   chat: "/employer/chat",
   procedure: "/employer/procedure",
+  checkoutHistory: "/employer/checkout-history",
 };
 
 const ADMIN_PATHS = {
@@ -39,6 +42,7 @@ const ADMIN_PATHS = {
   tags: "/admin/tags",
   employers: "/admin/employers",
   candidates: "/admin/candidates",
+  trasaction: "/admin/trasaction",
   services: "/admin/services",
   setting: "/admin/setting",
 };

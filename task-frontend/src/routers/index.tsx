@@ -1,4 +1,9 @@
-import { ErrorPage, ProtectedRoute } from "@/components/ui";
+import {
+  ErrorPage,
+  PaymentError,
+  PaymentSuccess,
+  ProtectedRoute,
+} from "@/components/ui";
 import { AdminLayout, CandidateLayout, EmployerLayout } from "@/layouts";
 import {
   CandidateAdminPage,
@@ -9,6 +14,7 @@ import {
   ServiceAdminPage,
   SigninAdminPage,
   TagsAdminPage,
+  TrasactionAdminPage,
 } from "@/pages/Admin";
 import {
   AppliedJobsPage,
@@ -32,8 +38,10 @@ import {
   ProfileEmployerPage,
   ScheduleEmployerPage,
   SigninEmployerPage,
+  TrasactionEmployerPage,
   UpgradeAccountEmployer,
 } from "@/pages/Employer";
+
 import { PathConstants } from "@/utils/constants";
 import { AuthHelper } from "@/utils/helpers";
 import { useEffect } from "react";
@@ -190,6 +198,10 @@ const Routers = () => {
               path={PathConstants.EMPLOYER_PATHS.upgrade}
               element={<UpgradeAccountEmployer />}
             />
+            <Route
+              path={PathConstants.EMPLOYER_PATHS.checkoutHistory}
+              element={<TrasactionEmployerPage />}
+            />
           </Route>
         </Route>
 
@@ -243,7 +255,28 @@ const Routers = () => {
               path={PathConstants.ADMIN_PATHS.services}
               element={<ServiceAdminPage />}
             />
+            <Route
+              path={PathConstants.ADMIN_PATHS.trasaction}
+              element={<TrasactionAdminPage />}
+            />
           </Route>
+        </Route>
+        <Route
+          element={
+            <ProtectedRoute
+              isAllowed={AuthHelper.isEmployer() || AuthHelper.isCandidate()}
+              redirectTo={PathConstants.OTHER_PATHS.all}
+            />
+          }
+        >
+          <Route
+            path={PathConstants.OTHER_PATHS.paymentSuccess}
+            element={<PaymentSuccess />}
+          />
+          <Route
+            path={PathConstants.OTHER_PATHS.paymentError}
+            element={<PaymentError />}
+          />
         </Route>
 
         <Route path={PathConstants.OTHER_PATHS.all} element={<ErrorPage />} />

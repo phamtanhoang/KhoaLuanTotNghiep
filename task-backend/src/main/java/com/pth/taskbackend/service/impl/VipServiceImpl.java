@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,8 +19,12 @@ public class VipServiceImpl implements VipService {
     @Autowired
     VipRepository vipRepository;
     @Override
-    public Page<Vip> findByNameContainningAndType(String name, EVipStatus status, Pageable pageable) {
+    public Page<Vip> findByNameContainingAndType(String name, EVipStatus status, Pageable pageable) {
         return vipRepository.findByNameContainingAndType(name,status,pageable);
+    }
+    @Override
+    public List<Vip> findByEmployer() {
+        return vipRepository.findByEmployer();
     }
 
     @Override
@@ -39,7 +44,8 @@ public class VipServiceImpl implements VipService {
     }
 
     @Override
-    public void deleteById(String id) {
-        deleteById(id);
+    public void deleteById(Vip vip) {
+        vip.setStatus(EVipStatus.DELETED);
+        vipRepository.save(vip);
     }
 }

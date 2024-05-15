@@ -28,6 +28,9 @@ const employersService = {
       EmployerAPI.getListPublic(name, currentPage, itemPerPage)
     );
   },
+  async getTop(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(EmployerAPI.getTop(currentPage, itemPerPage));
+  },
 
   async update(id: string, status: string) {
     const body = {

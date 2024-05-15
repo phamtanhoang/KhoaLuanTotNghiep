@@ -647,5 +647,43 @@ public class EmployerController {
     }
 
 
+    @Operation(summary = "Get top Employer", description = "", tags = {})
+    @GetMapping("/topEmployer")
+    public ResponseEntity<BaseResponse> getTopEmployer(Pageable pageable) {
+        try {
 
+            Page<Employer> employers = employerService.findTopEmployer(pageable);
+
+            Page<EmployerResponse> employerResponses = employers.map(employer ->
+                    new EmployerResponse(
+                            employer.getId(),
+                            employer.getCreated(),
+                            employer.getUpdated(),
+                            employer.getImage(),
+                            employer.getBackgroundImage(),
+                            employer.getName(),
+                            employer.getLocation(),
+                            employer.getPhoneNumber(),
+                            employer.getBusinessCode(),
+                            employer.getDescription(),
+                            employer.getUser().getEmail(),
+                            employer.getUser().getStatus(),
+                            employer.getUser().getId(),
+                            true
+                    )
+            );
+            if (employers.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách nhà tuyển dụng rỗng", HttpStatus.OK.value(), null)
+                );
+            } else {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách nhà tuyển dụng", HttpStatus.OK.value(), employerResponses)
+                );
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 }

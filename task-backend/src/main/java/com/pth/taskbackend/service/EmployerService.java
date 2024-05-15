@@ -28,4 +28,6 @@ public interface EmployerService {
     void deleteById(String id) throws IOException;
 
     Long countAll()throws IOException;
+
+    Page<Employer>findTopEmployer(Pageable pageable) throws IOException;
 }

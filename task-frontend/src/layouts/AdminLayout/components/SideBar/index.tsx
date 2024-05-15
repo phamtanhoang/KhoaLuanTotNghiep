@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AiFillHome } from "react-icons/ai";
+import { AiFillHome, AiOutlineTransaction } from "react-icons/ai";
 import { BiSolidCategoryAlt } from "react-icons/bi";
 import { FaClipboardList, FaUserGraduate, FaUserTie } from "react-icons/fa";
 import { RiVipDiamondFill } from "react-icons/ri";
@@ -76,7 +76,6 @@ const SideBar: React.FC<SideBarProps> = ({ openSideBar, _onClickOpen }) => {
                 openSideBar={openSideBar}
               />
             </li>
-
             <li>
               <SidebarLinkAdmin
                 link={PathConstants.ADMIN_PATHS.jobs}
@@ -85,7 +84,6 @@ const SideBar: React.FC<SideBarProps> = ({ openSideBar, _onClickOpen }) => {
                 openSideBar={openSideBar}
               />
             </li>
-
             <li>
               <SidebarLinkAdmin
                 link={PathConstants.ADMIN_PATHS.employers}
@@ -104,10 +102,10 @@ const SideBar: React.FC<SideBarProps> = ({ openSideBar, _onClickOpen }) => {
             </li>
             <li>
               <SidebarLinkAdmin
-                link={PathConstants.ADMIN_PATHS.services}
-                name="Gói dịch vụ"
+                link={PathConstants.ADMIN_PATHS.trasaction}
+                name="Giao dịch"
                 icon={
-                  <RiVipDiamondFill className="text-xl lg:text-lg m-auto" />
+                  <AiOutlineTransaction className="text-xl lg:text-lg m-auto" />
                 }
                 openSideBar={openSideBar}
               />
@@ -140,12 +138,22 @@ const SideBar: React.FC<SideBarProps> = ({ openSideBar, _onClickOpen }) => {
             </li>
             <li>
               <SidebarLinkAdmin
+                link={PathConstants.ADMIN_PATHS.services}
+                name="Gói dịch vụ"
+                icon={
+                  <RiVipDiamondFill className="text-xl lg:text-lg m-auto" />
+                }
+                openSideBar={openSideBar}
+              />
+            </li>
+            {/* <li>
+              <SidebarLinkAdmin
                 link={PathConstants.ADMIN_PATHS.setting}
                 name="Thiết lập"
                 icon={<IoMdSettings className="text-2xl lg:text-xl m-auto" />}
                 openSideBar={openSideBar}
               />
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>

@@ -2,65 +2,71 @@ import React from "react";
 import { MdCheck } from "react-icons/md";
 
 interface ServiceItemProps {
-  name: string;
-  description: string;
-  include: { value: string }[];
-  price: number;
+  id?: string;
+  name?: string;
+  description?: string;
+  price?: number;
+  month?: number;
+  color?: string;
+  _onClickCheckout?: () => void;
 }
 
 const ServiceItem: React.FC<ServiceItemProps> = ({
   name,
   description,
-  include,
   price,
+  month,
+  color,
+  _onClickCheckout,
 }) => {
   return (
-    <div className="bg-white mx-auto max-w-2xl lg:rounded-3xl lg:flex lg:max-w-none w-full">
-      <div className="p-6 lg:p-10 lg:flex-auto">
-        <h3 className="text-2xl font-bold tracking-tight text-gray-900">
-          {name}
-        </h3>
-        <p className="mt-4 text-base leading-7 text-gray-600">{description}</p>
-        <div className="mt-6 flex items-center gap-4">
-          <h4 className="flex-none text-sm font-semibold leading-6 text-orangetext">
-            Tiện ích bao gồm
+    <div className=" flex flex-col-reverse lg:flex-row justify-between p-3 lg:p-5 gap-4 lg:rounded-lg bg-white shadow-indigo-50 shadow-md">
+      <div className="w-full lg:w-[calc(100%-10rem)]">
+        <h2 className="text-gray-900 text-lg lg:text-xl font-semibold text-left flex">
+          Giá tiền:&nbsp;&nbsp;
+          <p
+            className="text-xl lg:text-2xl font-bold leading-6 italic"
+            style={{ color: color }}
+          >
+            {price?.toLocaleString()} VNĐ&nbsp;
+            <span className="font-medium text-gray-500">/</span>
+            <span className="font-medium text-base text-gray-500 ">
+              &nbsp;{month} tháng
+            </span>
+          </p>
+        </h2>
+
+        <div className="mt-2 flex items-center gap-4">
+          <h4
+            className="flex-none text-base font-semibold leading-6"
+            style={{ color: color }}
+          >
+            Mô tả dịch vụ
           </h4>
           <div className="h-px flex-auto bg-gray-100"></div>
         </div>
-        <ul className="mt-4 grid grid-cols-1 gap-3 text-sm leading-6 text-gray-600 sm:grid-cols-2 lg:gap-6">
-          {include.map((item, index) => (
-            <li className="flex gap-2" key={index}>
-              <MdCheck className="text-xl text-orangetext my-auto" />
-              {item.value}
-            </li>
-          ))}
-        </ul>
+        <p
+          className=" text-gray-500 text-left mt-1 line-clamp-2 text-base italic"
+          data-tooltip-id="tooltip"
+          data-tooltip-content="Last Transaction"
+        >
+          {description}
+        </p>
+
+        <button
+          className="mt-4 flex justify-start text font-medium px-4 py-2 mt-max  text-white rounded tracking-wider  outline-none items-end"
+          style={{ backgroundColor: color }}
+          onClick={_onClickCheckout}
+        >
+          Thanh toán
+        </button>
       </div>
-      <div className="p-2 lg:w-full lg:max-w-md max-lg:pt-0">
-        <div className="rounded-2xl bg-body py-6 px-10 text-center  lg:flex lg:flex-col lg:justify-center lg:py-10 lg:px-16">
-          <div className="mx-auto max-w-xs">
-            <p className="text-base font-semibold text-gray-600">
-              Thanh toán một lần, sở hữu thả ga
-            </p>
-            <p className="mt-4 flex items-baseline justify-center gap-2">
-              <span className="text-5xl font-bold tracking-tight text-gray-900">
-                {price}
-              </span>
-              <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600">
-                VNĐ
-              </span>
-            </p>
-            <a
-              href="#"
-              className="mt-6 block w-full rounded-md bg-orangetext px-3 py-4 text-center font-semibold text-white hover:bg-orangetext/90"
-            >
-              Thanh toán
-            </a>
-            <p className="mt-4 text-xs leading-5 text-gray-600">
-              Nếu gặp bất cứ vấn đề gì cần hỗ trợ hãy liên hệ với chúng tôi ngay
-              để được hỗ trợ.
-            </p>
-          </div>
+      <div
+        className=" mx-auto w-40 h-40  rounded-full shadow-2xl font-semibold  border-white  border-dashed border-2  flex justify-center items-center "
+        style={{ backgroundColor: color }}
+      >
+        <div>
+          <h1 className="text-white text-2xl ">{name}</h1>
         </div>
       </div>
     </div>

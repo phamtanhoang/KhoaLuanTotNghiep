@@ -14,6 +14,8 @@ import Loading from "./Loading";
 import LoadingSpiner from "./LoadingSpiner";
 import Pagination from "./Pagination";
 import PaginationCustom from "./PaginationCustom";
+import PaymentError from "./PaymentError";
+import PaymentSuccess from "./PaymentSuccess";
 import ProtectedRoute from "./ProtectedRoute";
 import Schedule from "./Schedule";
 import SearchJobs from "./SearchJobs";
@@ -40,4 +42,6 @@ export {
   Hero,
   EmptyData,
   ChatUI,
+  PaymentSuccess,
+  PaymentError
 };

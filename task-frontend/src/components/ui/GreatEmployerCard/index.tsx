@@ -23,10 +23,16 @@ const GreatEmployerCard: React.FC<GreatEmployerCardProps> = ({
         <img src={image ? image : NONE_USER} alt={name} />
       </div>
       <div className="px-6 py-3 pt-0 text-center">
-        <h5 className="mb-1 block font-sans text-lg font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased">
+        <h5
+          className="mb-1 block font-sans uppercase font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased line-clamp-1"
+          data-tooltip-id="tooltip"
+          data-tooltip-content={name}
+        >
           {name}
         </h5>
-        <p className="block font-sans text-[0.9rem] font-normal leading-relaxed text-inherit antialiased line-clamp-2">
+        <p
+          className="block font-sans text-[0.9rem] font-normal leading-relaxed text-inherit antialiased line-clamp-2"
+        >
           {description}
         </p>
       </div>
