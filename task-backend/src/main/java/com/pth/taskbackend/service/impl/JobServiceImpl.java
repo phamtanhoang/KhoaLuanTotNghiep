@@ -184,4 +184,29 @@ public class JobServiceImpl implements JobService {
     public Page<Job> getJobsSaved(String CandidateId, String keyword, String location, Pageable pageable) {
         return jobRepository.getJobsSaved(CandidateId, keyword, location, pageable);
     }
+
+    @Override
+    public Page<Job> getNewJob(Pageable pageable) throws IOException {
+        return jobRepository.findNewJobs(pageable);
+    }
+
+    @Override
+    public Page<Job> findPendingJobs_Employer(String employerId, Pageable pageable) throws java.io.IOException {
+        return jobRepository.findPendingJobs_Employer(employerId, pageable);
+    }
+
+    @Override
+    public Page<Job> findPendingJobs_HR(String hrId, Pageable pageable) throws java.io.IOException {
+        return jobRepository.findPendingJobs_HR(hrId, pageable);
+    }
+
+    @Override
+    public Page<Job> findJobsActive_Employer(String employerId, Pageable pageable) throws java.io.IOException {
+        return jobRepository.findJobsActive_Employer(employerId, pageable);
+    }
+
+    @Override
+    public Page<Job> findJobsActive_HR(String hrId, Pageable pageable) throws java.io.IOException {
+        return jobRepository.findJobsActive_HR(hrId, pageable);
+    }
 }

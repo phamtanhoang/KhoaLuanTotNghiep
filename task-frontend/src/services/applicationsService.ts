@@ -161,5 +161,11 @@ const applicationsService = {
   async deleteStepSchedule(id: string) {
     return await axiosConfig.delete(ApplicationAPI.deleteStepSchedule(id));
   },
+
+  async getPending_Employer(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(
+      ApplicationAPI.getPending_Employer(currentPage, itemPerPage)
+    );
+  },
 };
 export default applicationsService;

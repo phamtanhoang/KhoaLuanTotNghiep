@@ -1,15 +1,19 @@
+import { AuthHelper } from "@/utils/helpers";
 import {
   StatisticsApplications,
   StatisticsCard,
   StatisticsJobs,
 } from "./components";
 import { IoHome } from "react-icons/io5";
+import { FaClipboardList, FaHouseUser } from "react-icons/fa";
+import { MdOutlineContactPage, MdOutlinePendingActions } from "react-icons/md";
+import { useState } from "react";
+import ModalBase from "@/components/modal";
 const statisticsCardsData = [
   {
-    color: "gray",
     icon: <IoHome className="w-full h-full justify-center p-2.5" />,
-    title: "Today's Money",
-    value: "$53k",
+    title: "Số lượng nhân sự",
+    value: "10",
     footer: {
       color: "text-green-500",
       value: "+55%",
@@ -17,7 +21,6 @@ const statisticsCardsData = [
     },
   },
   {
-    color: "gray",
     icon: <IoHome className="w-full h-full justify-center p-2.5" />,
     title: "Today's Users",
     value: "2,300",
@@ -28,7 +31,6 @@ const statisticsCardsData = [
     },
   },
   {
-    color: "gray",
     icon: <IoHome className="w-full h-full justify-center p-2.5" />,
     title: "New Clients",
     value: "3,462",
@@ -39,7 +41,6 @@ const statisticsCardsData = [
     },
   },
   {
-    color: "gray",
     icon: <IoHome className="w-full h-full justify-center p-2.5" />,
     title: "Sales",
     value: "$103,430",
@@ -87,50 +88,96 @@ const applyData = [
 ];
 
 const DashboardPage = () => {
+  const [id, setId] = useState<string>("");
+  const [open, setOpen] = useState<boolean>(false);
+  const [funcs, setFuncs] = useState<string>("");
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   return (
-    <div className="w-full flex flex-col gap-4">
-      <div className="grid gap-2  sm:grid-cols-2 xl:grid-cols-4 max-lg:px-4">
-        {statisticsCardsData.map((item, index) => (
+    <>
+      <ModalBase
+        id={id}
+        open={open}
+        handleClose={handleClose}
+        funcs={funcs}
+        // fetchData={fetchListData}
+      />
+      <div className="w-full flex flex-col gap-4">
+        <div className="grid gap-2  sm:grid-cols-2 xl:grid-cols-4 max-lg:px-4">
+          {/* {statisticsCardsData.map((item, index) => (
+      <StatisticsCard
+        key={index}
+        title={item.title}
+        icon={item.icon}
+        value={item.value}
+        description={
+          <p className="font-normal text-gray-600">
+            <strong className={item.footer.color}>
+              {item.footer.value}
+            </strong>
+            &nbsp;{item.footer.label}
+          </p>
+        }
+      />
+    ))} */}
+          {AuthHelper.isEmployer() && (
+            <StatisticsCard
+              title="Số lượng nhân sự"
+              icon={
+                <FaHouseUser className="w-full h-full justify-center p-2.5" />
+              }
+              value="10"
+            />
+          )}
+
           <StatisticsCard
-            key={index}
-            title={item.title}
-            icon={item.icon}
-            value={item.value}
-            description={
-              <p className="font-normal text-gray-600">
-                <strong className={item.footer.color}>
-                  {item.footer.value}
-                </strong>
-                &nbsp;{item.footer.label}
-              </p>
+            title="Tin đang tuyển"
+            icon={
+              <FaClipboardList className="w-full h-full justify-center p-2.5" />
             }
+            value="5"
           />
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-white p-4 lg:rounded-xl">
-          <StatisticsJobs
-            title="Công việc đang đăng tuyển"
-            link=""
-            type=""
-            value={jobsData}
+          <StatisticsCard
+            title="Tin chưa duyệt"
+            icon={
+              <MdOutlinePendingActions className="w-full h-full justify-center p-2.5" />
+            }
+            value="2"
           />
-        </div>
-        <div className="bg-white p-4 lg:rounded-xl">
-          <StatisticsJobs
-            title="Công việc chưa được duyệt"
-            link=""
-            type=""
-            value={jobsData}
+          <StatisticsCard
+            title="Ứng tuyển chưa duyệt"
+            icon={
+              <MdOutlineContactPage className="w-full h-full justify-center p-2.5" />
+            }
+            value="3"
           />
         </div>
-      </div>
 
-      <div className="w-full lg:rounded-xl bg-white p-4">
-        <StatisticsApplications value={applyData} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="bg-white p-4 lg:rounded-xl">
+            <StatisticsJobs
+              title="Công việc đang đăng tuyển"
+              link=""
+              type=""
+              value={jobsData}
+            />
+          </div>
+          <div className="bg-white p-4 lg:rounded-xl">
+            <StatisticsJobs
+              title="Công việc chưa được duyệt"
+              link=""
+              type=""
+              value={jobsData}
+            />
+          </div>
+        </div>
+
+        <div className="w-full lg:rounded-xl bg-white p-4">
+          <StatisticsApplications />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 export default DashboardPage;

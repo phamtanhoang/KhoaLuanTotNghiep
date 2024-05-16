@@ -70,7 +70,7 @@ const Table: React.FC<TrasactionTableProps> = ({
         <tbody className="bg-white divide-y divide-borderColor">
           {isLoading ? (
             <tr className="bg-white">
-              <td className="py-3 whitespace-no-wrap" colSpan={6}>
+              <td className="py-3 whitespace-no-wrap" colSpan={7}>
                 <Loading />
               </td>
             </tr>
@@ -78,7 +78,7 @@ const Table: React.FC<TrasactionTableProps> = ({
             <>
               {isEmpty ? (
                 <tr className="bg-white">
-                  <td className="py-3 whitespace-no-wrap" colSpan={6}>
+                  <td className="py-3 whitespace-no-wrap" colSpan={7}>
                     <ListEmpty />
                   </td>
                 </tr>

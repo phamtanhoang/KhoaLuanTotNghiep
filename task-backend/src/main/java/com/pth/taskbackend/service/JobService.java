@@ -68,4 +68,11 @@ public interface JobService {
     boolean checkIsSaveJob(String candidateId, String jobId);
 
     Page<Job> getJobsSaved(String CandidateId, String keyword, String location, Pageable pageable) throws  IOException;
+
+    Page<Job> getNewJob(Pageable pageable) throws  IOException;
+
+    Page<Job>findPendingJobs_Employer(String employerId,Pageable pageable)throws  IOException;
+    Page<Job>findPendingJobs_HR(String hrId,Pageable pageable)throws  IOException;
+    Page<Job>findJobsActive_Employer(String employerId,Pageable pageable)throws  IOException;
+    Page<Job>findJobsActive_HR(String hrId,Pageable pageable)throws  IOException;
 }

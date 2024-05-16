@@ -30,7 +30,7 @@ const EMPLOYER_PATHS = {
   schedule: "/employer/schedule",
   chat: "/employer/chat",
   procedure: "/employer/procedure",
-  checkoutHistory: "/employer/checkout-history",
+  checkoutHistory: "/employer/trasaction",
 };
 
 const ADMIN_PATHS = {

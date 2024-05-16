@@ -7,8 +7,35 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/free-mode";
 import { FreeMode, Navigation, Pagination } from "swiper/modules";
+import { useContext, useEffect, useState } from "react";
+import { LoadingContext } from "@/App";
+import { jobsService } from "@/services";
+import { SwalHelper } from "@/utils/helpers";
 
 const GreatJobs = () => {
+  const [jobs, setJobs] = useState<JobModel[]>([]);
+  const context = useContext(LoadingContext);
+  const fetchEmployers = () => {
+    context.handleOpenLoading();
+    jobsService
+      .getTop(0, 10)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          setJobs(res?.data?.Data?.content || "");
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  };
+  useEffect(() => {
+    fetchEmployers();
+  }, []);
   return (
     <section className="py-12 lg:py-16 bg-gray-50">
       <div className="px-5 lg:px-28 flex justify-between mb-8 text-gray-700">
@@ -45,46 +72,16 @@ const GreatJobs = () => {
             1280: { slidesPerView: 4, spaceBetween: 8 },
           }}
         >
-          <SwiperSlide>
-            <GreatJobCard
-              id="1"
-              image="https://source.unsplash.com/random/400x400"
-              name="UI/UX Review Check"
-              employer="Công ty dược phẩm Phúc Long"
-            />
-          </SwiperSlide>
-          <SwiperSlide>
-            <GreatJobCard
-              id="1"
-              image="https://source.unsplash.com/random/400x400"
-              name="UI/UX Review Check"
-              employer="Công ty dược phẩm Phúc Long"
-            />
-          </SwiperSlide>
-          <SwiperSlide>
-            <GreatJobCard
-              id="1"
-              image="https://source.unsplash.com/random/400x400"
-              name="UI/UX Review Check"
-              employer="Công ty dược phẩm Phúc Long"
-            />
-          </SwiperSlide>
-          <SwiperSlide>
-            <GreatJobCard
-              id="1"
-              image="https://source.unsplash.com/random/400x400"
-              name="UI/UX Review Check"
-              employer="Công ty dược phẩm Phúc Long"
-            />
-          </SwiperSlide>
-          <SwiperSlide>
-            <GreatJobCard
-              id="1"
-              image="https://source.unsplash.com/random/400x400"
-              name="UI/UX Review Check"
-              employer="Công ty dược phẩm Phúc Long"
-            />
-          </SwiperSlide>
+          {jobs.map((job: JobModel) => (
+            <SwiperSlide>
+              <GreatJobCard
+                id={job.id!}
+                image={job.employer?.avatar!}
+                name={job.name!}
+                employer={job.employer?.name!}
+              />
+            </SwiperSlide>
+          ))}
         </Swiper>
       </div>
     </section>

@@ -266,20 +266,62 @@ public class ApplicationController {
             }
 
 
-            Page<ApplicationResponse> responseList = pendingApplications.map(application -> new ApplicationResponse(
-                    application.getId(),
-                    application.getCreated(),
-                    application.getCV(),
-                    application.getCurrentStep(),
+            Page<ApplicationResponse> responseList = pendingApplications.map(application -> {
 
-                    application.getEmail(),
-                    application.getFullName(),
-                    application.getLetter(),
-                    application.getPhoneNumber(),
-                    application.getStatus(),
-                    null,null
-            ));
+                CandidateResponse candidateResponse = new CandidateResponse(
+                        application.getCandidate().getId(),
+                        application.getCandidate().getCreated(),
+                        application.getCandidate().getUpdated(),
+                        application.getCandidate().getFirstName(),
+                        application.getCandidate().getLastName(),
+                        application.getCandidate().getPhoneNumber(),
+                        application.getCandidate().getSex(),
+                        application.getCandidate().getAvatar(),
+                        application.getCandidate().getDateOfBirth(),
+                        application.getCandidate().getIntroduction(),
+                        application.getCandidate().getJob(),
+                        application.getCandidate().getLink(),
+                        application.getCandidate().getIsFindJob(),
+                        application.getCandidate().getUser().getStatus(),
+                        application.getCandidate().getUser().getEmail(),
+                        application.getCandidate().getUser().getId()
+                );
+                JobResponse jobResponse = new JobResponse(
+                        application.getJob().getId(),
+                        application.getJob().getCreated(),
+                        application.getJob().getUpdated(),
+                        application.getJob().getToDate(),
+                        application.getJob().getName(),
+                        application.getJob().getDescription(),
+                        application.getJob().getExperience(),
+                        application.getJob().getFromSalary(),
+                        application.getJob().getToSalary(),
+                        application.getJob().getLocation(),
+                        application.getJob().getStatus(),
+                        false,
+                        false,
+                        DateFunc.isExpired(application.getJob().getToDate()),
+                        true,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                );
 
+                return new ApplicationResponse(
+                        application.getId(),
+                        application.getCreated(),
+                        application.getCV(),
+                        application.getCurrentStep(),
+                        application.getEmail(),
+                        application.getFullName(),
+                        application.getLetter(),
+                        application.getPhoneNumber(),
+                        application.getStatus(),
+                        candidateResponse,jobResponse
+                );
+            });
 
             return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc đang đợi duyệt", HttpStatus.OK.value(), responseList));
 

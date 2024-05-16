@@ -101,7 +101,7 @@ const TrasactionEmployerPage = () => {
             <input
               type="text"
               placeholder="Nhập từ khóa..."
-              className="block w-full py-2 pr-5 text-gray-700 bg-white border border-gray-200 rounded-lg lg:w-80 placeholder-gray-400/70 pl-11 rtl:pr-11 rtl:pl-5 focus:border-bgBlue focus:ring-bgBlue/20 focus:outline-none focus:ring focus:ring-opacity-40"
+              className="block w-full py-2 pr-5 text-gray-700 bg-white border border-gray-200 rounded-lg lg:w-80 placeholder-gray-400/70 pl-11 rtl:pr-11 rtl:pl-5 focus:border-orangetext"
               value={keyWord}
               onChange={(e) => setKeyWord(e.target.value)}
             />

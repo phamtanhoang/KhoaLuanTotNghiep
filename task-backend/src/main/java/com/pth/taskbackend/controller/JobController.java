@@ -303,26 +303,8 @@ public class JobController {
     }
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("/getVipJobs")
-    public ResponseEntity<BaseResponse> getVipJobs(@RequestHeader(value = "Authorization",required = false)String token,
-                                                Pageable pageable) {
+    public ResponseEntity<BaseResponse> getVipJobs(Pageable pageable) {
         try {
-            Optional<Candidate> optionalCandidate;
-
-            if(token!=null) {
-                String email = jwtService.extractUsername(token.substring(7));
-                boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
-                if (permission){
-                    optionalCandidate = candidateService.findByUserEmail(email);
-                    if (optionalCandidate.isEmpty())
-                        return ResponseEntity.ok(
-                                new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
-                        );
-                }else{
-                    optionalCandidate = null;
-                }
-            } else {
-                optionalCandidate = null;
-            }
 
             Page<Job> jobs = jobService.findVipJob(pageable);
             if (jobs.isEmpty()) {
@@ -331,30 +313,6 @@ public class JobController {
                 );
             } else {
                 List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
-                    List<StepResponse> stepResponses;
-
-                    if (job.getProcess() != null) {
-                        Page<Step> steps = stepService.findByProcessId(job.getProcess().getId(),null);
-
-                        List<Step> stepList = steps.getContent();
-
-                        stepResponses = stepList.stream()
-                                .map(step -> new StepResponse(
-                                        step.getId(),
-                                        step.getName(),
-                                        step.getNumber(),
-                                        step.getDescription(),
-                                        step.getProcess() != null ? step.getProcess().getId() : null
-                                ))
-                                .collect(Collectors.toList());
-                    } else {
-                        stepResponses = Collections.emptyList();
-                    }
-                    List<com.pth.taskbackend.model.meta.Tag> tagList = tagService.findByJobId(job.getId(), null).toList();
-
-                    JobCategoryResponse categoryResponse = new JobCategoryResponse(
-                            job.getCategory()!=null ? job.getCategory().getId():null,
-                            job.getCategory()!=null ? job.getCategory().getName():null);
 
                     JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
                             job.getHumanResource().getEmployer().getName(),
@@ -362,17 +320,6 @@ public class JobController {
                             job.getHumanResource().getEmployer().getUser().getEmail(),
                             job.getHumanResource().getEmployer().getImage(),
                             job.getHumanResource().getEmployer().getPhoneNumber());
-
-                    JobProcessResponse jobProcessResponse = new JobProcessResponse(
-                            job.getProcess() != null ? job.getProcess().getId() : null,
-                            job.getProcess() != null ? job.getProcess().getName() : null,
-                            stepResponses
-                    );
-
-                    JobHrResponse jobHrResponse = new JobHrResponse(
-                            job.getHumanResource().getId(),
-                            job.getHumanResource().getFirstName() + " " + job.getHumanResource().getLastName()
-                    );
 
 
                     return new JobResponse(
@@ -388,14 +335,14 @@ public class JobController {
                             job.getLocation(),
                             job.getStatus(),
                             true,
-                            optionalCandidate != null && (optionalCandidate.filter(candidate -> jobService.findByCandidateIdAndJobId(candidate.getId(), job.getId()).isPresent()).isPresent()),
+                            false,
                             DateFunc.isExpired(job.getToDate()),
-                            optionalCandidate != null && (optionalCandidate.filter(value -> applicationService.findByJobIdAndCandidateId(job.getId(), value.getId()).isPresent()).isPresent()),
-                            categoryResponse,
+                            false,
+                            null,
                             jobEmployerResponse,
-                            jobHrResponse,
-                            jobProcessResponse,
-                            tagList
+                            null,
+                            null,
+                            null
                     );
                 }).collect(Collectors.toList());
 
@@ -414,30 +361,31 @@ public class JobController {
 
     }
     @Operation(summary = "Get top Jobs", description = "", tags = {})
-    @GetMapping("/topJobs")
+    @GetMapping("/top-jobs")
     public ResponseEntity<BaseResponse> getTopJobs(Pageable pageable) {
         try {
-            Page<Object[]> objects = jobService.findActiveJobsWithApplicationCount(pageable);
-            if (objects.isEmpty()) {
+            Page<Object[]> jobs = jobService.findActiveJobsWithApplicationCount(pageable);
+            if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
                 );
             } else {
-                List<TopJobResponse> topJobResponses = objects.stream().map(result -> {
+                List<TopJobResponse> topJobResponses = jobs.stream().map(result -> {
                     Job job = (Job) result[0];
-                    Long count = (Long) result[1];
+                    Long applicationCount = (Long) result[1];
                     return new TopJobResponse(
                             job.getId(),
                             job.getName(),
                             job.getHumanResource().getEmployer().getId(),
                             job.getHumanResource().getEmployer().getName(),
                             job.getHumanResource().getEmployer().getImage(),
-                            count
+                            applicationCount
                     );
                 }).collect(Collectors.toList());
 
+                Page<TopJobResponse> jobResponsePage = new PageImpl<>(topJobResponses, jobs.getPageable(), jobs.getTotalElements());
                 return ResponseEntity.ok(
-                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), topJobResponses)
+                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobResponsePage)
                 );
             }
         } catch (Exception e) {
@@ -1623,6 +1571,7 @@ public class JobController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }@Operation(summary = "update status", description = "", tags = {})
+
     @PatchMapping("/updateStatus-employer/{id}")
     public ResponseEntity<BaseResponse> updateJobStatusByEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody  String status) {
         try {
@@ -2020,6 +1969,202 @@ public class JobController {
                 );
 
             }
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "get new job", description = "", tags = {})
+    @GetMapping("/new-jobs")
+    public ResponseEntity<BaseResponse> getNewJobs(Pageable pageable) {
+        try {
+
+            Page<Job> jobs = jobService.getNewJob(pageable);
+            if (jobs.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
+                );
+            } else {
+                List<HomeJobResponse> jobResponses = jobs.getContent().stream().map(job -> {
+                    return new HomeJobResponse(
+                            job.getId(),
+                            job.getCreated(),
+                            job.getUpdated(),
+                            job.getName(),
+                            job.getHumanResource().getEmployer()
+                    );
+                }).collect(Collectors.toList());
+
+                Page<HomeJobResponse> jobResponsePage = new PageImpl<>(jobResponses, jobs.getPageable(), jobs.getTotalElements());
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobResponsePage)
+                );
+
+            }
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "get active job", description = "", tags = {})
+    @GetMapping("/getActive-jobs")
+    public ResponseEntity<BaseResponse> getActiveJob(@RequestHeader("Authorization") String token,Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            if (ERole.EMPLOYER == optionalUser.get().getRole()){
+                Optional<Employer> employer = employerService.findByUserEmail(optionalUser.get().getEmail());
+                if(employer.isEmpty()){
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm thấy nhà tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
+                    );
+                };
+                Page<Job> jobs = jobService.findJobsActive_Employer(employer.get().getId(), pageable);
+
+                List<HomeJobResponse> jobResponses = jobs.getContent().stream().map(job -> {
+                    return new HomeJobResponse(
+                            job.getId(),
+                            job.getCreated(),
+                            job.getUpdated(),
+                            job.getName(),
+                            job.getHumanResource().getEmployer()
+                    );
+                }).collect(Collectors.toList());
+
+                Page<HomeJobResponse> jobResponsePage = new PageImpl<>(jobResponses, jobs.getPageable(), jobs.getTotalElements());
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobResponsePage)
+                );
+            }else if (ERole.HR == optionalUser.get().getRole()){
+                Optional<HumanResource> humanResource = humanResourceService.findByEmail(optionalUser.get().getEmail());
+                if(humanResource.isEmpty()){
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm thấy nhà tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
+                    );
+                };
+                Page<Job> jobs = jobService.findJobsActive_HR(humanResource.get().getId(), pageable);
+
+                List<HomeJobResponse> jobResponses = jobs.getContent().stream().map(job -> {
+                    return new HomeJobResponse(
+                            job.getId(),
+                            job.getCreated(),
+                            job.getUpdated(),
+                            job.getName(),
+                            job.getHumanResource().getEmployer()
+                    );
+                }).collect(Collectors.toList());
+
+                Page<HomeJobResponse> jobResponsePage = new PageImpl<>(jobResponses, jobs.getPageable(), jobs.getTotalElements());
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobResponsePage)
+                );
+            }else{
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }
+
+
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "get pending job", description = "", tags = {})
+    @GetMapping("/getPending-jobs")
+    public ResponseEntity<BaseResponse> getJobPending(@RequestHeader("Authorization") String token,Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            if (ERole.EMPLOYER == optionalUser.get().getRole()){
+                Optional<Employer> employer = employerService.findByUserEmail(optionalUser.get().getEmail());
+                if(employer.isEmpty()){
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm thấy nhà tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
+                    );
+                };
+                Page<Job> jobs = jobService.findPendingJobs_Employer(employer.get().getId(), pageable);
+
+                List<HomeJobResponse> jobResponses = jobs.getContent().stream().map(job -> {
+                    return new HomeJobResponse(
+                            job.getId(),
+                            job.getCreated(),
+                            job.getUpdated(),
+                            job.getName(),
+                            job.getHumanResource().getEmployer()
+                    );
+                }).collect(Collectors.toList());
+
+                Page<HomeJobResponse> jobResponsePage = new PageImpl<>(jobResponses, jobs.getPageable(), jobs.getTotalElements());
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobResponsePage)
+                );
+            }else if (ERole.HR == optionalUser.get().getRole()){
+                Optional<HumanResource> humanResource = humanResourceService.findByEmail(optionalUser.get().getEmail());
+                if(humanResource.isEmpty()){
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm thấy nhà tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
+                    );
+                };
+                Page<Job> jobs = jobService.findPendingJobs_HR(humanResource.get().getId(), pageable);
+
+                List<HomeJobResponse> jobResponses = jobs.getContent().stream().map(job -> {
+                    return new HomeJobResponse(
+                            job.getId(),
+                            job.getCreated(),
+                            job.getUpdated(),
+                            job.getName(),
+                            job.getHumanResource().getEmployer()
+                    );
+                }).collect(Collectors.toList());
+
+                Page<HomeJobResponse> jobResponsePage = new PageImpl<>(jobResponses, jobs.getPageable(), jobs.getTotalElements());
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobResponsePage)
+                );
+            }else{
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }
+
+
 
         }catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

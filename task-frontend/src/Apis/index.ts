@@ -70,10 +70,7 @@ const EmployerAPI = {
   ) => {
     return `/employers?keyword=${keyword}&page=${currentPage}&size=${itemPerPage}`;
   },
-  getTop: (
-    currentPage?: number,
-    itemPerPage?: number
-  ) => {
+  getTop: (currentPage?: number, itemPerPage?: number) => {
     return `/employers/topEmployer?page=${currentPage}&size=${itemPerPage}`;
   },
 
@@ -234,6 +231,15 @@ const JobAPI = {
   ) => {
     return `/jobs/getJobs/${id}?name=${name}&location=${location}&page=${currentPage}&size=${itemPerPage}`;
   },
+  getNewJobs: (currentPage?: number, itemPerPage?: number) => {
+    return `/jobs/new-jobs?page=${currentPage}&size=${itemPerPage}`;
+  },
+  getTopJobs: (currentPage?: number, itemPerPage?: number) => {
+    return `/jobs/top-jobs?page=${currentPage}&size=${itemPerPage}`;
+  },
+  getTop: (currentPage?: number, itemPerPage?: number) => {
+    return `/jobs/getVipJobs?page=${currentPage}&size=${itemPerPage}`;
+  },
 };
 
 const ApplicationAPI = {
@@ -293,6 +299,10 @@ const ApplicationAPI = {
   },
   deleteStepSchedule: (id?: string) => {
     return `/applications/deleteStepSchedule/${id}`;
+  },
+
+  getPending_Employer: (currentPage?: number, itemPerPage?: number) => {
+    return `/applications/pendingApplications-employer?page=${currentPage}&size=${itemPerPage}`;
   },
 };
 const ScheduleAPI = {

@@ -1,11 +1,33 @@
 import BANNER1 from "@/assets/images/banner1.png";
 import { TopJobCard } from "..";
-import { GrFormNextLink } from "react-icons/gr";
-import { PathConstants } from "@/utils/constants";
-import { useNavigate } from "react-router-dom";
+import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
+import { useEffect, useState } from "react";
+import { jobsService } from "@/services";
+import { SwalHelper } from "@/utils/helpers";
 
 const PopularJobs = () => {
-  const navigate = useNavigate();
+  const [jobs, setJobs] = useState<any[]>([]);
+  const itemPerPage = 6;
+  const [page, setPage] = useState<number>(0);
+  const [isFirst, setIsFirst] = useState<boolean>(true);
+  const [isLast, setIsLast] = useState<boolean>(false);
+  useEffect(() => {
+    jobsService
+      .getTopJobs(page, itemPerPage)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          setJobs(res.data.Data.content || []);
+          setIsFirst(res.data.Data.first);
+          setIsLast(res.data.Data.last);
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {});
+  }, [page]);
   return (
     <section className="w-full bg-orangebackground pb-10">
       <div className="lg:w-[90%] mx-auto flex items-center lg:flex-row lg:mt-0 mb- flex-col-reverse">
@@ -20,53 +42,44 @@ const PopularJobs = () => {
             </p>
 
             <div className="mt-5 grid grid-cols-1 lg:grid-cols-2 gap-2">
-              <TopJobCard
-                id="1"
-                image="https://source.unsplash.com/random/400x400"
-                name="Lập trình viên Front-end"
-                employer="Google"
-              />
-              <TopJobCard
-                id="1"
-                image="https://source.unsplash.com/random/400x400"
-                name="Lập trình viên Front-end"
-                employer="Google"
-              />
-              <TopJobCard
-                id="1"
-                image="https://source.unsplash.com/random/400x400"
-                name="Lập trình viên Front-end"
-                employer="Google"
-              />
-              <TopJobCard
-                id="1"
-                image="https://source.unsplash.com/random/400x400"
-                name="Lập trình viên Front-end"
-                employer="Google"
-              />
-              <TopJobCard
-                id="1"
-                image="https://source.unsplash.com/random/400x400"
-                name="Lập trình viên Front-end"
-                employer="Google"
-              />
-              <TopJobCard
-                id="1"
-                image="https://source.unsplash.com/random/400x400"
-                name="Lập trình viên Front-end"
-                employer="Google"
-              />
+              {jobs.map((job: any) => (
+                <TopJobCard
+                  id={job.id!}
+                  image={job.image!}
+                  name={job.name!}
+                  employer={job.employerName!}
+                />
+              ))}
             </div>
-            <div className="relative w-max text-center overflow-hidden">
-              <p
-                className="text-[0.9rem] font-lato font-normal pb-2 flex items-center gap-1 hover:gap-2 mt-4 text-gray-700 hover:text-orangetext transition-all duration-300 cursor-pointer relative before:absolute before:w-full before:h-0.5 before:bg-orangetext before:-left-36 before:bottom-0 before:opacity-0 hover:before:left-0 hover:before:opacity-100 hover:before:transition-all hover:before:duration-500"
-                onClick={() => {
-                  navigate(PathConstants.CANDIDATE_PATHS.jobs);
-                }}
-              >
-                <span className="">Xem thêm</span>{" "}
-                <GrFormNextLink className="text-xl" />
-              </p>
+            <div className="relative w-full text-center flex justify-between">
+              <div>
+                {!isFirst && (
+                  <p
+                    className="text-[0.9rem] font-lato font-normal pb-2 flex items-center gap-1 hover:gap-2 mt-4 text-gray-700 hover:text-orangetext transition-all duration-300 cursor-pointer relative before:absolute before:w-full before:h-0.5 before:bg-orangetext before:-left-36 before:bottom-0 before:opacity-0 hover:before:left-0 hover:before:opacity-100 hover:before:transition-all hover:before:duration-500"
+                    onClick={() => {
+                      setPage(page - 1);
+                    }}
+                  >
+                    <GrFormPreviousLink className="text-xl" />
+                    &nbsp;
+                    <span className="">Trước</span>
+                  </p>
+                )}
+              </div>
+              <div>
+                {!isLast && (
+                  <p
+                    className="text-[0.9rem] font-lato font-normal pb-2 flex items-center gap-1 hover:gap-2 mt-4 text-gray-700 hover:text-orangetext transition-all duration-300 cursor-pointer relative before:absolute before:w-full before:h-0.5 before:bg-orangetext before:-left-36 before:bottom-0 before:opacity-0 hover:before:left-0 hover:before:opacity-100 hover:before:transition-all hover:before:duration-500"
+                    onClick={() => {
+                      setPage(page + 1);
+                    }}
+                  >
+                    <span className="">Sau</span>
+                    &nbsp;
+                    <GrFormNextLink className="text-xl" />
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>

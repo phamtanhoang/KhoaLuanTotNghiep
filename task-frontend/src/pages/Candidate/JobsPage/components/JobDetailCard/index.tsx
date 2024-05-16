@@ -276,9 +276,9 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
               <div className="mx-5 border-b-2 border-borderColor border-dashed"></div>
               <div className="mx-5 flex flex-col gap-3">
                 <label className="text-base font-semibold uppercase">
-                  Mô tả công việc
+                  Thông tin chi tiết{" "}
                 </label>
-                <div className="mt-1 text-sm">
+                <div className="text-sm">
                   {parse(description || "", TextHelper.OptionParses)}
                 </div>
               </div>

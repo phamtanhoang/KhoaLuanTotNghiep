@@ -21,25 +21,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job, String> {
-    //    @Query("SELECT j FROM Job j " +
-//            "INNER JOIN j.humanResource hr " +
-//            "INNER JOIN hr.employer e " +
-//            "LEFT JOIN j.tags jt " +
-//            "WHERE (:keyword IS NULL OR " +
-//            "       (LOWER(j.name) LIKE %:keyword% " +
-//            "       OR LOWER(j.description) LIKE %:keyword% " +
-//            "       OR LOWER(e.name) LIKE %:keyword%)) " +
-//            "AND (:experience IS NULL OR :experience = '' OR j.experience = :experience) " +
-//            "AND (:location IS NULL OR :location = '' OR LOWER(j.location) LIKE %:location%) " +
-//            "AND (COALESCE(:categoryId, '') = '' OR j.category.id = :categoryId) " +
-//            "AND j.status = 'ACTIVE' " +
-//            "AND j.toDate > CURRENT_TIMESTAMP " +
-//            "AND (:fromDate IS NULL OR j.created >= :fromDate) " +
-//            "AND (:tag IS NULL OR :tag = '' OR jt.id = :tag) " +
-//            "AND (:isVip IS NULL  OR  :isVip = false OR e IN (SELECT DISTINCT e FROM Employer e " +
-//            "JOIN VipEmployer v ON e.id = v.employer.id " +
-//            "WHERE DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE())) " +
-//            "ORDER BY j.created DESC")
     @Query("SELECT j FROM Job j " +
             "WHERE (:keyword IS NULL OR LOWER(j.name) LIKE CONCAT('%', :keyword, '%')) " +
             "AND (:location IS NULL OR LOWER(j.location) LIKE CONCAT('%', :location, '%')) " +
@@ -206,7 +187,8 @@ public interface JobRepository extends JpaRepository<Job, String> {
     @Query("SELECT j, (SELECT COUNT(a) FROM Application a WHERE a.job.id = j.id) AS applicationCount " +
             "FROM Job j " +
             "WHERE j.status = 'ACTIVE' " +
-            "ORDER BY j.created DESC")
+            "AND j.toDate > CURRENT_TIMESTAMP " +
+            "ORDER BY applicationCount DESC, j.created DESC")
     Page<Object[]> findActiveJobsWithApplicationCount(Pageable pageable);
 
     @Query("SELECT COUNT(e) FROM Job e")
@@ -241,5 +223,34 @@ public interface JobRepository extends JpaRepository<Job, String> {
                            @Param("keyword") String keyword,
                            @Param("location") String location,
                            Pageable pageable);
+
+    @Query("SELECT j FROM Job j " +
+            "WHERE j.status = 'ACTIVE' " +
+            "AND j.toDate > CURRENT_TIMESTAMP " +
+            "ORDER BY j.created DESC")
+    Page<Job> findNewJobs(Pageable pageable);
+
+    @Query("SELECT j FROM Job j " +
+            "WHERE j.status = 'PENDING'  " +
+            "And j.humanResource.employer.id=:employerId " +
+            "ORDER BY j.created DESC")
+    Page<Job> findPendingJobs_Employer(String employerId, Pageable pageable);
+    @Query("SELECT j FROM Job j " +
+            "WHERE j.status = 'PENDING'  " +
+            "And j.humanResource.id=:hrId " +
+            "ORDER BY j.created DESC")
+    Page<Job> findPendingJobs_HR(String hrId, Pageable pageable);
+    @Query("SELECT j FROM Job j " +
+            "WHERE j.status = 'ACTIVE'  " +
+            "And j.humanResource.employer.id=:employerId " +
+            "AND j.toDate > CURRENT_TIMESTAMP " +
+            "ORDER BY j.created DESC")
+    Page<Job> findJobsActive_Employer(String employerId, Pageable pageable);
+    @Query("SELECT j FROM Job j " +
+            "WHERE j.status = 'ACTIVE'  " +
+            "And j.humanResource.id=:hrId " +
+            "AND j.toDate > CURRENT_TIMESTAMP " +
+            "ORDER BY j.created DESC")
+    Page<Job> findJobsActive_HR(String hrId, Pageable pageable);
 }
 

@@ -142,5 +142,15 @@ const jobsService = {
       headers: { "Content-Type": "application/json" },
     });
   },
+
+  async getNewJobs(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(JobAPI.getNewJobs(currentPage, itemPerPage));
+  },
+  async getTopJobs(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(JobAPI.getTopJobs(currentPage, itemPerPage));
+  },
+  async getTop(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(JobAPI.getTop(currentPage, itemPerPage));
+  },
 };
 export default jobsService;

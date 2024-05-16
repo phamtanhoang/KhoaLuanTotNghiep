@@ -5,7 +5,6 @@ interface GreatJobCardProps {
   image: string;
   name: string;
   employer: string;
-
 }
 
 const GreatJobCard: React.FC<GreatJobCardProps> = ({
@@ -20,14 +19,22 @@ const GreatJobCard: React.FC<GreatJobCardProps> = ({
   };
   return (
     <div className="relative flex h-max flex-col rounded-xl bg-white bg-clip-border text-gray-700 cursor-grab">
-      <div className="relative mx-auto my-8 w-[120px] h-[120px] overflow-hidden rounded-xl bg-blue-gray-500 bg-clip-border text-white shadow-lg shadow-blue-gray-500/40">
+      <div className="relative mx-auto my-8 w-[100px] h-[100px] overflow-hidden rounded-xl bg-blue-gray-500 bg-clip-border text-white shadow-lg shadow-blue-gray-500/40">
         <img src={image ? image : NONE_USER} alt={name} />
       </div>
       <div className="px-6 py-3 pt-0 text-center">
-        <h5 className="mb-1 block font-sans text-xl font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased">
+        <h5
+          className="mb-1 block font-sans text-lg uppercase font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased truncate"
+          data-tooltip-id="tooltip"
+          data-tooltip-content={name}
+        >
           {name}
         </h5>
-        <p className="block font-sans text-base font-light leading-relaxed text-inherit antialiased">
+        <p
+          className="block font-sans text-base font-light leading-relaxed text-inherit antialiased truncate"
+          data-tooltip-id="tooltip"
+          data-tooltip-content={employer}
+        >
           {employer}
         </p>
       </div>
