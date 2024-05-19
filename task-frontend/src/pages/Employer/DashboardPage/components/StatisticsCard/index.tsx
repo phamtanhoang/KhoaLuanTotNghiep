@@ -13,8 +13,8 @@ const StatisticsCard: React.FC<StatisticsCardProps> = ({
   description,
 }) => {
   return (
-    <div className="border border-borderColor shadow-sm bg-white rounded-xl">
-      <div className="flex justify-between p-4">
+    <div className="border border-borderColor shadow-sm bg-white rounded-xl ">
+      <div className="flex justify-between p-4 gap-3">
         <div className="h-16 w-16 place-items-center bg-orangetext rounded-xl text-white">
           {icon}
         </div>

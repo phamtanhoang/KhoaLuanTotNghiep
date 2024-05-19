@@ -88,5 +88,11 @@ const employersService = {
       headers: { "Content-Type": "application/json" },
     });
   },
+
+  async getPendingEmployer_Admin(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(
+      EmployerAPI.getPendingEmployer_Admin(currentPage, itemPerPage)
+    );
+  },
 };
 export default employersService;

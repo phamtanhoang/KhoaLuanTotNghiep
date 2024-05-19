@@ -55,4 +55,6 @@ public interface CandidateRepository extends JpaRepository<Candidate, String> {
 //            "And a.status='ACTIVE'")
 //    Page<Candidate> findVipCandidates(Pageable pageable);
 
+    @Query("SELECT COUNT(c) FROM Candidate c WHERE c.user.status != 'DELETED'")
+    Integer countCandidate_Admin();
 }

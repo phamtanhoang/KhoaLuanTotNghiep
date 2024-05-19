@@ -31,7 +31,7 @@ const ShareCard = () => {
       <CiLink className="text-3xl" />
       <input
         id="urlInput"
-        className="w-full outline-none bg-transparent truncate"
+        className="w-full outline-none bg-transparent truncate mr-2"
         type="text"
         placeholder="link"
         value={currentUrl}
@@ -39,7 +39,7 @@ const ShareCard = () => {
       />
 
       <button
-        className="w-max py-1 px-2.5 text-white rounded lg:rounded-md flex  justify-center items-center min-w-max outline-none relative overflow-hidden duration-300 ease-linear
+        className="w-max py-1 px-2.5 text-white rounded flex  justify-center items-center min-w-max outline-none relative overflow-hidden duration-300 ease-linear
                     after:absolute after:inset-x-0 after:aspect-square after:scale-0 after:opacity-70 after:origin-center after:duration-300 after:ease-linear after:rounded-full after:top-0 after:left-0 after:bg-orange-500 hover:after:opacity-100 hover:after:scale-[2.5] bg-orangetext border-transparent hover:border-orange-500"
         onClick={_onClickCopyClick}
       >

@@ -125,4 +125,21 @@ public class EmployerServiceImpl implements EmployerService {
     public Page<Employer> findTopEmployer(Pageable pageable) throws IOException {
         return employerRepository.findVipEmployers(pageable);
     }
+
+    @Override
+    public Page<Employer> findPendingEmployer_admin(Pageable pageable) throws IOException {
+        return employerRepository.findPendingEmployer_ADMIN(pageable);
+    }
+
+    @Override
+    public Integer countEmployer_Admin() {
+        return employerRepository.countEmployer_Admin();
+    }
+
+    @Override
+    public Integer countEmployerVip_Admin() {
+        return employerRepository.countEmployerVip_Admin();
+    }
+
+
 }

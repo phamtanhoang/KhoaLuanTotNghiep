@@ -133,5 +133,12 @@ public interface ApplicationRepository extends JpaRepository<Application, String
     Optional<Application>findByIdAndCandidateId(String id, String candidateId);
     Optional<Application>findByIdAndJobHumanResourceEmployerId(String id, String employerId);
 
-
+    @Query("SELECT COUNT(app) FROM Application app " +
+            "WHERE app.status = 'PENDING' " +
+            "And app.job.humanResource.employer.id=:id")
+    Integer countApplicationPending_Employer(String id);
+    @Query("SELECT COUNT(app) FROM Application app " +
+            "WHERE app.status = 'PENDING' " +
+            "And app.job.humanResource.id=:id ")
+    Integer countApplicationPending_HR(String id);
 }

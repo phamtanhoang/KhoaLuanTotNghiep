@@ -65,7 +65,7 @@ const RecentJobs = () => {
                     }}
                   >
                     <GrFormPreviousLink className="text-xl" />
-                    &nbsp;
+
                     <span className="">Trước</span>
                   </p>
                 )}
@@ -79,7 +79,7 @@ const RecentJobs = () => {
                     }}
                   >
                     <span className="">Sau</span>
-                    &nbsp;
+    
                     <GrFormNextLink className="text-xl" />
                   </p>
                 )}

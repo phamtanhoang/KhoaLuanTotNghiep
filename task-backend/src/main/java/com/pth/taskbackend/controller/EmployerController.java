@@ -7,6 +7,7 @@ import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.model.meta.HumanResource;
+import com.pth.taskbackend.model.meta.Job;
 import com.pth.taskbackend.model.meta.User;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
@@ -23,14 +24,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
 @CrossOrigin(origins = "*")
@@ -681,6 +686,55 @@ public class EmployerController {
                         new BaseResponse("Danh sách nhà tuyển dụng", HttpStatus.OK.value(), employerResponses)
                 );
             }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "Get top Employer", description = "", tags = {})
+    @GetMapping("/getPendingEmployers_Admin")
+    public ResponseEntity<BaseResponse> getPendingEmployer(@RequestHeader("Authorization")String token, Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            if (ERole.ADMIN != optionalUser.get().getRole()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }else{
+
+                Page<Employer> employers = employerService.findPendingEmployer_admin(pageable);
+
+                Page<EmployerResponse> employerResponses = employers.map(employer ->
+                        new EmployerResponse(
+                                employer.getId(),
+                                employer.getCreated(),
+                                employer.getUpdated(),
+                                employer.getImage(),
+                                employer.getBackgroundImage(),
+                                employer.getName(),
+                                employer.getLocation(),
+                                employer.getPhoneNumber(),
+                                employer.getBusinessCode(),
+                                employer.getDescription(),
+                                employer.getUser().getEmail(),
+                                employer.getUser().getStatus(),
+                                employer.getUser().getId(),
+                                true
+                        )
+                );
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách nhà tuyển dụng", HttpStatus.OK.value(), employerResponses)
+                );
+            }
+
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));

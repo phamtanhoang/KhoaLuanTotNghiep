@@ -2046,7 +2046,7 @@ public class JobController {
                     return new HomeJobResponse(
                             job.getId(),
                             job.getCreated(),
-                            job.getUpdated(),
+                            job.getToDate(),
                             job.getName(),
                             job.getHumanResource().getEmployer()
                     );
@@ -2069,7 +2069,7 @@ public class JobController {
                     return new HomeJobResponse(
                             job.getId(),
                             job.getCreated(),
-                            job.getUpdated(),
+                            job.getToDate(),
                             job.getName(),
                             job.getHumanResource().getEmployer()
                     );
@@ -2125,7 +2125,7 @@ public class JobController {
                     return new HomeJobResponse(
                             job.getId(),
                             job.getCreated(),
-                            job.getUpdated(),
+                            job.getToDate(),
                             job.getName(),
                             job.getHumanResource().getEmployer()
                     );
@@ -2148,7 +2148,7 @@ public class JobController {
                     return new HomeJobResponse(
                             job.getId(),
                             job.getCreated(),
-                            job.getUpdated(),
+                            job.getToDate(),
                             job.getName(),
                             job.getHumanResource().getEmployer()
                     );
@@ -2174,6 +2174,93 @@ public class JobController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+    @Operation(summary = "get pending job", description = "", tags = {})
+    @GetMapping("/getPendingJobs_Admin")
+    public ResponseEntity<BaseResponse> getJobPendingAdmin(@RequestHeader("Authorization") String token,Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            if (ERole.ADMIN != optionalUser.get().getRole()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }else{
+
+                Page<Job> jobs = jobService.findJobsPending_Admin(pageable);
+
+                List<HomeJobResponse> jobResponses = jobs.getContent().stream().map(job -> {
+                    return new HomeJobResponse(
+                            job.getId(),
+                            job.getCreated(),
+                            job.getToDate(),
+                            job.getName(),
+                            job.getHumanResource().getEmployer()
+                    );
+                }).collect(Collectors.toList());
+
+                Page<HomeJobResponse> jobResponsePage = new PageImpl<>(jobResponses, jobs.getPageable(), jobs.getTotalElements());
+                return ResponseEntity.ok(
+                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), jobResponsePage)
+                );
+            }
+
+
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+//    @Operation(summary = "", description = "", tags = {})
+//    @GetMapping("/statistic")
+//    public ResponseEntity<BaseResponse> getStatistic(@RequestHeader("Authorization") String token) {
+//        try {
+//            String email = jwtService.extractUsername(token.substring(7));
+//            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+//            if (!permission)
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+//                );
+//
+//            Optional<User> optionalUser = userRepository.findByEmail(email);
+//            if (optionalUser.isEmpty())
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+//                );
+//
+//            if (ERole.EMPLOYER == optionalUser.get().getRole()){
+//
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), null)
+//                );
+//            }else if (ERole.HR == optionalUser.get().getRole()){
+//
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Danh sách công việc", HttpStatus.OK.value(), null)
+//                );
+//            }else{
+//                return ResponseEntity.ok(
+//                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+//                );
+//            }
+//
+//        }catch (ExpiredJwtException e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+//        }
+//    }
 }
 
 

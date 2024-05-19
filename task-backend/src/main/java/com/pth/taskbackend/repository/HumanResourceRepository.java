@@ -37,4 +37,9 @@ public interface HumanResourceRepository extends JpaRepository<HumanResource, St
 
     Page<HumanResource>findByEmployerId(String id, Pageable pageable);
     Optional<HumanResource>findByIdAndEmployerId(String id, String employerId);
+
+    @Query("SELECT COUNT(c) FROM HumanResource c " +
+            "WHERE c.user.status != 'DELETED'" +
+            "AND c.employer.id = :id")
+    Integer countHR_Employer(String id);
 }

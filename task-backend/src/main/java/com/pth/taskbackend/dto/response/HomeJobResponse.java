@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public record HomeJobResponse(String id,
                               LocalDateTime created,
-                              LocalDateTime updated,
+                              LocalDateTime toDate,
                               String name,
                               Employer employer) {
 }

@@ -85,6 +85,10 @@ const EmployerAPI = {
   employerById_admin: (id?: string) => {
     return `/employers/getEmployer-admin/${id}`;
   },
+
+  getPendingEmployer_Admin: (currentPage?: number, itemPerPage?: number) => {
+    return `/employers/getPendingEmployers_Admin?page=${currentPage}&size=${itemPerPage}`;
+  },
 };
 
 const TagAPI = {
@@ -240,6 +244,16 @@ const JobAPI = {
   getTop: (currentPage?: number, itemPerPage?: number) => {
     return `/jobs/getVipJobs?page=${currentPage}&size=${itemPerPage}`;
   },
+
+  getPendingJob: (currentPage?: number, itemPerPage?: number) => {
+    return `/jobs/getPending-jobs?page=${currentPage}&size=${itemPerPage}`;
+  },
+  getActiveJob: (currentPage?: number, itemPerPage?: number) => {
+    return `/jobs/getActive-jobs?page=${currentPage}&size=${itemPerPage}`;
+  },
+  getPendingJob_Admin: (currentPage?: number, itemPerPage?: number) => {
+    return `/jobs/getPendingJobs_Admin?page=${currentPage}&size=${itemPerPage}`;
+  },
 };
 
 const ApplicationAPI = {
@@ -310,6 +324,10 @@ const ScheduleAPI = {
     return `/schedule?userId=${id}&fromDate=${fromDate}&toDate=${toDate}`;
   },
 };
+const StatisticsAPI = {
+  getCount_admin: "/statistics/getCount_Admin",
+  getCount: "/statistics/getCount",
+};
 const VipAPI = {
   base: "/vips",
   vipById: (id: string) => {
@@ -370,4 +388,5 @@ export {
   ApplicationAPI,
   ScheduleAPI,
   VipAPI,
+  StatisticsAPI,
 };

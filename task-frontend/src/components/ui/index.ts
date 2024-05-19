@@ -43,5 +43,5 @@ export {
   EmptyData,
   ChatUI,
   PaymentSuccess,
-  PaymentError
+  PaymentError,
 };

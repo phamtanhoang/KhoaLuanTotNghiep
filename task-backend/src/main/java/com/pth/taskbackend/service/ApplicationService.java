@@ -35,4 +35,7 @@ public interface ApplicationService {
     Page<Application> findByHRIdAndStatusAndNameContaining(String hrId, EApplyStatus status, String keyword, Pageable pageable) throws  IOException;
     Page<Application>findByEmployerIdAndStatus(String employerId, EApplyStatus status, Pageable pageable)throws IOException;
     Page<Application> findByHrIdAndStatus(String hrId, EApplyStatus status, Pageable pageable)throws IOException;
+
+    Integer countApplicationPending_Employer(String id);
+    Integer countApplicationPending_HR(String id);
 }

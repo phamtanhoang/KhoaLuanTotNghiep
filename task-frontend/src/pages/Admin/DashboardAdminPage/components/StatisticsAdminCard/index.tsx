@@ -1,33 +1,27 @@
+import { ReactNode } from "react";
+
 interface StatisticsAdminCardProps {
   quantity: number;
-  percent: number;
+  icon?: ReactNode;
   title: string;
 }
 const StatisticsAdminCard: React.FC<StatisticsAdminCardProps> = ({
   quantity,
-  percent,
+  icon,
   title,
 }) => {
   return (
     <>
-      <div className="bg-white rounded-md border border-borderColor p-6 shadow-md shadow-black/5">
-        <div className="flex justify-between mb-4">
-          <div>
-            <div className="flex items-center mb-1">
-              <div className="text-2xl font-semibold">{quantity}</div>
-              <div className="p-1 rounded bg-emerald-500/10 text-emerald-500 text-[12px] font-semibold leading-none ml-2">
-                +{percent}%
-              </div>
-            </div>
-            <div className="text-base font-medium text-gray-400">{title}</div>
+      <div className="bg-white rounded-md border border-borderColor shadow-md shadow-black/5">
+        <div className="flex justify-between p-4 gap-3">
+          <div className="h-16 w-16 place-items-center bg-bgBlue rounded-xl text-white">
+            {icon}
+          </div>
+          <div className=" text-right">
+            <h2 className=" text-gray-800 font-bold">{title}</h2>
+            <p className="text-2xl font-semibold mt-1">{quantity}</p>
           </div>
         </div>
-        <a
-          href="#"
-          className="text-[#f84525] font-medium text-sm hover:text-red-800"
-        >
-          Chi tiết
-        </a>
       </div>
     </>
   );

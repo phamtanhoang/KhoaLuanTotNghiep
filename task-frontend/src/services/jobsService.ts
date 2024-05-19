@@ -152,5 +152,16 @@ const jobsService = {
   async getTop(currentPage?: number, itemPerPage?: number) {
     return await axiosConfig.get(JobAPI.getTop(currentPage, itemPerPage));
   },
+  async getPendingJob(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(
+      JobAPI.getPendingJob(currentPage, itemPerPage)
+    );
+  },
+  async getActiveJob(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(JobAPI.getActiveJob(currentPage, itemPerPage));
+  },
+  async getPendingJob_Admin(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(JobAPI.getPendingJob_Admin(currentPage, itemPerPage));
+  },
 };
 export default jobsService;

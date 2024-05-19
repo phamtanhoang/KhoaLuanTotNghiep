@@ -30,4 +30,9 @@ public interface EmployerService {
     Long countAll()throws IOException;
 
     Page<Employer>findTopEmployer(Pageable pageable) throws IOException;
+
+    Page<Employer>findPendingEmployer_admin(Pageable pageable) throws IOException;
+
+    Integer countEmployer_Admin();
+    Integer countEmployerVip_Admin();
 }

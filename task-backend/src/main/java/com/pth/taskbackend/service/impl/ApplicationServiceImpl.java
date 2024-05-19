@@ -110,4 +110,14 @@ public class ApplicationServiceImpl implements ApplicationService {
     public Page<Application> findByHrIdAndStatus(String hrId, EApplyStatus status, Pageable pageable) {
         return applicationRepository.findByHrIdAndStatus(hrId,status,pageable);
     }
+
+    @Override
+    public Integer countApplicationPending_Employer(String id) {
+        return applicationRepository.countApplicationPending_Employer(id);
+    }
+
+    @Override
+    public Integer countApplicationPending_HR(String id) {
+        return applicationRepository.countApplicationPending_HR(id);
+    }
 }

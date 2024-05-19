@@ -191,22 +191,51 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Page<Job> findPendingJobs_Employer(String employerId, Pageable pageable) throws java.io.IOException {
+    public Page<Job> findPendingJobs_Employer(String employerId, Pageable pageable) throws IOException {
         return jobRepository.findPendingJobs_Employer(employerId, pageable);
     }
 
     @Override
-    public Page<Job> findPendingJobs_HR(String hrId, Pageable pageable) throws java.io.IOException {
+    public Page<Job> findPendingJobs_HR(String hrId, Pageable pageable) throws IOException {
         return jobRepository.findPendingJobs_HR(hrId, pageable);
     }
 
     @Override
-    public Page<Job> findJobsActive_Employer(String employerId, Pageable pageable) throws java.io.IOException {
+    public Page<Job> findJobsActive_Employer(String employerId, Pageable pageable) throws IOException {
         return jobRepository.findJobsActive_Employer(employerId, pageable);
     }
 
     @Override
-    public Page<Job> findJobsActive_HR(String hrId, Pageable pageable) throws java.io.IOException {
+    public Page<Job> findJobsActive_HR(String hrId, Pageable pageable) throws IOException {
         return jobRepository.findJobsActive_HR(hrId, pageable);
+    }
+
+    @Override
+    public Page<Job> findJobsPending_Admin(Pageable pageable) throws IOException {
+        return jobRepository.findPendingJobs_ADMIN(pageable);
+    }
+
+    @Override
+    public Integer countJobActive_Admin() {
+        return jobRepository.countJobActive_Admin();
+    }
+
+    @Override
+    public Integer countJobActive_Employer(String id) {
+        return jobRepository.countJobActive_Employer(id);
+    }
+
+    @Override
+    public Integer countJobActive_HR(String id) {
+        return jobRepository.countJobActive_HR(id);
+    }
+    @Override
+    public Integer countJobPending_Employer(String id) {
+        return jobRepository.countJobPending_Employer(id);
+    }
+
+    @Override
+    public Integer countJobPending_HR(String id) {
+        return jobRepository.countJobPending_HR(id);
     }
 }

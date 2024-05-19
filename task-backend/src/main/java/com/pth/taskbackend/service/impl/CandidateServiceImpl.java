@@ -101,4 +101,8 @@ public class CandidateServiceImpl implements CandidateService {
     public Long count() throws IOException {
         return candidateRepository.count();
     }
+    @Override
+    public Integer countCandidate_Admin() throws IOException {
+        return candidateRepository.countCandidate_Admin();
+    }
 }

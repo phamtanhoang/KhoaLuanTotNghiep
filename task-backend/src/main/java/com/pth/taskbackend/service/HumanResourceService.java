@@ -22,4 +22,6 @@ public interface HumanResourceService {
     HumanResource updateAvatar(HumanResource humanResource, MultipartFile avatar) throws IOException;
     void deleteById(String id)throws IOException;
     void delete(HumanResource humanResource)throws IOException;
+
+    Integer countHR_Employer(String id);
 }

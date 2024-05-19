@@ -4,6 +4,7 @@ import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.model.meta.HumanResource;
+import com.pth.taskbackend.model.meta.Job;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -43,4 +44,19 @@ public interface EmployerRepository extends JpaRepository<Employer, String> {
             "And a.status='ACTIVE'" +
             " order by RAND()")
     Page<Employer> findVipEmployers(Pageable pageable);
+
+    @Query("SELECT e FROM Employer e " +
+            "JOIN  User u on e.user.id=u.id "+
+            "WHERE u.status = 'PENDING' " +
+            "ORDER BY e.created DESC")
+    Page<Employer> findPendingEmployer_ADMIN(Pageable pageable);
+
+    @Query("SELECT COUNT(e) FROM Employer e WHERE e.user.status != 'DELETED'")
+    Integer countEmployer_Admin();
+    @Query("SELECT COUNT(e) e FROM Employer e " +
+            "JOIN  User a on e.user.id=a.id "+
+            "JOIN VipEmployer v ON e.id = v.employer.id " +
+            "WHERE DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE()" +
+            "And a.status!='DELETED'")
+    Integer countEmployerVip_Admin();
 }

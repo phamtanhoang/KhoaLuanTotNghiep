@@ -30,5 +30,5 @@ public interface CandidateService {
     Page<Candidate> findCandidateByKeyword(String keyword, Pageable pageable)throws  IOException;
     Long count()throws IOException;
 
-
+    Integer countCandidate_Admin()throws IOException;
 }

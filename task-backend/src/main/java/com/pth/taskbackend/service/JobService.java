@@ -75,4 +75,11 @@ public interface JobService {
     Page<Job>findPendingJobs_HR(String hrId,Pageable pageable)throws  IOException;
     Page<Job>findJobsActive_Employer(String employerId,Pageable pageable)throws  IOException;
     Page<Job>findJobsActive_HR(String hrId,Pageable pageable)throws  IOException;
+    Page<Job>findJobsPending_Admin(Pageable pageable)throws  IOException;
+
+    Integer countJobActive_Admin();
+    Integer countJobActive_Employer(String id);
+    Integer countJobActive_HR(String id);
+    Integer countJobPending_Employer(String id);
+    Integer countJobPending_HR(String id);
 }

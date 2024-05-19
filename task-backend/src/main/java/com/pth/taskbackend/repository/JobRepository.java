@@ -252,5 +252,33 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "AND j.toDate > CURRENT_TIMESTAMP " +
             "ORDER BY j.created DESC")
     Page<Job> findJobsActive_HR(String hrId, Pageable pageable);
+
+    @Query("SELECT j FROM Job j " +
+            "WHERE j.status = 'PENDING'  " +
+            "ORDER BY j.created DESC")
+    Page<Job> findPendingJobs_ADMIN(Pageable pageable);
+
+    @Query("SELECT COUNT(j) FROM Job j " +
+            "WHERE j.status = 'ACTIVE' " +
+            "AND j.toDate > CURRENT_TIMESTAMP")
+    Integer countJobActive_Admin();
+    @Query("SELECT COUNT(j) FROM Job j " +
+            "WHERE j.status = 'ACTIVE' " +
+            "And j.humanResource.employer.id = :id " +
+            "AND j.toDate > CURRENT_TIMESTAMP")
+    Integer countJobActive_Employer(String id);
+    @Query("SELECT COUNT(j) FROM Job j " +
+            "WHERE j.status = 'ACTIVE' " +
+            "And j.humanResource.id=:id "+
+            "AND j.toDate > CURRENT_TIMESTAMP")
+    Integer countJobActive_HR(String id);
+    @Query("SELECT COUNT(j) FROM Job j " +
+            "WHERE j.status = 'PENDING' " +
+            "And j.humanResource.employer.id = :id ")
+    Integer countJobPending_Employer(String id);
+    @Query("SELECT COUNT(j) FROM Job j " +
+            "WHERE j.status = 'PENDING' " +
+            "And j.humanResource.id=:id ")
+    Integer countJobPending_HR(String id);
 }
 

@@ -132,6 +132,9 @@ const StatisticsApplications = () => {
               <tr
                 className="w-full hover:bg-gray-500/10 cursor-pointer border-t border-borderColor px-4 gap-2 justify-between lg:hidden text-gray-700 py-2"
                 key={index}
+                onClick={() => {
+                  _onClickDetail(item.id);
+                }}
               >
                 <div className="flex items-center gap-4">
                   <img
@@ -145,7 +148,8 @@ const StatisticsApplications = () => {
                   />
                   <div>
                     <h2 className="text-base font-semibold text-gray-800 hover:text-orangetext cursor-pointer">
-                      {item.candidate?.name}
+                      {item.candidate?.firstName}&nbsp;
+                      {item.candidate?.lastName}
                     </h2>
                     <p className="text-sm font-normal text-lightGray ">
                       {item.candidate?.email}
@@ -154,13 +158,11 @@ const StatisticsApplications = () => {
                 </div>
                 <p className="mt-1.5">
                   Tên công việc:&nbsp;&nbsp;
-                  <span className="text-lg font-semibold">
-                    {item?.job?.name!}
-                  </span>
+                  <span className=" font-semibold">{item?.job?.name!}</span>
                 </p>
                 <p>
                   Ngày ứng tuyển:&nbsp;&nbsp;
-                  <span className="text-lg font-semibold">
+                  <span className=" font-semibold">
                     {DateHelper.formatDateTime(item?.applyDate!)}
                   </span>
                 </p>

@@ -97,4 +97,9 @@ public class HumanResourceServiceImpl implements HumanResourceService {
         humanResourceRepository.delete(humanResource);
 
     }
+
+    @Override
+    public Integer countHR_Employer(String id) {
+        return humanResourceRepository.countHR_Employer(id);
+    }
 }

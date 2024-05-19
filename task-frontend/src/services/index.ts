@@ -6,6 +6,7 @@ import humanResourcesService from "./humanResourcesService";
 import jobsService from "./jobsService";
 import proceduresService from "./proceduresService";
 import scheduleService from "./scheduleService";
+import statisticsService from "./statisticsService";
 import tagsService from "./tagsService";
 import usersService from "./usersService";
 
@@ -20,4 +21,5 @@ export {
   usersService,
   humanResourcesService,
   scheduleService,
+  statisticsService,
 };
