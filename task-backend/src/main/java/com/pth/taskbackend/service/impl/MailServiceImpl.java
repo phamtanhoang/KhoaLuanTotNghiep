@@ -27,22 +27,20 @@ public class MailServiceImpl implements MailService {
 
 
     @Override
-    public void sendEmail(String to, String name, String jobName, String jobId , String state, String templateName)
+    public void sendEmail(String to, String user, String body,String templateName)
             throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
 
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
 
         Context context = new Context();
-        context.setVariable("name", name);
-        context.setVariable("jobName", jobName);
-        context.setVariable("jobId", jobId);
-        context.setVariable("state", state);
-        String html = templateEngine.process(templateName, context);
+        context.setVariable("user", user);
+        context.setVariable("body", body);
+        String html = templateEngine.process("EMAIL_TEMPLATE", context);
 
         helper.setFrom(fromEmail);
         helper.setTo(to);
-        helper.setSubject("JOBS THÔNG BÁO");
+        helper.setSubject("JOOBS THÔNG BÁO");
         helper.setText(html, true);
 
         mailSender.send(message);

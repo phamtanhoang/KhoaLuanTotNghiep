@@ -21,10 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
@@ -54,6 +51,12 @@ public class StatisticController {
 
     @Autowired
     ApplicationService applicationService;
+
+    @Autowired
+    VipEmployerService vipEmployerService;
+
+    @Autowired
+    CategoryService categoryService;
     @GetMapping("/getCount_Admin")
     public ResponseEntity<BaseResponse> getCount_Admin(@RequestHeader("Authorization") String token) {
         try {
@@ -145,6 +148,59 @@ public class StatisticController {
             }
 
 
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @GetMapping("/getStatistic_Admin")
+    public ResponseEntity<BaseResponse> getStatistic(@RequestHeader("Authorization") String token, @RequestParam int year){
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            if (optionalUser.get().getRole()!=ERole.ADMIN)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            // Initialize an array with 12 elements for 12 months
+            Long[] prices = new Long[12];
+            Arrays.fill(prices, 0L);
+
+            // Query the database for prices in each month
+            List<VipEmployer> vipEmployers = vipEmployerService.findStatisticInYear(year);
+            for (VipEmployer vipEmployer : vipEmployers) {
+                int month = vipEmployer.getCreated().getMonthValue();
+                prices[month - 1] += vipEmployer.getPrice();
+            }
+
+            // Create a list of month-price pairs
+            List<Map<String, Object>> line = new ArrayList<>();
+            for (int i = 0; i < 12; i++) {
+                Map<String, Object> monthPrice = new HashMap<>();
+                monthPrice.put("month", i + 1);
+                monthPrice.put("price", prices[i]);
+                line.add(monthPrice);
+            }
+
+            List<Map<String, Object>> donut = categoryService.findStatisticInYear(year);
+
+
+            StatisticResponse statisticResponse = new StatisticResponse(line, donut);
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Thành công", HttpStatus.OK.value(), statisticResponse)
+            );
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));

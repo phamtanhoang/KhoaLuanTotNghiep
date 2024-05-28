@@ -1,34 +1,37 @@
 package com.pth.taskbackend.controller;
 
+import com.pth.taskbackend.controller.test.Message;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.service.MailService;
-import com.pth.taskbackend.util.constant.TokenConstant;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
 @CrossOrigin(origins = "*")
 @Tag(name = "Resource", description = "Test APIs")
 @SecurityRequirement(name = "javainuseapi")
-@RestController
 @RequestMapping(value = {BASE_URL + "/resource"})
+@RestController
 public class ResourceController {
 
     @Autowired
     private MailService mailService;
+
     @GetMapping("send-mail")
     public ResponseEntity<BaseResponse> SendMail() {
         try {
-            mailService.sendEmail("datlequang1717@gmail.com", "",
-                    "", "", "", "EMAIL_TEMPLATE");
+            mailService.sendEmail("2051052048hoang@ou.edu.vn", "Hoàng",
+                    "Ban đã đăng kí tài khoản thành công!!","EMAIL_TEMPLATE");
             return ResponseEntity.ok(new BaseResponse("Gửi mail thành công", 200, null));
         }
         catch(MessagingException e){
@@ -39,10 +42,27 @@ public class ResourceController {
             return ResponseEntity.ok(new BaseResponse("Có lỗi xảy ra trong quá trình gửi mail!", 500, null));
         }
     }
-    @Operation(summary = "Test Auth", description = "", tags = {})
-    @GetMapping
-    public String welcome(@CookieValue(name = TokenConstant.APP_ACCESS_TOKEN, required = false) String yourCookieValue) {
 
-        return "Hello World %s" +  yourCookieValue;
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
+
+    @MessageMapping("/message") // "/app/message"
+    @SendTo("/chatroom/public")
+    public Message receivePublicMessage(@Payload Message message){
+        return message;
+    }
+    @MessageMapping("/private-message")
+    public Message receivePrivateMessage(@Payload Message message){
+        simpMessagingTemplate.convertAndSendToUser(message.getReceiverName(), "/private", message); // "/user/username/private"
+        System.out.println("message: " + message);
+        return message;
+    }
+
+    @MessageMapping("/application")
+    @SendTo("/application/123")
+    public Message chatApplication(@Payload Message message){
+        System.out.println("message: " + message);
+        return message;
     }
 }

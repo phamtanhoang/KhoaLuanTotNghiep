@@ -45,4 +45,8 @@ public interface VipEmployerRepository extends JpaRepository<VipEmployer, String
             "   GROUP BY v2.employer" +
             ")")
     Long countValidVipEmployers();
+
+
+    @Query("SELECT v FROM VipEmployer v WHERE YEAR(v.created) = :year")
+    List<VipEmployer> findStatisticInYear(@Param("year") int year);
 }

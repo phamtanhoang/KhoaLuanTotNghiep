@@ -56,6 +56,34 @@ const DashboardAdminPage = () => {
         context.handleCloseLoading();
       });
   }, []);
+
+  const [monthLabelChart, setMonthLabelChart] = useState<any>([]);
+  const [monthDataChart, setMonthDataChart] = useState<any>([]);
+  const [cateLabelChart, setCateLabelChart] = useState<any>([]);
+  const [cateDataChart, setCateDataChart] = useState<any>([]);
+
+  useEffect(() => {
+    context.handleOpenLoading();
+    statisticsService
+      .getStatisticByYear(year)
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          const data = res.data.Data;
+          setMonthLabelChart(data?.line?.map((item: any) => item.month));
+          setMonthDataChart(data?.line?.map((item: any) => item.price));
+          setCateLabelChart(data?.donut?.map((item: any) => item.category));
+          setCateDataChart(data?.donut?.map((item: any) => item.percentage));
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  }, [year]);
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5 mb-3 lg:mb-5">
@@ -126,20 +154,7 @@ const DashboardAdminPage = () => {
                   id: "basic-bar",
                 },
                 xaxis: {
-                  categories: [
-                    "Tháng 1",
-                    "Tháng 2",
-                    "Tháng 3",
-                    "Tháng 4",
-                    "Tháng 5",
-                    "Tháng 6",
-                    "Tháng 7",
-                    "Tháng 8",
-                    "Tháng 9",
-                    "Tháng 10",
-                    "Tháng 11",
-                    "Tháng 12",
-                  ],
+                  categories: monthLabelChart,
                 },
                 colors: ["#4d4dff"],
                 title: {
@@ -155,7 +170,7 @@ const DashboardAdminPage = () => {
               series={[
                 {
                   name: "Doanh thu",
-                  data: [0, 0, 0, 4000000, 3700000, 0, 0, 0, 0, 0, 0, 0],
+                  data: monthDataChart,
                 },
               ]}
               type="area"
@@ -165,13 +180,7 @@ const DashboardAdminPage = () => {
           <div className="lg:w-[45%]">
             <Chart
               options={{
-                labels: [
-                  "Công nghệ thông tin / Điện tử viễn thông",
-                  "Tài chính / Kế toán",
-                  "Luật / Pháp lý",
-                  "Truyền thông / Quảng cáo",
-                  "Khác",
-                ],
+                labels: cateLabelChart,
                 title: {
                   text: "Thống kê theo ngành nghề",
                   align: "center",
@@ -182,7 +191,7 @@ const DashboardAdminPage = () => {
                   },
                 },
               }}
-              series={[32, 28, 13, 17, 10]}
+              series={cateDataChart}
               type="donut"
               height={350}
             />

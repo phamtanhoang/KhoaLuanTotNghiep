@@ -327,6 +327,9 @@ const ScheduleAPI = {
 const StatisticsAPI = {
   getCount_admin: "/statistics/getCount_Admin",
   getCount: "/statistics/getCount",
+  getStatisticByYear: (year?: number) => {
+    return `/statistics/getStatistic_Admin?year=${year}`;
+  },
 };
 const VipAPI = {
   base: "/vips",

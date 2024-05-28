@@ -84,4 +84,9 @@ public class VipEmployerServiceImpl implements VipEmployerService {
         return  vipEmployerRepository.countValidVipEmployers();
     }
 
+    @Override
+    public List<VipEmployer> findStatisticInYear(int year) {
+        return vipEmployerRepository.findStatisticInYear(year);
+    }
+
 }

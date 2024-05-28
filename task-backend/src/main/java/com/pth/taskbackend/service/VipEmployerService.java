@@ -31,4 +31,6 @@ public interface VipEmployerService {
     public float sumPrice()throws IOException;
     Long countValidVipEmployers() throws  IOException;
 
+    public List<VipEmployer> findStatisticInYear(int year);
+
 }

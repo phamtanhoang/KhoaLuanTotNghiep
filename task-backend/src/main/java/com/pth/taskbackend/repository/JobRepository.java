@@ -280,5 +280,6 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "WHERE j.status = 'PENDING' " +
             "And j.humanResource.id=:id ")
     Integer countJobPending_HR(String id);
+
 }
 

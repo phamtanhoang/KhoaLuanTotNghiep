@@ -16,7 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -112,6 +113,46 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findCategoriesOrderedByJobCount(pageable);
     }
 
+    @Override
+    public List<Map<String, Object>> findStatisticInYear(int year) {
+        List<Map<String, Object>> statistics = categoryRepository.findStatisticInYear(year);
+
+        // Calculate total jobs
+        long totalJobs = statistics.stream()
+                .mapToLong(stat -> (long) stat.get("count"))
+                .sum();
+
+        // Calculate percentage for each category
+        for (Map<String, Object> stat : statistics) {
+            long count = (long) stat.get("count");
+            double percentage = (double) count / totalJobs * 100;
+            stat.put("percentage", percentage);
+        }
+
+        if (statistics.size() > 10) {
+            List<Map<String, Object>> top4Categories = statistics.subList(0, 4);
+
+            double totalPercentageTop4 = top4Categories.stream()
+                    .mapToDouble(cat -> (double) cat.get("percentage"))
+                    .sum();
+
+            long totalCountOthers = statistics.subList(4, statistics.size()).stream()
+                    .mapToLong(cat -> (long) cat.get("count"))
+                    .sum();
+
+            Map<String, Object> otherCategory = new HashMap<>();
+            otherCategory.put("percentage", 100.0 - totalPercentageTop4);
+            otherCategory.put("count", totalCountOthers);
+            otherCategory.put("category", "Khác");
+
+            statistics = new ArrayList<>(top4Categories);
+            statistics.add(otherCategory);
+        } else {
+            statistics = new ArrayList<>(statistics);
+        }
+
+        return statistics;
+    }
 
 
 }

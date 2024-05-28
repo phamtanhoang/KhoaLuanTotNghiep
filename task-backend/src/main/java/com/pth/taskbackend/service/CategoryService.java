@@ -4,9 +4,12 @@ import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.model.meta.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface CategoryService {
@@ -18,6 +21,8 @@ public interface CategoryService {
     Category updateCategory(Category category, String name, MultipartFile file) throws IOException;
     void deleteCategory(Category category) throws IOException;
     Page<Object[]>findCategoriesByJobCount(Pageable pageable);
+
+    List<Map<String, Object>> findStatisticInYear(@Param("year") int year);
 //    Category create(Category category, MultipartFile file) throws IOException;
 //    Category update(Category category, MultipartFile image) throws IOException;
 //    void deleteCategory(Category category);
