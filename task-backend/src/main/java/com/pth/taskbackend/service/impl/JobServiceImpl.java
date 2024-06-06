@@ -61,8 +61,8 @@ public class JobServiceImpl implements JobService {
 
 
     @Override
-    public Page<Job> findByNameContainingAndCategoryIdAndStatus(String name, String categoryId,EStatus status, Pageable pageable) throws IOException {
-        return jobRepository.findByNameContainingAndCategoryIdAndStatus(name,categoryId,status,pageable);
+    public Page<Job> findByNameContainingAndCategoryIdAndStatus(String name, String categoryId,EStatus status,boolean isExpired, Pageable pageable) throws IOException {
+        return jobRepository.findByNameContainingAndCategoryIdAndStatus(name,categoryId,status,isExpired, pageable);
     }
 
     @Override
@@ -88,14 +88,14 @@ public class JobServiceImpl implements JobService {
 
 
     @Override
-    public Page<Job> findByKeywordAndStatusAndCategoryIdAndHRId(String keyword, EStatus status, String categoryId,String hRId, Pageable pageable) throws IOException {
-        return jobRepository.findByKeywordAndStatusAndCategoryIdAndHRId(keyword,status,categoryId,hRId,pageable);
+    public Page<Job> findByKeywordAndStatusAndCategoryIdAndHRId(String keyword, EStatus status, String categoryId,String hRId,boolean isExpired, Pageable pageable) throws IOException {
+        return jobRepository.findByKeywordAndStatusAndCategoryIdAndHRId(keyword,status,categoryId,hRId, isExpired,pageable);
     }
 
     @Override
-    public Page<Job> findByKeywordAndStatusAndCategoryIdAndEmployerId(String keyword, EStatus status, String categoryId, String employerId, Pageable pageable) throws IOException {
+    public Page<Job> findByKeywordAndStatusAndCategoryIdAndEmployerId(String keyword, EStatus status, String categoryId, String employerId,boolean isExpired, Pageable pageable) throws IOException {
 
-        return jobRepository.findByKeywordAndStatusAndCategoryIdAndEmployerId(keyword,status,categoryId,employerId,pageable);
+        return jobRepository.findByKeywordAndStatusAndCategoryIdAndEmployerId(keyword,status,categoryId,employerId, isExpired,pageable);
 
     }
 

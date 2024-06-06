@@ -17,6 +17,8 @@ interface JobTableProps {
   _onClickDelete: (item: JobModel) => void;
   _onChangeStatus: (e: ChangeEvent<HTMLSelectElement>) => void;
   status: string;
+  isExpired: any;
+  setIsExpired: any;
   isLoading: boolean;
   isEmpty: boolean;
   currentPage: number;
@@ -28,6 +30,8 @@ const Table: React.FC<JobTableProps> = ({
   _onClickDetail,
   _onChangeStatus,
   status,
+  isExpired,
+  setIsExpired,
   isLoading,
   currentPage,
   itemPerpage,
@@ -49,7 +53,20 @@ const Table: React.FC<JobTableProps> = ({
               scope="col"
               className="px-4 py-3.5 text-base font-semibold text-left text-gray-600 w-[32%]"
             >
-              Tiêu đề
+              <span className="pr-2">Công việc:</span>
+
+              <select
+                className="bg-gray-50 rounded-md"
+                value={isExpired}
+                onChange={(e) => setIsExpired(e.target.value)}
+              >
+                <option value="false" className="p-2 text-sm">
+                  Đang tuyển
+                </option>
+                <option value="true" className="p-2 text-sm">
+                  Hết hạn
+                </option>
+              </select>
             </th>
             <th
               scope="col"

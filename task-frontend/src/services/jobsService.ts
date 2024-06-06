@@ -35,6 +35,7 @@ const jobsService = {
     keyword?: string,
     category?: string,
     status?: string,
+    isExpired?: boolean,
     currentPage?: number,
     itemPerPage?: number
   ) {
@@ -43,6 +44,7 @@ const jobsService = {
         keyword,
         category,
         status,
+        isExpired,
         currentPage,
         itemPerPage
       )
@@ -52,11 +54,19 @@ const jobsService = {
     keyword?: string,
     category?: string,
     status?: string,
+    isExpired?: boolean,
     currentPage?: number,
     itemPerPage?: number
   ) {
     return await axiosConfig.get(
-      JobAPI.getList_Admin(keyword, category, status, currentPage, itemPerPage)
+      JobAPI.getList_Admin(
+        keyword,
+        category,
+        status,
+        isExpired,
+        currentPage,
+        itemPerPage
+      )
     );
   },
   async getJobsByEmployerID(
@@ -161,7 +171,9 @@ const jobsService = {
     return await axiosConfig.get(JobAPI.getActiveJob(currentPage, itemPerPage));
   },
   async getPendingJob_Admin(currentPage?: number, itemPerPage?: number) {
-    return await axiosConfig.get(JobAPI.getPendingJob_Admin(currentPage, itemPerPage));
+    return await axiosConfig.get(
+      JobAPI.getPendingJob_Admin(currentPage, itemPerPage)
+    );
   },
 };
 export default jobsService;

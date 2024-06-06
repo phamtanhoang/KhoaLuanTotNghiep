@@ -19,6 +19,7 @@ const CANDIDATE_KEYS = {
   changeInfoCandidate: "ChangeInfoCandidate",
   changeExpSkillInfoCandidate: "ChangeExpSkillInfoCandidate",
   updateCandidate: "updateCandidate",
+  detailCandidate: "detailCandidate",
 };
 const APPLICATION_KEYS = {
   applyJob: "ApplyJob",

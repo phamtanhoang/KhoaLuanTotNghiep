@@ -22,6 +22,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,6 +84,9 @@ public class ApplicationController {
     StepScheduleService stepScheduleService;
     @Autowired
     StepResultService stepResultService;
+
+    @Autowired
+    private MailService mailService;
 
     @PostMapping("/applyWithCV/{id}")
     public ResponseEntity<BaseResponse> applyJobWithNewCV(
@@ -131,6 +136,10 @@ public class ApplicationController {
                         new BaseResponse("Đã ứng tuyển vào công việc này!!!", HttpStatus.BAD_REQUEST.value(), null)
                 );
 
+            mailService.sendEmail(email, fullName,
+                    "Ban đã nộp ứng tuyển thành công vị trí "+job.getName()+" của "+job.getHumanResource().getEmployer().getName(),"EMAIL_TEMPLATE");
+
+
             Application application = new Application();
 
             String uploadCV = fileUploadFunc.uploadCV(cVFile);
@@ -148,10 +157,13 @@ public class ApplicationController {
             applicationService.create(application);
 
 
+
             return ResponseEntity.ok(
                     new BaseResponse("Ứng tuyển công việc thành công", HttpStatus.OK.value(), null)
             );
 
+        } catch(MessagingException e){
+            return ResponseEntity.ok(new BaseResponse("Tên mail không hợp lệ!", 500, null));
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
@@ -200,6 +212,10 @@ public class ApplicationController {
                         new BaseResponse("Đã ứng tuyển vào công việc này!", HttpStatus.BAD_REQUEST.value(), null)
                 );
 
+            mailService.sendEmail(email, fullName,
+                    "Ban đã nộp ứng tuyển thành công vị trí "+job.getName()+" của "+job.getHumanResource().getEmployer().getName(),"EMAIL_TEMPLATE");
+
+
             Application application = new Application();
 
             application.setCV(cVFile);
@@ -211,7 +227,6 @@ public class ApplicationController {
             application.setJob(job);
             application.setFullName(fullName);
             application.setCurrentStep(0);
-            System.out.println(application);
             applicationService.create(application);
 
 
@@ -219,6 +234,8 @@ public class ApplicationController {
                     new BaseResponse("Ứng tuyển công việc thành công", HttpStatus.OK.value(), null)
             );
 
+        } catch(MessagingException e){
+            return ResponseEntity.ok(new BaseResponse("Tên mail không hợp lệ!", 500, null));
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
@@ -806,6 +823,81 @@ public class ApplicationController {
         }
     }
 
+    @DeleteMapping("/deleteApplication-employer/{id}")
+    public ResponseEntity<BaseResponse> deleteApplicationEmployer(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") String id
+    ) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+            }
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            Application application;
+            switch (optionalUser.get().getRole()) {
+                case HR: {
+                    Optional<HumanResource> humanResource = humanResourceService.findByEmail(email);
+                    if (humanResource.isEmpty()) {
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                    }
+                    Optional<Application> optionalApplication = applicationService.findByIdAndJobHumanResourceId(id, humanResource.get().getId());
+                    if (optionalApplication.isEmpty()) {
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                    }
+                    application = optionalApplication.get();
+                    break;
+                }
+                case EMPLOYER: {
+                    Optional<Employer> employer = employerService.findByUserEmail(email);
+                    if (employer.isEmpty()) {
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                    }
+
+                    Optional<Application> optionalApplication = applicationService.findByIdAndJobHumanResourceEmployerId(id, employer.get().getId());
+
+                    if (optionalApplication.isEmpty()) {
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                    }
+                    application = optionalApplication.get();
+                    break;
+                }
+                default:
+                    return ResponseEntity.ok(
+                            new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                    );
+            }
+
+            applicationService.delete(application);
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Xóa đơn ứng tuyển", HttpStatus.OK.value(), null)
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
     @GetMapping("/getApplication-admin/{id}")
     public ResponseEntity<?> getApplicationDetailsAdmin(
             @RequestHeader("Authorization") String token,
@@ -1087,6 +1179,16 @@ public class ApplicationController {
                 System.out.println("Total step: " + totalStep);
                 System.out.println("Current step: " + currentStep);
                 System.out.println("application, " + application);
+                System.out.println("123"+application.getEmail());
+                if(statusEnum==EApplyStatus.PROCESSING)
+                    mailService.sendEmail(application.getEmail(), application.getFullName(),
+                            "Đơn ứng tuyển vị trí "+application.getJob().getName()+" của bạn đã được chuyển bước!","EMAIL_TEMPLATE");
+                if(statusEnum==EApplyStatus.APPROVED)
+                    mailService.sendEmail(application.getEmail(), application.getFullName(),
+                            "Đơn ứng tuyển vị trí "+application.getJob().getName()+" của bạn đã được duyệt!","EMAIL_TEMPLATE");
+                if(statusEnum==EApplyStatus.REJECTED)
+                    mailService.sendEmail(application.getEmail(), application.getFullName(),
+                            "Đơn ứng tuyển vị trí "+application.getJob().getName()+" của bạn đã không được duyệt!","EMAIL_TEMPLATE");
 
                 if (currentStep == 0) {
 
@@ -1171,6 +1273,8 @@ public class ApplicationController {
             return ResponseEntity.ok(
                     new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
             );
+        } catch(MessagingException e){
+            return ResponseEntity.ok(new BaseResponse("Tên mail không hợp lệ!", 500, null));
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
@@ -1236,6 +1340,12 @@ public class ApplicationController {
                         stepScheduleRequest.stepNumber(),
                         application);
 
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
+                String formattedStartDate = stepScheduleRequest.startDate().format(formatter);
+                String formattedEndDate = endDate.format(formatter);
+
+                mailService.sendEmail(application.getEmail(), application.getFullName(),
+                        "Đơn ứng tuyển vị trí "+application.getJob().getName()+" của bạn đã được tạo 1 lịch hẹn mới vào "+formattedStartDate+" và kết thúc vào "+formattedEndDate+"!","EMAIL_TEMPLATE");
                 return ResponseEntity.ok(
                         new BaseResponse("Tạo lịch hẹn thành công!", HttpStatus.OK.value(), stepSchedule1)
                 );
@@ -1244,6 +1354,8 @@ public class ApplicationController {
             return ResponseEntity.ok(
                     new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
             );
+        } catch(MessagingException e){
+            return ResponseEntity.ok(new BaseResponse("Tên mail không hợp lệ!", 500, null));
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
@@ -1266,7 +1378,6 @@ public class ApplicationController {
                         new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
                 );
             String email = jwtService.extractUsername(token.substring(7));
-
 
             Optional<User> userOptional = userRepository.findByEmail(email);
             if (userOptional.isEmpty()) {
@@ -1446,6 +1557,7 @@ public class ApplicationController {
             if (Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getUser().getId())
                     || Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getEmployer().getUser().getId())) {
                 stepScheduleService.delete(stepSchedule);
+
                 return ResponseEntity.ok(
                         new BaseResponse("Xóa lịch hẹn thành công thành công!", HttpStatus.OK.value(), null)
                 );

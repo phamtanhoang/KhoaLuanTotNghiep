@@ -3,19 +3,33 @@ package com.pth.taskbackend.service.impl;
 import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Application;
+import com.pth.taskbackend.model.meta.Message;
+import com.pth.taskbackend.model.meta.StepResult;
+import com.pth.taskbackend.model.meta.StepSchedule;
 import com.pth.taskbackend.repository.ApplicationRepository;
+import com.pth.taskbackend.repository.MessageRepository;
+import com.pth.taskbackend.repository.StepResultRepository;
+import com.pth.taskbackend.repository.StepScheduleRepository;
 import com.pth.taskbackend.service.ApplicationService;
+import com.pth.taskbackend.service.StepScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 @Service
 public class ApplicationServiceImpl implements ApplicationService {
     @Autowired
     ApplicationRepository applicationRepository;
+    @Autowired
+    MessageRepository messageRepository;
+    @Autowired
+    StepScheduleRepository stepScheduleRepository;
+    @Autowired
+    StepResultRepository stepResultRepository;
     @Override
     public Application create(Application application) {
 
@@ -35,8 +49,18 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public void delete(Application application) {
+        List<Message> messages = messageRepository.findByApplicationId(application.getId());
+        messageRepository.deleteAll(messages);
 
+        List<StepSchedule> stepSchedules = stepScheduleRepository.findByApplicationId(application.getId());
+        stepScheduleRepository.deleteAll(stepSchedules);
+
+        List<StepResult> stepResults = stepResultRepository.findByApplicationId(application.getId());
+        stepResultRepository.deleteAll(stepResults);
+
+        applicationRepository.delete(application);
     }
+
 
     @Override
     public Optional<Application> findById(String id) {

@@ -183,7 +183,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   setSidebarOpen={setSidebarOpen}
                 />
               </li>
-              <li>
+              {/* <li>
                 <SidebarLink
                   link={PathConstants.EMPLOYER_PATHS.findCandidate}
                   name="Tìm ứng viên"
@@ -198,7 +198,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   icon={<AiFillMessage className="text-lg" />}
                   setSidebarOpen={setSidebarOpen}
                 />
-              </li>
+              </li> */}
 
               {/* <li>
                 <SidebarLink

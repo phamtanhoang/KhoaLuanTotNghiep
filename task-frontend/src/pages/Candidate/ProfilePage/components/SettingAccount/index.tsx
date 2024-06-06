@@ -51,9 +51,7 @@ const SettingAccount: React.FC<SettingAccountProps> = ({
               isFindJob ? "text-orangetext" : "text-gray-300"
             }`}
           >
-            {isFindJob
-              ? "Đang bật tìm kiếm việc làm."
-              : "Đã tắt tìm kiếm việc làm."}
+            Cho phép NTD xem hồ sơ
           </label>
         </div>
         <div className="flex flex-col ">

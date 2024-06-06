@@ -4,6 +4,7 @@ import { ConfigSelect } from "@/configs/selectConfig";
 import { categoriesService } from "@/services";
 import {
   ONCHANGE_CATEGORY,
+  ONCHANGE_ISEXPIRED,
   ONCHANGE_KEYWORD,
   ONCHANGE_STATUS,
 } from "@/store/reducers/searchReducer";
@@ -44,6 +45,7 @@ const FilterModal = (props: any) => {
   const [keyword, setKeyword] = useState<string>(searchReducer.keyword);
 
   const [status, setStatus] = useState<string>(searchReducer.status);
+  const [isExpired, setIsExpired] = useState<any>(searchReducer.isExpired);
   const [category, setCategory] = useState<string>(searchReducer.category);
 
   const [categories, setCategories] = useState<CategoryModel[]>([]);
@@ -61,6 +63,7 @@ const FilterModal = (props: any) => {
     }
     if (location.pathname === PathConstants.EMPLOYER_PATHS.jobs) {
       dispatch(ONCHANGE_STATUS(status));
+      dispatch(ONCHANGE_ISEXPIRED(isExpired));
       dispatch(ONCHANGE_KEYWORD(keyword));
       dispatch(ONCHANGE_CATEGORY(category));
       return;
@@ -74,6 +77,7 @@ const FilterModal = (props: any) => {
   const _onClear = () => {
     setKeyword("");
     setStatus("");
+    setIsExpired(false);
     setCategory("");
   };
   const fetchDropdownData = (service: any, setState: any) => {
@@ -116,6 +120,26 @@ const FilterModal = (props: any) => {
         </div>
 
         <div className="mt-10 flex flex-col gap-4">
+          {location.pathname === PathConstants.EMPLOYER_PATHS.jobs && (
+            <div className="w-full">
+              <select
+                className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-1 transition-colors duration-300 ${
+                  isAdminPath
+                    ? "border-borderColor focus:border-bgBlue focus:ring-bgblue"
+                    : "border-borderColor focus:border-orangetext focus:ring-orangetext"
+                }`}
+                value={isExpired}
+                onChange={(e) => setIsExpired(e.target.value)}
+              >
+                <option value="false" className="p-2 text-sm">
+                  Đang tuyển
+                </option>
+                <option value="true" className="p-2 text-sm">
+                  Hết hạn
+                </option>
+              </select>
+            </div>
+          )}
           <div className="w-full">
             <label className="block mb-1.5 text-base font-medium text-gray-600">
               Từ khóa:

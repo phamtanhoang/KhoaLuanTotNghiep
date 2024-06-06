@@ -394,11 +394,13 @@ public class JobController {
         }
     }
 
-
+//1
     @GetMapping("/getJobs-admin")
     public ResponseEntity<?> getJobsByAdmin(@RequestHeader("Authorization") String token,
                                             @RequestParam(required = false) String keyword,
-                                            @RequestParam(required = false) EStatus status, Pageable pageable) {
+                                            @RequestParam(required = false) EStatus status,
+                                            @RequestParam(required = false) boolean isExpired,
+                                            Pageable pageable) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
@@ -418,7 +420,7 @@ public class JobController {
                         new BaseResponse("Không được sử dụng trạng thái này", HttpStatus.BAD_REQUEST.value(), null)
                 );
 
-            Page<Job> jobs = jobService.findByNameContainingAndCategoryIdAndStatus(keyword, null,status, pageable);
+            Page<Job> jobs = jobService.findByNameContainingAndCategoryIdAndStatus(keyword, null,status,isExpired, pageable);
             if (jobs.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách công việc rỗng", HttpStatus.OK.value(), null)
@@ -752,6 +754,7 @@ public class JobController {
                                                           @RequestParam(required = false) String keyword,
                                                           @RequestParam(required = false) String categoryId,
                                                           @RequestParam(required = false) EStatus status,
+                                                          @RequestParam(required = false) boolean isExpired,
                                                           Pageable pageable) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
@@ -780,7 +783,7 @@ public class JobController {
                     return ResponseEntity.status(HttpStatus.OK)
                             .body(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
 
-                jobs = jobService.findByKeywordAndStatusAndCategoryIdAndHRId(keyword, status, categoryId, humanResourceOptional.get().getId(), pageable);
+                jobs = jobService.findByKeywordAndStatusAndCategoryIdAndHRId(keyword, status, categoryId, humanResourceOptional.get().getId(),isExpired, pageable);
 
             }
             else {
@@ -789,7 +792,7 @@ public class JobController {
                 if(optionalEmployer.isEmpty())
                     return ResponseEntity.status(HttpStatus.OK)
                             .body(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
-                jobs = jobService.findByKeywordAndStatusAndCategoryIdAndEmployerId(keyword, status, categoryId, optionalEmployer.get().getId(), pageable);
+                jobs = jobService.findByKeywordAndStatusAndCategoryIdAndEmployerId(keyword, status, categoryId, optionalEmployer.get().getId(),isExpired, pageable);
 
             }
             if (jobs.isEmpty()) {

@@ -16,4 +16,6 @@ public interface StepResultRepository  extends JpaRepository<StepResult,String> 
 
 
     List<StepResult> findAllByApplicationId(String id);
+    List<StepResult> findByApplicationId(String id);
+
 }

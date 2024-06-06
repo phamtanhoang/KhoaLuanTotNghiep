@@ -1,5 +1,6 @@
 package com.pth.taskbackend.repository;
 
+import com.pth.taskbackend.model.meta.Message;
 import com.pth.taskbackend.model.meta.StepSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface StepScheduleRepository extends JpaRepository<StepSchedule,String> {
+    List<StepSchedule> findByApplicationId(String id);
 
     @Query("SELECT s FROM StepSchedule s WHERE s.application.id = :id AND s.stepNumber = :number")
     Optional<StepSchedule> findByApplicationIdAndStepNumber(String id, int number);

@@ -167,5 +167,8 @@ const applicationsService = {
       ApplicationAPI.getPending_Employer(currentPage, itemPerPage)
     );
   },
+  async deleteApplication(id: string) {
+    return await axiosConfig.delete(ApplicationAPI.deleteApplication(id));
+  },
 };
 export default applicationsService;

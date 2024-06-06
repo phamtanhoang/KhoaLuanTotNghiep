@@ -6,6 +6,7 @@ import com.pth.taskbackend.dto.request.ExperienceRequest;
 import com.pth.taskbackend.dto.request.SkillRequest;
 import com.pth.taskbackend.dto.request.UpdateCandidateRequest;
 import com.pth.taskbackend.dto.response.*;
+import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.ESex;
 import com.pth.taskbackend.enums.EStatus;
@@ -80,6 +81,8 @@ public class CandidateController {
     @Autowired
     EmployerService employerService;
     @Autowired HumanResourceService humanResourceService;
+
+    @Autowired ApplicationService applicationService;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("getCandidates-admin")
     public ResponseEntity<BaseResponse> getCandidatesByAdmin(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword,@RequestParam(required = false)EStatus status, Pageable pageable) {
@@ -339,6 +342,125 @@ public class CandidateController {
                     candidate.getUser().getId());
             return ResponseEntity.ok(
                     new BaseResponse("Chi tiết ứng viên", HttpStatus.OK.value(), response)
+            );
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "Get by application", description = "", tags = {})
+    @GetMapping("/getByApplication/{id}")
+    public ResponseEntity<BaseResponse> getCandidateByApplication(@RequestHeader("Authorization")String token, @PathVariable() String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER)
+                    || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Application> optionalApplication = applicationService.findById(id);
+            if (optionalApplication.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy đơn ứng tuyển", HttpStatus.NOT_FOUND.value(), null)
+                );
+            if (optionalApplication.get().getStatus().equals(EApplyStatus.DELETED))
+                return ResponseEntity.ok(
+                        new BaseResponse("Không thể truy cập đơn ứng tuyển đã xóa!", HttpStatus.NO_CONTENT.value(), null)
+                );
+
+            Application application = optionalApplication.get();
+
+
+            Optional<Candidate>  optionalCandidate = candidateService.findById(application.getCandidate().getId());
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            if (optionalCandidate.get().getUser().getStatus().equals(EStatus.DELETED))
+                return ResponseEntity.ok(
+                        new BaseResponse("Tài khoản ứng viên không còn tồn tại!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Candidate candidate = optionalCandidate.get();
+            List<Education>educationList = educationService.findByCandidateId(optionalCandidate.get().getId(),Pageable.unpaged()).stream().toList();
+            List<EducationResponse> educationResponses = educationList.stream()
+                    .map(education -> new EducationResponse(
+                            education.getId(),
+                            education.getCreated(),
+                            education.getUpdated(),
+                            education.getFromDate(),
+                            education.getToDate(),
+                            education.getEducation(),
+                            education.getSequence(),
+                            education.getDescription(),
+                            education.getCandidate().getId()
+                    ))
+                    .toList();
+
+            List<Experience>experiences = experienceService.findByCandidateId(optionalCandidate.get().getId(),Pageable.unpaged()).stream().toList();
+
+            List<ExperienceResponse> experienceResponses = experiences.stream()
+                    .map(experience -> new ExperienceResponse(
+                            experience.getId(),
+                            experience.getCreated(),
+                            experience.getUpdated(),
+                            experience.getFromDate(),
+                            experience.getToDate(),
+                            experience.getExperience(),
+                            experience.getSequence(),
+                            experience.getDescription(),
+                            experience.getCandidate().getId()
+                    ))
+                    .collect(Collectors.toList());
+
+
+            List<Skill>skills = skillService.findByCandidateId(optionalCandidate.get().getId(),Pageable.unpaged()).stream().toList();
+
+            List<SkillResponse> skillResponses = skills.stream()
+                    .map(skill -> new SkillResponse(
+                            skill.getId(),
+                            skill.getCreated(),
+                            skill.getUpdated(),
+                            skill.getSkill(),
+                            skill.getSequence(),
+                            skill.getDescription(),
+                            skill.getCandidate().getId()
+                    ))
+                    .collect(Collectors.toList());
+
+            Map<String,Object>response= new HashMap<>();
+            response.put("skills",skillResponses);
+            response.put("experiences",experienceResponses);
+            response.put("educations",educationResponses);
+            CandidateDetailResponse responses = new CandidateDetailResponse(
+                    candidate.getId(),
+                    candidate.getFirstName(),
+                    candidate.getLastName(),
+                    candidate.getPhoneNumber(),
+                    candidate.getSex(),
+                    candidate.getAvatar(),
+                    candidate.getDateOfBirth(),
+                    candidate.getIntroduction(),
+                    candidate.getJob(),
+                    candidate.getLink(),
+                    candidate.getUser().getEmail(),
+                    candidate.getUser().getId(),
+                    candidate.getAddress(),
+                    response
+            );
+            return ResponseEntity.ok(
+                    new BaseResponse("Chi tiết ứng viên", HttpStatus.OK.value(), responses)
             );
         }catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

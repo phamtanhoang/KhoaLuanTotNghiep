@@ -15,6 +15,8 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
 @CrossOrigin(origins = "*")
@@ -47,22 +49,10 @@ public class ResourceController {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
-    @MessageMapping("/message") // "/app/message"
-    @SendTo("/chatroom/public")
-    public Message receivePublicMessage(@Payload Message message){
-        return message;
-    }
-    @MessageMapping("/private-message")
-    public Message receivePrivateMessage(@Payload Message message){
-        simpMessagingTemplate.convertAndSendToUser(message.getReceiverName(), "/private", message); // "/user/username/private"
-        System.out.println("message: " + message);
-        return message;
-    }
-
-    @MessageMapping("/application")
-    @SendTo("/application/123")
-    public Message chatApplication(@Payload Message message){
-        System.out.println("message: " + message);
-        return message;
+    @MessageMapping("/chat")
+    @SendTo("/topic/messages")
+    public Message sendMessage(@Payload Message chatMessage) {
+        chatMessage.setTimestamp(new Date());
+        return chatMessage;
     }
 }

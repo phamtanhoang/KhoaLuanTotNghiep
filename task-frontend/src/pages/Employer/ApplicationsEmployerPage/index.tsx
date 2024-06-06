@@ -21,6 +21,7 @@ export interface ApplicationTableProps {
   value: ApplicationModel[];
   _onClickDetail: (item: ApplicationModel) => void;
   _onClickDelete: (item: ApplicationModel) => void;
+  _onClickInfo: (item: ApplicationModel) => void;
   isLoading: boolean;
   isEmpty: boolean;
   currentPage: number;
@@ -56,17 +57,38 @@ const ApplicationsEmployerPage = () => {
       "Xóa đơn ứng tuyển này?",
       "warning",
       () => {
-        SwalHelper.BigAlert("That bai", "error");
+        context.handleOpenLoading();
+        applicationsService
+          .deleteApplication(item.id)
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              SwalHelper.MiniAlert("Xóa đơn ứng tuyển thành công", "success");
+              fetchListData();
+            } else {
+              SwalHelper.MiniAlert(res.data.Message, "error");
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
       },
-      () => {
-        SwalHelper.MiniAlert("That bai", "error");
-      }
+      () => {}
     );
   };
   const _onClickDetail = (item: ApplicationModel) => {
     setId(item.id);
     setFuncs(ModalConstants.APPLICATION_KEYS.applycationDetail);
     handleOpen();
+  };
+  const _onClickInfo = (item: ApplicationModel) => {
+    if (item.candidate?.isFindJob) {
+      setId(item.id);
+      setFuncs(ModalConstants.CANDIDATE_KEYS.detailCandidate);
+      handleOpen();
+    }
   };
 
   const fetchListData = () => {
@@ -134,6 +156,7 @@ const ApplicationsEmployerPage = () => {
               value={applications}
               _onClickDelete={_onClickDelete}
               _onClickDetail={_onClickDetail}
+              _onClickInfo={_onClickInfo}
               isLoading={isLoadingTable}
               currentPage={currentPage}
               itemPerpage={itemPerPage}
@@ -145,6 +168,7 @@ const ApplicationsEmployerPage = () => {
               value={applications}
               _onClickDelete={_onClickDelete}
               _onClickDetail={_onClickDetail}
+              _onClickInfo={_onClickInfo}
               isLoading={isLoadingTable}
               currentPage={currentPage}
               itemPerpage={itemPerPage}

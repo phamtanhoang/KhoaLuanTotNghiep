@@ -158,7 +158,7 @@ const DashboardAdminPage = () => {
                 },
                 colors: ["#4d4dff"],
                 title: {
-                  text: "Thống kê doanh thu",
+                  text: "Thống kê doanh thu (Tháng)",
                   align: "center",
                   style: {
                     fontSize: "20px",

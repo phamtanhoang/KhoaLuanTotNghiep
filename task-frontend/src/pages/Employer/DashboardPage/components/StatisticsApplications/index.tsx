@@ -17,15 +17,17 @@ const StatisticsApplications = () => {
   const itemPerPage = 8;
   const [page, setPage] = useState<number>(0);
   const [isFirst, setIsFirst] = useState<boolean>(true);
-  const [isLast, setIsLast] = useState<boolean>(false);
+  const [isLast, setIsLast] = useState<boolean>(true);
   const fetchListData = () => {
     applicationsService
       .getPending_Employer(page, itemPerPage)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          setItems(res.data.Data.content || []);
-          setIsFirst(res.data.Data.first);
-          setIsLast(res.data.Data.last);
+          if (res.data.Data != null) {
+            setItems(res.data.Data?.content || []);
+            setIsFirst(res.data.Data?.first);
+            setIsLast(res.data.Data?.last);
+          }
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -43,6 +45,7 @@ const StatisticsApplications = () => {
     setFuncs(ModalConstants.APPLICATION_KEYS.applycationDetail);
     handleOpen();
   };
+  // alert("first " + isFirst + " last " + isLast);
   return (
     <>
       <ModalBase

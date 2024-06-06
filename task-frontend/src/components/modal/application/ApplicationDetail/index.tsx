@@ -23,8 +23,6 @@ import { MdSkipNext } from "react-icons/md";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { GrSchedulePlay } from "react-icons/gr";
 import { BiDetail } from "react-icons/bi";
-import { over } from "stompjs";
-import SockJS from "sockjs-client";
 
 interface StepItemProps {
   index: number;
@@ -35,7 +33,6 @@ interface StepItemProps {
   _onClickDetailStepSchedule: (id: string) => void;
 }
 
-var stompClient: any = null;
 const StepItem: React.FC<StepItemProps> = ({
   index,
   item,
@@ -274,85 +271,7 @@ const ApplicationDetail = (props: any) => {
       });
   };
 
-  // useEffect(() => {
-  //   connect();
-  // }, []);
 
-  // const connect = () => {
-  //   let Sock = new SockJS("http://localhost:8080/ws");
-  //   stompClient = over(Sock);
-  //   stompClient.connect({}, onConnected, onError);
-  // };
-
-  // const onConnected = () => {
-  //   stompClient.subscribe(`/app/application/${id}`, onMessageReceived);
-  // };
-
-  // const onMessageReceived = (payload: any) => {
-  //   var payloadData = JSON.parse(payload.body);
-  //   alert(payloadData);
-  //   // publicChats.push(payloadData);
-  //   // setPublicChats([...publicChats]);
-  // };
-
-  // const onError = (err: any) => {
-  //   console.log(err);
-  // };
-
-  // const handleMessage = (event) => {
-  //   const { value } = event.target;
-  //   setUserData({ ...userData, message: value });
-  // };
-  // const sendValue = () => {
-  //   if (stompClient) {
-  //     var chatMessage = {
-  //       senderName: userData.username,
-  //       message: userData.message,
-  //       status: "MESSAGE",
-  //     };
-  //     console.log(chatMessage);
-  //     stompClient.send(
-  //       `/app/application/${roomId}`,
-  //       {},
-  //       JSON.stringify(chatMessage)
-  //     );
-  //     setUserData({ ...userData, message: "" });
-  //   }
-  // };
-
-  // const handleUsername = (event) => {
-  //   const { value } = event.target;
-  //   setUserData({ ...userData, username: value });
-  // };
-
-  // const registerUser = () => {
-  //   connect();
-  // };
-
-  const [mess, setMess] = useState([]);
-  const [stompClient, setStompClient] = useState<any>(null);
-
-  useEffect(() => {
-    const socket = new SockJS("http://localhost:8080/ws"); // Thay đổi URL phù hợp với backend của bạn
-    const stompClient2 = over(socket);
-
-    stompClient2.connect({}, () => {
-      console.log("WebSocket connection established");
-
-      // Đăng ký nhận tin nhắn từ server
-      stompClient2.subscribe(`/app/application/${id}`, (message) => {
-        // setMess((prevMessages: any) => [...prevMessages, message.body]);
-      });
-    });
-
-    setStompClient(stompClient2);
-
-    return () => {
-      if (stompClient) {
-        stompClient.disconnect();
-      }
-    };
-  }, []);
 
   const _onClickUpDateStep = (status: string, result: string) => {
     context.handleOpenLoading();

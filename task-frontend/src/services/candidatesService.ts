@@ -64,6 +64,12 @@ const candidatesService = {
     });
   },
 
+  async getDetail_Employer(id: string) {
+    return await axiosConfig.get(CandidateAPI.getDetail_Employer(id), {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
+
   async changeImage(image: File | null) {
     const formData = new FormData();
     if (image) formData.append("avatar", image);

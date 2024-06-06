@@ -7,6 +7,7 @@ export const searchReducer = createSlice({
     keyword: "",
     category: "",
     status: "",
+    isExpired: false,
   },
 
   reducers: {
@@ -19,10 +20,14 @@ export const searchReducer = createSlice({
     ONCHANGE_CATEGORY: (state, action) => {
       state.category = action.payload;
     },
+    ONCHANGE_ISEXPIRED: (state, action) => {
+      state.isExpired = action.payload;
+    },
     ONCLEAR_FILTER: (state) => {
       state.keyword = "";
       state.category = "";
       state.status = "";
+      state.isExpired = false;
     },
   },
 });
@@ -32,6 +37,7 @@ export const {
   ONCHANGE_STATUS,
   ONCHANGE_CATEGORY,
   ONCLEAR_FILTER,
+  ONCHANGE_ISEXPIRED,
 } = searchReducer.actions;
 
 export default searchReducer.reducer;

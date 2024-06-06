@@ -5,6 +5,7 @@ import {
   ProtectedRoute,
 } from "@/components/ui";
 import { AdminLayout, CandidateLayout, EmployerLayout } from "@/layouts";
+import TestChat from "@/layouts/test";
 import {
   CandidateAdminPage,
   CategoryAdminPage,
@@ -72,6 +73,7 @@ const Routers = () => {
     <BrowserRouter>
       <ScrollToTop />
       <Routes>
+        <Route path="test" element={<TestChat />} />
         <Route
           path={PathConstants.CANDIDATE_PATHS.default}
           element={<Navigate to={PathConstants.CANDIDATE_PATHS.home} replace />}

@@ -50,6 +50,10 @@ const CandidateAPI = {
   uploadCV: "/candidates/uploadCV",
 
   clearCV: "/candidates/deleteCV",
+
+  getDetail_Employer: (id?: string) => {
+    return `/candidates/getByApplication/${id}`;
+  },
 };
 
 const EmployerAPI = {
@@ -175,19 +179,21 @@ const JobAPI = {
     keyword?: string,
     category?: string,
     status?: string,
+    isExpired?: boolean,
     currentPage?: number,
     itemPerPage?: number
   ) => {
-    return `/jobs/getJobs-employer?keyword=${keyword}&categoryId=${category}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
+    return `/jobs/getJobs-employer?keyword=${keyword}&categoryId=${category}&status=${status}&isExpired=${isExpired}&page=${currentPage}&size=${itemPerPage}`;
   },
   getList_Admin: (
     keyword?: string,
     category?: string,
     status?: string,
+    isExpired?: boolean,
     currentPage?: number,
     itemPerPage?: number
   ) => {
-    return `/jobs/getJobs-admin?keyword=${keyword}&categoryId=${category}&status=${status}&page=${currentPage}&size=${itemPerPage}`;
+    return `/jobs/getJobs-admin?keyword=${keyword}&categoryId=${category}&status=${status}&isExpired=${isExpired}&page=${currentPage}&size=${itemPerPage}`;
   },
 
   createJob: "/jobs/create",
@@ -317,6 +323,9 @@ const ApplicationAPI = {
 
   getPending_Employer: (currentPage?: number, itemPerPage?: number) => {
     return `/applications/pendingApplications-employer?page=${currentPage}&size=${itemPerPage}`;
+  },
+  deleteApplication: (id: string) => {
+    return `/applications/deleteApplication-employer/${id}`;
   },
 };
 const ScheduleAPI = {

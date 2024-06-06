@@ -827,6 +827,10 @@ body {
   top: 1.25rem;
 }
 
+.top-8{
+  top: 2rem;
+}
+
 .top-9{
   top: 2.25rem;
 }
@@ -837,18 +841,6 @@ body {
 
 .top-\[72px\]{
   top: 72px;
-}
-
-.top-20{
-  top: 5rem;
-}
-
-.top-8{
-  top: 2rem;
-}
-
-.top-7{
-  top: 1.75rem;
 }
 
 .z-0{
@@ -1712,18 +1704,6 @@ body {
 
 .w-screen{
   width: 100vw;
-}
-
-.w-\[60\%\]{
-  width: 60%;
-}
-
-.w-\[50\%\]{
-  width: 50%;
-}
-
-.w-\[\%\]{
-  width: %;
 }
 
 .min-w-full{
@@ -4721,10 +4701,6 @@ body {
   .lg\:w-max{
     width: -moz-max-content;
     width: max-content;
-  }
-
-  .lg\:w-\[450\%\]{
-    width: 450%;
   }
 
   .lg\:max-w-2xl{

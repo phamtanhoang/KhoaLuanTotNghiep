@@ -7,6 +7,9 @@ const formatDateTime = (date?: Date) => {
 const formatDate = (date?: Date) => {
   return moment(date).format("DD/MM/YYYY");
 };
+const formatDate2 = (date?: Date) => {
+  return moment(date).format("MM/YYYY");
+};
 function convertDate(date?: string | null): string {
   if (!date) {
     return "";
@@ -59,6 +62,7 @@ function calculateHours(startDateStr: string, endDateStr: string) {
 export const DateHelper = {
   formatDateTime,
   formatDate,
+  formatDate2,
   convertDate,
   convertDateFormat,
   getFirstDayOfMonth,

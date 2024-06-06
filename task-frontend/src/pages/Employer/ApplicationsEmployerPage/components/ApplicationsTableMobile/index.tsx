@@ -12,9 +12,10 @@ const ItemTSX: React.FC<{
   index: number;
   _onClickDetail: (item: ApplicationModel) => void;
   _onClickDelete: (item: ApplicationModel) => void;
+  _onClickInfo: (item: ApplicationModel) => void;
   currentPage: number;
   itemPerpage: number;
-}> = ({ item, index, _onClickDelete, _onClickDetail }) => {
+}> = ({ item, index, _onClickDelete, _onClickDetail, _onClickInfo }) => {
   let data = ConstantsHelper.findApplicationStateById(item.status);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -61,8 +62,13 @@ const ItemTSX: React.FC<{
               />
               <div>
                 <h2
-                  className="text-base font-semibold text-gray-800 cursor-pointer hover:text-orangetext line-clamp-2"
-                  onClick={() => {}}
+                  className={`text-base font-semibold text-gray-800 cursor-pointer ursor-default ${
+                    item.candidate?.isFindJob == true &&
+                    "hover:text-orangetext cursor-pointer "
+                  } line-clamp-2`}
+                  onClick={() => {
+                    _onClickInfo(item);
+                  }}
                 >
                   {item.candidate?.firstName} {item.candidate?.lastName}
                 </h2>
@@ -146,6 +152,7 @@ const ApplicationsTableMobile: React.FC<ApplicationTableProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,
+  _onClickInfo,
   isLoading,
   isEmpty,
   currentPage,
@@ -178,6 +185,7 @@ const ApplicationsTableMobile: React.FC<ApplicationTableProps> = ({
                         index={index}
                         _onClickDelete={_onClickDelete}
                         _onClickDetail={_onClickDetail}
+                        _onClickInfo={_onClickInfo}
                         currentPage={currentPage}
                         itemPerpage={itemPerpage}
                       />

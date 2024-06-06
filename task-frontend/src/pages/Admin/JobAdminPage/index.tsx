@@ -33,6 +33,7 @@ const JobAdminPage = () => {
   const [isLoadingTable, setIsLoadingTable] = useState<boolean>(false);
   const [keyword, setKeyword] = useState<string>("");
   const [status, setStatus] = useState<string>("");
+  const [isExpired, setIsExpired] = useState<boolean>(false);
 
   const [open, setOpen] = useState(false);
   const [funcs, setFuncs] = useState<string>("");
@@ -78,7 +79,14 @@ const JobAdminPage = () => {
   const fetchListData = () => {
     setIsLoadingTable(true);
     jobsService
-      .getList_Admin(keyword, "", status, currentPage - 1, itemPerPage)
+      .getList_Admin(
+        keyword,
+        "",
+        status,
+        isExpired,
+        currentPage - 1,
+        itemPerPage
+      )
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           dispatch(ONCHANGE_JOB_LIST(res.data.Data?.content || []));
@@ -101,7 +109,7 @@ const JobAdminPage = () => {
 
   useEffect(() => {
     fetchListData();
-  }, [keyword, status, currentPage]);
+  }, [keyword, status, isExpired, currentPage]);
   return (
     <>
       <ModalBase
@@ -149,6 +157,8 @@ const JobAdminPage = () => {
           _onClickDetail={_onClickDetail}
           _onChangeStatus={_onChangeStatus}
           status={status}
+          isExpired={isExpired}
+          setIsExpired={setIsExpired}
           isLoading={isLoadingTable}
           currentPage={currentPage}
           itemPerpage={itemPerPage}

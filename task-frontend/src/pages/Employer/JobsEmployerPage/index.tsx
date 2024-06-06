@@ -94,6 +94,7 @@ const JobsEmployerPage = () => {
         searchReducer.keyword,
         searchReducer.category,
         searchReducer.status,
+        searchReducer.isExpired,
         currentPage - 1,
         itemPerPage
       )
@@ -124,6 +125,7 @@ const JobsEmployerPage = () => {
     searchReducer.keyword,
     searchReducer.category,
     searchReducer.status,
+    searchReducer.isExpired,
     currentPage,
   ]);
 

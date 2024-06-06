@@ -31,7 +31,7 @@ public interface JobService {
             Pageable pageable);
 
     Page<Job>findByProcessId(String id, Pageable pageable)throws IOException;
-    Page<Job>findByNameContainingAndCategoryIdAndStatus(String name,String categoryId,EStatus status,Pageable pageable)throws IOException;
+    Page<Job>findByNameContainingAndCategoryIdAndStatus(String name,String categoryId,EStatus status,boolean isExpired,Pageable pageable)throws IOException;
     Page<Job>findByStatusOrderByCreatedDesc(EStatus status, Pageable pageable)throws IOException;
 
     Page<Job>findVipJob(Pageable pageable)throws  IOException;
@@ -39,8 +39,8 @@ public interface JobService {
 
     Page<Job> searchJobs(String keyword, String location, String experience, LocalDateTime fromDate, String categoryId,String tagId, Pageable pageable) throws java.io.IOException ;
 
-    Page<Job>findByKeywordAndStatusAndCategoryIdAndHRId(String keyword, EStatus status,String categoryId,String hRId,Pageable pageable)throws IOException;
-    Page<Job>findByKeywordAndStatusAndCategoryIdAndEmployerId(String keyword, EStatus status,String categoryId,String employerId,Pageable pageable)throws IOException;
+    Page<Job>findByKeywordAndStatusAndCategoryIdAndHRId(String keyword, EStatus status,String categoryId,String hRId,boolean isExpired,Pageable pageable)throws IOException;
+    Page<Job>findByKeywordAndStatusAndCategoryIdAndEmployerId(String keyword, EStatus status,String categoryId,String employerId,boolean isExpired,Pageable pageable)throws IOException;
     Page<Job>findByKeywordAndCategoryIdAndEmployerId(String keyword,String categoryId,String employerId,Pageable pageable)throws IOException;
     Page<Job>findByKeywordAndCategoryIdAndHRId(String keyword,String categoryId,String hrId,Pageable pageable)throws IOException;
 

@@ -76,9 +76,9 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "AND (COALESCE(:categoryId, '') = '' OR j.category.id = :categoryId) " +
             "AND j.status != 'DELETED' " +
             "AND (:status IS NULL OR:status = ''  OR j.status = :status) " +
-            "AND j.toDate > CURRENT_TIMESTAMP " +
+            "AND (:isExpired = true AND j.toDate < CURRENT_TIMESTAMP OR :isExpired = false AND j.toDate > CURRENT_TIMESTAMP) " +
             "ORDER BY j.created DESC")
-    Page<Job> findByNameContainingAndCategoryIdAndStatus(String keyword, String categoryId, EStatus status, Pageable pageable);
+    Page<Job> findByNameContainingAndCategoryIdAndStatus(String keyword, String categoryId, EStatus status,boolean isExpired, Pageable pageable);
 
 
     @Query("SELECT j FROM Job j " +
@@ -100,12 +100,13 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "AND (COALESCE(:categoryId, '') = '' OR j.category.id = :categoryId) " +
             "AND j.humanResource.id = :hRId " +
             "AND j.status != 'DELETED' " +
+            "AND (:isExpired = true AND j.toDate < CURRENT_TIMESTAMP OR :isExpired = false AND j.toDate > CURRENT_TIMESTAMP) " +
             "ORDER BY j.created DESC")
     Page<Job> findByKeywordAndStatusAndCategoryIdAndHRId(
             @Param("keyword") String keyword,
             @Param("status") EStatus status,
             @Param("categoryId") String categoryId,
-            @Param("hRId") String hRId,
+            @Param("hRId") String hRId,boolean isExpired,
             Pageable pageable);
 
     @Query("SELECT j FROM Job j " +
@@ -136,12 +137,14 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "AND (COALESCE(:categoryId, '') = '' OR j.category.id = :categoryId) " +
             "AND j.humanResource.employer.id = :employerId " +
             "AND j.status != 'DELETED' " +
+            "AND (:isExpired = true AND j.toDate < CURRENT_TIMESTAMP OR :isExpired = false AND j.toDate > CURRENT_TIMESTAMP) " +
             "ORDER BY j.created DESC")
     Page<Job> findByKeywordAndStatusAndCategoryIdAndEmployerId(
             @Param("keyword") String keyword,
             @Param("status") EStatus status,
             @Param("categoryId") String categoryId,
             @Param("employerId") String employerId,
+            boolean isExpired,
             Pageable pageable);
 
 

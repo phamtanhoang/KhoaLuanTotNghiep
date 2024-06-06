@@ -30,7 +30,7 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
 
     @Query("SELECT c, COUNT(j.id) as count " +
             "FROM Category c " +
-            "LEFT JOIN Job j ON c.id = j.category.id " +
+            "LEFT JOIN Job j ON c.id = j.category.id AND j.toDate > CURRENT_TIMESTAMP " +
             "GROUP BY c " +
             "ORDER BY count DESC")
     Page<Object[]> findCategoriesOrderedByJobCount(Pageable pageable);

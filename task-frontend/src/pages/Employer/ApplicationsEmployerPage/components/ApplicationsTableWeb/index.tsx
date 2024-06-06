@@ -11,6 +11,7 @@ const ItemTSX: React.FC<{
   index: number;
   _onClickDelete: (item: ApplicationModel) => void;
   _onClickDetail: (item: ApplicationModel) => void;
+  _onClickInfo: (item: ApplicationModel) => void;
   currentPage: number;
   itemPerpage: number;
 }> = ({
@@ -18,6 +19,7 @@ const ItemTSX: React.FC<{
   index,
   _onClickDelete,
   _onClickDetail,
+  _onClickInfo,
   currentPage,
   itemPerpage,
 }) => {
@@ -45,8 +47,11 @@ const ItemTSX: React.FC<{
             />
             <div>
               <h2
-                className="text-base font-semibold text-gray-800 cursor-pointer hover:text-orangetext line-clamp-2"
-                onClick={() => {}}
+                className={`text-base font-semibold text-gray-800 cursor-default ${
+                  item.candidate?.isFindJob == true &&
+                  "hover:text-orangetext cursor-pointer "
+                } line-clamp-2`}
+                onClick={() => _onClickInfo(item)}
               >
                 {item.candidate?.firstName} {item.candidate?.lastName}
               </h2>
@@ -93,7 +98,7 @@ const ItemTSX: React.FC<{
           />
           <AiFillDelete
             className=" cursor-pointer hover:text-red-500"
-            onClick={() => _onClickDetail(item)}
+            onClick={() => _onClickDelete(item)}
           />
         </div>
       </td>
@@ -105,6 +110,7 @@ const ApplicationsTableWeb: React.FC<ApplicationTableProps> = ({
   value,
   _onClickDelete,
   _onClickDetail,
+  _onClickInfo,
   isLoading,
   isEmpty,
   currentPage,
@@ -146,6 +152,7 @@ const ApplicationsTableWeb: React.FC<ApplicationTableProps> = ({
                         index={index}
                         _onClickDelete={_onClickDelete}
                         _onClickDetail={_onClickDetail}
+                        _onClickInfo={_onClickInfo}
                         currentPage={currentPage}
                         itemPerpage={itemPerpage}
                       />
