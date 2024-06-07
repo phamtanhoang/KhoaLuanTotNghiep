@@ -171,7 +171,6 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void saveJob(String jobId, String candidateId) {
-        System.out.println(jobId + "     " + candidateId);
         jobRepository.saveJob(jobId,candidateId);
     }
 

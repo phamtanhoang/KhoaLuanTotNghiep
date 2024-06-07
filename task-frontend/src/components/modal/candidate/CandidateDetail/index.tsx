@@ -1,19 +1,21 @@
 import { LoadingContext } from "@/App";
-import { candidatesService } from "@/services";
-import { DateHelper, SwalHelper } from "@/utils/helpers";
+import { candidatesService, employersService } from "@/services";
+import { AuthHelper, DateHelper, SwalHelper } from "@/utils/helpers";
 import { useContext, useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
-import { IoMdExit } from "react-icons/io";
+import { IoIosRemoveCircleOutline, IoMdExit } from "react-icons/io";
 import NON_USER from "@/assets/images/non-user.jpg";
+import { PathConstants } from "@/utils/constants";
 
 const CandidateDetail = (props: any) => {
   const context = useContext(LoadingContext);
   const handleClose = props.handleClose;
   const id = props.id;
+  const fetchData = props.fetchData;
 
   const [candidate, setCandidate] = useState<any>(null);
 
-  const fetchData = () => {
+  const fetchInfo = () => {
     context.handleOpenLoading();
     candidatesService
       .getDetail_Employer(id)
@@ -33,8 +35,36 @@ const CandidateDetail = (props: any) => {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchInfo();
   }, []);
+
+  const _onClickUnFollow = () => {
+    SwalHelper.Confirm(
+      "Xác nhận hủy người theo dõi này?",
+      "question",
+      () => {
+        context.handleOpenLoading();
+        employersService
+          .unfollow_Employer(id)
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              fetchData();
+              handleClose();
+              SwalHelper.MiniAlert(res.data.Message, "success");
+            } else {
+              SwalHelper.MiniAlert(res.data.Message, "error");
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
+      },
+      () => {}
+    );
+  };
 
   return (
     <>
@@ -167,6 +197,16 @@ const CandidateDetail = (props: any) => {
         </div>
 
         <div className="flex justify-end gap-4 px-4 py-3 border-t">
+          {AuthHelper.isEmployer() && PathConstants.EMPLOYER_PATHS.profile && (
+            <button
+              className="flex items-center gap-2 w-max h-max px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-600/85 font-medium"
+              onClick={_onClickUnFollow}
+            >
+              <IoIosRemoveCircleOutline className="text-xl" />
+              <p>Hủy người theo dõi</p>
+            </button>
+          )}
+
           <button
             className="flex items-center gap-2 w-max h-max px-4 py-2 bg-slate-300 text-white rounded-md hover:bg-slate-300/90 font-medium"
             onClick={handleClose}

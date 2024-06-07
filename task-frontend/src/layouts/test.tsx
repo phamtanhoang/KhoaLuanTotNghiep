@@ -1,103 +1,31 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
-import {
-  TextField,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemAvatar,
-  Avatar,
-  Typography,
-} from "@material-ui/core";
-import Stomp from "stompjs";
-import SockJS from "sockjs-client";
+import React, { useEffect, useRef } from "react";
+import { io, Socket } from "socket.io-client";
 
-interface Message {
-  nickname: string;
-  content: string;
-}
+const App: React.FC = () => {
+  // const socketRef = useRef<Socket | null>(null);
 
-const TestChat: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [message, setMessage] = useState<string>("");
-  const [nickname, setNickname] = useState<string>("");
-  const [stompClient, setStompClient] = useState<any | null>(null);
+  // useEffect(() => {
+  //   const socket = io("http://localhost:9092/chat?token=abc123", {
+  //     transports: ["polling", "websocket"],
+  //   });
+  //   socketRef.current = socket;
 
-  useEffect(() => {
-    const socket = new SockJS("http://localhost:8080/ws");
-    const client = Stomp.over(socket);
+  //   socket.on("connect", () => {
+  //     console.log("Connected to the server");
+  //   });
 
-    client.connect({}, () => {
-      client.subscribe("/topic/messages", (message: any) => {
-        const receivedMessage: Message = JSON.parse(message.body);
-        setMessages((prevMessages) => [...prevMessages, receivedMessage]);
-      });
-    });
+  //   socket.on("connect_error", (error: any) => {
+  //     console.log("Failed to connect to the server", error);
+  //   });
 
-    setStompClient(client);
+  //   return () => {
+  //     if (socketRef.current) {
+  //       socketRef.current.disconnect();
+  //     }
+  //   };
+  // }, []);
 
-    return () => {
-      client.disconnect(() => {}, {});
-    };
-  }, []);
-
-  const handleNicknameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setNickname(event.target.value);
-  };
-
-  const handleMessageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setMessage(event.target.value);
-  };
-
-  const sendMessage = () => {
-    if (message.trim()) {
-      const chatMessage: Message = {
-        nickname,
-        content: message,
-      };
-
-      stompClient?.send("/app/chat", {}, JSON.stringify(chatMessage));
-      setMessage("");
-    }
-  };
-
-  return (
-    <div>
-      <List>
-        {messages.map((msg, index) => (
-          <ListItem key={index}>
-            <ListItemAvatar>
-              <Avatar>{msg.nickname.charAt(0)}</Avatar>
-            </ListItemAvatar>
-            <ListItemText
-              primary={
-                <Typography variant="subtitle1">{msg.nickname}</Typography>
-              }
-              secondary={msg.content}
-            />
-          </ListItem>
-        ))}
-      </List>
-
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <TextField
-          placeholder="Enter your nickname"
-          value={nickname}
-          onChange={handleNicknameChange}
-          autoFocus
-        />
-        <TextField
-          placeholder="Type a message"
-          value={message}
-          onChange={handleMessageChange}
-          fullWidth
-        />
-        <IconButton onClick={sendMessage} disabled={!message.trim()}>
-          send
-        </IconButton>
-      </div>
-    </div>
-  );
+  return <div>App</div>;
 };
 
-export default TestChat;
+export default App;

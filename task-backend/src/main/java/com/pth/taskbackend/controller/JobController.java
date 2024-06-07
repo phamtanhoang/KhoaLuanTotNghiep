@@ -15,6 +15,7 @@ import com.pth.taskbackend.util.func.DateFunc;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
@@ -67,6 +69,7 @@ public class JobController {
     @Autowired
     ObjectMapper objectMapper;
     @Autowired ApplicationService applicationService;
+    @Autowired MailService mailService;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("")
     public ResponseEntity<BaseResponse> getJobs(@RequestHeader(value = "Authorization",required = false)String token,
@@ -1539,12 +1542,42 @@ public class JobController {
                         return ResponseEntity.ok(
                                 new BaseResponse("Đã bật tuyển dụng", HttpStatus.BAD_REQUEST.value(), null)
                         );
+
+                    if(job.getStatus().equals(EStatus.PENDING)) {
+                        List<Candidate> candidates = candidateService.getCandidatesFollow(job.getHumanResource().getEmployer().getId());
+                        List<String> emails = candidates.stream()
+                                .map(candidate -> candidate.getUser().getEmail())
+                                .collect(Collectors.toList());
+
+
+                        CompletableFuture.runAsync(() -> {
+                            emails.forEach(item -> {
+                                try {
+                                    String imageUrl = job.getHumanResource().getEmployer().getImage();
+                                    if (imageUrl == null || imageUrl.isEmpty()) {
+                                        imageUrl = "https://res.cloudinary.com/dcpatkvcu/image/upload/v1695807392/DoAnNganh/non-user_lctzz5.jpg";
+                                    }
+                                    String category = job.getCategory().getName();
+                                    if (category == null || category.isEmpty()) {
+                                        category = "Khác";
+                                    }
+                                    mailService.sendEmailV2(item, item, job.getHumanResource().getEmployer().getName(),
+                                            imageUrl, job.getId(), job.getName(), job.getLocation(),
+                                            category,
+                                            "EMAIL_TEMPLATE2");
+                                } catch (MessagingException e) {
+                                    System.out.println("Failed to send email to: " + item);
+                                }
+                            });
+                        });
+                    }
                     job.setStatus(EStatus.ACTIVE);
                     jobService.update(job);
-
                     return ResponseEntity.ok(
                             new BaseResponse("Bật tuyển công việc thành công", HttpStatus.OK.value(), null)
                     );
+
+
                 case INACTIVE:
 
                     if(job.getStatus().equals(EStatus.INACTIVE))

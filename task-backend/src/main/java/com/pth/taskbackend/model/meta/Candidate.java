@@ -79,6 +79,13 @@ public class Candidate extends BaseEntity {
     )
     private Set<Job> jobs = new HashSet<>();
 
-
+    @JsonIgnore
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "followed_employer",
+            joinColumns = @JoinColumn(name = "candidate_id"),
+            inverseJoinColumns = @JoinColumn(name = "employer_id")
+    )
+    private Set<Employer> employers = new HashSet<>();
 }
 

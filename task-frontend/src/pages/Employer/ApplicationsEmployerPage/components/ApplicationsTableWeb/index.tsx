@@ -47,10 +47,8 @@ const ItemTSX: React.FC<{
             />
             <div>
               <h2
-                className={`text-base font-semibold text-gray-800 cursor-default ${
-                  item.candidate?.isFindJob == true &&
-                  "hover:text-orangetext cursor-pointer "
-                } line-clamp-2`}
+                className={`text-base font-semibold text-gray-800  
+                  hover:text-orangetext cursor-pointer line-clamp-2`}
                 onClick={() => _onClickInfo(item)}
               >
                 {item.candidate?.firstName} {item.candidate?.lastName}

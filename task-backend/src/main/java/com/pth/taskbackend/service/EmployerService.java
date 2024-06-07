@@ -1,6 +1,7 @@
 package com.pth.taskbackend.service;
 
 import com.pth.taskbackend.enums.EStatus;
+import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.repository.EmployerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 public interface EmployerService {
@@ -35,4 +37,10 @@ public interface EmployerService {
 
     Integer countEmployer_Admin();
     Integer countEmployerVip_Admin();
+
+    boolean checkIsFollowEmployer(String candidateId, String id);
+    void followEmployer(String candidateId, String id);
+    void unfollowEmployer(String candidateId, String id);
+    Page<Employer> getEmployersFollowed(String id, Pageable pageable) throws  IOException;
+
 }

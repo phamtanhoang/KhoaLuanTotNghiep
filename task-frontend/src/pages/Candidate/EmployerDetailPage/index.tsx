@@ -3,7 +3,7 @@ import { EmptyData, GreatEmployers } from "@/components/ui";
 import { useParams } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { LoadingContext } from "@/App";
-import { SwalHelper } from "@/utils/helpers";
+import { AuthHelper, SwalHelper } from "@/utils/helpers";
 import { employersService } from "@/services";
 import { Hero } from "@/components/ui";
 import { PathConstants } from "@/utils/constants";
@@ -36,6 +36,67 @@ const EmployerDetailPage = () => {
   useEffect(() => {
     fetchData();
   }, [id]);
+
+  const _onClickFollow = (id: string) => {
+    if (!AuthHelper.isCandidate()) {
+      SwalHelper.MiniAlert("Vui lòng đăng nhập tài khoàn ứng viên!", "warning");
+      return;
+    }
+    SwalHelper.Confirm(
+      `Theo dõi sẽ nhận được thông tin tuyển dụng qua email`,
+      "question",
+      () => {
+        context.handleOpenLoading();
+        employersService
+          .followEmployer(id!)
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              fetchData();
+              SwalHelper.MiniAlert(res.data.Message, "success");
+            } else {
+              SwalHelper.MiniAlert(res.data.Message, "error");
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
+      },
+      () => {}
+    );
+  };
+  const _onClickUnfollow = (id: string) => {
+    if (!AuthHelper.isCandidate()) {
+      SwalHelper.MiniAlert("Vui lòng đăng nhập tài khoàn ứng viên!", "warning");
+      return;
+    }
+    SwalHelper.Confirm(
+      `Bỏ theo dõi sẽ không tiếp tục nhận được thông tin tuyển dụng`,
+      "question",
+      () => {
+        context.handleOpenLoading();
+        employersService
+          .unfollowEmployer(id!)
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              fetchData();
+              SwalHelper.MiniAlert(res.data.Message, "success");
+            } else {
+              SwalHelper.MiniAlert(res.data.Message, "error");
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
+      },
+      () => {}
+    );
+  };
   return (
     <>
       <Hero
@@ -49,6 +110,7 @@ const EmployerDetailPage = () => {
             <>
               <div className="w-full lg:w-4/12 flex flex-col gap-3 lg:gap-5">
                 <LeftPage
+                  id={employer?.id}
                   name={employer?.name}
                   description={employer?.description}
                   image={employer?.image}
@@ -56,6 +118,9 @@ const EmployerDetailPage = () => {
                   email={employer?.email}
                   phone={employer?.phoneNumber}
                   isVip={employer?.isVip}
+                  isFollow={employer?.isFollow}
+                  _onClickFollow={_onClickFollow}
+                  _onClickUnfollow={_onClickUnfollow}
                 />
               </div>
               <div className="w-full lg:w-8/12 flex flex-col mx-auto bg-white rounded-sm ">

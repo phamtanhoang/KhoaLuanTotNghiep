@@ -10,6 +10,7 @@ const CANDIDATE_PATHS = {
   employers: "/employers",
   jobDetails: "/jobs/:id",
   employerDetails: "/employers/:id",
+  employerDetails2: "/employers",
   myProfile: "/profile",
   savedJobs: "/saved-jobs",
   appliedJobs: "/applied-jobs",

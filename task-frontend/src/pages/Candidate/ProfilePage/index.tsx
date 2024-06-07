@@ -8,6 +8,7 @@ import {
   Information,
   UserCard,
   SettingAccount,
+  FollowedList,
 } from "./components";
 import { GreatJobs } from "@/components/ui";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
@@ -335,6 +336,9 @@ const ProfilePage = () => {
                   </ul>
                 </div>
               </div>
+            </div>
+            <div className="bg-white p-5 shadow-sm rounded-sm">
+              <FollowedList />
             </div>
           </div>
         </div>

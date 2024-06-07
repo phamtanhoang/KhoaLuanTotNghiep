@@ -79,7 +79,7 @@ const JobDetailCard: React.FC<JobDetailCardProps> = ({
                 </h1>
                 <div className="mt-1 relative line-clamp-1">
                   <Link
-                    to={`${PathConstants.CANDIDATE_PATHS.employerDetails}/${employerId}`}
+                    to={`${PathConstants.CANDIDATE_PATHS.employerDetails2}/${employerId}`}
                     className="text-gray-600 text-base font-medium hover:text-gray-800 decoration-clone underline mb-1"
                     data-tooltip-id="tooltip"
                     data-tooltip-content={employerName}

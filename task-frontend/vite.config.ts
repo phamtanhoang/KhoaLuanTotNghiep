@@ -12,10 +12,10 @@ export default defineConfig({
       "@": "/src",
     },
   },
-  // optimizeDeps: {
-  //   exclude: ["js-big-decimal"],
-  // },
-  // define: {
-  //   global: {},
-  // },
+  optimizeDeps: {
+    exclude: ["js-big-decimal"],
+  },
+  define: {
+    global: {},
+  },
 });

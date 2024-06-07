@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -57,4 +58,12 @@ public interface CandidateRepository extends JpaRepository<Candidate, String> {
 
     @Query("SELECT COUNT(c) FROM Candidate c WHERE c.user.status != 'DELETED'")
     Integer countCandidate_Admin();
+
+    @Query("SELECT j FROM Candidate j INNER JOIN j.employers c " +
+            "WHERE (:id IS NULL OR c.id = :id) ")
+    Page<Candidate> getCandidatesFollow(String id, Pageable pageable);
+    @Query("SELECT c FROM Candidate c INNER JOIN c.employers e " +
+            "WHERE (:id IS NULL OR e.id = :id) " +
+            "AND e.user.status='ACTIVE'")
+    List<Candidate> getCandidatesFollow(String id);
 }

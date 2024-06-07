@@ -135,9 +135,7 @@ const StatisticsJobs: React.FC<StatisticsJobsProps> = ({ title, type }) => {
                   >
                     <h2>
                       Tên công việc:&nbsp;&nbsp;
-                      <span className="font-semibold">
-                        {item.name!}
-                      </span>
+                      <span className="font-semibold">{item.name!}</span>
                     </h2>
                     <p>
                       Ngày đăng tuyển:&nbsp;&nbsp;

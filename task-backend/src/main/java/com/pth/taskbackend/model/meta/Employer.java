@@ -1,5 +1,6 @@
 package com.pth.taskbackend.model.meta;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.BaseEntity;
@@ -46,6 +47,13 @@ public class Employer extends BaseEntity {
     @OneToMany(mappedBy = "employer", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<VipEmployer> vipEmployers = new HashSet<>();
 
-
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            },
+            mappedBy = "employers")
+    private Set<Candidate> candidates = new HashSet<>();
 }
 

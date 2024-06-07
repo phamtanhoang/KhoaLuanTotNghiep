@@ -26,6 +26,5 @@
     }
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }],
-  "files": ["src/index.tsx", "src/types/custom.d.ts"]
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

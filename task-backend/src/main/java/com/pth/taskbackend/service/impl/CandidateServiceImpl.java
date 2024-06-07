@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 @Service
 public class CandidateServiceImpl implements CandidateService {
@@ -104,5 +105,14 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public Integer countCandidate_Admin() throws IOException {
         return candidateRepository.countCandidate_Admin();
+    }
+
+    @Override
+    public Page<Candidate> getCandidatesFollow(String id, Pageable pageable) throws IOException {
+        return candidateRepository.getCandidatesFollow(id, pageable);
+    }
+    @Override
+    public List<Candidate> getCandidatesFollow(String id) throws IOException {
+        return candidateRepository.getCandidatesFollow(id);
     }
 }

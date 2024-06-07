@@ -1,4 +1,4 @@
-<html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0;" />
@@ -158,29 +158,51 @@
                         >
                             Xin chào <span th:text="${user}"></span>!
                         </p>
-                        <p
+                        <div
                                 style="
-                    font-family: Helvetica, sans-serif;
-                    font-size: 16px;
-                    font-weight: normal;
-                    margin: 0;
-                    margin-bottom: 24px;
-                    color: black;
-                    line-height: 1.5;
-                  "
+                                    font-family: Helvetica, sans-serif;
+                                    font-size: 14px;
+                                    font-weight: normal;
+                                    margin: 0;
+                                    margin-bottom: 24px;
+                                    color: black;
+                                    line-height: 1.5;
+                                  "
                         >
-                            <span th:text="${body}"></span>
-                        </p>
+                            <p>Nhà tuyển dụng <span style="font-weight: 600;" th:text="${employer}"></span> vừa đăng tuyển 1 công việc có thể sẽ phù hợp với bạn. <span style="font-weight: 600;">JOOBS</span> mong muốn sẽ giúp bạn tìm được công việc mơ ước của mình.</p>
+                            <div
+                                    style="
+                                        display: flex;
+                                        border: 1px solid #ccc;
+                                        padding: 10px;
+                                      "
+                            >
+                                <div style="margin-right:10px">
+                                    <img
+                                            style="width: 80px; height: 80px; border: 1px solid #ccc"
+                                            th:src="${avatar}"
+                                            alt="Logo"
+                                    />
+                                </div>
+                                <div>
+                                    <div style="font-size: 17px; font-weight: bold;">
+                                        <a th:href="'http://localhost:3000/jobs/' + ${jobId}"><span th:text="${job}"></span></a>
+                                    </div>
+                                    <div style="font-size: 14px">Ngành nghề: <span th:text="${salary}"></span></div>
+                                    <div style="font-size: 14px">Đia chỉ: <span th:text="${location}"></span></div>
+                                </div>
+                            </div>
+                        </div>
 
                         <p
                                 style="
-                    font-family: Helvetica, sans-serif;
-                    font-size: 16px;
-                    font-weight: normal;
-                    margin: 0;
-                    color: black;
-                    font-style: italic;
-                  "
+                                    font-family: Helvetica, sans-serif;
+                                    font-size: 16px;
+                                    font-weight: normal;
+                                    margin: 0;
+                                    color: black;
+                                    font-style: italic;
+                                  "
                         >
                             Chúc bạn một ngày tốt lành!
                         </p>

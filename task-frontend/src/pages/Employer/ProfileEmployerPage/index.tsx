@@ -1,5 +1,11 @@
 import { useContext, useEffect, useState } from "react";
-import { BaseInfo, HRDetail, HRInfo, MoreDetail } from "./components";
+import {
+  BaseInfo,
+  FollowerList,
+  HRDetail,
+  HRInfo,
+  MoreDetail,
+} from "./components";
 import ModalBase from "@/components/modal";
 import { LoadingContext } from "@/App";
 import { employersService } from "@/services";
@@ -124,7 +130,7 @@ const ProfileEmployerPage = () => {
           </div>
 
           <div className="bg-white lg:rounded-lg p-4 lg:p-8">
-            {/* <HumanResourceList value={sampleData} /> */}
+            <FollowerList />
           </div>
         </>
       ) : (

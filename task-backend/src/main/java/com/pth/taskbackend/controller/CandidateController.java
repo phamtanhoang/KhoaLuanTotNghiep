@@ -351,9 +351,9 @@ public class CandidateController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-    @Operation(summary = "Get by application", description = "", tags = {})
-    @GetMapping("/getByApplication/{id}")
-    public ResponseEntity<BaseResponse> getCandidateByApplication(@RequestHeader("Authorization")String token, @PathVariable() String id) {
+    @Operation(summary = "Get info", description = "", tags = {})
+    @GetMapping("/getInfo_Employer/{id}")
+    public ResponseEntity<BaseResponse> getInfo_Employer(@RequestHeader("Authorization")String token,@PathVariable String id) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER)
@@ -369,20 +369,7 @@ public class CandidateController {
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            Optional<Application> optionalApplication = applicationService.findById(id);
-            if (optionalApplication.isEmpty())
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy đơn ứng tuyển", HttpStatus.NOT_FOUND.value(), null)
-                );
-            if (optionalApplication.get().getStatus().equals(EApplyStatus.DELETED))
-                return ResponseEntity.ok(
-                        new BaseResponse("Không thể truy cập đơn ứng tuyển đã xóa!", HttpStatus.NO_CONTENT.value(), null)
-                );
-
-            Application application = optionalApplication.get();
-
-
-            Optional<Candidate>  optionalCandidate = candidateService.findById(application.getCandidate().getId());
+            Optional<Candidate>  optionalCandidate = candidateService.findById(id);
             if (optionalCandidate.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
@@ -1106,8 +1093,43 @@ public class CandidateController {
         }
     }
 
+    @Operation(summary = "get list candidate follow", description = "", tags = {})
+    @GetMapping("/getCandidatesFollow")
+    public ResponseEntity<BaseResponse> getCandidatesFollow(@RequestHeader("Authorization")String token, Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
 
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Optional<Employer> employer = employerService.findByUserEmail(optionalUser.get().getEmail());
+            if(employer.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
 
+            Page<Candidate> candidates = candidateService.getCandidatesFollow(employer.get().getId(), pageable);
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Danh sách ứng viên theo dõi", HttpStatus.OK.value(), candidates)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 
 
 }

@@ -52,7 +52,11 @@ const CandidateAPI = {
   clearCV: "/candidates/deleteCV",
 
   getDetail_Employer: (id?: string) => {
-    return `/candidates/getByApplication/${id}`;
+    return `/candidates/getInfo_Employer/${id}`;
+  },
+
+  getFollower: (currentPage?: number, itemPerPage?: number) => {
+    return `/candidates/getCandidatesFollow?page=${currentPage}&size=${itemPerPage}`;
   },
 };
 
@@ -92,6 +96,20 @@ const EmployerAPI = {
 
   getPendingEmployer_Admin: (currentPage?: number, itemPerPage?: number) => {
     return `/employers/getPendingEmployers_Admin?page=${currentPage}&size=${itemPerPage}`;
+  },
+
+  followEmployer: (id: string) => {
+    return `/employers/follow-employer/${id}`;
+  },
+  unfollowEmployer: (id: string) => {
+    return `/employers/unfollow-employer/${id}`;
+  },
+  unfollow_Employer: (id: string) => {
+    return `/employers/unfollow-employerV2/${id}`;
+  },
+
+  getFollowed: (currentPage?: number, itemPerPage?: number) => {
+    return `/employers/getEmployersFollowed?page=${currentPage}&size=${itemPerPage}`;
   },
 };
 

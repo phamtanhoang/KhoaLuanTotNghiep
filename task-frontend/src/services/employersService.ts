@@ -94,5 +94,21 @@ const employersService = {
       EmployerAPI.getPendingEmployer_Admin(currentPage, itemPerPage)
     );
   },
+
+  async followEmployer(id: string) {
+    return await axiosConfig.post(EmployerAPI.followEmployer(id));
+  },
+  async unfollowEmployer(id: string) {
+    return await axiosConfig.delete(EmployerAPI.unfollowEmployer(id));
+  },
+  async unfollow_Employer(id: string) {
+    return await axiosConfig.delete(EmployerAPI.unfollow_Employer(id));
+  },
+
+  async getFollowed(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(
+      EmployerAPI.getFollowed(currentPage, itemPerPage)
+    );
+  },
 };
 export default employersService;

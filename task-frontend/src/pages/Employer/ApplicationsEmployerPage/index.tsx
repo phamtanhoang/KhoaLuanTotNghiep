@@ -84,11 +84,9 @@ const ApplicationsEmployerPage = () => {
     handleOpen();
   };
   const _onClickInfo = (item: ApplicationModel) => {
-    if (item.candidate?.isFindJob) {
-      setId(item.id);
-      setFuncs(ModalConstants.CANDIDATE_KEYS.detailCandidate);
-      handleOpen();
-    }
+    setId(item.candidate?.id!);
+    setFuncs(ModalConstants.CANDIDATE_KEYS.detailCandidate);
+    handleOpen();
   };
 
   const fetchListData = () => {

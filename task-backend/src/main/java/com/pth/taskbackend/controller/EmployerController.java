@@ -5,16 +5,10 @@ import com.pth.taskbackend.dto.request.UpdateEmployerRequest;
 import com.pth.taskbackend.dto.response.*;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
-import com.pth.taskbackend.model.meta.Employer;
-import com.pth.taskbackend.model.meta.HumanResource;
-import com.pth.taskbackend.model.meta.Job;
-import com.pth.taskbackend.model.meta.User;
+import com.pth.taskbackend.model.meta.*;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
-import com.pth.taskbackend.service.AuthService;
-import com.pth.taskbackend.service.EmployerService;
-import com.pth.taskbackend.service.HumanResourceService;
-import com.pth.taskbackend.service.VipEmployerService;
+import com.pth.taskbackend.service.*;
 import com.pth.taskbackend.util.func.CheckPermission;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,6 +55,9 @@ public class EmployerController {
 
     @Autowired
     HumanResourceService humanResourceService;
+
+    @Autowired
+    CandidateService candidateService;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("getEmployers-admin")
     public ResponseEntity<BaseResponse> getEmployersByAdmin(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword,@RequestParam(required = false)EStatus status, Pageable pageable) {
@@ -275,8 +272,26 @@ public class EmployerController {
     }
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse> getEmployerById(@PathVariable("id") String id) {
+    public ResponseEntity<BaseResponse> getEmployerById(@RequestHeader(value = "Authorization",required = false)String token,
+                                                        @PathVariable("id") String id) {
         try {
+            Optional<Candidate> optionalCandidate;
+
+            if(token!=null) {
+                String email = jwtService.extractUsername(token.substring(7));
+                boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+                if (permission){
+                    optionalCandidate = candidateService.findByUserEmail(email);
+                    if (optionalCandidate.isEmpty())
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy ứng viên ", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                }else{
+                    optionalCandidate = null;
+                }
+            } else {
+                optionalCandidate = null;
+            }
 
             Optional<Employer> optionalEmployer = employerService.findByIdAndStatus(id,EStatus.ACTIVE);
             if (optionalEmployer.isEmpty())
@@ -284,9 +299,8 @@ public class EmployerController {
                         new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-
             Employer employer = optionalEmployer.get();
-            EmployerResponse employerResponse =  new EmployerResponse(
+            EmployerResponseV2 employerResponse =  new EmployerResponseV2(
                     employer.getId(),
                     employer.getCreated(),
                     employer.getUpdated(),
@@ -300,8 +314,9 @@ public class EmployerController {
                     employer.getUser().getEmail(),
                     employer.getUser().getStatus(),
                     employer.getUser().getId(),
-                    vipEmployerService.isVip(employer.getId())
-            );
+                    vipEmployerService.isVip(employer.getId()),
+                    optionalCandidate != null && employerService.checkIsFollowEmployer(optionalCandidate.get().getId(), employer.getId())
+                    );
 
                 return ResponseEntity.ok(
                         new BaseResponse("Chi tiết nhà tuyển dụng ", HttpStatus.OK.value(), employerResponse)
@@ -740,4 +755,194 @@ public class EmployerController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
+    @Operation(summary = "follow employer", description = "", tags = {})
+    @PostMapping("/follow-employer/{id}")
+    public ResponseEntity<BaseResponse> followEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Optional<Candidate> candidate = candidateService.findByUserEmail(optionalUser.get().getEmail());
+            if(candidate.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            Optional<Employer> optionalEmployer = employerService.findById(id);
+            if (optionalEmployer.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            Employer employer = optionalEmployer.get();
+
+            if(!employerService.checkIsFollowEmployer(candidate.get().getId(), employer.getId())){
+                employerService.followEmployer(candidate.get().getId(), employer.getId());
+                return ResponseEntity.ok(
+                        new BaseResponse("Theo dõi thành công", HttpStatus.OK.value(), false)
+                );
+            }
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Bạn đã theo dõi nhà tuyển dụng này trước đó!", HttpStatus.BAD_REQUEST.value(), true)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn!", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "unfollow employer", description = "", tags = {})
+    @DeleteMapping("/unfollow-employer/{id}")
+    public ResponseEntity<BaseResponse> unFollowEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Optional<Candidate> candidate = candidateService.findByUserEmail(optionalUser.get().getEmail());
+            if(candidate.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            Optional<Employer> optionalEmployer = employerService.findById(id);
+            if (optionalEmployer.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            Employer employer = optionalEmployer.get();
+
+            if(employerService.checkIsFollowEmployer(candidate.get().getId(), employer.getId())){
+                employerService.unfollowEmployer(candidate.get().getId(), employer.getId());
+                return ResponseEntity.ok(
+                        new BaseResponse("Bỏ theo dõi thành công", HttpStatus.OK.value(), false)
+                );
+            }
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Bạn chưa theo dõi nhà tuyển dụng này trước đó!", HttpStatus.BAD_REQUEST.value(), true)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "unfollow employer V2", description = "", tags = {})
+    @DeleteMapping("/unfollow-employerV2/{id}")
+    public ResponseEntity<BaseResponse> unFollowEmployerV2(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Optional<Employer> optionalEmployer = employerService.findByUserEmail(optionalUser.get().getEmail());
+            if (optionalEmployer.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            Optional<Candidate> candidate = candidateService.findById(id);
+            if(candidate.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            Employer employer = optionalEmployer.get();
+
+            if(employerService.checkIsFollowEmployer(candidate.get().getId(), employer.getId())){
+                employerService.unfollowEmployer(candidate.get().getId(), employer.getId());
+                return ResponseEntity.ok(
+                        new BaseResponse("Hủy người theo dõi thành công", HttpStatus.OK.value(), false)
+                );
+            }
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Tài khoản ứng viên này chưa theo dõi bạn trước đó!", HttpStatus.BAD_REQUEST.value(), true)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "get list employer followed", description = "", tags = {})
+    @GetMapping("/getEmployersFollowed")
+    public ResponseEntity<BaseResponse> getEmployersFollowed(@RequestHeader("Authorization")String token, Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Optional<Candidate> candidate = candidateService.findByUserEmail(optionalUser.get().getEmail());
+            if(candidate.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            Page<Employer> employers = employerService.getEmployersFollowed(candidate.get().getId(), pageable);
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Danh sách nhà tuyển dụng đã theo dõi", HttpStatus.OK.value(), employers)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
 }

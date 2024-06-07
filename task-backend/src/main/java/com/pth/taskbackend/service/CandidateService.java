@@ -5,10 +5,12 @@ import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Employer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 public interface CandidateService {
@@ -31,4 +33,8 @@ public interface CandidateService {
     Long count()throws IOException;
 
     Integer countCandidate_Admin()throws IOException;
+
+    Page<Candidate> getCandidatesFollow(String id, Pageable pageable) throws  IOException;
+    List<Candidate> getCandidatesFollow(String id) throws  IOException;
+
 }

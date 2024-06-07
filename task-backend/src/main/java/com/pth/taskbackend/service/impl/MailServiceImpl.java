@@ -27,7 +27,7 @@ public class MailServiceImpl implements MailService {
 
 
     @Override
-    public void sendEmail(String to, String user, String body,String templateName)
+    public void sendEmail(String to, String user, String body, String templateName)
             throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
 
@@ -36,7 +36,32 @@ public class MailServiceImpl implements MailService {
         Context context = new Context();
         context.setVariable("user", user);
         context.setVariable("body", body);
-        String html = templateEngine.process("EMAIL_TEMPLATE", context);
+        String html = templateEngine.process(templateName, context);
+
+        helper.setFrom(fromEmail);
+        helper.setTo(to);
+        helper.setSubject("JOOBS THÔNG BÁO");
+        helper.setText(html, true);
+
+        mailSender.send(message);
+    }
+
+    @Override
+    public void sendEmailV2(String to, String user, String employer,String avatar,String jobId, String job,String location,String salary, String templateName)
+            throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+
+        Context context = new Context();
+        context.setVariable("user", user);
+        context.setVariable("employer", employer);
+        context.setVariable("avatar", avatar);
+        context.setVariable("job", job);
+        context.setVariable("jobId", jobId);
+        context.setVariable("location", location);
+        context.setVariable("salary", salary);
+        String html = templateEngine.process(templateName, context);
 
         helper.setFrom(fromEmail);
         helper.setTo(to);

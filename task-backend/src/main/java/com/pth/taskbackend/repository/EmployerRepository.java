@@ -8,10 +8,15 @@ import com.pth.taskbackend.model.meta.Job;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface EmployerRepository extends JpaRepository<Employer, String> {
@@ -59,4 +64,22 @@ public interface EmployerRepository extends JpaRepository<Employer, String> {
             "WHERE DATE(v.fromDate) <= CURRENT_DATE() AND DATE(v.toDate) >= CURRENT_DATE()" +
             "And a.status!='DELETED'")
     Integer countEmployerVip_Admin();
+
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM followed_employer WHERE employer_id = :employerId and candidate_id = :candidateId ", nativeQuery = true)
+    void unfollowEmployer(String candidateId, String employerId);
+
+    @Transactional
+    @Modifying
+    @Query(value = "INSERT INTO followed_employer(candidate_id, employer_id) VALUES (:candidateId, :employerId)", nativeQuery = true)
+    void followEmployer(String candidateId, String employerId);
+
+    @Query("SELECT COUNT(e) > 0 FROM Employer e INNER JOIN e.candidates c WHERE c.id = :candidateId and e.id = :employerId")
+    boolean checkIsFollowEmployer(String candidateId, String employerId);
+
+    @Query("SELECT e FROM Employer e INNER JOIN e.candidates c " +
+            "WHERE (:id IS NULL OR c.id = :id) " +
+            "AND c.user.status='ACTIVE'")
+    Page<Employer> getEmployersFollowed(String id, Pageable pageable);
 }

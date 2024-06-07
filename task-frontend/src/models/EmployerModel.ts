@@ -14,4 +14,5 @@ interface EmployerModel {
   email?: string;
   userId?: string;
   isVip?: boolean;
+  isFollow?: boolean;
 }

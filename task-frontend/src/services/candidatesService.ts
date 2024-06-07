@@ -122,5 +122,11 @@ const candidatesService = {
       headers: { "Content-Type": "application/json" },
     });
   },
+
+  async getFollower(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(
+      CandidateAPI.getFollower(currentPage, itemPerPage)
+    );
+  },
 };
 export default candidatesService;

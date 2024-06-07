@@ -1,7 +1,9 @@
 import { ShareCard } from "@/components/ui";
 import NON_USER from "@/assets/images/non-user.jpg";
 import { RiVipCrown2Line } from "react-icons/ri";
+
 interface LeftPageCardProps {
+  id?: string;
   image?: string;
   name?: string;
   location?: string;
@@ -9,9 +11,13 @@ interface LeftPageCardProps {
   phone?: string;
   description?: string;
   isVip?: boolean;
+  isFollow?: boolean;
+  _onClickFollow: (id: string) => void;
+  _onClickUnfollow: (id: string) => void;
 }
 
 const LeftPage: React.FC<LeftPageCardProps> = ({
+  id,
   image,
   name,
   location,
@@ -19,6 +25,9 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
   phone,
   description,
   isVip,
+  isFollow,
+  _onClickFollow,
+  _onClickUnfollow,
 }) => {
   return (
     <>
@@ -47,6 +56,21 @@ const LeftPage: React.FC<LeftPageCardProps> = ({
           <h1 className="text-lg font-medium uppercase leading-tight tracking-wide antialiased hover:underline cursor-pointer text-center">
             {name}
           </h1>
+          {isFollow ? (
+            <button
+              className="flex justify-center font-medium mx-auto w-max px-4 py-2 text-white transition duration-500 ease-out bg-orangetext rounded hover:bg-orange-500 hover:ease-in "
+              onClick={() => _onClickUnfollow(id!)}
+            >
+              Bỏ theo dõi nhà tuyển dụng
+            </button>
+          ) : (
+            <button
+              className="flex justify-center font-medium mx-auto w-max px-4 py-2 text-white transition duration-500 ease-out bg-orangetext rounded hover:bg-orange-500 hover:ease-in "
+              onClick={() => _onClickFollow(id!)}
+            >
+              Theo dõi nhà tuyển dụng
+            </button>
+          )}
         </div>
       </div>
       <div className="w-full bg-white rounded-sm">

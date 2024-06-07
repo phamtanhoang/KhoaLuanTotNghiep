@@ -1,8 +1,10 @@
 package com.pth.taskbackend.service.impl;
 
 import com.pth.taskbackend.enums.EStatus;
+import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Category;
 import com.pth.taskbackend.model.meta.Employer;
+import com.pth.taskbackend.model.meta.Job;
 import com.pth.taskbackend.repository.EmployerRepository;
 import com.pth.taskbackend.service.EmployerService;
 import com.pth.taskbackend.util.func.FileUploadFunc;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -139,6 +142,29 @@ public class EmployerServiceImpl implements EmployerService {
     @Override
     public Integer countEmployerVip_Admin() {
         return employerRepository.countEmployerVip_Admin();
+    }
+
+    @Override
+    public boolean checkIsFollowEmployer(String candidateId, String id) {
+        return employerRepository.checkIsFollowEmployer(candidateId, id);
+    }
+
+    @Override
+    public void followEmployer(String candidateId, String id) {
+         employerRepository.followEmployer(candidateId, id);
+
+    }
+
+    @Override
+    public void unfollowEmployer(String candidateId, String id) {
+         employerRepository.unfollowEmployer(candidateId, id);
+    }
+
+
+
+    @Override
+    public Page<Employer> getEmployersFollowed(String id, Pageable pageable) throws IOException {
+        return employerRepository.getEmployersFollowed(id, pageable);
     }
 
 
