@@ -46,11 +46,16 @@ const ServiceItem: React.FC<ServiceItemProps> = ({
           <div className="h-px flex-auto bg-gray-100"></div>
         </div>
         <p
-          className=" text-gray-500 text-left mt-1 line-clamp-2 text-base italic"
+          className=" text-gray-500 text-left mt-1  text-base italic"
           data-tooltip-id="tooltip"
           data-tooltip-content="Last Transaction"
         >
-          {description}
+          {description?.split("\n").map((line, i) => (
+            <span key={i}>
+              {line}
+              <br />
+            </span>
+          ))}
         </p>
 
         <button

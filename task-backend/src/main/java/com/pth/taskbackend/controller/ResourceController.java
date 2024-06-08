@@ -15,6 +15,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Date;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
@@ -55,4 +56,5 @@ public class ResourceController {
         chatMessage.setTimestamp(new Date());
         return chatMessage;
     }
+
 }

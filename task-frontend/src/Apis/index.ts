@@ -278,6 +278,9 @@ const JobAPI = {
   getPendingJob_Admin: (currentPage?: number, itemPerPage?: number) => {
     return `/jobs/getPendingJobs_Admin?page=${currentPage}&size=${itemPerPage}`;
   },
+  getSimilar: (id: string, currentPage?: number, itemPerPage?: number) => {
+    return `/jobs/getSimilar/${id}?page=${currentPage}&size=${itemPerPage}`;
+  },
 };
 
 const ApplicationAPI = {

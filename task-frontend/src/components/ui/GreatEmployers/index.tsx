@@ -37,7 +37,7 @@ const GreatEmployers = () => {
     fetchEmployers();
   }, []);
   return (
-    <section className="py-12 lg:py-16 bg-gray-50">
+    <section className="py-12 lg:py-16 bg-body">
       <div className="px-5 lg:px-28 flex justify-between mb-8 text-gray-700">
         <div className="text-center lg:text-left w-full lg:w-[50%]">
           <h1 className="text-3xl  font-bold tracking-wider font-lato ">

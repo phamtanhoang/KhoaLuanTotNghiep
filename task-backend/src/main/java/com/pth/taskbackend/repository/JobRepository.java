@@ -284,5 +284,13 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "And j.humanResource.id=:id ")
     Integer countJobPending_HR(String id);
 
+    @Query("SELECT j FROM Job j " +
+            "WHERE j.id != :jobId " +
+            "AND j.status = 'ACTIVE' " +
+            "AND j.toDate > CURRENT_TIMESTAMP " +
+            "AND (j.category.id = (SELECT j2.category.id FROM Job j2 WHERE j2.id = :jobId)) " +
+            "ORDER BY RAND()")
+    Page<Job> findSimilarJobs(@Param("jobId") String jobId, Pageable pageable);
+
 }
 

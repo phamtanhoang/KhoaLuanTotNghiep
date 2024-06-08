@@ -991,6 +991,82 @@ public class JobController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+    @Operation(summary = "Get similar", description = "", tags = {})
+    @GetMapping("/getSimilar/{id}")
+    public ResponseEntity<BaseResponse> getJobSimilar(@RequestHeader(name="Authorization", required = false) String token, @PathVariable String id, Pageable pageable) {
+        try {
+            Optional<Candidate> optionalCandidate;
+            if(token!=null) {
+                String email = jwtService.extractUsername(token.substring(7));
+                boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+                if (permission){
+                    optionalCandidate = candidateService.findByUserEmail(email);
+                    if (optionalCandidate.isEmpty())
+                        return ResponseEntity.ok(
+                                new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                        );
+                }else{
+                    optionalCandidate = null;
+                }
+            } else {
+                optionalCandidate = null;
+            }
+            Optional<Job> optionalJob = jobService.findById(id);
+            if(optionalJob.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy công viêc! ", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            Page<Job> jobs = jobService.findJobSimilar(id, pageable);
+
+            List<JobResponse> jobResponses = jobs.getContent().stream().map(job -> {
+                JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                        job.getCategory()!=null ? job.getCategory().getId():null,
+                        job.getCategory()!=null ? job.getCategory().getName():null);
+                JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                        job.getHumanResource().getEmployer().getName(),
+                        job.getHumanResource().getEmployer().getId(),
+                        job.getHumanResource().getEmployer().getUser().getEmail(),
+                        job.getHumanResource().getEmployer().getImage(),
+                        job.getHumanResource().getEmployer().getPhoneNumber());
+
+
+                return new JobResponse(
+                        job.getId(),
+                        job.getCreated(),
+                        job.getUpdated(),
+                        job.getToDate(),
+                        job.getName(),
+                        job.getDescription(),
+                        job.getExperience(),
+                        job.getFromSalary(),
+                        job.getToSalary(),
+                        job.getLocation(),
+                        job.getStatus(),
+                        vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
+                        optionalCandidate != null && (optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), job.getId()).isPresent()).isPresent()),
+                        false,
+                        false,
+                        categoryResponse,
+                        jobEmployerResponse,
+                        null,
+                        null,
+                        null
+                );
+            }).collect(Collectors.toList());
+
+            Page<JobResponse> jobResponsePage = new PageImpl<>(jobResponses, jobs.getPageable(), jobs.getTotalElements());
+            return ResponseEntity.ok(
+                    new BaseResponse("Thông tin công việc", HttpStatus.OK.value(), jobResponses)
+            );
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 
     @Operation(summary = "Get detail", description = "", tags = {})
     @GetMapping("/getDetail-employer/{id}")

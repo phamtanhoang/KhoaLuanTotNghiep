@@ -1,5 +1,5 @@
 import { Hero } from "@/components/ui";
-import { LeftPage, RightPage } from "./components";
+import { JobsSimilar, LeftPage, RightPage } from "./components";
 import { GreatJobs } from "@/components/ui";
 import { useContext, useEffect, useState } from "react";
 import ModalBase from "@/components/modal";
@@ -104,7 +104,7 @@ const JobDetailPage = () => {
           <div className="w-full lg:w-8/12 flex flex-col mx-auto">
             <LeftPage
               id={job?.id!}
-              image={job?.employer?.image}
+              image={job?.employer?.avatar}
               status={job?.status}
               employer={job?.employer?.name}
               category={job?.category?.name || "Khác"}
@@ -137,6 +137,7 @@ const JobDetailPage = () => {
           </div>
         </div>
       </section>
+      <JobsSimilar id={id!} />
       <GreatJobs />
     </>
   );

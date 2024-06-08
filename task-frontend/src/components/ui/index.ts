@@ -9,6 +9,7 @@ import GreatJobs from "./GreatJobs";
 import Hero from "./Hero";
 import ImageCropper from "./ImageCropper";
 import JobCard from "./JobCard";
+import JobCardV2 from "./JobCardV2";
 import ListEmpty from "./ListEmpty";
 import Loading from "./Loading";
 import LoadingSpiner from "./LoadingSpiner";
@@ -27,6 +28,7 @@ export {
   LoadingSpiner,
   ListEmpty,
   JobCard,
+  JobCardV2,
   Pagination,
   GreatJobCard,
   GreatEmployerCard,

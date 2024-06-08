@@ -175,5 +175,10 @@ const jobsService = {
       JobAPI.getPendingJob_Admin(currentPage, itemPerPage)
     );
   },
+  async getSimilar(id: string, currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(
+      JobAPI.getSimilar(id, currentPage, itemPerPage)
+    );
+  },
 };
 export default jobsService;

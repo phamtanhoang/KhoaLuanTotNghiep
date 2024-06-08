@@ -237,4 +237,9 @@ public class JobServiceImpl implements JobService {
     public Integer countJobPending_HR(String id) {
         return jobRepository.countJobPending_HR(id);
     }
+
+    @Override
+    public Page<Job> findJobSimilar(String id, Pageable pageable) {
+        return jobRepository.findSimilarJobs(id, pageable);
+    }
 }

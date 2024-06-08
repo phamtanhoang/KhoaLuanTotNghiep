@@ -1,31 +1,40 @@
-import React, { useEffect, useRef } from "react";
-import { io, Socket } from "socket.io-client";
+import React, { useEffect, useState } from "react";
+import Stomp from "stompjs";
+import SockJS from "sockjs-client";
 
 const App: React.FC = () => {
-  // const socketRef = useRef<Socket | null>(null);
+  const [messages, setMessages] = useState<any>([]);
+  const [stompClient, setStompClient] = useState<any>(null);
 
-  // useEffect(() => {
-  //   const socket = io("http://localhost:9092/chat?token=abc123", {
-  //     transports: ["polling", "websocket"],
-  //   });
-  //   socketRef.current = socket;
+  useEffect(() => {
+    const socket = new SockJS("http://localhost:8080/ws");
+    const client = Stomp.over(socket);
 
-  //   socket.on("connect", () => {
-  //     console.log("Connected to the server");
-  //   });
+    client.connect(
+      {},
+      () => {
+        client.subscribe("/topic/messages", (message: any) => {
+          const receivedMessage = JSON.parse(message.body);
+          // setMessages((prevMessages: any) => [
+          //   ...prevMessages,
+          //   receivedMessage,
+          // ]);
+          console.log(receivedMessage);
+        });
+      },
+      (error) => {
+        console.log("Failed to connect: ", error);
+      }
+    );
 
-  //   socket.on("connect_error", (error: any) => {
-  //     console.log("Failed to connect to the server", error);
-  //   });
+    setStompClient(client);
 
-  //   return () => {
-  //     if (socketRef.current) {
-  //       socketRef.current.disconnect();
-  //     }
-  //   };
-  // }, []);
+    return () => {
+      client.disconnect(() => {});
+    };
+  }, []);
 
-  return <div>App</div>;
+  return <div>App1111</div>;
 };
 
 export default App;
