@@ -69,6 +69,11 @@ const candidatesService = {
       headers: { "Content-Type": "application/json" },
     });
   },
+  async getDetail_Candidate() {
+    return await axiosConfig.get(CandidateAPI.getDetail_Candidate, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
 
   async changeImage(image: File | null) {
     const formData = new FormData();

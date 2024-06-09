@@ -5,29 +5,33 @@ import { IoSend } from "react-icons/io5";
 import { SwalHelper } from "@/utils/helpers/swalHelper";
 import { TextEditor } from "@/components/form";
 import { LoadingContext } from "@/App";
-import { useDispatch, useSelector } from "react-redux";
-import { TextHelper } from "@/utils/helpers";
+import { DateHelper, TextHelper } from "@/utils/helpers";
 import applicationsService from "@/services/applicationsService";
+import { candidatesService } from "@/services";
+import { ModalConstants } from "@/utils/constants";
+import ModalBase from "../..";
+import html2pdf from "html2pdf.js";
 
 const ApplyJob = (props: any) => {
   const context = useContext(LoadingContext);
   const id = props.id;
   const fetchData = props.fetchData;
 
-  const { currentCandidate } = useSelector((state: any) => state.authReducer);
   const handleClose = props.handleClose;
-  const [checked, setChecked] = useState<boolean>(true);
+  const [candidate, setCandidate] = useState<any>(null);
+  const [checked, setChecked] = useState<string>("upload");
   const [cvFile, setCVFile] = useState<File | null>(null);
-  const [name, setName] = useState<string>(
-    `${currentCandidate?.firstName} ${currentCandidate?.lastName}`
-  );
-  const [phoneNumber, setPhoneNumber] = useState<string>(
-    currentCandidate?.phoneNumber
-  );
-  const [email, setEmail] = useState<string>(currentCandidate?.email);
+  const [name, setName] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [coverLetter, setCoverLetter] = useState<string>(
     TextHelper.ApplicationHelper
   );
+
+  const [openSub, setOpenSub] = useState(false);
+  const [funcsSub, setFuncsSub] = useState<string>("");
+  const handleOpenSub = () => setOpenSub(true);
+  const handleCloseSub = () => setOpenSub(false);
 
   const _onClickChooseCV = () => {
     if (checked) document.getElementById("input-CV")?.click();
@@ -57,7 +61,7 @@ const ApplyJob = (props: any) => {
       return;
     }
 
-    if (checked) {
+    if (checked == "upload") {
       if (!cvFile) {
         SwalHelper.MiniAlert("Vui lòng chọn CV!", "warning");
         return;
@@ -88,22 +92,20 @@ const ApplyJob = (props: any) => {
         .finally(() => {
           context.handleCloseLoading();
         });
-    } else {
+    } else if (checked == "choose") {
       context.handleOpenLoading();
       applicationsService
-        .applyJob_Link(
-          id,
-          name,
-          email,
-          phoneNumber,
-          coverLetter,
-          currentCandidate?.cV
-        )
+        .applyJob_Link(id, name, email, phoneNumber, coverLetter, candidate?.cV)
         .then((res) => {
           if (res.status === 200 && res.data.Status === 200) {
             handleClose();
             fetchData(id);
             SwalHelper.MiniAlert(res.data.Message, "success");
+          } else if (res.status === 413) {
+            SwalHelper.MiniAlert(
+              "File quá lớn vui lòng chọn file nhỏ hơn!",
+              "error"
+            );
           } else {
             SwalHelper.MiniAlert(res.data.Message, "error");
           }
@@ -114,6 +116,51 @@ const ApplyJob = (props: any) => {
         .finally(() => {
           context.handleCloseLoading();
         });
+    } else if (checked == "generate") {
+      context.handleOpenLoading();
+
+      const element = document.getElementById("pdf");
+
+      var opt = {
+        margin: [0.5, 0.8, 0.5, 0.8],
+        filename: `CV_${candidate?.id}.pdf`,
+        image: { type: "jpeg", quality: 1 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: "in", format: "a4", orientation: "p" },
+      };
+
+      html2pdf()
+        .set(opt)
+        .from(element)
+        .outputPdf("blob")
+        .then((pdfBlob: Blob) => {
+          const pdfFile = new File([pdfBlob], `CV_${candidate?.id}.pdf`, {
+            type: "application/pdf",
+          });
+          applicationsService
+            .applyJob_File(id, name, email, phoneNumber, coverLetter, pdfFile)
+            .then((res) => {
+              if (res.status === 200 && res.data.Status === 200) {
+                handleClose();
+                fetchData(id);
+                SwalHelper.MiniAlert(res.data.Message, "success");
+              } else {
+                SwalHelper.MiniAlert(res.data.Message, "error");
+              }
+            })
+            .catch(() => {
+              SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+            })
+            .finally(() => {
+              context.handleCloseLoading();
+            });
+        })
+        .catch(() => {
+          SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+          context.handleCloseLoading();
+        });
+    } else {
+      SwalHelper.MiniAlert("Vui lòng chọn loại cv!", "warning");
     }
   };
   const _onChangeCoverLetter = (event: any, editor: any) => {
@@ -121,8 +168,39 @@ const ApplyJob = (props: any) => {
     setCoverLetter(data);
   };
 
+  const fetchInfo = () => {
+    context.handleOpenLoading();
+
+    candidatesService
+      .getDetail_Candidate()
+      .then((res) => {
+        if (res.status === 200 && res.data.Status === 200) {
+          setCandidate(res?.data?.Data);
+          setName(`${res?.data?.Data?.firstName} ${res?.data?.Data?.lastName}`);
+          setEmail(res?.data?.Data?.email);
+          setPhoneNumber(res?.data?.Data?.phoneNumber);
+        } else {
+          SwalHelper.MiniAlert(res.data.Message, "error");
+        }
+      })
+      .catch(() => {
+        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+      })
+      .finally(() => {
+        context.handleCloseLoading();
+      });
+  };
+
+  useEffect(() => {
+    fetchInfo();
+  }, []);
+  const _onClickCV = () => {
+    setFuncsSub(ModalConstants.CANDIDATE_KEYS.candidateCV);
+    handleOpenSub();
+  };
   return (
-    <div className="lg:w-[45%] w-screen bg-white relative rounded">
+    <div className="lg:w-[42%] w-screen bg-white relative rounded">
+      <ModalBase open={openSub} handleClose={handleCloseSub} funcs={funcsSub} />
       <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-orangetext rounded-t">
         <h2 className="text-xl font-semibold   line-clamp-1 my-auto">
           Đơn ứng tuyển
@@ -183,59 +261,86 @@ const ApplyJob = (props: any) => {
                 Chọn CV để ứng tuyển <span className="text-red-500">*</span>
               </label>
               <div className="mt-2 flex flex-col gap-2 ">
-                <div
-                  className="flex gap-2 cursor-pointer"
-                  onClick={() => setChecked(true)}
-                >
+                <div className="flex gap-2">
                   <input
                     type="checkbox"
                     className="cursor-pointer relative h-4 w-4 rounded-md border my-auto accent-bgBlue"
-                    checked={checked == true ? true : false}
+                    checked={checked == "upload" ? true : false}
+                    onClick={() => setChecked("upload")}
                   />
                   <label
                     htmlFor="isExChange"
                     className="cursor-pointer text-slate-500 flex justify-center items-center font-bold pl-2 pr-2 bg-slate-200 uppercase text-xs py-0.5"
+                    onClick={() => setChecked("upload")}
                   >
                     Tải CV lên từ máy của tôi
                   </label>
                 </div>
 
-                <div
-                  className="flex gap-2 cursor-pointer"
-                  onClick={() => {
-                    currentCandidate?.cV && setChecked(false);
-                  }}
-                >
+                <div className="flex gap-2">
                   <input
                     type="checkbox"
                     className="cursor-pointer relative h-4 w-4 rounded-md border my-auto accent-bgBlue"
-                    checked={checked == false ? true : false}
-                    disabled={currentCandidate?.cV ? false : true}
+                    checked={checked == "choose" ? true : false}
+                    disabled={candidate?.cV ? false : true}
+                    onClick={() => {
+                      candidate?.cV && setChecked("choose");
+                    }}
                   />
                   <label
                     htmlFor="isExChange"
                     className={`cursor-pointer  flex justify-center items-center font-bold pl-2 pr-2  uppercase text-xs py-0.5 ${
-                      currentCandidate?.cV
+                      candidate?.cV
                         ? "text-slate-500 bg-slate-200"
                         : "text-slate-300 bg-slate-100"
                     }`}
+                    onClick={() => {
+                      candidate?.cV && setChecked("choose");
+                    }}
                   >
                     Chọn CV trong thư viện của tôi
                   </label>{" "}
                   <AiFillEye
                     className={`cursor-pointer  text-xl  ${
-                      currentCandidate?.cV
+                      candidate?.cV
                         ? "hover:text-orangetext"
                         : "text-slate-300 "
                     }`}
                     onClick={() =>
-                      currentCandidate?.cV &&
-                      window.open(currentCandidate?.cV, "_blank")
+                      candidate?.cV && window.open(candidate?.cV, "_blank")
                     }
                   />
                 </div>
+                <div className="flex gap-2">
+                  <input
+                    type="checkbox"
+                    className="cursor-pointer relative h-4 w-4 rounded-md border my-auto accent-bgBlue"
+                    checked={checked == "generate" ? true : false}
+                    disabled={candidate?.cV ? false : true}
+                    onClick={() => {
+                      candidate?.cV && setChecked("generate");
+                    }}
+                  />
+                  <label
+                    htmlFor="isExChange"
+                    className="cursor-pointer text-slate-500 flex justify-center items-center font-bold pl-2 pr-2 bg-slate-200 uppercase text-xs py-0.5"
+                    onClick={() => {
+                      candidate?.cV && setChecked("generate");
+                    }}
+                  >
+                    Tạo CV từ thông tin cá nhân
+                  </label>{" "}
+                  <AiFillEye
+                    className={`cursor-pointer  text-xl  ${
+                      candidate?.cV
+                        ? "hover:text-orangetext"
+                        : "text-slate-300 "
+                    }`}
+                    onClick={_onClickCV}
+                  />
+                </div>
 
-                {checked && (
+                {checked == "upload" && (
                   <>
                     <div
                       className="border-dashed border  p-5 flex flex-col justify-center items-center"
@@ -264,20 +369,19 @@ const ApplyJob = (props: any) => {
                         Loại tệp: .doc, .docs, .pdf. có kích thước dưới 1MB
                       </span>
                     </p>
+                    {cvFile && (
+                      <div className="rounded-md bg-gray-100 py-3 px-4">
+                        <div className="flex items-center justify-between gap-4">
+                          <p className="text-base font-medium truncate">
+                            {cvFile.name}
+                          </p>
+                          <button className="" onClick={_onClickClearCV}>
+                            <AiOutlineClose />
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </>
-                )}
-
-                {cvFile && (
-                  <div className="rounded-md bg-gray-100 py-3 px-4">
-                    <div className="flex items-center justify-between gap-4">
-                      <p className="text-base font-medium truncate">
-                        {cvFile.name}
-                      </p>
-                      <button className="" onClick={_onClickClearCV}>
-                        <AiOutlineClose />
-                      </button>
-                    </div>
-                  </div>
                 )}
               </div>
             </div>
@@ -295,6 +399,148 @@ const ApplyJob = (props: any) => {
               <TextEditor value={coverLetter} onChange={_onChangeCoverLetter} />
             </div>
           </div>
+        </div>
+      </div>
+      <div className="mx-4 text-gray-700 text-sm hidden">
+        <div id="pdf" className="mb-2">
+          {/* <div className="flex justify-center mb-3">
+                <img
+                    src={candidate?.avatar ? candidate?.avatar : NON_USER}
+                    className="w-24 h-24 rounded-full"
+                />
+                </div> */}
+          <div className="flex gap-3 items-center justify-between">
+            <div className="my-auto">
+              <h2 className="text-3xl font-semibold">
+                {candidate?.firstName} {candidate?.lastName}
+              </h2>
+              <p className="text-lg text-gray-600 font-medium italic mt-1">
+                {candidate?.job}
+              </p>
+            </div>
+
+            <div className="my-auto text-sm text-gray-700">
+              {candidate?.email && (
+                <p className="flex gap-1">
+                  <span className="">Email:</span>
+                  <a
+                    href={`mailto:${candidate?.email}`}
+                    className="italic font-medium"
+                  >
+                    {candidate?.email}
+                  </a>
+                </p>
+              )}
+              {candidate?.sex && (
+                <p className="flex gap-1">
+                  <span className="">Giới tính:</span>
+                  <p className="italic font-medium">
+                    {candidate?.sex == "MALE"
+                      ? "Nam"
+                      : candidate?.sex == "FEMALE"
+                      ? "Nữ"
+                      : "Khác"}
+                  </p>
+                </p>
+              )}
+              {candidate?.phoneNumber && (
+                <p className="flex gap-1">
+                  <span className="">Số điện thoại:</span>
+                  <a
+                    href={`tel:${candidate?.phoneNumber}`}
+                    className="italic font-medium"
+                  >
+                    {candidate?.phoneNumber}
+                  </a>
+                </p>
+              )}
+              {candidate?.link && (
+                <p className="flex gap-1">
+                  <span className="">Liên kết:</span>
+                  <a href={candidate?.link} className="italic font-medium">
+                    {candidate?.link}
+                  </a>
+                </p>
+              )}
+              {candidate?.address && (
+                <p className="flex gap-1">
+                  <span className="">Địa chỉ:</span>
+                  <span className="italic font-medium">
+                    {candidate?.address}
+                  </span>
+                </p>
+              )}
+            </div>
+          </div>
+          <hr className="my-4" />
+          {candidate?.introduction && (
+            <div>
+              <h3 className="text-xl font-semibold mb-2">Giới thiệu</h3>
+              <p className="text-md leading-relaxed text-justify">
+                {candidate?.introduction}
+              </p>
+            </div>
+          )}
+          {candidate?.extra?.skills?.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-xl font-semibold mb-2">Kĩ năng</h3>
+              <ul className="text-md">
+                {candidate?.extra?.skills?.map((item: any, index: number) => (
+                  <li key={index} className="text-justify">
+                    <span className="font-medium">-&nbsp;{item?.skill}</span>
+                    {item?.description && ": "}
+                    {item?.description}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {candidate?.extra?.experiences?.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-xl font-semibold">Kinh nghiệm</h3>
+              <div>
+                {candidate?.extra?.experiences?.map(
+                  (item: any, index: number) => (
+                    <div className="mt-2" key={index}>
+                      <h4 className="text-base font-medium">
+                        -&nbsp;{item?.experience} |{" "}
+                        {DateHelper.formatDate2(new Date(item?.fromDate!))} -{" "}
+                        {item?.toDate == "now"
+                          ? "Hiện tại"
+                          : DateHelper.formatDate2(new Date(item?.toDate!))}
+                      </h4>
+                      <p className="text-md text-gray-600 italic text-justify">
+                        &nbsp;&nbsp;&nbsp;{item?.description}
+                      </p>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          )}
+          {candidate?.extra?.educations?.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-xl font-semibold">Học vấn</h3>
+              <div>
+                {candidate?.extra?.educations?.map(
+                  (item: any, index: number) => (
+                    <div className="mt-2" key={index}>
+                      <h4 className="text-base font-medium">
+                        -&nbsp;{item?.education} |{" "}
+                        {DateHelper.formatDate2(new Date(item?.fromDate!))} -{" "}
+                        {item?.toDate == "now"
+                          ? "Hiện tại"
+                          : DateHelper.formatDate2(new Date(item?.toDate!))}
+                      </h4>
+                      <p className="text-md text-gray-600 italic text-justify">
+                        &nbsp;&nbsp;&nbsp;{item?.description}
+                      </p>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

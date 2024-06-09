@@ -85,7 +85,7 @@ const ApplicationsEmployerPage = () => {
   };
   const _onClickInfo = (item: ApplicationModel) => {
     setId(item.candidate?.id!);
-    setFuncs(ModalConstants.CANDIDATE_KEYS.detailCandidate);
+    setFuncs(ModalConstants.CANDIDATE_KEYS.candidateCV);
     handleOpen();
   };
 

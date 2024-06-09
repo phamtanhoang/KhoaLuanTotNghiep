@@ -24,6 +24,7 @@ import {
   PathConstants,
 } from "@/utils/constants";
 import { ONCHANGE_SKILL_EXPERIENCE_EDUCATION_LIST } from "@/store/reducers/listDataReducer";
+import { TbEyeStar } from "react-icons/tb";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
@@ -167,6 +168,10 @@ const ProfilePage = () => {
       () => {}
     );
   };
+  const _onClickCV = () => {
+    setFuncs(ModalConstants.CANDIDATE_KEYS.candidateCV);
+    handleOpen();
+  };
 
   return (
     <>
@@ -202,11 +207,22 @@ const ProfilePage = () => {
           </div>
           <div className="w-full md:w-9/12 flex flex-col gap-5">
             <div className="bg-white p-5 shadow-sm rounded-sm">
-              <div className="flex items-center space-x-2 font-semibold text-gray-900 leading-8 mb-3">
-                <span className="text-orangetext text-2xl my-auto">
-                  <MdInfoOutline />
-                </span>
-                <span className="tracking-wide text-lg">Thông tin cá nhân</span>
+              <div className="flex justify-between gap-3">
+                <div className="flex items-center space-x-2 font-semibold text-gray-900 leading-8 mb-3">
+                  <span className="text-orangetext text-2xl my-auto">
+                    <MdInfoOutline />
+                  </span>
+                  <span className="tracking-wide text-lg">
+                    Thông tin cá nhân
+                  </span>
+                </div>
+                <button
+                  className="flex items-center gap-1.5 w-max h-max px-3 py-1.5 bg-orangetext text-white rounded hover:bg-orangetext/85 font-medium text-sm"
+                  onClick={_onClickCV}
+                >
+                  <TbEyeStar className="text-lg" />
+                  <p>Xem hồ sơ</p>
+                </button>
               </div>
 
               <Information

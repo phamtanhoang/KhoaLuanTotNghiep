@@ -54,6 +54,8 @@ const CandidateAPI = {
   getDetail_Employer: (id?: string) => {
     return `/candidates/getInfo_Employer/${id}`;
   },
+  
+  getDetail_Candidate: "/candidates/getInfo_Candidate",
 
   getFollower: (currentPage?: number, itemPerPage?: number) => {
     return `/candidates/getCandidatesFollow?page=${currentPage}&size=${itemPerPage}`;

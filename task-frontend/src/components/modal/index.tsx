@@ -4,6 +4,7 @@ import { CreateJob, DetailsJob, DetailsJobAdmin } from "./job";
 import { ChangeAvatar, ChangeBackground, ChooseImage } from "./image";
 
 import {
+  CandidateCV,
   CandidateDetail,
   CandidateUpdate,
   ChangeExpSkillInfoCandidate,
@@ -158,6 +159,9 @@ const ModalBase = (props: any) => {
         fetchData={fetchData}
         handleClose={handleClose}
       />
+    ),
+    [ModalConstants.CANDIDATE_KEYS.candidateCV]: (
+      <CandidateCV id={id} fetchData={fetchData} handleClose={handleClose} />
     ),
 
     [ModalConstants.HUMANRESOURCE_KEYS.createHumanResource]: (

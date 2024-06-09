@@ -100,99 +100,127 @@ const CandidateDetail = (props: any) => {
               </div>
 
               <div className="my-auto">
-                {candidate?.phoneNumber && (
-                  <p className="text-sm text-gray-600">
-                    SĐT: {candidate?.phoneNumber}
-                  </p>
-                )}
                 {candidate?.email && (
-                  <p className="text-sm text-gray-600">
-                    Email: {candidate?.email}
+                  <p className="flex gap-1">
+                    <span className="">Email:</span>
+                    <a
+                      href={`mailto:${candidate?.email}`}
+                      className="italic font-medium"
+                    >
+                      {candidate?.email}
+                    </a>
                   </p>
                 )}
                 {candidate?.sex && (
-                  <p className="text-sm text-gray-600">
-                    Giới tính:{" "}
-                    {candidate?.sex == "MALE"
-                      ? "Nam"
-                      : candidate?.sex == "FEMALE"
-                      ? "Nữ"
-                      : "Khác"}
+                  <p className="flex gap-1">
+                    <span className="">Giới tính:</span>
+                    <p className="italic font-medium">
+                      {candidate?.sex == "MALE"
+                        ? "Nam"
+                        : candidate?.sex == "FEMALE"
+                        ? "Nữ"
+                        : "Khác"}
+                    </p>
+                  </p>
+                )}
+                {candidate?.phoneNumber && (
+                  <p className="flex gap-1">
+                    <span className="">Số điện thoại:</span>
+                    <a
+                      href={`tel:${candidate?.phoneNumber}`}
+                      className="italic font-medium"
+                    >
+                      {candidate?.phoneNumber}
+                    </a>
                   </p>
                 )}
                 {candidate?.link && (
-                  <p className="text-sm text-gray-600">
-                    Liên kết: {candidate?.link}
+                  <p className="flex gap-1">
+                    <span className="">Liên kết:</span>
+                    <a href={candidate?.link} className="italic font-medium">
+                      {candidate?.link}
+                    </a>
                   </p>
                 )}
                 {candidate?.address && (
-                  <p className="text-sm text-gray-600">
-                    Nơi sống: {candidate?.address}
+                  <p className="flex gap-1">
+                    <span className="">Địa chỉ:</span>
+                    <span className="italic font-medium">
+                      {candidate?.address}
+                    </span>
                   </p>
                 )}
               </div>
             </div>
             <hr className="my-4" />
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Giới thiệu</h3>
-              <p className="text-sm leading-relaxed ">
-                {candidate?.introduction}
-              </p>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-2">Kĩ năng</h3>
-              <ul className="list-disc list-inside text-sm">
-                {candidate?.extra?.skills?.map((item: any, index: number) => (
-                  <li key={index}>
-                    {item?.skill}
-                    {item?.description && ": "}
-                    {item?.description}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold">Kinh nghiệm</h3>
+            {candidate?.introduction && (
               <div>
-                {candidate?.extra?.experiences?.map(
-                  (item: any, index: number) => (
-                    <div className="mt-2" key={index}>
-                      <h4 className="text-md font-medium">
-                        {item?.experience} |{" "}
-                        {DateHelper.formatDate2(new Date(item?.fromDate!))} -{" "}
-                        {item?.toDate == "now"
-                          ? "Hiện tại"
-                          : DateHelper.formatDate2(new Date(item?.toDate!))}
-                      </h4>
-                      <p className="text-sm text-gray-600 italic">
-                        {item?.description}
-                      </p>
-                    </div>
-                  )
-                )}
+                <h3 className="text-xl font-semibold mb-2">Giới thiệu</h3>
+                <p className="text-md leading-relaxed text-justify">
+                  {candidate?.introduction}
+                </p>
               </div>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold">Học vấn</h3>
-              <div>
-                {candidate?.extra?.educations?.map(
-                  (item: any, index: number) => (
-                    <div className="mt-2" key={index}>
-                      <h4 className="text-md font-medium">
-                        {item?.education} |{" "}
-                        {DateHelper.formatDate2(new Date(item?.fromDate!))} -{" "}
-                        {item?.toDate == "now"
-                          ? "Hiện tại"
-                          : DateHelper.formatDate2(new Date(item?.toDate!))}
-                      </h4>
-                      <p className="text-sm text-gray-600 italic">
-                        {item?.description}
-                      </p>
-                    </div>
-                  )
-                )}
+            )}
+            {candidate?.extra?.skills?.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-xl font-semibold mb-2">Kĩ năng</h3>
+                <ul className="text-md">
+                  {candidate?.extra?.skills?.map((item: any, index: number) => (
+                    <li key={index} className="text-justify">
+                      <span className="font-medium">-&nbsp;{item?.skill}</span>
+                      {item?.description && ": "}
+                      {item?.description}
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
+            )}
+            {candidate?.extra?.experiences?.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-xl font-semibold">Kinh nghiệm</h3>
+                <div>
+                  {candidate?.extra?.experiences?.map(
+                    (item: any, index: number) => (
+                      <div className="mt-2" key={index}>
+                        <h4 className="text-base font-medium">
+                          -&nbsp;{item?.experience} |{" "}
+                          {DateHelper.formatDate2(new Date(item?.fromDate!))} -{" "}
+                          {item?.toDate == "now"
+                            ? "Hiện tại"
+                            : DateHelper.formatDate2(new Date(item?.toDate!))}
+                        </h4>
+                        <p className="text-md text-gray-600 italic text-justify">
+                          &nbsp;&nbsp;&nbsp;{item?.description}
+                        </p>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+            {candidate?.extra?.educations?.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-xl font-semibold">Học vấn</h3>
+                <div>
+                  {candidate?.extra?.educations?.map(
+                    (item: any, index: number) => (
+                      <div className="mt-2" key={index}>
+                        <h4 className="text-base font-medium">
+                          -&nbsp;{item?.education} |{" "}
+                          {DateHelper.formatDate2(new Date(item?.fromDate!))} -{" "}
+                          {item?.toDate == "now"
+                            ? "Hiện tại"
+                            : DateHelper.formatDate2(new Date(item?.toDate!))}
+                        </h4>
+                        <p className="text-md text-gray-600 italic text-justify">
+                          &nbsp;&nbsp;&nbsp;{item?.description}
+                        </p>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
