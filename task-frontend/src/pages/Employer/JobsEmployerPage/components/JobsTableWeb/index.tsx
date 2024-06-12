@@ -99,8 +99,8 @@ const JobsTableWeb: React.FC<JobsTableProps> = ({
       <table className="w-full text-gray-600 table-fixed">
         <thead>
           <th className="w-[5%]">STT</th>
-          <th className="px-5 w-[35%] text-left">Tên công việc</th>
-          <th className="px-5 w-[15%] text-left">Tình trạng</th>
+          <th className="px-5 w-[33%] text-left">Tên công việc</th>
+          <th className="px-5 w-[17%] text-left">Tình trạng</th>
           <th className="px-5 w-[20%]">Danh mục</th>
           <th className="px-5 w-[15%]">Ngày hết hạn</th>
           <th className="px-5 w-[15%]"></th>

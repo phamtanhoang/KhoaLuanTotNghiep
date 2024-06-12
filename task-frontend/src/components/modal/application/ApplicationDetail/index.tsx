@@ -271,8 +271,6 @@ const ApplicationDetail = (props: any) => {
       });
   };
 
-
-
   const _onClickUpDateStep = (status: string, result: string) => {
     context.handleOpenLoading();
     applicationsService

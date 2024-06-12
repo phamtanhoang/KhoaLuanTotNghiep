@@ -87,5 +87,15 @@ public class Candidate extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "employer_id")
     )
     private Set<Employer> employers = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "followedCandidates")
+    private Set<Employer> followedByEmployers = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "followedCandidates_HR")
+    private Set<HumanResource> followedByHRs = new HashSet<>();
+
+
 }
 

@@ -1,3 +1,3 @@
-import CandidateCard from "./CandidateCard";
+import Table from "./Table";
 
-export { CandidateCard };
+export { Table };

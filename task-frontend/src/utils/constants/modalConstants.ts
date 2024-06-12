@@ -14,6 +14,7 @@ const JOB_KEYS = {
   detailJob: "DetailJob",
   detailJobAdmin: "DetailJobAdmin",
   EditJob: "EditJob",
+  changeDealine: "changeDealine",
 };
 const CANDIDATE_KEYS = {
   changeInfoCandidate: "ChangeInfoCandidate",
@@ -21,6 +22,7 @@ const CANDIDATE_KEYS = {
   updateCandidate: "updateCandidate",
   detailCandidate: "detailCandidate",
   candidateCV: "candidateCV",
+  myCV: "myCV",
 };
 const APPLICATION_KEYS = {
   applyJob: "ApplyJob",

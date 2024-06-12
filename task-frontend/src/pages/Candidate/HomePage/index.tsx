@@ -33,23 +33,21 @@ const HomePage: React.FC = () => {
   const context = useContext(LoadingContext);
   const dispatch = useDispatch();
 
-  const { totalPages, currentPage, isEmpty } = useSelector(
-    (state: any) => state.paginationReducer
-  );
+  const { isEmpty } = useSelector((state: any) => state.paginationReducer);
   const { categories, employers } = useSelector(
     (state: any) => state.listDataReducer
   );
   useEffect(() => {
+    dispatch(ONCHANGE_CATEGORY_LIST([]));
     dispatch(CLEAR_PAGINATION_STATE());
   }, []);
   const fetchCategories = () => {
     context.handleOpenLoading();
     categoriesService
-      .getTopCategories(currentPage - 1, 8)
+      .getTopCategories()
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          const cates = categories.concat(res?.data?.Data?.content || []);
-          dispatch(ONCHANGE_CATEGORY_LIST(cates));
+          dispatch(ONCHANGE_CATEGORY_LIST(res?.data?.Data?.content));
           dispatch(ONCHANGE_PAGINATION(res.data.Data));
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
@@ -80,11 +78,10 @@ const HomePage: React.FC = () => {
         context.handleCloseLoading();
       });
   };
-  useEffect(() => {
-    fetchCategories();
-  }, [currentPage]);
+
   useEffect(() => {
     fetchEmployers();
+    fetchCategories();
   }, []);
 
   return (
@@ -136,7 +133,6 @@ const HomePage: React.FC = () => {
               {employers.map((item: EmployerModel, index: number) => (
                 <SwiperSlide key={index}>
                   <TopEmployerCard
-                  
                     id={item?.id!}
                     image={item?.image!}
                     name={item?.name!}
@@ -181,19 +177,8 @@ const HomePage: React.FC = () => {
                     jobCount={item.count!}
                   />
                 ))}
-              </div>{" "}
+              </div>
             </>
-          )}
-
-          {totalPages > currentPage && !isEmpty && (
-            <div className="w-full flex justify-center items-center mt-12">
-              <button
-                className="flex text-white justify-center items-center w-max min-w-max sm:w-max px-6 h-12 rounded-lg outline-none relative overflow-hidden border duration-300 ease-linear after:absolute after:inset-x-0 after:aspect-square after:scale-0 after:opacity-70 after:origin-center after:duration-300 after:ease-linear after:rounded-full after:top-0 after:left-0 after:bg-orange-500 hover:after:opacity-100 hover:after:scale-[2.5] bg-orangetext border-transparent hover:border-orange-500 mx-auto"
-                onClick={() => dispatch(ONCHANGE_CURRENTPAGE(currentPage + 1))}
-              >
-                <span className="z-[1] font-medium">Xem thêm</span>
-              </button>
-            </div>
           )}
         </div>
       </section>

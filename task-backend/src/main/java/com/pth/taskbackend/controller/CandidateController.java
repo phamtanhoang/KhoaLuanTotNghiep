@@ -379,6 +379,13 @@ public class CandidateController {
                         new BaseResponse("Tài khoản ứng viên không còn tồn tại!", HttpStatus.NOT_FOUND.value(), null)
                 );
 
+            String ID;
+            if(optionalUser.get().getRole()==ERole.EMPLOYER){
+                ID=employerService.findByUserEmail(email).get().getId();
+            } else{
+                ID=humanResourceService.findByEmail(email).get().getId();
+            }
+
             Candidate candidate = optionalCandidate.get();
             List<Education>educationList = educationService.findByCandidateId(optionalCandidate.get().getId(),Pageable.unpaged()).stream().toList();
             List<EducationResponse> educationResponses = educationList.stream()
@@ -445,6 +452,9 @@ public class CandidateController {
                     candidate.getUser().getEmail(),
                     candidate.getUser().getId(),
                     candidate.getAddress(),
+                    optionalUser.get().getRole()==ERole.EMPLOYER ?
+                            candidateService.checkIsFollow_Employer_Candidate(ID, id) :
+                            candidateService.checkIsFollow_HR_Candidate(ID, id),
                     response
             );
             return ResponseEntity.ok(
@@ -552,6 +562,7 @@ public class CandidateController {
                     candidate.getUser().getEmail(),
                     candidate.getUser().getId(),
                     candidate.getAddress(),
+                    false,
                     response
             );
             return ResponseEntity.ok(
@@ -568,8 +579,12 @@ public class CandidateController {
 
 
     @Operation(summary = "Get list", description = "", tags = {})
-    @GetMapping("")
-    public ResponseEntity<BaseResponse> getCandidates(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword, Pageable pageable) {
+    @GetMapping("/findCV")
+    public ResponseEntity<BaseResponse> findCV(@RequestHeader("Authorization") String token,
+                                               @RequestParam(required = false)String job,
+                                               @RequestParam(required = false)String location,
+                                               @RequestParam(required = false)String skill,
+                                               Pageable pageable) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER)||checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
@@ -598,12 +613,62 @@ public class CandidateController {
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép sử dụng chức năng này", HttpStatus.FORBIDDEN.value(), null)
                 );
-            Page<Candidate> candidates = candidateService.findCandidateByKeyword(keyword, pageable);
 
-            Page<CandidateResponse> responses = candidates.map(candidate -> new CandidateResponse(
+            Page<Candidate> candidates = candidateService.findCV(job,location, skill, pageable);
+
+            Page<CandidateDetailResponse> responses = candidates.map(candidate -> {
+                List<Education>educationList = educationService.findByCandidateId(candidate.getId(), Pageable.unpaged()).stream().toList();
+                List<EducationResponse> educationResponses = educationList.stream()
+                        .map(education -> new EducationResponse(
+                                education.getId(),
+                                education.getCreated(),
+                                education.getUpdated(),
+                                education.getFromDate(),
+                                education.getToDate(),
+                                education.getEducation(),
+                                education.getSequence(),
+                                education.getDescription(),
+                                education.getCandidate().getId()
+                        ))
+                        .toList();
+
+                List<Experience>experiences = experienceService.findByCandidateId(candidate.getId(),Pageable.unpaged()).stream().toList();
+
+                List<ExperienceResponse> experienceResponses = experiences.stream()
+                        .map(experience -> new ExperienceResponse(
+                                experience.getId(),
+                                experience.getCreated(),
+                                experience.getUpdated(),
+                                experience.getFromDate(),
+                                experience.getToDate(),
+                                experience.getExperience(),
+                                experience.getSequence(),
+                                experience.getDescription(),
+                                experience.getCandidate().getId()
+                        ))
+                        .collect(Collectors.toList());
+
+
+                List<Skill>skills = skillService.findByCandidateId(candidate.getId(),Pageable.unpaged()).stream().toList();
+
+                List<SkillResponse> skillResponses = skills.stream()
+                        .map(s -> new SkillResponse(
+                                s.getId(),
+                                s.getCreated(),
+                                s.getUpdated(),
+                                s.getSkill(),
+                                s.getSequence(),
+                                s.getDescription(),
+                                s.getCandidate().getId()
+                        ))
+                        .collect(Collectors.toList());
+
+                Map<String,Object>response= new HashMap<>();
+                response.put("skills",skillResponses);
+                response.put("experiences",experienceResponses);
+                response.put("educations",educationResponses);
+                return new CandidateDetailResponse(
                     candidate.getId(),
-                    candidate.getCreated(),
-                    candidate.getUpdated(),
                     candidate.getFirstName(),
                     candidate.getLastName(),
                     candidate.getPhoneNumber(),
@@ -613,21 +678,17 @@ public class CandidateController {
                     candidate.getIntroduction(),
                     candidate.getJob(),
                     candidate.getLink(),
-                    candidate.getIsFindJob(),
-                    candidate.getUser().getStatus(),
+                    candidate.getCV(),
                     candidate.getUser().getEmail(),
-                    candidate.getUser().getId()
-            ));
+                    candidate.getUser().getId(),
+                    candidate.getAddress(),
+                    false,
+                    response);
+            });
 
-            if (responses.isEmpty()) {
-                return ResponseEntity.ok(
-                        new BaseResponse("Danh sách ứng viên rỗng", HttpStatus.OK.value(), null)
-                );
-            } else {
-                return ResponseEntity.ok(
-                        new BaseResponse("Danh sách ứng viên", HttpStatus.OK.value(), responses)
-                );
-            }
+
+            return ResponseEntity.ok(new BaseResponse("Danh sách ứng viên", HttpStatus.OK.value(), responses));
+
         }catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
@@ -636,6 +697,7 @@ public class CandidateController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/profile")
     public ResponseEntity<BaseResponse> getCandidateProfile(@RequestHeader("Authorization")String token) {
@@ -1239,5 +1301,429 @@ public class CandidateController {
         }
     }
 
+    @Operation(summary = "follow candidate employer", description = "", tags = {})
+    @PostMapping("/followCandidate_Employer/{id}")
+    public ResponseEntity<BaseResponse> followCandidate_Employer(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
 
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Employer> optionalEmployer = employerService.findByUserEmail(optionalUser.get().getEmail());
+            if(optionalEmployer.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            Optional<Candidate> optionalCandidate = candidateService.findById(id);
+            if (optionalCandidate.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            Employer employer = optionalEmployer.get();
+            Candidate candidate = optionalCandidate.get();
+
+            if(!candidateService.checkIsFollow_Employer_Candidate(employer.getId(), candidate.getId())){
+                candidateService.follow_Employer_Candidate(employer.getId(), candidate.getId());
+                return ResponseEntity.ok(
+                        new BaseResponse("Lưu ứng viên thành công", HttpStatus.OK.value(), false)
+                );
+            }
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Bạn đã lưu ứng viên này trước đó!", HttpStatus.BAD_REQUEST.value(), true)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn!", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "unfollow candidate employer", description = "", tags = {})
+    @DeleteMapping("/unfollowCandidate_Employer/{id}")
+    public ResponseEntity<BaseResponse> unfollowCandidate_Employer(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Employer> optionalEmployer = employerService.findByUserEmail(optionalUser.get().getEmail());
+            if(optionalEmployer.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            Optional<Candidate> optionalCandidate = candidateService.findById(id);
+            if (optionalCandidate.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            Employer employer = optionalEmployer.get();
+            Candidate candidate = optionalCandidate.get();
+
+            if(candidateService.checkIsFollow_Employer_Candidate(employer.getId(), candidate.getId())){
+                candidateService.unfollow_Employer_Candidate(employer.getId(), candidate.getId());
+                return ResponseEntity.ok(
+                        new BaseResponse("Bỏ lưu ứng viên thành công", HttpStatus.OK.value(), false)
+                );
+            }
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Bạn chưa lưu ứng viên này trước đó!", HttpStatus.BAD_REQUEST.value(), true)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn!", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "get list candidates saved for employer", description = "", tags = {})
+    @GetMapping("/getCandidatesSaved_Employer")
+    public ResponseEntity<BaseResponse> getCandidatesSaved_Employer(@RequestHeader("Authorization")String token, Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            Optional<Employer> employer = employerService.findByUserEmail(optionalUser.get().getEmail());
+            if(employer.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy nhà tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            Page<Candidate> candidates = candidateService.getCandidatesSaved_Employer(employer.get().getId(), pageable);
+            Page<CandidateDetailResponse> responses = candidates.map(candidate -> {
+                List<Education>educationList = educationService.findByCandidateId(candidate.getId(), Pageable.unpaged()).stream().toList();
+                List<EducationResponse> educationResponses = educationList.stream()
+                        .map(education -> new EducationResponse(
+                                education.getId(),
+                                education.getCreated(),
+                                education.getUpdated(),
+                                education.getFromDate(),
+                                education.getToDate(),
+                                education.getEducation(),
+                                education.getSequence(),
+                                education.getDescription(),
+                                education.getCandidate().getId()
+                        ))
+                        .toList();
+
+                List<Experience>experiences = experienceService.findByCandidateId(candidate.getId(),Pageable.unpaged()).stream().toList();
+
+                List<ExperienceResponse> experienceResponses = experiences.stream()
+                        .map(experience -> new ExperienceResponse(
+                                experience.getId(),
+                                experience.getCreated(),
+                                experience.getUpdated(),
+                                experience.getFromDate(),
+                                experience.getToDate(),
+                                experience.getExperience(),
+                                experience.getSequence(),
+                                experience.getDescription(),
+                                experience.getCandidate().getId()
+                        ))
+                        .collect(Collectors.toList());
+
+
+                List<Skill>skills = skillService.findByCandidateId(candidate.getId(),Pageable.unpaged()).stream().toList();
+
+                List<SkillResponse> skillResponses = skills.stream()
+                        .map(s -> new SkillResponse(
+                                s.getId(),
+                                s.getCreated(),
+                                s.getUpdated(),
+                                s.getSkill(),
+                                s.getSequence(),
+                                s.getDescription(),
+                                s.getCandidate().getId()
+                        ))
+                        .collect(Collectors.toList());
+
+                Map<String,Object>response= new HashMap<>();
+                response.put("skills",skillResponses);
+                response.put("experiences",experienceResponses);
+                response.put("educations",educationResponses);
+                return new CandidateDetailResponse(
+                        candidate.getId(),
+                        candidate.getFirstName(),
+                        candidate.getLastName(),
+                        candidate.getPhoneNumber(),
+                        candidate.getSex(),
+                        candidate.getAvatar(),
+                        candidate.getDateOfBirth(),
+                        candidate.getIntroduction(),
+                        candidate.getJob(),
+                        candidate.getLink(),
+                        candidate.getCV(),
+                        candidate.getUser().getEmail(),
+                        candidate.getUser().getId(),
+                        candidate.getAddress(),
+                        true,
+                        response);
+            });
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Danh sách ứng viên đã lưu", HttpStatus.OK.value(), responses)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "follow candidate hr", description = "", tags = {})
+    @PostMapping("/followCandidate_HR/{id}")
+    public ResponseEntity<BaseResponse> followCandidate_HR(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(optionalUser.get().getEmail());
+            if(optionalHumanResource.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy tài khoản nhân sự!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            Optional<Candidate> optionalCandidate = candidateService.findById(id);
+            if (optionalCandidate.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            HumanResource humanResource = optionalHumanResource.get();
+            Candidate candidate = optionalCandidate.get();
+
+            if(!candidateService.checkIsFollow_HR_Candidate(humanResource.getId(), candidate.getId())){
+                candidateService.follow_HR_Candidate(humanResource.getId(), candidate.getId());
+                return ResponseEntity.ok(
+                        new BaseResponse("Lưu ứng viên thành công", HttpStatus.OK.value(), false)
+                );
+            }
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Bạn đã lưu ứng viên này trước đó!", HttpStatus.BAD_REQUEST.value(), true)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn!", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+    @Operation(summary = "unfollow candidate HR", description = "", tags = {})
+    @DeleteMapping("/unfollowCandidate_HR/{id}")
+    public ResponseEntity<BaseResponse> unfollowCandidate_HR(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(optionalUser.get().getEmail());
+            if(optionalHumanResource.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy tài khoản nhân sự!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+            Optional<Candidate> optionalCandidate = candidateService.findById(id);
+            if (optionalCandidate.isEmpty()) {
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+
+            HumanResource humanResource = optionalHumanResource.get();
+            Candidate candidate = optionalCandidate.get();
+
+            if(candidateService.checkIsFollow_HR_Candidate(humanResource.getId(), candidate.getId())){
+                candidateService.unfollow_HR_Candidate(humanResource.getId(), candidate.getId());
+                return ResponseEntity.ok(
+                        new BaseResponse("Bỏ ứng viên thành công", HttpStatus.OK.value(), false)
+                );
+            }
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Bạn chưa lưu ứng viên này trước đó!", HttpStatus.BAD_REQUEST.value(), true)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn!", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "get list candidates saved for HR", description = "", tags = {})
+    @GetMapping("/getCandidatesSaved_HR")
+    public ResponseEntity<BaseResponse> getCandidatesSaved_HR(@RequestHeader("Authorization")String token, Pageable pageable) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép!", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(optionalUser.get().getEmail());
+            if(optionalHumanResource.isEmpty()){
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy tài khoản nhân sự!", HttpStatus.NOT_FOUND.value(), null)
+                );
+            }
+
+            Page<Candidate> candidates = candidateService.getCandidatesSaved_HR(optionalHumanResource.get().getId(), pageable);
+            Page<CandidateDetailResponse> responses = candidates.map(candidate -> {
+                List<Education>educationList = educationService.findByCandidateId(candidate.getId(), Pageable.unpaged()).stream().toList();
+                List<EducationResponse> educationResponses = educationList.stream()
+                        .map(education -> new EducationResponse(
+                                education.getId(),
+                                education.getCreated(),
+                                education.getUpdated(),
+                                education.getFromDate(),
+                                education.getToDate(),
+                                education.getEducation(),
+                                education.getSequence(),
+                                education.getDescription(),
+                                education.getCandidate().getId()
+                        ))
+                        .toList();
+
+                List<Experience>experiences = experienceService.findByCandidateId(candidate.getId(),Pageable.unpaged()).stream().toList();
+
+                List<ExperienceResponse> experienceResponses = experiences.stream()
+                        .map(experience -> new ExperienceResponse(
+                                experience.getId(),
+                                experience.getCreated(),
+                                experience.getUpdated(),
+                                experience.getFromDate(),
+                                experience.getToDate(),
+                                experience.getExperience(),
+                                experience.getSequence(),
+                                experience.getDescription(),
+                                experience.getCandidate().getId()
+                        ))
+                        .collect(Collectors.toList());
+
+
+                List<Skill>skills = skillService.findByCandidateId(candidate.getId(),Pageable.unpaged()).stream().toList();
+
+                List<SkillResponse> skillResponses = skills.stream()
+                        .map(s -> new SkillResponse(
+                                s.getId(),
+                                s.getCreated(),
+                                s.getUpdated(),
+                                s.getSkill(),
+                                s.getSequence(),
+                                s.getDescription(),
+                                s.getCandidate().getId()
+                        ))
+                        .collect(Collectors.toList());
+
+                Map<String,Object>response= new HashMap<>();
+                response.put("skills",skillResponses);
+                response.put("experiences",experienceResponses);
+                response.put("educations",educationResponses);
+                return new CandidateDetailResponse(
+                        candidate.getId(),
+                        candidate.getFirstName(),
+                        candidate.getLastName(),
+                        candidate.getPhoneNumber(),
+                        candidate.getSex(),
+                        candidate.getAvatar(),
+                        candidate.getDateOfBirth(),
+                        candidate.getIntroduction(),
+                        candidate.getJob(),
+                        candidate.getLink(),
+                        candidate.getCV(),
+                        candidate.getUser().getEmail(),
+                        candidate.getUser().getId(),
+                        candidate.getAddress(),
+                        true,
+                        response);
+            });
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Danh sách ứng viên đã lưu", HttpStatus.OK.value(), responses)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 }

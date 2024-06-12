@@ -1,5 +1,6 @@
 package com.pth.taskbackend.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.pth.taskbackend.dto.request.ChangeDealine;
 import com.pth.taskbackend.dto.request.JobRequest;
 import com.pth.taskbackend.dto.response.*;
 import com.pth.taskbackend.enums.ERole;
@@ -1682,8 +1683,8 @@ public class JobController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
-    }@Operation(summary = "update status", description = "", tags = {})
-
+    }
+    @Operation(summary = "update status", description = "", tags = {})
     @PatchMapping("/updateStatus-employer/{id}")
     public ResponseEntity<BaseResponse> updateJobStatusByEmployer(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody  String status) {
         try {
@@ -1777,6 +1778,71 @@ public class JobController {
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (EmptyResultDataAccessException e) {
             return ResponseEntity.ok(new BaseResponse("Không tìm thấy công việc cần duyệt!", HttpStatus.NOT_FOUND.value(), null));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "update dealine", description = "", tags = {})
+    @PatchMapping("/updateDateline/{id}")
+    public ResponseEntity<BaseResponse> updateJobDateline(@RequestHeader("Authorization")String token, @PathVariable("id") String id,@RequestBody ChangeDealine toDate) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission =
+                    checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR)||
+                    checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
+
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Optional<Job> optionalJob = Optional.empty();
+
+            if(optionalUser.get().getRole().equals(ERole.EMPLOYER))
+            {
+                Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
+                if (optionalEmployer.isEmpty())
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                    );
+
+                optionalJob=jobService.findByIdAndEmployerId(id,optionalEmployer.get().getId());
+
+            }
+            else if(optionalUser.get().getRole().equals(ERole.HR))
+            {
+                Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
+                if (optionalHumanResource.isEmpty())
+                    return ResponseEntity.ok(
+                            new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
+                    );
+
+                optionalJob=jobService.findByIdAndHRId(id,optionalHumanResource.get().getId());
+
+            }
+            if (optionalJob.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy công việc tương ứng!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            Job job = optionalJob.get();
+            job.setToDate(toDate.toDate());
+            jobRepository.save(job);
+            return ResponseEntity.ok(
+                    new BaseResponse("Gia hạn công việc thành công", HttpStatus.OK.value(), job)
+            );
+
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -133,5 +133,48 @@ const candidatesService = {
       CandidateAPI.getFollower(currentPage, itemPerPage)
     );
   },
+  async getCandidatesFindJob(
+    job?: string,
+    location?: string,
+    skill?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) {
+    return await axiosConfig.get(
+      CandidateAPI.getCandidatesFindJob(
+        job,
+        location,
+        skill,
+        currentPage,
+        itemPerPage
+      )
+    );
+  },
+
+  async followCandidate_Employer(id: string) {
+    return await axiosConfig.post(CandidateAPI.followCandidate_Employer(id));
+  },
+  async unfollowCandidate_employer(id: string) {
+    return await axiosConfig.delete(
+      CandidateAPI.unfollowCandidate_employer(id)
+    );
+  },
+  async getSavedEmployer_Employer(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(
+      CandidateAPI.getSavedCandidate_Employer(currentPage, itemPerPage)
+    );
+  },
+
+  async followCandidate_HR(id: string) {
+    return await axiosConfig.post(CandidateAPI.followCandidate_HR(id));
+  },
+  async unfollowCandidate_HR(id: string) {
+    return await axiosConfig.delete(CandidateAPI.unfollowCandidate_HR(id));
+  },
+  async getSavedEmployer_HR(currentPage?: number, itemPerPage?: number) {
+    return await axiosConfig.get(
+      CandidateAPI.getSavedCandidate_HR(currentPage, itemPerPage)
+    );
+  },
 };
 export default candidatesService;

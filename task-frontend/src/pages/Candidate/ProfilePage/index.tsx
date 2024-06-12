@@ -169,7 +169,7 @@ const ProfilePage = () => {
     );
   };
   const _onClickCV = () => {
-    setFuncs(ModalConstants.CANDIDATE_KEYS.candidateCV);
+    setFuncs(ModalConstants.CANDIDATE_KEYS.myCV);
     handleOpen();
   };
 

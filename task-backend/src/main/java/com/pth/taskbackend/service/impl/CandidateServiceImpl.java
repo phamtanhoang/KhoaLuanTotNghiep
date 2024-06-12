@@ -94,8 +94,8 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
-    public Page<Candidate> findCandidateByKeyword(String keyword, Pageable pageable) throws IOException {
-        return candidateRepository.findCandidateByKeyword(keyword,pageable);
+    public Page<Candidate> findCV(String job, String address, String skill, Pageable pageable) throws IOException {
+        return candidateRepository.findCV(job, address, skill,pageable);
     }
 
     @Override
@@ -114,5 +114,42 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public List<Candidate> getCandidatesFollow(String id) throws IOException {
         return candidateRepository.getCandidatesFollow(id);
+    }
+
+    @Override
+    public boolean checkIsFollow_Employer_Candidate(String employerId, String candidateId) {
+        return candidateRepository.checkIsFollow_Employer_Candidate(employerId, candidateId);
+    }
+
+    @Override
+    public void follow_Employer_Candidate(String employerId, String candidateId) {
+        candidateRepository.follow_Employer_Candidate(employerId, candidateId);
+    }
+
+    @Override
+    public void unfollow_Employer_Candidate(String employerId, String candidateId) {
+        candidateRepository.unfollow_Employer_Candidate(employerId, candidateId);
+    }
+
+    @Override
+    public Page<Candidate> getCandidatesSaved_Employer(String employerId, Pageable pageable) {
+        return candidateRepository.getCandidatesSaved_Employer(employerId, pageable);
+    }
+
+    @Override
+    public boolean checkIsFollow_HR_Candidate(String hrId, String candidateId) {
+        return candidateRepository.checkIsFollow_HR_Candidate(hrId, candidateId);
+    }
+    @Override
+    public void follow_HR_Candidate(String hrId, String candidateId) {
+        candidateRepository.follow_HR_Candidate(hrId, candidateId);
+    }
+    @Override
+    public void unfollow_HR_Candidate(String hrId, String candidateId) {
+        candidateRepository.unfollow_HR_Candidate(hrId, candidateId);
+    }
+    @Override
+    public Page<Candidate> getCandidatesSaved_HR(String hrId, Pageable pageable) {
+        return candidateRepository.getCandidatesSaved_HR(hrId, pageable);
     }
 }

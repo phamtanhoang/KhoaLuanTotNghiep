@@ -45,7 +45,11 @@ const StatisticsApplications = () => {
     setFuncs(ModalConstants.APPLICATION_KEYS.applycationDetail);
     handleOpen();
   };
-  // alert("first " + isFirst + " last " + isLast);
+  const _onClickInfo = (item: ApplicationModel) => {
+    setId(item.candidate?.id!);
+    setFuncs(ModalConstants.CANDIDATE_KEYS.candidateCV);
+    handleOpen();
+  };
   return (
     <>
       <ModalBase
@@ -117,7 +121,13 @@ const StatisticsApplications = () => {
                       alt="logo"
                     />
                     <div>
-                      <h2 className="text-base font-semibold text-gray-800 hover:text-orangetext cursor-pointer">
+                      <h2
+                        className="text-base font-semibold text-gray-800 hover:text-orangetext cursor-pointer"
+                        onClick={(e) => {
+                          _onClickInfo(item);
+                          e.stopPropagation();
+                        }}
+                      >
                         {item.candidate?.firstName}&nbsp;
                         {item.candidate?.lastName}
                       </h2>
@@ -150,7 +160,12 @@ const StatisticsApplications = () => {
                     alt="logo"
                   />
                   <div>
-                    <h2 className="text-base font-semibold text-gray-800 hover:text-orangetext cursor-pointer">
+                    <h2
+                      className="text-base font-semibold text-gray-800 hover:text-orangetext cursor-pointer"
+                      onClick={() => {
+                        _onClickInfo(item);
+                      }}
+                    >
                       {item.candidate?.firstName}&nbsp;
                       {item.candidate?.lastName}
                     </h2>

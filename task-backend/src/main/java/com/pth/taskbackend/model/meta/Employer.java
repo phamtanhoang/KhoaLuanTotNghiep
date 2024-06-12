@@ -48,12 +48,16 @@ public class Employer extends BaseEntity {
     private Set<VipEmployer> vipEmployers = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            },
-            mappedBy = "employers")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "employers")
     private Set<Candidate> candidates = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "employer_candidate_follow",
+            joinColumns = @JoinColumn(name = "employer_id"),
+            inverseJoinColumns = @JoinColumn(name = "candidate_id")
+    )
+    private Set<Candidate> followedCandidates = new HashSet<>();
 }
 

@@ -152,6 +152,14 @@ const jobsService = {
       headers: { "Content-Type": "application/json" },
     });
   },
+  async updateDateline(id: string, toDate: string) {
+    const body = {
+      toDate: toDate,
+    };
+    return await axiosConfig.patch(JobAPI.updateDateline(id), body, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
 
   async getNewJobs(currentPage?: number, itemPerPage?: number) {
     return await axiosConfig.get(JobAPI.getNewJobs(currentPage, itemPerPage));

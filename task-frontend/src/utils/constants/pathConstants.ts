@@ -29,7 +29,7 @@ const EMPLOYER_PATHS = {
   profile: "/employer/profile",
   upgrade: "/employer/upgrade",
   schedule: "/employer/schedule",
-  chat: "/employer/chat",
+  savedEmployer: "/employer/saved-employer",
   procedure: "/employer/procedure",
   checkoutHistory: "/employer/trasaction",
 };

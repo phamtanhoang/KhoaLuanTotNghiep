@@ -132,7 +132,7 @@ const FilterModal = (props: any) => {
                 onChange={(e) => setIsExpired(e.target.value)}
               >
                 <option value="false" className="p-2 text-sm">
-                  Đang tuyển
+                  Còn hạn
                 </option>
                 <option value="true" className="p-2 text-sm">
                   Hết hạn

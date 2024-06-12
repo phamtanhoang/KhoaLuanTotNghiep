@@ -110,167 +110,24 @@ import {
 import { PiGenderIntersexBold } from "react-icons/pi";
 
 function App() {
-  const [candidate, setCandidate] = useState<any>(null);
-  const context = useContext(LoadingContext);
+  const [email, setEmail] = useState<any>("");
 
-  const fetchInfo = () => {
-    context.handleOpenLoading();
-    candidatesService
-      .getDetail_Employer("8adf1cbb-5579-483b-8dad-7f5507a7ac33")
-      .then((res) => {
-        if (res.status === 200 && res.data.Status === 200) {
-          setCandidate(res?.data?.Data);
-        } else {
-          SwalHelper.MiniAlert(res.data.Message, "error");
-        }
-      })
-      .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-      })
-      .finally(() => {
-        context.handleCloseLoading();
-      });
-  };
-  useEffect(() => {
-    fetchInfo();
-  }, []);
-
-  const createPdf = () => {
-    const element = document.getElementById("pdf");
-
-    var opt = {
-      margin: [0.5, 0.8, 0.5, 0.8],
-      filename: "cv.pdf",
-      image: { type: "jpeg", quality: 1 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: "in", format: "a4", orientation: "p" },
-    };
-
-    html2pdf().set(opt).from(element).save();
+  const check = () => {
+    const emailPattern = new RegExp(
+      "[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}"
+    );
+    if (emailPattern.test(email)) {
+      alert("phai email");
+    } else {
+      alert("kh phai email");
+    }
   };
   return (
     <div>
       <div id="pdf">
-        {/* <div className="flex justify-center mb-3">
-          <img
-            src={candidate?.avatar ? candidate?.avatar : NON_USER}
-            className="w-24 h-24 rounded-full"
-          />
-        </div> */}
-        <div className="flex gap-3 items-center justify-between">
-          <div className="my-auto">
-            <h2 className="text-3xl font-semibold">
-              {candidate?.firstName} {candidate?.lastName}
-            </h2>
-            <p className="text-lg text-gray-600 font-medium italic mt-1">
-              {candidate?.job}
-            </p>
-          </div>
-
-          <div className="my-auto text-sm text-gray-700">
-            {candidate?.email && (
-              <p className="flex gap-1">
-                <MdOutlineMailOutline className="my-auto text-base" />
-                <a href={`mailto:${candidate?.email}`} className="my-auto">
-                  {candidate?.email}
-                </a>
-              </p>
-            )}
-            {candidate?.sex && (
-              <p className="flex gap-1">
-                <PiGenderIntersexBold className="my-auto text-base" />
-                <p className="my-auto">
-                  {candidate?.sex == "MALE"
-                    ? "Nam"
-                    : candidate?.sex == "FEMALE"
-                    ? "Nữ"
-                    : "Khác"}
-                </p>
-              </p>
-            )}
-            {candidate?.phoneNumber && (
-              <p className="flex gap-1">
-                <MdOutlinePhone className="my-auto text-base" />
-                <a href={`tel:${candidate?.phoneNumber}`} className="my-auto">
-                  {candidate?.phoneNumber}
-                </a>
-              </p>
-            )}
-            {candidate?.link && (
-              <p className="flex gap-1">
-                <MdLink className="my-auto text-base" />
-                <a href={candidate?.link} className="my-auto">
-                  {candidate?.link}
-                </a>
-              </p>
-            )}
-            {candidate?.address && (
-              <p className="flex gap-1">
-                <MdOutlineLocationOn className="my-auto text-base" />
-                <span className="my-auto">{candidate?.address}</span>
-              </p>
-            )}
-          </div>
-        </div>
-        <hr className="my-4" />
-        <div>
-          <h3 className="text-xl font-semibold mb-2">Giới thiệu</h3>
-          <p className="text-md leading-relaxed text-justify">
-            {candidate?.introduction}
-          </p>
-        </div>
-        <div className="mt-4">
-          <h3 className="text-xl font-semibold mb-2">Kĩ năng</h3>
-          <ul className="text-md">
-            {candidate?.extra?.skills?.map((item: any, index: number) => (
-              <li key={index} className="text-justify">
-                <span className="font-medium">-&nbsp;{item?.skill}</span>
-                {item?.description && ": "}
-                {item?.description}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="mt-4">
-          <h3 className="text-xl font-semibold">Kinh nghiệm</h3>
-          <div>
-            {candidate?.extra?.experiences?.map((item: any, index: number) => (
-              <div className="mt-2" key={index}>
-                <h4 className="text-base font-medium">
-                  -&nbsp;{item?.experience} |{" "}
-                  {DateHelper.formatDate2(new Date(item?.fromDate!))} -{" "}
-                  {item?.toDate == "now"
-                    ? "Hiện tại"
-                    : DateHelper.formatDate2(new Date(item?.toDate!))}
-                </h4>
-                <p className="text-md text-gray-600 italic text-justify">
-                  &nbsp;&nbsp;&nbsp;{item?.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="mt-4 mb-2">
-          <h3 className="text-xl font-semibold">Học vấn</h3>
-          <div>
-            {candidate?.extra?.educations?.map((item: any, index: number) => (
-              <div className="mt-2" key={index}>
-                <h4 className="text-base font-medium">
-                  -&nbsp;{item?.education} |{" "}
-                  {DateHelper.formatDate2(new Date(item?.fromDate!))} -{" "}
-                  {item?.toDate == "now"
-                    ? "Hiện tại"
-                    : DateHelper.formatDate2(new Date(item?.toDate!))}
-                </h4>
-                <p className="text-md text-gray-600 italic text-justify">
-                  &nbsp;&nbsp;&nbsp;{item?.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <input value={email} onChange={(e) => setEmail(e.target.value)} />
       </div>
-      <button onClick={createPdf}>Download PDF</button>
+      <button onClick={check}>checkEmail</button>
     </div>
   );
 }

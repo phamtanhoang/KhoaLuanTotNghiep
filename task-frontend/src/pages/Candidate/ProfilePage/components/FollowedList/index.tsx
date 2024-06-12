@@ -88,7 +88,7 @@ const FollowedList = () => {
           )}
         </div>
       </div>
-      <div className="grid grid-cols-2  lg:grid-cols-4 lg: gap-4 lg:gap-8 mt-4 lg:mt-8">
+      <div className="grid grid-cols-2  lg:grid-cols-4 lg: gap-4 lg:gap-8 my-2">
         {employers.map((item: EmployerModel, index: number) => (
           <div
             key={index}

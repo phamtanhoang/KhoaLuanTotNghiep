@@ -19,5 +19,6 @@ public record CandidateDetailResponse(String id,
                                       String email,
                                       String userId,
                                       String address,
+                                      boolean isSaved,
                                       Object extra) {
 }

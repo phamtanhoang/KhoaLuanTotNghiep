@@ -4,10 +4,11 @@ import LOGO from "@/assets/images/logo.png";
 import { IoHome, IoNewspaper } from "react-icons/io5";
 import { FaClipboardList, FaUsers } from "react-icons/fa6";
 import { RiUserSearchFill } from "react-icons/ri";
-import { AiFillMessage, AiFillSchedule } from "react-icons/ai";
+import { AiFillSchedule } from "react-icons/ai";
 import { MdTimeline } from "react-icons/md";
 import { AuthHelper } from "@/utils/helpers";
 import { PathConstants } from "@/utils/constants";
+import { FaUserCheck } from "react-icons/fa";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -183,7 +184,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   setSidebarOpen={setSidebarOpen}
                 />
               </li>
-              {/* <li>
+              <li>
                 <SidebarLink
                   link={PathConstants.EMPLOYER_PATHS.findCandidate}
                   name="Tìm ứng viên"
@@ -193,21 +194,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </li>
               <li>
                 <SidebarLink
-                  link={PathConstants.EMPLOYER_PATHS.chat}
-                  name="Trò chuyện"
-                  icon={<AiFillMessage className="text-lg" />}
+                  link={PathConstants.EMPLOYER_PATHS.savedEmployer}
+                  name="Ứng viên đã lưu"
+                  icon={<FaUserCheck className="text-lg" />}
                   setSidebarOpen={setSidebarOpen}
                 />
-              </li> */}
-
-              {/* <li>
-                <SidebarLink
-                  link={EMPLOYER_PATHS.setting}
-                  name="Phân quyền"
-                  icon={<FaUsersCog className="text-xl" />}
-                  setSidebarOpen={setSidebarOpen}
-                />
-              </li> */}
+              </li>
             </ul>
           </div>
         </nav>

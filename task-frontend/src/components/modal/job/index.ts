@@ -1,5 +1,6 @@
+import ChangeDealine from "./ChangeDealine";
 import CreateJob from "./CreateJob";
 import DetailsJob from "./DetailsJob";
 import DetailsJobAdmin from "./DetailsJobAdmin";
 
-export { CreateJob, DetailsJob, DetailsJobAdmin };
+export { CreateJob, DetailsJob, DetailsJobAdmin, ChangeDealine };

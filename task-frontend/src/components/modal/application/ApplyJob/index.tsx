@@ -195,7 +195,7 @@ const ApplyJob = (props: any) => {
     fetchInfo();
   }, []);
   const _onClickCV = () => {
-    setFuncsSub(ModalConstants.CANDIDATE_KEYS.candidateCV);
+    setFuncsSub(ModalConstants.CANDIDATE_KEYS.myCV);
     handleOpenSub();
   };
   return (

@@ -30,7 +30,7 @@ import {
 } from "@/pages/Candidate";
 import {
   ApplicationsEmployerPage,
-  ChatEmployerPage,
+  SavedEmployerPage,
   DashboardPage,
   FindCandidatePage,
   HREmployerPage,
@@ -177,8 +177,8 @@ const Routers = () => {
               element={<FindCandidatePage />}
             />
             <Route
-              path={PathConstants.EMPLOYER_PATHS.chat}
-              element={<ChatEmployerPage />}
+              path={PathConstants.EMPLOYER_PATHS.savedEmployer}
+              element={<SavedEmployerPage />}
             />
             <Route
               path={PathConstants.EMPLOYER_PATHS.schedule}

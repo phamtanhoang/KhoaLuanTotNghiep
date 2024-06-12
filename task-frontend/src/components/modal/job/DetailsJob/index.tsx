@@ -7,17 +7,23 @@ import { ConfigSelect } from "@/configs/selectConfig";
 import { SwalHelper, AuthHelper } from "@/utils/helpers";
 import { jobsService } from "@/services";
 import { DateHelper } from "@/utils/helpers/dateHelper";
-import { MdOutlinePauseCircle } from "react-icons/md";
+import { MdOutlineCalendarMonth, MdOutlinePauseCircle } from "react-icons/md";
 import { DataConstants } from "@/utils/constants/dataConstants";
+import ModalBase from "../..";
+import { ModalConstants } from "@/utils/constants";
 
 const DetailsJob = (props: any) => {
   const context = useContext(LoadingContext);
   const handleClose = props.handleClose;
   const fetchData = props.fetchData;
   const id = props.id;
+  const [openSub, setOpenSub] = useState<boolean>(false);
+  const [funcsSub, setFuncsSub] = useState<string>("");
+  const handleOpenSub = () => setOpenSub(true);
+  const handleCloseSub = () => setOpenSub(false);
 
   const [job, setJob] = useState<JobModel>();
-  useEffect(() => {
+  const fetchDataJob = () => {
     context.handleOpenLoading();
     jobsService
       .getDetail_Employer(id)
@@ -34,7 +40,10 @@ const DetailsJob = (props: any) => {
       .finally(() => {
         context.handleCloseLoading();
       });
-  }, []);
+  };
+  useEffect(() => {
+    fetchDataJob();
+  }, [id]);
 
   const tagOptions = Array.isArray(job?.tags)
     ? job.tags.map((item: TagModel) => ({
@@ -64,9 +73,20 @@ const DetailsJob = (props: any) => {
         context.handleCloseLoading();
       });
   };
+  const _onClickDealine = () => {
+    handleOpenSub();
+    setFuncsSub(ModalConstants.JOB_KEYS.changeDealine);
+  };
 
   return (
     <>
+      <ModalBase
+        id={id}
+        fetchData={fetchDataJob}
+        open={openSub}
+        handleClose={handleCloseSub}
+        funcs={funcsSub}
+      />
       <div className="lg:w-[45%] w-screen bg-white relative rounded">
         <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-orangetext rounded-t">
           <h2 className="text-xl font-semibold  line-clamp-1 my-auto">
@@ -254,37 +274,48 @@ const DetailsJob = (props: any) => {
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 px-4 py-3 border-t">
-          {job?.status == DataConstants.STATUS_DATA.PAUSED && (
+        <div className="flex justify-between gap-4 px-4 py-3 border-t">
+          <div>
             <button
-              className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-500/85 font-medium"
-              onClick={() =>
-                _onClickUpdateStatus(DataConstants.STATUS_DATA.ACTIVE)
-              }
+              className="flex items-center gap-2 w-max h-max px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-500/85 font-medium"
+              onClick={() => _onClickDealine()}
             >
-              <MdOutlinePauseCircle className="text-xl" />
-              <p>Bật tìm kiếm</p>
+              <MdOutlineCalendarMonth className="text-lg my-auto" />
+              <p>Gia hạn</p>
             </button>
-          )}
-          {job?.status == DataConstants.STATUS_DATA.ACTIVE && (
-            <button
-              className="flex items-center gap-2 w-max h-max px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-500/85 font-medium"
-              onClick={() =>
-                _onClickUpdateStatus(DataConstants.STATUS_DATA.PAUSED)
-              }
-            >
-              <MdOutlinePauseCircle className="text-xl" />
-              <p>Tắt tìm kiếm</p>
-            </button>
-          )}
+          </div>
+          <div className="flex gap-4">
+            {job?.status == DataConstants.STATUS_DATA.PAUSED && (
+              <button
+                className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-500/85 font-medium"
+                onClick={() =>
+                  _onClickUpdateStatus(DataConstants.STATUS_DATA.ACTIVE)
+                }
+              >
+                <MdOutlinePauseCircle className="text-xl" />
+                <p>Bật tìm kiếm</p>
+              </button>
+            )}
+            {job?.status == DataConstants.STATUS_DATA.ACTIVE && (
+              <button
+                className="flex items-center gap-2 w-max h-max px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-500/85 font-medium"
+                onClick={() =>
+                  _onClickUpdateStatus(DataConstants.STATUS_DATA.PAUSED)
+                }
+              >
+                <MdOutlinePauseCircle className="text-xl" />
+                <p>Tắt tìm kiếm</p>
+              </button>
+            )}
 
-          <button
-            className="hidden lg:flex items-center gap-2 w-max h-max px-4 py-2 bg-slate-300 text-white rounded-md hover:bg-slate-300/90 font-medium"
-            onClick={handleClose}
-          >
-            <IoMdExit className="text-lg" />
-            <p>Đóng</p>
-          </button>
+            <button
+              className="hidden lg:flex items-center gap-2 w-max h-max px-4 py-2 bg-slate-300 text-white rounded-md hover:bg-slate-300/90 font-medium"
+              onClick={handleClose}
+            >
+              <IoMdExit className="text-lg" />
+              <p>Đóng</p>
+            </button>
+          </div>
         </div>
       </div>
     </>

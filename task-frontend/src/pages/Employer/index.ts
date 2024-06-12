@@ -1,5 +1,5 @@
 import ApplicationsEmployerPage from "./ApplicationsEmployerPage";
-import ChatEmployerPage from "./ChatEmployerPage";
+import SavedEmployerPage from "./SavedEmployerPage";
 import DashboardPage from "./DashboardPage";
 import FindCandidatePage from "./FindCandidatePage";
 import HREmployerPage from "./HREmloyerPage";
@@ -18,7 +18,7 @@ export {
   ApplicationsEmployerPage,
   FindCandidatePage,
   ScheduleEmployerPage,
-  ChatEmployerPage,
+  SavedEmployerPage,
   ProcedureEmployerPage,
   HREmployerPage,
   ProfileEmployerPage,

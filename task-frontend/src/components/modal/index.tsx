@@ -1,6 +1,6 @@
 import { ChangePassword, RegisterEmployer, Signin, Signup } from "./auth";
 import { FilterModal } from "./filter";
-import { CreateJob, DetailsJob, DetailsJobAdmin } from "./job";
+import { ChangeDealine, CreateJob, DetailsJob, DetailsJobAdmin } from "./job";
 import { ChangeAvatar, ChangeBackground, ChooseImage } from "./image";
 
 import {
@@ -9,6 +9,7 @@ import {
   CandidateUpdate,
   ChangeExpSkillInfoCandidate,
   ChangeInfoCandidate,
+  MyCV,
 } from "./candidate";
 import {
   ApplicationDetail,
@@ -108,6 +109,9 @@ const ModalBase = (props: any) => {
         handleClose={handleClose}
       />
     ),
+    [ModalConstants.JOB_KEYS.changeDealine]: (
+      <ChangeDealine id={id} fetchData={fetchData} handleClose={handleClose} />
+    ),
 
     [ModalConstants.COMMON_KEYS.changeAvatar]: (
       <ChangeAvatar fetchData={fetchData} handleClose={handleClose} />
@@ -162,6 +166,10 @@ const ModalBase = (props: any) => {
     ),
     [ModalConstants.CANDIDATE_KEYS.candidateCV]: (
       <CandidateCV id={id} fetchData={fetchData} handleClose={handleClose} />
+    ),
+
+    [ModalConstants.CANDIDATE_KEYS.myCV]: (
+      <MyCV id={id} handleClose={handleClose} />
     ),
 
     [ModalConstants.HUMANRESOURCE_KEYS.createHumanResource]: (

@@ -54,11 +54,40 @@ const CandidateAPI = {
   getDetail_Employer: (id?: string) => {
     return `/candidates/getInfo_Employer/${id}`;
   },
-  
+
   getDetail_Candidate: "/candidates/getInfo_Candidate",
 
   getFollower: (currentPage?: number, itemPerPage?: number) => {
     return `/candidates/getCandidatesFollow?page=${currentPage}&size=${itemPerPage}`;
+  },
+  getCandidatesFindJob: (
+    job?: string,
+    location?: string,
+    skill?: string,
+    currentPage?: number,
+    itemPerPage?: number
+  ) => {
+    return `/candidates/findCV?job=${job}&location=${location}&skill=${skill}&page=${currentPage}&size=${itemPerPage}`;
+  },
+
+  followCandidate_Employer: (id: string) => {
+    return `/candidates/followCandidate_Employer/${id}`;
+  },
+  unfollowCandidate_employer: (id: string) => {
+    return `/candidates/unfollowCandidate_Employer/${id}`;
+  },
+  getSavedCandidate_Employer: (currentPage?: number, itemPerPage?: number) => {
+    return `/candidates/getCandidatesSaved_Employer?page=${currentPage}&size=${itemPerPage}`;
+  },
+  
+  followCandidate_HR: (id: string) => {
+    return `/candidates/followCandidate_HR/${id}`;
+  },
+  unfollowCandidate_HR: (id: string) => {
+    return `/candidates/unfollowCandidate_HR/${id}`;
+  },
+  getSavedCandidate_HR: (currentPage?: number, itemPerPage?: number) => {
+    return `/candidates/getCandidatesSaved_HR?page=${currentPage}&size=${itemPerPage}`;
   },
 };
 
@@ -251,6 +280,9 @@ const JobAPI = {
   },
   updateStatus_Employer: (id: string) => {
     return `/jobs/updateStatus-employer/${id}`;
+  },
+  updateDateline: (id: string) => {
+    return `/jobs/updateDateline/${id}`;
   },
   getJobsByEmployerID: (
     id: string,
