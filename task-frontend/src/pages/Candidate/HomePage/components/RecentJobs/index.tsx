@@ -37,7 +37,7 @@ const RecentJobs = () => {
         <div className="w-[90%] lg:w-[55%]">
           <div className="md:order-1 basis-1/2">
             <h1 className="text-3xl font-bold tracking-wide dark:text-white">
-              Cơ Hội Việc Làm <span className="text-orangetext">Mới Nhất</span>
+              Cơ hội việc làm <span className="text-orangetext">Mới Nhất</span>
             </h1>
             <p className="mt-4 tracking-wide text-gray-500">
               Khám phá những vị trí công việc mới nhất trên Website của chúng

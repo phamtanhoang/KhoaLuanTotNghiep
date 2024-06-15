@@ -84,4 +84,5 @@ public interface JobService {
     Integer countJobPending_HR(String id);
 
     Page<Job> findJobSimilar(String id, Pageable pageable);
+    List<Job> findSuitableJob(String id);
 }

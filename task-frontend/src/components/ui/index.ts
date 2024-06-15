@@ -10,6 +10,7 @@ import Hero from "./Hero";
 import ImageCropper from "./ImageCropper";
 import JobCard from "./JobCard";
 import JobCardV2 from "./JobCardV2";
+import JobSuitable from "./JobSuitable";
 import ListEmpty from "./ListEmpty";
 import Loading from "./Loading";
 import LoadingSpiner from "./LoadingSpiner";
@@ -46,4 +47,5 @@ export {
   ChatUI,
   PaymentSuccess,
   PaymentError,
+  JobSuitable,
 };

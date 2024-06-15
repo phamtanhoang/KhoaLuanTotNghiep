@@ -82,4 +82,9 @@ public interface EmployerRepository extends JpaRepository<Employer, String> {
             "WHERE (:id IS NULL OR c.id = :id) " +
             "AND c.user.status='ACTIVE'")
     Page<Employer> getEmployersFollowed(String id, Pageable pageable);
+
+    @Query("SELECT c FROM Employer c INNER JOIN c.followedCandidates e " +
+            "WHERE (:id IS NULL OR e.id = :id) " +
+            "AND e.user.status='ACTIVE'")
+    List<Employer> getEmployersSavedMe(String id);
 }

@@ -34,6 +34,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -137,6 +139,7 @@ public class ChatController {
 
                         return new MessageResponse(
                                 message.getId(),
+                                message.getApplication().getId(),
                                 message.getCreated(),
                                 message.getContent(),
                                 message.getFile(),
@@ -204,9 +207,56 @@ public class ChatController {
                     }
 
                     Message message = chatService.sendMessage(content,path,application, user);
-                    messagingTemplate.convertAndSend("/application/" + applicationId, message);
+
+                    String userName ="";
+                    String avatar ="";
+
+                    if(message.getUser().getRole()== ERole.CANDIDATE) {
+
+                        try {
+                            Optional<Candidate> candidateOptional = candidateService.findByUserEmail(message.getUser().getEmail());
+                            if(candidateOptional.isPresent()){
+                                userName=candidateOptional.get().getFirstName()+" "+candidateOptional.get().getLastName();
+                                avatar=candidateOptional.get().getAvatar();
+                            }
+
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+
+                    }else if(message.getUser().getRole() == ERole.EMPLOYER) {
+
+                        Optional<Employer> employerOptional = employerService.findByUserEmail(message.getUser().getEmail());
+                        if(employerOptional.isPresent()){
+                            userName=employerOptional.get().getName();
+                            avatar=employerOptional.get().getImage();
+                        }
+
+
+                    }else{
+
+                        Optional<HumanResource> humanResourceOptional = humanResourceService.findByEmail(message.getUser().getEmail());
+                        if(humanResourceOptional.isPresent()){
+                            userName=humanResourceOptional.get().getFirstName()+" "+humanResourceOptional.get().getLastName();
+                            avatar=humanResourceOptional.get().getAvatar();
+                        }
+
+                    }
+
+                    MessageResponse messageResponse = new MessageResponse(
+                            message.getId(),
+                            message.getApplication().getId(),
+                            LocalDateTime.now(),
+                            message.getContent(),
+                            message.getFile(),
+                            message.getUser().getId(),
+                            userName,
+                            avatar
+                    );
+
                     return ResponseEntity.ok(
-                            new BaseResponse("Gửi tin nhắn thành công", HttpStatus.OK.value(), message)
+                            new BaseResponse("Gửi tin nhắn thành công", HttpStatus.OK.value(), messageResponse)
                     );
                 }else{
                     return ResponseEntity.ok(
@@ -228,5 +278,10 @@ public class ChatController {
         }
     }
 
-
+    @MessageMapping("/chat")
+    public void sendMessage(@Payload MessageResponse chatMessage) {
+        System.out.println("chat: " + chatMessage);
+        String destination = "/topic/" + chatMessage.applicationId();
+        messagingTemplate.convertAndSend(destination, chatMessage);
+    }
 }

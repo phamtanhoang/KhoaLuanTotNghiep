@@ -257,13 +257,13 @@ const ChangeExpSkillInfoCandidate = (props: any) => {
     <div className="lg:w-[40%] w-screen bg-white relative rounded">
       <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-orangetext rounded-t">
         <h2 className="text-xl font-semibold  line-clamp-1 my-auto">
-          Chỉnh sửa{" "}
+          
           {type === DataConstants.TYPE_EXTRA_DATA.SKILL
-            ? "kĩ năng"
+            ? "Kĩ năng"
             : type === DataConstants.TYPE_EXTRA_DATA.EXP
-            ? "kinh nghiệm làm việc"
+            ? "Kinh nghiệm làm việc"
             : type === DataConstants.TYPE_EXTRA_DATA.EDU
-            ? "trình độ học vấn"
+            ? "Trình độ học vấn"
             : ""}
         </h2>
         <button

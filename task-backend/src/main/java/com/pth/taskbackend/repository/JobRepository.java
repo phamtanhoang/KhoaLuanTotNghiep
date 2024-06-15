@@ -292,5 +292,8 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "ORDER BY RAND()")
     Page<Job> findSimilarJobs(@Param("jobId") String jobId, Pageable pageable);
 
+
+    @Query(value="CALL FindSuitableJobs(:candidateId)", nativeQuery = true)
+    List<Job> findSuitableJob(@Param("candidateId") String candidateId);
 }
 

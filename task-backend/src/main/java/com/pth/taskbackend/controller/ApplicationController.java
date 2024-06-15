@@ -998,18 +998,6 @@ public class ApplicationController {
 
 
             Page<ApplicationResponse> candidateApplications = applications.map(application -> new ApplicationResponse(
-//                    application.getId(),
-//                    application.getCandidate().getId(),
-//                    application.getCandidate().getUser().getEmail(),
-//                    application.getFullName(),
-//                    application.getCandidate().getAvatar(),
-//                    application.getCreated(),
-//                    application.getStatus(),
-//                    application.getJob().getId(),
-//                    application.getJob().getName(),
-//                    application.getJob().getHumanResource().getEmployer().getId(),
-//                    application.getJob().getHumanResource().getEmployer().getName(),
-//                    application.getCV()
                     application.getId(),
                     application.getCreated(),
                     application.getCV(),
@@ -1176,10 +1164,6 @@ public class ApplicationController {
 
                 int totalStep = Math.toIntExact(stepService.countAllByProcessId(application.getJob().getProcess().getId()));
                 int currentStep = application.getCurrentStep();
-                System.out.println("Total step: " + totalStep);
-                System.out.println("Current step: " + currentStep);
-                System.out.println("application, " + application);
-                System.out.println("123"+application.getEmail());
                 if(statusEnum==EApplyStatus.PROCESSING)
                     mailService.sendEmail(application.getEmail(), application.getFullName(),
                             "Đơn ứng tuyển vị trí "+application.getJob().getName()+" của bạn đã được chuyển bước!","EMAIL_TEMPLATE");

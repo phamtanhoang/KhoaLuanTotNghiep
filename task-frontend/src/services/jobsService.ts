@@ -188,5 +188,8 @@ const jobsService = {
       JobAPI.getSimilar(id, currentPage, itemPerPage)
     );
   },
+  async getSuitable() {
+    return await axiosConfig.get(JobAPI.getSuitable);
+  },
 };
 export default jobsService;

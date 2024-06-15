@@ -48,7 +48,7 @@ const JobsSimilar: React.FC<JobsSimilarProps> = ({ id }) => {
         <div className="px-5 lg:px-28 flex justify-between mb-8 text-gray-700">
           <div className="text-center lg:text-left w-full lg:w-[50%]">
             <h1 className="text-3xl  font-bold tracking-wider font-lato ">
-              Việc Làm <span className="text-orangetext">Liên Quan</span>
+              Việc làm <span className="text-orangetext">Liên Quan</span>
             </h1>
           </div>
           <div className=" flex-row justify-between items-end gap-4 hidden lg:flex">

@@ -79,7 +79,7 @@ const CandidateAPI = {
   getSavedCandidate_Employer: (currentPage?: number, itemPerPage?: number) => {
     return `/candidates/getCandidatesSaved_Employer?page=${currentPage}&size=${itemPerPage}`;
   },
-  
+
   followCandidate_HR: (id: string) => {
     return `/candidates/followCandidate_HR/${id}`;
   },
@@ -315,6 +315,7 @@ const JobAPI = {
   getSimilar: (id: string, currentPage?: number, itemPerPage?: number) => {
     return `/jobs/getSimilar/${id}?page=${currentPage}&size=${itemPerPage}`;
   },
+  getSuitable: `/jobs/getSuitable`,
 };
 
 const ApplicationAPI = {

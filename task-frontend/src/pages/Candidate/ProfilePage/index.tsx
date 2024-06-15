@@ -1,4 +1,4 @@
-import { Hero } from "@/components/ui";
+import { Hero, JobSuitable } from "@/components/ui";
 import { FaEdit } from "react-icons/fa";
 import { GiGraduateCap, GiSkills } from "react-icons/gi";
 import { IoNewspaperOutline } from "react-icons/io5";
@@ -359,6 +359,7 @@ const ProfilePage = () => {
           </div>
         </div>
       </section>
+      <JobSuitable />
       <GreatJobs />
     </>
   );

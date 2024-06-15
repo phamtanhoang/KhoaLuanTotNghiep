@@ -242,4 +242,8 @@ public class JobServiceImpl implements JobService {
     public Page<Job> findJobSimilar(String id, Pageable pageable) {
         return jobRepository.findSimilarJobs(id, pageable);
     }
+    @Override
+    public List<Job> findSuitableJob(String id) {
+        return jobRepository.findSuitableJob(id);
+    }
 }

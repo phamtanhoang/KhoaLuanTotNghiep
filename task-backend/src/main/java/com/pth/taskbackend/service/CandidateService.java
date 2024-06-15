@@ -3,6 +3,7 @@ package com.pth.taskbackend.service;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Employer;
+import com.pth.taskbackend.model.meta.HumanResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -53,6 +54,8 @@ public interface CandidateService {
 
     Page<Candidate> getCandidatesSaved_Employer(String employerId, Pageable pageable);
 
+    List<Employer> getEmployersSavedMe(String candidateId);
+
     boolean checkIsFollow_HR_Candidate(String hrId, String candidateId);
 
     void follow_HR_Candidate(String hrId, String candidateId);
@@ -60,4 +63,6 @@ public interface CandidateService {
     void unfollow_HR_Candidate(String hrId, String candidateId);
 
     Page<Candidate> getCandidatesSaved_HR(String hrId, Pageable pageable);
+
+    List<HumanResource> getHRsSavedMe(String candidateId);
 }

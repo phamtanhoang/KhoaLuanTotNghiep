@@ -17,7 +17,7 @@ const QuestionsAndAnswer = () => {
                 <span className="mt-0.5">
                   <FaQuestion className="h-6 w-6 p-1 border-2 border-orangetext text-orangetext rounded-full text-center mr-1 mb-2" />
                 </span>
-                <span className="text-orangetext pr-1">Joobs</span> - Nền tảng
+                <span className="text-orangetext pr-1">Joobs</span> nền tảng
                 thông minh hoạt động như thế nào?
               </h1>
               <p className="text-base text-gray-400 ml-8 lg:pr-16 mt-1 text-justify">

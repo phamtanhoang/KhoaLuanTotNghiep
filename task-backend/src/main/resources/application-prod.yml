@@ -7,9 +7,9 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/job_app
-    username: root
-    password: Hoang2002
+    url: jdbc:mysql://sql12.freesqldatabase.com/sql12713933
+    username: sql12713933
+    password: mIiCTVQGH5
 
 springdoc:
   openapi:

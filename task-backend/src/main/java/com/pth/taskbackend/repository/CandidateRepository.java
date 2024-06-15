@@ -3,6 +3,7 @@ package com.pth.taskbackend.repository;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Employer;
+import com.pth.taskbackend.model.meta.HumanResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -91,7 +92,7 @@ public interface CandidateRepository extends JpaRepository<Candidate, String> {
     void unfollow_Employer_Candidate(String employerId, String candidateId);
 
     @Query("SELECT j FROM Candidate j INNER JOIN j.followedByEmployers c " +
-            "WHERE (:id IS NULL OR c.id = :id) ")
+            "WHERE (:id IS NULL OR c.id = :id) AND j.user.status = 'ACTIVE'")
     Page<Candidate> getCandidatesSaved_Employer(String id, Pageable pageable);
 
     @Query("SELECT COUNT(e) > 0 FROM Candidate e INNER JOIN e.followedByHRs c WHERE c.id = :hrId and e.id = :candidateId")
@@ -108,6 +109,7 @@ public interface CandidateRepository extends JpaRepository<Candidate, String> {
     void unfollow_HR_Candidate(String hrId, String candidateId);
 
     @Query("SELECT j FROM Candidate j INNER JOIN j.followedByHRs c " +
-            "WHERE (:id IS NULL OR c.id = :id) ")
+            "WHERE (:id IS NULL OR c.id = :id) AND j.user.status = 'ACTIVE'")
     Page<Candidate> getCandidatesSaved_HR(String id, Pageable pageable);
+
 }

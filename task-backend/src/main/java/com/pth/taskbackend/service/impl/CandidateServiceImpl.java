@@ -3,7 +3,10 @@ package com.pth.taskbackend.service.impl;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Candidate;
 import com.pth.taskbackend.model.meta.Employer;
+import com.pth.taskbackend.model.meta.HumanResource;
 import com.pth.taskbackend.repository.CandidateRepository;
+import com.pth.taskbackend.repository.EmployerRepository;
+import com.pth.taskbackend.repository.HumanResourceRepository;
 import com.pth.taskbackend.service.CandidateService;
 import com.pth.taskbackend.util.func.FileUploadFunc;
 import com.pth.taskbackend.util.func.ImageFunc;
@@ -20,6 +23,12 @@ import java.util.Optional;
 public class CandidateServiceImpl implements CandidateService {
     @Autowired
     CandidateRepository candidateRepository;
+
+    @Autowired
+    EmployerRepository employerRepository;
+
+    @Autowired
+    HumanResourceRepository humanResourceRepository;
     @Override
     public Page<Candidate> findByKeywordAndStatus(String keyword, EStatus status, Pageable pageable) {
         return candidateRepository.findByKeywordAndUserStatus(keyword,status,pageable);
@@ -137,6 +146,11 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
+    public List<Employer> getEmployersSavedMe(String candidateId) {
+        return employerRepository.getEmployersSavedMe(candidateId);
+    }
+
+    @Override
     public boolean checkIsFollow_HR_Candidate(String hrId, String candidateId) {
         return candidateRepository.checkIsFollow_HR_Candidate(hrId, candidateId);
     }
@@ -151,5 +165,10 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public Page<Candidate> getCandidatesSaved_HR(String hrId, Pageable pageable) {
         return candidateRepository.getCandidatesSaved_HR(hrId, pageable);
+    }
+
+    @Override
+    public List<HumanResource> getHRsSavedMe(String candidateId) {
+        return humanResourceRepository.getHRsSavedMe(candidateId);
     }
 }

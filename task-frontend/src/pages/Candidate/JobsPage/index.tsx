@@ -1,4 +1,10 @@
-import { GreatJobs, JobCard, Loading, PaginationCustom } from "@/components/ui";
+import {
+  GreatJobs,
+  JobCard,
+  JobSuitable,
+  Loading,
+  PaginationCustom,
+} from "@/components/ui";
 import { JobDetailCard, SearchJob } from "./components";
 import "react-tooltip/dist/react-tooltip.css";
 import { useContext, useEffect, useState } from "react";
@@ -270,6 +276,7 @@ const JobsPage: React.FC = () => {
           </>
         )}
       </section>
+      <JobSuitable />
       <GreatJobs />
     </>
   );

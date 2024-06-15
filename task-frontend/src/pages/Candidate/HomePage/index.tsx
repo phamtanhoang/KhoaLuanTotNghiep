@@ -27,7 +27,7 @@ import {
   ONCHANGE_CATEGORY_LIST,
   ONCHANGE_EMPLOYER_LIST,
 } from "@/store/reducers/listDataReducer";
-import { EmptyData } from "@/components/ui";
+import { EmptyData, JobSuitable } from "@/components/ui";
 
 const HomePage: React.FC = () => {
   const context = useContext(LoadingContext);
@@ -91,7 +91,7 @@ const HomePage: React.FC = () => {
         <div className="px-5 lg:px-28 flex justify-between mb-8">
           <div className="text-center lg:text-left w-full lg:w-[50%]">
             <h1 className="text-3xl lg:text-4xl  font-bold tracking-wider mb-4">
-              Nhà Tuyển Dụng <span className="text-orangetext">Nổi Bật</span>
+              Nhà tuyển dụng <span className="text-orangetext">Nổi Bật</span>
             </h1>
             <p className="text-sm lg:text-base text-gray-600 tracking-wide">
               Dưới đây là một số nhà tuyển dụng độc đáo và có uy tín, cung cấp
@@ -144,6 +144,7 @@ const HomePage: React.FC = () => {
           )}
         </div>
       </section>
+      <JobSuitable />
 
       <RecentJobs />
       <PopularJobs />
@@ -152,7 +153,7 @@ const HomePage: React.FC = () => {
         <div className="px-5 lg:px-28">
           <div className="text-center">
             <h2 className="text-3xl font-bold">
-              Danh Mục <span className="text-orangetext">Phổ Biến</span>
+              Danh mục <span className="text-orangetext">Phổ Biến</span>
             </h2>
             <p className="mt-6 font-normal text-neutral-500">
               Chúng tôi cung cấp một loạt các công việc đa dạng để đáp ứng nhu

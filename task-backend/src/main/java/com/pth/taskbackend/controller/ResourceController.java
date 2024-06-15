@@ -1,6 +1,5 @@
 package com.pth.taskbackend.controller;
 
-import com.pth.taskbackend.controller.test.Message;
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.service.MailService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -8,13 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
@@ -45,15 +38,7 @@ public class ResourceController {
     }
 
 
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
 
-    @MessageMapping("/chat")
-    @SendTo("/topic/messages")
-    public Message sendMessage(@Payload Message chatMessage) {
-        chatMessage.setTimestamp(new Date());
-        return chatMessage;
-    }
 
 
 }

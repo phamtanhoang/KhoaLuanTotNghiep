@@ -20,6 +20,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -36,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
@@ -83,6 +85,7 @@ public class CandidateController {
     @Autowired HumanResourceService humanResourceService;
 
     @Autowired ApplicationService applicationService;
+    @Autowired MailService mailService;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("getCandidates-admin")
     public ResponseEntity<BaseResponse> getCandidatesByAdmin(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword,@RequestParam(required = false)EStatus status, Pageable pageable) {
@@ -1178,8 +1181,33 @@ public class CandidateController {
             }
             experienceService.save(experiences);
 
+            List<Employer> employers = candidateService.getEmployersSavedMe(optionalCandidate.get().getId());
+            List<HumanResource> humanResources = candidateService.getHRsSavedMe(optionalCandidate.get().getId());
+
+            List<String> emails = employers.stream()
+                    .map(employer -> employer.getUser().getEmail())
+                    .collect(Collectors.toList());
+
+            emails.addAll(humanResources.stream()
+                    .map(humanResource -> humanResource.getUser().getEmail())
+                    .collect(Collectors.toList()));
+
+            String fullName=optionalCandidate.get().getFirstName()+" "+optionalCandidate.get().getLastName();
+            CompletableFuture.runAsync(() -> {
+                emails.forEach(item -> {
+                    try {
+                        mailService.sendEmail(item, item,
+                                "Tài khoản ứng viên "+fullName+" ("+optionalCandidate.get().getUser().getEmail()+
+                                        ") vừa cập nhật thông tin có thể bạn sẽ quan tâm.",
+                                "EMAIL_TEMPLATE");
+                    } catch (MessagingException e) {
+                        System.out.println("Failed to send email to: " + item);
+                    }
+                });
+            });
+
             return ResponseEntity.ok(
-                    new BaseResponse( "Thêm danh sách kinh nghiệm thành công", HttpStatus.OK.value(),null)
+                    new BaseResponse( "Thêm danh sách kinh nghiệm thành công", HttpStatus.OK.value(),emails)
             );
 
         } catch (Exception e) {
@@ -1213,7 +1241,30 @@ public class CandidateController {
                 skill.setCandidate(optionalCandidate.get());
             }
             skillService.save(skills);
+            List<Employer> employers = candidateService.getEmployersSavedMe(optionalCandidate.get().getId());
+            List<HumanResource> humanResources = candidateService.getHRsSavedMe(optionalCandidate.get().getId());
 
+            List<String> emails = employers.stream()
+                    .map(employer -> employer.getUser().getEmail())
+                    .collect(Collectors.toList());
+
+            emails.addAll(humanResources.stream()
+                    .map(humanResource -> humanResource.getUser().getEmail())
+                    .collect(Collectors.toList()));
+
+            String fullName=optionalCandidate.get().getFirstName()+" "+optionalCandidate.get().getLastName();
+            CompletableFuture.runAsync(() -> {
+                emails.forEach(item -> {
+                    try {
+                        mailService.sendEmail(item, item,
+                                "Tài khoản ứng viên "+fullName+" ("+optionalCandidate.get().getUser().getEmail()+
+                                        ") vừa cập nhật thông tin có thể bạn sẽ quan tâm.",
+                                "EMAIL_TEMPLATE");
+                    } catch (MessagingException e) {
+                        System.out.println("Failed to send email to: " + item);
+                    }
+                });
+            });
             return ResponseEntity.ok(
                     new BaseResponse( "Thêm danh sách kỹ năng thành công", HttpStatus.OK.value(),null)
             );
@@ -1253,6 +1304,30 @@ public class CandidateController {
             }
             educationService.save(educationList);
 
+            List<Employer> employers = candidateService.getEmployersSavedMe(optionalCandidate.get().getId());
+            List<HumanResource> humanResources = candidateService.getHRsSavedMe(optionalCandidate.get().getId());
+
+            List<String> emails = employers.stream()
+                    .map(employer -> employer.getUser().getEmail())
+                    .collect(Collectors.toList());
+
+            emails.addAll(humanResources.stream()
+                    .map(humanResource -> humanResource.getUser().getEmail())
+                    .collect(Collectors.toList()));
+
+            String fullName=optionalCandidate.get().getFirstName()+" "+optionalCandidate.get().getLastName();
+            CompletableFuture.runAsync(() -> {
+                emails.forEach(item -> {
+                    try {
+                        mailService.sendEmail(item, item,
+                                "Tài khoản ứng viên "+fullName+" ("+optionalCandidate.get().getUser().getEmail()+
+                                        ") vừa cập nhật thông tin có thể bạn sẽ quan tâm.",
+                                "EMAIL_TEMPLATE");
+                    } catch (MessagingException e) {
+                        System.out.println("Failed to send email to: " + item);
+                    }
+                });
+            });
             return ResponseEntity.ok(
                     new BaseResponse( "Thêm danh sách học vấn thành công", HttpStatus.OK.value(),null)
             );

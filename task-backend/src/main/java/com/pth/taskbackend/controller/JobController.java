@@ -2398,6 +2398,67 @@ public class JobController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
+    @Operation(summary = "Get Suitable", description = "", tags = {})
+    @GetMapping("/getSuitable")
+    public ResponseEntity<BaseResponse> findSuitableJob(@RequestHeader(name="Authorization", required = false) String token) {
+        try {
+            String email = jwtService.extractUsername(token.substring(7));
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(email);
+            if (optionalCandidate.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Không tìm thấy ứng viên!", HttpStatus.NOT_FOUND.value(), null)
+                );
+
+            List<Job> jobs = jobService.findSuitableJob(optionalCandidate.get().getId());
+
+            List<JobResponse> jobResponses = jobs.stream().map(job -> {
+                JobCategoryResponse categoryResponse = new JobCategoryResponse(
+                        job.getCategory()!=null ? job.getCategory().getId():null,
+                        job.getCategory()!=null ? job.getCategory().getName():null);
+                JobEmployerResponse jobEmployerResponse = new JobEmployerResponse(
+                        job.getHumanResource().getEmployer().getName(),
+                        job.getHumanResource().getEmployer().getId(),
+                        job.getHumanResource().getEmployer().getUser().getEmail(),
+                        job.getHumanResource().getEmployer().getImage(),
+                        job.getHumanResource().getEmployer().getPhoneNumber());
+
+
+                return new JobResponse(
+                        job.getId(),
+                        job.getCreated(),
+                        job.getUpdated(),
+                        job.getToDate(),
+                        job.getName(),
+                        job.getDescription(),
+                        job.getExperience(),
+                        job.getFromSalary(),
+                        job.getToSalary(),
+                        job.getLocation(),
+                        job.getStatus(),
+                        vipEmployerService.isVip(job.getHumanResource().getEmployer().getId()),
+                        jobService.checkIsSaveJob(optionalCandidate.get().getId(),job.getId()),
+                        false,
+                        false,
+                        categoryResponse,
+                        jobEmployerResponse,
+                        null,
+                        null,
+                        null
+                );
+            }).collect(Collectors.toList());
+
+            return ResponseEntity.ok(
+                    new BaseResponse("Công việc phù hợp!", HttpStatus.OK.value(), jobResponses)
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
 //    @Operation(summary = "", description = "", tags = {})
 //    @GetMapping("/statistic")
 //    public ResponseEntity<BaseResponse> getStatistic(@RequestHeader("Authorization") String token) {

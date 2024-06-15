@@ -32,7 +32,11 @@ interface StepItemProps {
   _onClickCreateStepSchedule: (id: string) => void;
   _onClickDetailStepSchedule: (id: string) => void;
 }
+import { over } from "stompjs";
+import SockJS from "sockjs-client";
+import { URL } from "@/Apis";
 
+let stompClient: any = null;
 const StepItem: React.FC<StepItemProps> = ({
   index,
   item,
@@ -158,30 +162,24 @@ const ApplicationDetail = (props: any) => {
   const id = props.id;
   const fetchListData = props.fetchData;
   const handleClose = props.handleClose;
-  const [currentPage, setCurrentPage] = useState<number>(0);
 
   const context = useContext(LoadingContext);
   const dispatch = useDispatch();
   const { application } = useSelector((state: any) => state.singleDataReducer);
-  const { steps, messages } = useSelector(
-    (state: any) => state.listDataReducer
-  );
+  const { steps } = useSelector((state: any) => state.listDataReducer);
   const [content, setContent] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [stepId, setStepId] = useState<string>("");
   const [status, setStatus] = useState<string>("");
 
+  const [messages, setMessages] = useState<any>([]);
+
   useEffect(() => {
     dispatch(ONCHANGE_APPLICATION_SINGLE(null));
     dispatch(ONCHANGE_STEP_LIST([]));
     dispatch(ONCHANGE_MESSAGE_LIST([]));
   }, []);
-
-  const _onClickChat = () => {
-    setFuncsSub(ModalConstants.CHAT_KEYS.chatApplication);
-    handleOpenSub();
-  };
 
   const fetchData = () => {
     if (AuthHelper.isEmployer() || AuthHelper.isHR()) {
@@ -228,7 +226,8 @@ const ApplicationDetail = (props: any) => {
       .getMessagesApplication(id)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          dispatch(ONCHANGE_MESSAGE_LIST(res.data.Data));
+          setMessages(res.data.Data);
+          connect();
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -258,7 +257,7 @@ const ApplicationDetail = (props: any) => {
           setContent("");
           setFile(null);
 
-          fetchMessageData(id);
+          stompClient.send("/app/chat", {}, JSON.stringify(res.data.Data));
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
         }
@@ -315,6 +314,33 @@ const ApplicationDetail = (props: any) => {
     handleOpenSub();
   };
 
+  const connect = () => {
+    const Sock = new SockJS(`${URL}/ws`);
+    stompClient = over(Sock);
+
+    stompClient.connect({}, onConnected, (err: any) => {
+      console.log("Error ", err);
+    });
+  };
+
+  const onConnected = () => {
+    stompClient.subscribe(`/topic/${id}`, onPrivateMessage);
+  };
+
+  const onPrivateMessage = (payload: any) => {
+    const payloadData = JSON.parse(payload.body);
+    setMessages((prevMessages: any) => [...prevMessages, payloadData]);
+  };
+
+  const [type, setType] = useState<boolean>(true);
+
+  const _onClickChat = () => {
+    setType(true);
+  };
+  const _onClickApplication = () => {
+    setType(false);
+  };
+
   return (
     <>
       <ModalBase
@@ -340,8 +366,12 @@ const ApplicationDetail = (props: any) => {
           </button>
         </div>
 
-        <div className="h-max max-h-[75vh] my-2 mx-1 flex">
-          <div className="mr-1 px-3 text-gray-700 flex flex-col gap-4 overflow-auto scrollbar-custom lg:w-[55%]">
+        <div className="h-[75vh] max-h-[75vh] my-2 mx-1 flex">
+          <div
+            className={`mr-1 w-full px-3 text-gray-700 flex flex-col gap-4 overflow-auto scrollbar-custom ${
+              !type && "max-lg:hidden"
+            } lg:w-[55%]`}
+          >
             <div className="content-center flex flex-col gap-2">
               <div className="content-center w-full">
                 <label className="font-medium tracking-wide text-base uppercase">
@@ -466,7 +496,11 @@ const ApplicationDetail = (props: any) => {
           </div>
 
           <div className="border border-orangetext/50 max-lg:hidden"></div>
-          <div className="ml-1  text-gray-700 flex flex-col gap-2 lg:w-[45%] max-lg:hidden">
+          <div
+            className={`ml-1 w-full text-gray-700 flex flex-col gap-2 ${
+              type && "max-lg:hidden"
+            } lg:w-[45%]`}
+          >
             <label className="font-medium tracking-wide text-lg px-2">
               Thông tin trao đổi:
             </label>
@@ -483,56 +517,75 @@ const ApplicationDetail = (props: any) => {
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 px-4 py-3 border-t  ">
-          <button
-            className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-600/90 font-medium lg:hidden"
-            onClick={_onClickChat}
-          >
-            <AiFillMessage className="text-lg" />
-            <p>Trao đổi</p>
-          </button>
-
-          {(AuthHelper.isHR() || AuthHelper.isEmployer()) &&
-            application?.status != DataConstants.STATUS_DATA.APPROVED &&
-            application?.status != DataConstants.STATUS_DATA.REJECTED && (
-              <>
-                <button
-                  className="flex items-center gap-2 w-max h-max px-4 py-2 bg-red-500 text-white rounded hover:bg-red-500/90 font-medium"
-                  onClick={() => _onClick(DataConstants.STATUS_DATA.REJECTED)}
-                >
-                  <AiFillCloseCircle className="text-lg" />
-                  <p>Không duyệt</p>
-                </button>
-                {application?.currentStep == steps.length - 1 && (
-                  <button
-                    className="flex items-center gap-2 w-max h-max px-4 py-2 bg-green-500 text-white rounded hover:bg-green-500/90 font-medium"
-                    onClick={() => _onClick(DataConstants.STATUS_DATA.APPROVED)}
-                  >
-                    <AiFillCheckCircle className="text-lg" />
-                    <p>Duyệt</p>
-                  </button>
-                )}
-                {application?.currentStep != steps.length - 1 && (
-                  <button
-                    className="flex items-center gap-2 w-max h-max px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-500/90 font-medium "
-                    onClick={() =>
-                      _onClick(DataConstants.STATUS_DATA.PROCESSING)
-                    }
-                  >
-                    <MdSkipNext className="text-xl" />
-                    <p>Chuyển bước</p>
-                  </button>
-                )}
-              </>
+        <div className="flex justify-between gap-4 px-4 py-3 border-t  ">
+          <div className="flex gap-4">
+            {type ? (
+              <button
+                className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-600/90 font-medium lg:hidden"
+                onClick={() => {
+                  setType(false);
+                }}
+              >
+                <AiFillMessage className="text-lg" />
+                <p>Trao đổi</p>
+              </button>
+            ) : (
+              <button
+                className="flex items-center gap-2 w-max h-max px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-600/90 font-medium lg:hidden"
+                onClick={() => {
+                  setType(true);
+                }}
+              >
+                <AiFillMessage className="text-lg" />
+                <p>Đơn ứng tuyển</p>
+              </button>
             )}
+          </div>
+          <div className="flex gap-4">
+            {(AuthHelper.isHR() || AuthHelper.isEmployer()) &&
+              application?.status != DataConstants.STATUS_DATA.APPROVED &&
+              application?.status != DataConstants.STATUS_DATA.REJECTED && (
+                <>
+                  <button
+                    className="flex items-center gap-2 w-max h-max px-4 py-2 bg-red-500 text-white rounded hover:bg-red-500/90 font-medium"
+                    onClick={() => _onClick(DataConstants.STATUS_DATA.REJECTED)}
+                  >
+                    <AiFillCloseCircle className="text-lg" />
+                    <p>Không duyệt</p>
+                  </button>
+                  {application?.currentStep == steps.length - 1 && (
+                    <button
+                      className="flex items-center gap-2 w-max h-max px-4 py-2 bg-green-500 text-white rounded hover:bg-green-500/90 font-medium"
+                      onClick={() =>
+                        _onClick(DataConstants.STATUS_DATA.APPROVED)
+                      }
+                    >
+                      <AiFillCheckCircle className="text-lg" />
+                      <p>Duyệt</p>
+                    </button>
+                  )}
+                  {application?.currentStep != steps.length - 1 && (
+                    <button
+                      className="flex items-center gap-2 w-max h-max px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-500/90 font-medium "
+                      onClick={() =>
+                        _onClick(DataConstants.STATUS_DATA.PROCESSING)
+                      }
+                    >
+                      <MdSkipNext className="text-xl" />
+                      <p>Chuyển bước</p>
+                    </button>
+                  )}
+                </>
+              )}
 
-          <button
-            className="flex items-center gap-2 w-max h-max px-4 py-2 bg-slate-300 text-white rounded hover:bg-slate-300/90 font-medium"
-            onClick={handleClose}
-          >
-            <IoMdExit className="text-lg" />
-            <p>Đóng</p>
-          </button>
+            <button
+              className="flex items-center gap-2 w-max h-max px-4 py-2 bg-slate-300 text-white rounded hover:bg-slate-300/90 font-medium max-lg:hidden"
+              onClick={handleClose}
+            >
+              <IoMdExit className="text-lg" />
+              <p>Đóng</p>
+            </button>
+          </div>
         </div>
       </div>
     </>

@@ -14,8 +14,10 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: ["js-big-decimal"],
-  },
-  define: {
-    global: {},
+    esbuildOptions: {
+      define: {
+        global: "globalThis",
+      },
+    },
   },
 });

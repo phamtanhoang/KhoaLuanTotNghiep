@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
@@ -42,4 +43,9 @@ public interface HumanResourceRepository extends JpaRepository<HumanResource, St
             "WHERE c.user.status != 'DELETED'" +
             "AND c.employer.id = :id")
     Integer countHR_Employer(String id);
+
+    @Query("SELECT c FROM HumanResource c INNER JOIN c.followedCandidates_HR e " +
+            "WHERE (:id IS NULL OR e.id = :id) " +
+            "AND e.user.status='ACTIVE'")
+    List<HumanResource> getHRsSavedMe(String id);
 }
