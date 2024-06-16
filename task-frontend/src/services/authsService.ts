@@ -33,6 +33,24 @@ const authsService = {
       headers: { "Content-Type": "application/json" },
     });
   },
+  async verifyCandidate(email: string, token: string) {
+    const userData = {
+      email: email.trim(),
+      token: token.trim(),
+    };
+    return await axiosConfig.post(AuthAPI.verifyCandidate, userData, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
+  async verifyEmployer(email: string, token: string) {
+    const userData = {
+      email: email.trim(),
+      token: token.trim(),
+    };
+    return await axiosConfig.post(AuthAPI.verifyEmployer, userData, {
+      headers: { "Content-Type": "application/json" },
+    });
+  },
   async signupEmployer(
     username: string,
     password: string,

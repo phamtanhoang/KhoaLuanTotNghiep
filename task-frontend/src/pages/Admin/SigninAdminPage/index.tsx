@@ -3,7 +3,9 @@ import { authsService } from "@/services";
 import { CLEAR_AUTH_DATA } from "@/store/reducers/authReducer";
 import { PathConstants, DataConstants } from "@/utils/constants";
 import { AuthHelper, SwalHelper } from "@/utils/helpers";
-import { useContext, useState } from "react";
+import { useCaptchaGenerator } from "@/utils/hooks";
+import { useContext, useEffect, useState } from "react";
+import { IoReload } from "react-icons/io5";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -12,18 +14,27 @@ const SigninAdminPage = () => {
   const dispatch = useDispatch();
   const context = useContext(LoadingContext);
 
+  const { captchaText, canvasRef, reloadCaptcha } = useCaptchaGenerator();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [captcha, setCaptcha] = useState<string>("");
   const [error, setError] = useState<string>("");
 
   const _onClickSubmit = () => {
     setError("");
     if (!email) {
+      reloadCaptcha();
       setError("Vui lòng nhập email!!!");
       return;
     }
     if (!password) {
+      reloadCaptcha();
       setError("Vui lòng nhập mật khẩu!!!");
+      return;
+    }
+    if (captcha !== captchaText) {
+      reloadCaptcha();
+      setError("Captcha không trùng khớp!");
       return;
     }
 
@@ -37,16 +48,33 @@ const SigninAdminPage = () => {
           navigate(PathConstants.ADMIN_PATHS.dashboard);
           SwalHelper.MiniAlert(res.data.Message, "success");
         } else {
+          reloadCaptcha();
           setError(res.data.Message || "Đăng nhập không thành công");
         }
       })
       .catch(() => {
+        reloadCaptcha();
         SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
       })
       .finally(() => {
         context.handleCloseLoading();
       });
   };
+  useEffect(() => {
+    reloadCaptcha();
+  }, []);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        _onClickSubmit();
+      }
+    };
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleGlobalKeyDown);
+    };
+  }, []);
   return (
     <>
       <div className="min-h-screen flex items-center justify-center w-full bg-body">
@@ -91,6 +119,36 @@ const SigninAdminPage = () => {
                 required
                 onChange={(e) => setPassword(e.target.value)}
               />
+            </div>
+            <div className="mt-4 content-center">
+              <label className="block text-base font-medium text-gray-700 mb-1">
+                Captcha:
+              </label>
+              <div className="flex gap-3">
+                <input
+                  className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-bgBlue focus:border-bgBlue"
+                  type="text"
+                  placeholder="Nhập mã captcha"
+                  value={captcha}
+                  onChange={(e) => {
+                    setCaptcha(e.target.value);
+                  }}
+                />
+                <div className="flex ">
+                  <canvas
+                    ref={canvasRef}
+                    width="130"
+                    height="40"
+                    className="border-2 border-bgBlue rounded-l-lg border-r-0"
+                  ></canvas>
+                  <button
+                    className="text-xl p-2 rounded-r-lg bg-bgBlue text-gray-100 hover:bg-bgBlue/85 cursor-pointer transition ease-in duration-300"
+                    onClick={reloadCaptcha}
+                  >
+                    <IoReload />
+                  </button>
+                </div>
+              </div>
             </div>
 
             <button

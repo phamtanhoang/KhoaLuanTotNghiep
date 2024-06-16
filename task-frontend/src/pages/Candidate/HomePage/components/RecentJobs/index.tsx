@@ -7,7 +7,7 @@ import { SwalHelper } from "@/utils/helpers";
 
 const RecentJobs = () => {
   const [jobs, setJobs] = useState<JobModel[]>([]);
-  const itemPerPage = 6;
+  const itemPerPage = 8;
   const [page, setPage] = useState<number>(0);
   const [isFirst, setIsFirst] = useState<boolean>(true);
   const [isLast, setIsLast] = useState<boolean>(false);

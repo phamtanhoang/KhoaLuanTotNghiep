@@ -19,23 +19,25 @@ const JobSuitable = () => {
   const context = useContext(LoadingContext);
   const [jobs, setJobs] = useState<any>([]);
   useEffect(() => {
-    context.handleOpenLoading();
-    jobsService
-      .getSuitable()
-      .then((res) => {
-        if (res.status === 200 && res.data.Status === 200) {
-          setJobs(res?.data?.Data || "");
-        } else {
-          SwalHelper.MiniAlert(res.data.Message, "error");
-        }
-      })
-      .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-      })
-      .finally(() => {
-        context.handleCloseLoading();
-      });
-    context.handleCloseLoading();
+    if (AuthHelper.isCandidate()) {
+      context.handleOpenLoading();
+      jobsService
+        .getSuitable()
+        .then((res) => {
+          if (res.status === 200 && res.data.Status === 200) {
+            setJobs(res?.data?.Data || "");
+          } else {
+            SwalHelper.MiniAlert(res.data.Message, "error");
+          }
+        })
+        .catch(() => {
+          SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+        })
+        .finally(() => {
+          context.handleCloseLoading();
+        });
+      context.handleCloseLoading();
+    }
   }, []);
   return (
     <>

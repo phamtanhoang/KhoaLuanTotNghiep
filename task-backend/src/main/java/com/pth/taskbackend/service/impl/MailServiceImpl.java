@@ -38,9 +38,9 @@ public class MailServiceImpl implements MailService {
         context.setVariable("body", body);
         String html = templateEngine.process(templateName, context);
 
-        helper.setFrom(fromEmail);
+        helper.setFrom("Joobs Team <" + fromEmail + ">");
         helper.setTo(to);
-        helper.setSubject("JOOBS THÔNG BÁO");
+        helper.setSubject("Thông báo từ Joobs!");
         helper.setText(html, true);
 
         mailSender.send(message);
@@ -63,9 +63,9 @@ public class MailServiceImpl implements MailService {
         context.setVariable("salary", salary);
         String html = templateEngine.process(templateName, context);
 
-        helper.setFrom(fromEmail);
+        helper.setFrom("Joobs Team <" + fromEmail + ">");
         helper.setTo(to);
-        helper.setSubject("JOOBS THÔNG BÁO");
+        helper.setSubject("Thông báo từ Joobs!");
         helper.setText(html, true);
 
         mailSender.send(message);

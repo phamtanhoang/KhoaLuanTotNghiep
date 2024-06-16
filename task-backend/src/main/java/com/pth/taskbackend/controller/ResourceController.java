@@ -6,8 +6,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.TimeUnit;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
@@ -37,8 +40,29 @@ public class ResourceController {
         }
     }
 
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
+    @PostMapping()
+    public String setValue(@RequestParam String key, @RequestParam String value) {
+        long timeout = 15;
+        redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.MINUTES);
+        return "Value set successfully";
+    }
 
-
+    @GetMapping()
+    public String getValue(@RequestParam String key) {
+        return redisTemplate.opsForValue().get(key);
+    }
+    @DeleteMapping()
+    public String deleteValue(@RequestParam String key) {
+        redisTemplate.delete(key);
+        return "Clear successfully";
+    }
+    @PutMapping("")
+    public String putValue(@RequestParam String key, @RequestParam String value) {
+        redisTemplate.opsForValue().set(key, value);
+        return "Change value successfully";
+    }
 
 }

@@ -11,7 +11,7 @@ public record CreateCandidateRequest
          String firstName,
          String lastName,
          ESex sex,
-         String phoneNumber
+         String token
         ){
 
 }

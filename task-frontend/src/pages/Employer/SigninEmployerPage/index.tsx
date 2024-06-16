@@ -90,6 +90,17 @@ const SigninEmployerPage = () => {
     setFuncs(ModalConstants.AUTH_KEYS.registerEmployer);
     handleOpen();
   };
+  useEffect(() => {
+    const handleGlobalKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        _onClickSubmit();
+      }
+    };
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleGlobalKeyDown);
+    };
+  }, []);
 
   return (
     <>

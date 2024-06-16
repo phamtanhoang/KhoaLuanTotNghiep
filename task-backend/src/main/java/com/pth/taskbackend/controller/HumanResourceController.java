@@ -17,12 +17,14 @@ import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.AuthService;
 import com.pth.taskbackend.service.EmployerService;
 import com.pth.taskbackend.service.HumanResourceService;
+import com.pth.taskbackend.service.MailService;
 import com.pth.taskbackend.util.func.CheckPermission;
 import com.pth.taskbackend.util.func.ImageFunc;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -42,6 +44,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
@@ -66,6 +69,8 @@ public class HumanResourceController {
     JwtService jwtService;
     @Autowired
     CheckPermission checkPermission;
+    @Autowired
+    MailService mailService;
     @Autowired
     ObjectMapper objectMapper;
     private final PasswordEncoder passwordEncoder;
@@ -403,7 +408,14 @@ public class HumanResourceController {
                         );
                     hr.setStatus(EStatus.ACTIVE);
                     userRepository.save(hr);
-
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            mailService.sendEmail(hr.getEmail(), hr.getEmail(), "Tài khoản của bạn đã được duyệt.",
+                                    "EMAIL_TEMPLATE");
+                        } catch (MessagingException e) {
+                            System.out.println("Failed to send email to: " + hr.getEmail());
+                        }
+                    });
                     return ResponseEntity.ok(
                             new BaseResponse("Duyệt HR dụng thành công", HttpStatus.OK.value(), null)
                     );
@@ -414,7 +426,14 @@ public class HumanResourceController {
                         );
                     hr.setStatus(EStatus.INACTIVE);
                     userRepository.save(hr);
-
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            mailService.sendEmail(hr.getEmail(), hr.getEmail(), "Tài khoản của bạn đã bị khóa.",
+                                    "EMAIL_TEMPLATE");
+                        } catch (MessagingException e) {
+                            System.out.println("Failed to send email to: " + hr.getEmail());
+                        }
+                    });
                     return ResponseEntity.ok(
                             new BaseResponse("Khóa HR dụng thành công", HttpStatus.OK.value(), null)
                     );

@@ -8,6 +8,7 @@ const AUTH_KEYS = {
   signup: "Signup",
   changePassword: "ChangePassword",
   registerEmployer: "RegisterEmployer",
+  verifyEmail: "VerifyEmail",
 };
 const JOB_KEYS = {
   createJob: "CreateJob",

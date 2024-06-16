@@ -14,6 +14,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -28,6 +29,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
@@ -58,6 +60,9 @@ public class EmployerController {
 
     @Autowired
     CandidateService candidateService;
+
+    @Autowired
+    MailService mailService;
     @Operation(summary = "Get list", description = "", tags = {})
     @GetMapping("getEmployers-admin")
     public ResponseEntity<BaseResponse> getEmployersByAdmin(@RequestHeader("Authorization") String token,@RequestParam(required = false)String keyword,@RequestParam(required = false)EStatus status, Pageable pageable) {
@@ -199,18 +204,33 @@ public class EmployerController {
                         );
                     employer.setStatus(EStatus.ACTIVE);
                     userRepository.save(employer);
-
-                        return ResponseEntity.ok(
-                                new BaseResponse("Duyệt nhà tuyển dụng thành công", HttpStatus.OK.value(), null)
-                        );
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            mailService.sendEmail(employer.getEmail(), employer.getEmail(), "Tài khoản của bạn đã được duyệt.",
+                                    "EMAIL_TEMPLATE");
+                        } catch (MessagingException e) {
+                            System.out.println("Failed to send email to: " + employer.getEmail());
+                        }
+                    });
+                    return ResponseEntity.ok(
+                            new BaseResponse("Duyệt nhà tuyển dụng thành công", HttpStatus.OK.value(), null)
+                    );
                 case INACTIVE:
                     if(employer.getStatus().equals(EStatus.INACTIVE))
                         return ResponseEntity.ok(
                                 new BaseResponse("Đã khóa nhà tuyển dụng này rồi", HttpStatus.OK.value(), null)
                         );
+
                     employer.setStatus(EStatus.INACTIVE);
                     userRepository.save(employer);
-
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            mailService.sendEmail(employer.getEmail(), employer.getEmail(), "Tài khoản của bạn đã bị khóa.",
+                                    "EMAIL_TEMPLATE");
+                        } catch (MessagingException e) {
+                            System.out.println("Failed to send email to: " + employer.getEmail());
+                        }
+                    });
                     return ResponseEntity.ok(
                             new BaseResponse("Khóa nhà tuyển dụng thành công", HttpStatus.OK.value(), null)
                     );

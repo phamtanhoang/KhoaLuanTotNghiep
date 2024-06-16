@@ -6,8 +6,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
-
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/jobapp
@@ -16,10 +14,6 @@ spring:
 
   main:
     allow-circular-references: true
-
-  #    url: jdbc:mysql://localhost:3306/job_app
-  #    username: root
-  #    password: Hoang2002
 
   mail:
     host: smtp.gmail.com
@@ -33,11 +27,18 @@ spring:
           starttls:
             enable: true
 
+  redis:
+    host: localhost
+    port: 6379
+
+
 
 springdoc:
   openapi:
     url: http://localhost:8080
     description: Server URL in Development environment
+
+
 
 jwt:
   access-token:

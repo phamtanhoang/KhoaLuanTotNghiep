@@ -136,7 +136,7 @@ public class ApplicationController {
                         new BaseResponse("Đã ứng tuyển vào công việc này!!!", HttpStatus.BAD_REQUEST.value(), null)
                 );
 
-            mailService.sendEmail(email, fullName,
+            mailService.sendEmail(optionalCandidate.get().getUser().getEmail(), optionalCandidate.get().getUser().getEmail(),
                     "Ban đã nộp ứng tuyển thành công vị trí "+job.getName()+" của "+job.getHumanResource().getEmployer().getName(),"EMAIL_TEMPLATE");
 
 
@@ -212,7 +212,7 @@ public class ApplicationController {
                         new BaseResponse("Đã ứng tuyển vào công việc này!", HttpStatus.BAD_REQUEST.value(), null)
                 );
 
-            mailService.sendEmail(email, fullName,
+            mailService.sendEmail(optionalCandidate.get().getUser().getEmail(), optionalCandidate.get().getUser().getEmail(),
                     "Ban đã nộp ứng tuyển thành công vị trí "+job.getName()+" của "+job.getHumanResource().getEmployer().getName(),"EMAIL_TEMPLATE");
 
 
@@ -1165,13 +1165,13 @@ public class ApplicationController {
                 int totalStep = Math.toIntExact(stepService.countAllByProcessId(application.getJob().getProcess().getId()));
                 int currentStep = application.getCurrentStep();
                 if(statusEnum==EApplyStatus.PROCESSING)
-                    mailService.sendEmail(application.getEmail(), application.getFullName(),
+                    mailService.sendEmail(application.getCandidate().getUser().getEmail(), application.getCandidate().getUser().getEmail(),
                             "Đơn ứng tuyển vị trí "+application.getJob().getName()+" của bạn đã được chuyển bước!","EMAIL_TEMPLATE");
                 if(statusEnum==EApplyStatus.APPROVED)
-                    mailService.sendEmail(application.getEmail(), application.getFullName(),
+                    mailService.sendEmail(application.getCandidate().getUser().getEmail(), application.getCandidate().getUser().getEmail(),
                             "Đơn ứng tuyển vị trí "+application.getJob().getName()+" của bạn đã được duyệt!","EMAIL_TEMPLATE");
                 if(statusEnum==EApplyStatus.REJECTED)
-                    mailService.sendEmail(application.getEmail(), application.getFullName(),
+                    mailService.sendEmail(application.getCandidate().getUser().getEmail(), application.getCandidate().getUser().getEmail(),
                             "Đơn ứng tuyển vị trí "+application.getJob().getName()+" của bạn đã không được duyệt!","EMAIL_TEMPLATE");
 
                 if (currentStep == 0) {
@@ -1328,7 +1328,7 @@ public class ApplicationController {
                 String formattedStartDate = stepScheduleRequest.startDate().format(formatter);
                 String formattedEndDate = endDate.format(formatter);
 
-                mailService.sendEmail(application.getEmail(), application.getFullName(),
+                mailService.sendEmail(application.getCandidate().getUser().getEmail(), application.getCandidate().getUser().getEmail(),
                         "Đơn ứng tuyển vị trí "+application.getJob().getName()+" của bạn đã được tạo 1 lịch hẹn mới vào "+formattedStartDate+" và kết thúc vào "+formattedEndDate+"!","EMAIL_TEMPLATE");
                 return ResponseEntity.ok(
                         new BaseResponse("Tạo lịch hẹn thành công!", HttpStatus.OK.value(), stepSchedule1)

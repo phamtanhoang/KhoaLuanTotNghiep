@@ -60,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
     public Optional<User> register(String username, String password, ERole role) {
         User newUser = new User();
         newUser.setEmail(username);
-        newUser.setPassword(passwordEncoder.encode(password));
+        newUser.setPassword(password);
         if (role == ERole.EMPLOYER) {
             newUser.setStatus(EStatus.PENDING);
         } else {

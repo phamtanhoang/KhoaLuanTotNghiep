@@ -1,4 +1,10 @@
-import { ChangePassword, RegisterEmployer, Signin, Signup } from "./auth";
+import {
+  ChangePassword,
+  RegisterEmployer,
+  Signin,
+  Signup,
+  VerifyEmail,
+} from "./auth";
 import { FilterModal } from "./filter";
 import { ChangeDealine, CreateJob, DetailsJob, DetailsJobAdmin } from "./job";
 import { ChangeAvatar, ChangeBackground, ChooseImage } from "./image";
@@ -59,6 +65,13 @@ const ModalBase = (props: any) => {
     ),
     [ModalConstants.AUTH_KEYS.signup]: (
       <Signup handleClose={handleClose} setFuncs={setFuncs} />
+    ),
+    [ModalConstants.AUTH_KEYS.verifyEmail]: (
+      <VerifyEmail
+        id={id}
+        handleClose={handleClose}
+        fetchData={fetchData}
+      />
     ),
     [ModalConstants.AUTH_KEYS.changePassword]: (
       <ChangePassword setFuncs={setFuncs} handleClose={handleClose} />

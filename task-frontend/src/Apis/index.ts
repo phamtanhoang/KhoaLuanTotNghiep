@@ -5,7 +5,9 @@ const BASE_URL = URL + "/api" + VERSION;
 const AuthAPI = {
   signin: "/auths/login",
   signupCandidate: "/auths/registerCandidate",
+  verifyCandidate: "/auths/verifyCandidate",
   signupEmployer: "/auths/registerEmployer",
+  verifyEmployer: "/auths/verifyEmployer",
   logout: "/auths/logout",
   changePassword: "/auths/changePassword",
   refreshToken: "/auths/refresh",

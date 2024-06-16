@@ -226,7 +226,14 @@ public class CandidateController {
                         );
                     candidate.setStatus(EStatus.ACTIVE);
                     userRepository.save(candidate);
-
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            mailService.sendEmail(candidate.getEmail(), candidate.getEmail(), "Tài khoản của bạn đã được duyệt.",
+                                    "EMAIL_TEMPLATE");
+                        } catch (MessagingException e) {
+                            System.out.println("Failed to send email to: " + candidate.getEmail());
+                        }
+                    });
                     return ResponseEntity.ok(
                             new BaseResponse("Duyệt ứng viên thành công", HttpStatus.OK.value(), null)
                     );
@@ -237,7 +244,14 @@ public class CandidateController {
                         );
                     candidate.setStatus(EStatus.INACTIVE);
                     userRepository.save(candidate);
-
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            mailService.sendEmail(candidate.getEmail(), candidate.getEmail(), "Tài khoản của bạn đã bị khóa.",
+                                    "EMAIL_TEMPLATE");
+                        } catch (MessagingException e) {
+                            System.out.println("Failed to send email to: " + candidate.getEmail());
+                        }
+                    });
                     return ResponseEntity.ok(
                             new BaseResponse("Khóa ứng viên dụng thành công", HttpStatus.OK.value(), null)
                     );
