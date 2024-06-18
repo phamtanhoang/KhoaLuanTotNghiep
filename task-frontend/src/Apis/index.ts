@@ -11,6 +11,10 @@ const AuthAPI = {
   logout: "/auths/logout",
   changePassword: "/auths/changePassword",
   refreshToken: "/auths/refresh",
+  resetPassword: "/auths/reset-password",
+  forgotPassword: (email: string) => {
+    return `/auths/forgotPassword?email=${email}`;
+  },
 };
 
 const UserAPI = {

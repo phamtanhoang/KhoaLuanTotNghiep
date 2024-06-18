@@ -18,6 +18,7 @@ import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.security.UserInfoDetails;
 import com.pth.taskbackend.service.*;
+import com.pth.taskbackend.util.constant.PathConstant;
 import com.pth.taskbackend.util.func.CheckPermission;
 import com.pth.taskbackend.util.func.GenerateTokenVerify;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -403,60 +404,49 @@ public class AuthController {
     }
 
     @Operation(summary = "forgot Password", description = "", tags = {})
-    @PostMapping("/forgotPassword")
-    public ResponseEntity<BaseResponse> forgotPassword(@RequestBody VerifyEmail request) {
+    @GetMapping("/forgotPassword")
+    public ResponseEntity<BaseResponse> forgotPassword(@RequestParam String email) {
 
         try{
-            String storedToken = redisTemplate.opsForValue().get(request.email());
-            System.out.println("storedToken, "+ storedToken);
-
-            if (storedToken != null ) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                CreateEmployerRequest createEmployerRequest = new CreateEmployerRequest(
-                        objectMapper.readTree(storedToken).get("username").asText(),
-                        objectMapper.readTree(storedToken).get("password").asText(),
-                        objectMapper.readTree(storedToken).get("name").asText(),
-                        objectMapper.readTree(storedToken).get("location").asText(),
-                        objectMapper.readTree(storedToken).get("description").asText(),
-                        objectMapper.readTree(storedToken).get("phoneNumber").asText(),
-                        objectMapper.readTree(storedToken).get("businessCode").asText(),
-                        objectMapper.readTree(storedToken).get("token").asText()
-                );
-
-                if(createEmployerRequest.token().equals(request.token())){
-                    redisTemplate.delete(request.email());
-                    if (userRepository.findByEmail(createEmployerRequest.username()).isPresent()) {
-                        return ResponseEntity.ok(
-                                new BaseResponse("Tên người dùng đã tồn tại!", 400, null)
-                        );
-                    };
-
-                    Optional<User> user = authService.register(
-                            createEmployerRequest.username(),
-                            createEmployerRequest.password(),
-                            ERole.EMPLOYER);
-                    Employer employer = new Employer();
-                    employer.setName(createEmployerRequest.name());
-                    employer.setDescription(createEmployerRequest.description());
-                    employer.setLocation(createEmployerRequest.location());
-                    employer.setPhoneNumber(createEmployerRequest.phoneNumber());
-                    employer.setBusinessCode(createEmployerRequest.businessCode());
-                    employer.setUser(user.get());
-                    employerService.create(employer,null,null);
-                    return ResponseEntity.ok(new BaseResponse("Tạo tài khoản thành công.",HttpStatus.OK.value(), null));
-                }
+            Optional<User> optionalUser =  userRepository.findByEmail(email);
+            if(optionalUser.isEmpty())
                 return ResponseEntity.ok(
-                        new BaseResponse("Mã xác minh không khớp!", HttpStatus.FORBIDDEN.value(),null)
-                );
+                    new BaseResponse("Tài khoản không tổn tại!", 400, null)
+                );  
+            User user = optionalUser.get();
+            String token = jwtService.generateToken(user.getEmail());
+            String resetPasswordLink = PathConstant.FRONTEND_URL+"/reset-password?token=" + token;
+            mailService.sendEmail(user.getEmail(),user.getEmail(),"Bạn có 5 phút đặt lại mật khẩu. Nhấp vào liên kết sau để tiếp tục: "+resetPasswordLink,"EMAIL_TEMPLATE");
 
-            }
-
-            return ResponseEntity.ok(
-                    new BaseResponse("Mã xác minh không tồn tại hoặc đã hết hạn!", HttpStatus.NOT_FOUND.value(),null)
-            );
-
-
+            return ResponseEntity.ok(new BaseResponse("Email đặt lại mật khẩu đã được gửi.", 200, null));
         } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "Reset Password", description = "", tags = {})
+    @PostMapping("/reset-password")
+    public ResponseEntity<BaseResponse> resetPassword(@RequestHeader("Authorization")String token,
+                                                      @RequestBody ResetPassword resetPassword) {
+        try{
+            String username = jwtService.extractUsername(token.substring(7));
+            Optional<User> optionalUser= userRepository.findByEmail(username);
+            if(optionalUser.isEmpty())
+                return ResponseEntity.ok(
+                        new BaseResponse("Tài khoản không tổn tại!", 400, null)
+                );
+             User user =optionalUser.get();
+             user.setPassword(passwordEncoder.encode(resetPassword.password()));
+            userRepository.save(user);
+            return ResponseEntity.ok(new BaseResponse("Đặt lại mật khẩu thành công.", 200, user));
+
+        }
+        catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
+        }
+        catch(Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }

@@ -88,6 +88,9 @@ public class VipController {
             return  ResponseEntity.ok(
                     new BaseResponse("Vip được tìm thấy", HttpStatus.OK.value(), vipResponse)
             );
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -144,6 +147,9 @@ public class VipController {
             return  ResponseEntity.ok(
                     new BaseResponse("Vip được tìm thấy", HttpStatus.OK.value(), vipResponse)
             );
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -193,6 +199,9 @@ public class VipController {
                     new BaseResponse("Vip được tìm thấy", HttpStatus.OK.value(), vipResponses)
             );
 
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -225,6 +234,9 @@ public class VipController {
             return  ResponseEntity.ok(
                     new BaseResponse("Vip được tìm thấy", HttpStatus.OK.value(), vips)
             );
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -263,6 +275,9 @@ public class VipController {
             return  ResponseEntity.ok(
                     new BaseResponse("Danh sách giao dịch", HttpStatus.OK.value(), reponse)
             );
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -302,6 +317,9 @@ public class VipController {
             return  ResponseEntity.ok(
                     new BaseResponse("Chi tiết giao dịch", HttpStatus.OK.value(), trasactionReponse)
             );
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -342,6 +360,9 @@ public class VipController {
             return  ResponseEntity.ok(
                     new BaseResponse("Chi tiết giao dịch", HttpStatus.OK.value(), trasactionReponse)
             );
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -385,6 +406,9 @@ public class VipController {
             return  ResponseEntity.ok(
                     new BaseResponse("Danh sách giao dịch", HttpStatus.OK.value(), reponse)
             );
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -623,6 +647,9 @@ public class VipController {
             String paymentUrl = PaymentConfig.vnp_PayUrl + "?" + queryUrl;
 
             return ResponseEntity.ok().body(new BaseResponse("Trang thanh toán", HttpStatus.OK.value(), paymentUrl));
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } catch (Exception e) {
@@ -698,143 +725,4 @@ public class VipController {
         }
         return vipEmployer;
     }
-
-    //    @Operation(summary = "Get list by candidate", description = "", tags = {})
-//    @GetMapping("getVips-candidate")
-//    public ResponseEntity<BaseResponse> getVipsByCandidate(@RequestHeader("Authorization")String token, Pageable pageable) {
-//        try {
-//            String email = jwtService.extractUsername(token.substring(7));
-//            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
-//            if (!permission)
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-//                );
-//
-//            Optional<User> optionalUser = userRepository.findByEmail(email);
-//            if (optionalUser.isEmpty())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Không tìm thấy người dùng ", HttpStatus.NOT_FOUND.value(), null)
-//                );
-//            Page<Vip> vips = vipService.findByStatusAndType(EType.CANDIDATE,EVipStatus.ACTIVE,pageable);
-//
-//            if (vips.isEmpty())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Danh sách Vip rỗng", HttpStatus.OK.value(), null)
-//                );
-//            Page<VipResponse> vipResponses = vips
-//                    .map(vip -> new VipResponse(
-//                            vip.getId(),
-//                            vip.getCreated(),
-//                            vip.getUpdated(),
-//                            vip.getColor(),
-//                            vip.getMonth(),
-//                            vip.getName(),
-//                            vip.getPrice(),
-//                            vip.getStatus(),
-//                            vip.getType(),
-//                            vip.getDescription()
-//                    ));
-//
-//            return  ResponseEntity.ok(
-//                    new BaseResponse("Vip được tìm thấy", HttpStatus.OK.value(), vipResponses)
-//            );
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
-//    }
-
-
-//    @Operation(summary = "Get lists vip candidate", description = "", tags = {})
-//    @GetMapping("getVipCandidates")
-//    public ResponseEntity<BaseResponse> getVipCandidates(@RequestHeader("Authorization")String token, Pageable pageable) {
-//        try {
-//            String email = jwtService.extractUsername(token.substring(7));
-//            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
-//            if (!permission)
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-//                );
-//
-//            Optional<User> optionalUser = userRepository.findByEmail(email);
-//            if (optionalUser.isEmpty())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Không tìm thấy người dùng ", HttpStatus.NOT_FOUND.value(), null)
-//                );
-//            Page<Candidate> vipCandidates = candidateService.findVipCandidates(pageable);
-//
-//            if (vipCandidates.isEmpty())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Danh sách ứng viên Vip rỗng", HttpStatus.OK.value(), null)
-//                );
-//            Page<VipCandidateResponse> vipResponses = vipCandidates.map(vip -> new VipCandidateResponse(
-//                    vip.getUser().getId(),
-//                    vip.getUser().getCreated(),
-//                    vip.getUser().getUpdated(),
-//                    vip.getUser().getEmail(),
-//                    vip.getUser().getStatus(),
-//                    vip.getUser().getRole(),
-//                    vip.getFirstName(),
-//                    vip.getLastName(),
-//                    vip.getAvatar(),
-//                    vip.getAddress(),
-//                    vip.getDateOfBirth(),
-//                    vip.getIntroduction(),
-//                    vip.getJob(),
-//                    vip.getLink(),
-//                    vip.getPhoneNumber(),
-//                    vip.getSex()
-//            ));
-//
-//            return  ResponseEntity.ok(
-//                    new BaseResponse("Danh sách các ứng viên Vip", HttpStatus.OK.value(), vipResponses)
-//            );
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
-//    }
-//    @Operation(summary = "Get list vip employers", description = "", tags = {})
-//    @GetMapping("getVipEmployers")
-//    public ResponseEntity<BaseResponse> getVipsEmployers(@RequestHeader("Authorization")String token, Pageable pageable) {
-//        try {
-//            String email = jwtService.extractUsername(token.substring(7));
-//            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
-//            if (!permission)
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-//                );
-//
-//            Optional<User> optionalUser = userRepository.findByEmail(email);
-//            if (optionalUser.isEmpty())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Không tìm thấy người dùng ", HttpStatus.NOT_FOUND.value(), null)
-//                );
-//            Page<Vip> vips = vipService.findByStatusAndType(EType.CANDIDATE,EVipStatus.ACTIVE,pageable);
-//
-//            if (vips.isEmpty())
-//                return ResponseEntity.ok(
-//                        new BaseResponse("Danh sách Vip rỗng", HttpStatus.OK.value(), null)
-//                );
-//            Page<VipResponse> vipResponses = vips
-//                    .map(vip -> new VipResponse(
-//                            vip.getId(),
-//                            vip.getCreated(),
-//                            vip.getUpdated(),
-//                            vip.getColor(),
-//                            vip.getMonth(),
-//                            vip.getName(),
-//                            vip.getPrice(),
-//                            vip.getStatus(),
-//                            vip.getType()
-//                    ));
-//
-//            return  ResponseEntity.ok(
-//                    new BaseResponse("Vip được tìm thấy", HttpStatus.OK.value(), vipResponses)
-//            );
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-//        }
-//    }
 }

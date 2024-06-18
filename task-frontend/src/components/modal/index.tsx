@@ -1,6 +1,7 @@
 import {
   ChangePassword,
   RegisterEmployer,
+  ResetPassword,
   Signin,
   Signup,
   VerifyEmail,
@@ -67,11 +68,10 @@ const ModalBase = (props: any) => {
       <Signup handleClose={handleClose} setFuncs={setFuncs} />
     ),
     [ModalConstants.AUTH_KEYS.verifyEmail]: (
-      <VerifyEmail
-        id={id}
-        handleClose={handleClose}
-        fetchData={fetchData}
-      />
+      <VerifyEmail id={id} handleClose={handleClose} fetchData={fetchData} />
+    ),
+    [ModalConstants.AUTH_KEYS.resetPassword]: (
+      <ResetPassword handleClose={handleClose}/>
     ),
     [ModalConstants.AUTH_KEYS.changePassword]: (
       <ChangePassword setFuncs={setFuncs} handleClose={handleClose} />

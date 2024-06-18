@@ -108,15 +108,19 @@ const ProceduresEmployerPage = () => {
         setIsLoadingTable(false);
       });
   };
+  const [isFirstEffectCompleted, setIsFirstEffectCompleted] = useState(false);
 
   useEffect(() => {
     dispatch(ONCLEAR_FILTER());
     dispatch(CLEAR_PAGINATION_STATE());
+    setIsFirstEffectCompleted(true);
   }, []);
 
   useEffect(() => {
-    fetchListData();
-  }, [searchReducer.keyword, currentPage]);
+    if (isFirstEffectCompleted) {
+      fetchListData();
+    }
+  }, [isFirstEffectCompleted, searchReducer.keyword, currentPage]);
   return (
     <>
       <ModalBase

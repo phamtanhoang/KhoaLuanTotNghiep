@@ -114,14 +114,20 @@ const JobsEmployerPage = () => {
       });
   };
 
+  const [isFirstEffectCompleted, setIsFirstEffectCompleted] = useState(false);
+
   useEffect(() => {
     dispatch(ONCLEAR_FILTER());
     dispatch(CLEAR_PAGINATION_STATE());
+    setIsFirstEffectCompleted(true);
   }, []);
 
   useEffect(() => {
-    fetchListData();
+    if (isFirstEffectCompleted) {
+      fetchListData();
+    }
   }, [
+    isFirstEffectCompleted,
     searchReducer.keyword,
     searchReducer.category,
     searchReducer.status,

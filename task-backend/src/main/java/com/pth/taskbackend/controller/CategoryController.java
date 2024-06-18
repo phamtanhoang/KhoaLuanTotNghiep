@@ -121,6 +121,9 @@ public class CategoryController {
                         new BaseResponse("Danh sách danh mục", HttpStatus.OK.value(), categories)
                 );
             }
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
@@ -173,7 +176,7 @@ public class CategoryController {
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        }catch (DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(
                     new BaseResponse("Tên danh mục đã tồn tại", HttpStatus.BAD_REQUEST.value(), null)
             );
@@ -185,7 +188,7 @@ public class CategoryController {
 
     @Operation(summary = "update", description = "", tags = {})
     @PatchMapping("/{id}")
-public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization")String token, @PathVariable("id") String id, @RequestPart String name,
+    public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization")String token, @PathVariable("id") String id, @RequestPart String name,
                                                    @RequestPart(required = false) MultipartFile image) {
         try {
 
@@ -208,7 +211,6 @@ public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization
                         new BaseResponse("Không tìm thấy danh mục để cập nhật!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
-
 
             Category  category = categoryService.updateCategory(optionalCategory.get(), name, image);
             return ResponseEntity.ok(

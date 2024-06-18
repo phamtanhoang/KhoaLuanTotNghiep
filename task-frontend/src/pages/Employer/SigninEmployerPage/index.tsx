@@ -101,6 +101,10 @@ const SigninEmployerPage = () => {
       window.removeEventListener("keydown", handleGlobalKeyDown);
     };
   }, []);
+  const _onClickForgetPassword = () => {
+    handleOpen();
+    setFuncs(ModalConstants.AUTH_KEYS.resetPassword);
+  };
 
   return (
     <>
@@ -170,10 +174,10 @@ const SigninEmployerPage = () => {
             </div>
             <div className="my-4 flex items-center justify-between px-2">
               <a
-                className="text-sm font-medium text-gray-800 hover:text-orangetext"
-                href=" "
+                className="font-medium text-orangetext hover:text-orange-500 cursor-pointer"
+                onClick={_onClickForgetPassword}
               >
-                Quên mật khẩu?
+                Quên mật khẩu!
               </a>
             </div>
             <button

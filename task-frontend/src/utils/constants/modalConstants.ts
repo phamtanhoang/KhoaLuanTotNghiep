@@ -9,6 +9,7 @@ const AUTH_KEYS = {
   changePassword: "ChangePassword",
   registerEmployer: "RegisterEmployer",
   verifyEmail: "VerifyEmail",
+  resetPassword: "resetPassword",
 };
 const JOB_KEYS = {
   createJob: "CreateJob",

@@ -19,6 +19,7 @@ import PaginationCustom from "./PaginationCustom";
 import PaymentError from "./PaymentError";
 import PaymentSuccess from "./PaymentSuccess";
 import ProtectedRoute from "./ProtectedRoute";
+import ResetPasswordPage from "./ResetPasswordPage";
 import Schedule from "./Schedule";
 import SearchJobs from "./SearchJobs";
 import ShareCard from "./ShareCard";
@@ -48,4 +49,5 @@ export {
   PaymentSuccess,
   PaymentError,
   JobSuitable,
+  ResetPasswordPage
 };

@@ -2,6 +2,7 @@ const OTHER_PATHS = {
   all: "*",
   paymentSuccess: "/payment-success",
   paymentError: "/payment-error",
+  resetPassword: "/reset-password",
 };
 const CANDIDATE_PATHS = {
   default: "/",

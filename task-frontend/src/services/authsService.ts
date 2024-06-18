@@ -88,5 +88,16 @@ const authsService = {
       headers: { "Content-Type": "application/json" },
     });
   },
+  async resetPassword(password: string, token: string) {
+    const userData = {
+      password: password.trim(),
+    };
+    return await axiosConfig.post(AuthAPI.resetPassword, userData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+  async forgotPassword(email: string) {
+    return await axiosConfig.get(AuthAPI.forgotPassword(email));
+  },
 };
 export default authsService;

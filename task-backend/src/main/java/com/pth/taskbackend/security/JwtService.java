@@ -19,9 +19,9 @@ import java.util.function.Function;
 public class JwtService {
 
     public static final String SECRET = "Lu4byRqrMCp6OmPf3zyRUphe1NP0MZrZaB+2Kzay5OBb1Mfs6atzgSfwFCNVxpXhtQP5ToIzK1x1PgCFCpFY0Q==";
-    public static  int REFRESH_TOKEN_EXPIRATION_SECONDS = 7776000;
-//    public static  int ACCESS_TOKEN_EXPIRATION_SECONDS = 7776000;
-    public static  int ACCESS_TOKEN_EXPIRATION_SECONDS = 3600000;
+    public static  int REFRESH_TOKEN_EXPIRATION_SECONDS = 30*24*60*60;
+
+    public static  int ACCESS_TOKEN_EXPIRATION_SECONDS = 5*60;
     private List<String> validTokens = new ArrayList<>();
     public String generateToken(String username, EStatus status, ERole role) {
         Map<String, Object> claims = new HashMap<>();

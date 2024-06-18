@@ -114,14 +114,24 @@ const ApplicationsEmployerPage = () => {
       });
   };
 
+  const [isFirstEffectCompleted, setIsFirstEffectCompleted] = useState(false);
+
   useEffect(() => {
     dispatch(ONCLEAR_FILTER());
     dispatch(CLEAR_PAGINATION_STATE());
+    setIsFirstEffectCompleted(true);
   }, []);
 
   useEffect(() => {
-    fetchListData();
-  }, [searchReducer.keyword, searchReducer.status, currentPage]);
+    if (isFirstEffectCompleted) {
+      fetchListData();
+    }
+  }, [
+    isFirstEffectCompleted,
+    searchReducer.keyword,
+    searchReducer.status,
+    currentPage,
+  ]);
   return (
     <>
       <ModalBase

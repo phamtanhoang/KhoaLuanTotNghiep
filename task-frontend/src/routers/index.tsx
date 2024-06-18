@@ -3,9 +3,9 @@ import {
   PaymentError,
   PaymentSuccess,
   ProtectedRoute,
+  ResetPasswordPage,
 } from "@/components/ui";
 import { AdminLayout, CandidateLayout, EmployerLayout } from "@/layouts";
-import TestChat from "@/layouts/test";
 import {
   CandidateAdminPage,
   CategoryAdminPage,
@@ -73,7 +73,6 @@ const Routers = () => {
     <BrowserRouter>
       <ScrollToTop />
       <Routes>
-        <Route path="test" element={<TestChat />} />
         <Route
           path={PathConstants.CANDIDATE_PATHS.default}
           element={<Navigate to={PathConstants.CANDIDATE_PATHS.home} replace />}
@@ -280,7 +279,10 @@ const Routers = () => {
             element={<PaymentError />}
           />
         </Route>
-
+        <Route
+          path={PathConstants.OTHER_PATHS.resetPassword}
+          element={<ResetPasswordPage />}
+        />
         <Route path={PathConstants.OTHER_PATHS.all} element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
