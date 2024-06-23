@@ -8,7 +8,6 @@ public record ApplicationResponse (
     String id,
     LocalDateTime applyDate,
     String cV,
-    int currentStep,
     String email,
     String fullName,
     String letter,

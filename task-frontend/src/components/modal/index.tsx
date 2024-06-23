@@ -22,8 +22,8 @@ import {
   ApplicationDetail,
   ApplicationStep,
   ApplyJob,
-  CreateStepSchedule,
-  DetailStepSchedule,
+  CreateSchedule,
+  DetailSchedule,
   HandleApplication,
 } from "./application";
 import { ChangeInfoEmployer, EmployerUpdate } from "./employer";
@@ -38,6 +38,7 @@ import { CreateProcedure, UpdateProcedure } from "./procedure";
 import { ModalConstants } from "@/utils/constants";
 import { ChatApplication } from "./chat";
 import { Checkout, CreateVip, DetailTransaction, UpdateVip } from "./vip";
+import { sub } from "date-fns";
 
 const ModalBase = (props: any) => {
   // take props
@@ -54,8 +55,7 @@ const ModalBase = (props: any) => {
   const data = props.data;
   const email = props.email;
   const password = props.password;
-
-  const setApplicationId = props.setApplicationId;
+  const subId = props.subId;
 
   const status = props.status;
   const _onClickUpDateStep = props._onClickUpDateStep;
@@ -71,7 +71,7 @@ const ModalBase = (props: any) => {
       <VerifyEmail id={id} handleClose={handleClose} fetchData={fetchData} />
     ),
     [ModalConstants.AUTH_KEYS.resetPassword]: (
-      <ResetPassword handleClose={handleClose}/>
+      <ResetPassword handleClose={handleClose} />
     ),
     [ModalConstants.AUTH_KEYS.changePassword]: (
       <ChangePassword setFuncs={setFuncs} handleClose={handleClose} />
@@ -220,21 +220,19 @@ const ModalBase = (props: any) => {
     [ModalConstants.APPLICATION_KEYS.applycationStep]: (
       <ApplicationStep id={id} stepId={stepId} handleClose={handleClose} />
     ),
-    [ModalConstants.APPLICATION_KEYS.createStepSchedule]: (
-      <CreateStepSchedule
-        id={id}
-        stepId={stepId}
+    [ModalConstants.APPLICATION_KEYS.createSchedule]: (
+      <CreateSchedule
+        subId={subId}
         fetchData={fetchData}
         handleClose={handleClose}
       />
     ),
-    [ModalConstants.APPLICATION_KEYS.detailStepSchedule]: (
-      <DetailStepSchedule
-        id={id}
-        stepId={stepId}
+    [ModalConstants.APPLICATION_KEYS.detailSchedule]: (
+      <DetailSchedule
+        id={subId}
+        type={type}
         fetchData={fetchData}
         handleClose={handleClose}
-        setApplicationId={setApplicationId}
         setFuncs={setFuncs}
       />
     ),

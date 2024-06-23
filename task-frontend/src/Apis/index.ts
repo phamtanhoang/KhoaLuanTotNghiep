@@ -370,17 +370,17 @@ const ApplicationAPI = {
     return `/applications/updateStatus/${id}`;
   },
 
-  detailStepSchedule: (id?: string) => {
-    return `/applications/detailStepSchedule/${id}`;
+  detailSchedule: (id?: string) => {
+    return `/applications/detailSchedule/${id}`;
   },
-  createStepSchedule: (id?: string) => {
-    return `/applications/createStepSchedule/${id}`;
+  createSchedule: (id?: string) => {
+    return `/applications/createSchedule/${id}`;
   },
-  updateStepSchedule: (id?: string) => {
-    return `/applications/updateStepSchedule/${id}`;
+  updateSchedule: (id?: string) => {
+    return `/applications/updateSchedule/${id}`;
   },
-  deleteStepSchedule: (id?: string) => {
-    return `/applications/deleteStepSchedule/${id}`;
+  deleteSchedule: (id?: string) => {
+    return `/applications/deleteSchedule/${id}`;
   },
 
   getPending_Employer: (currentPage?: number, itemPerPage?: number) => {
@@ -391,9 +391,7 @@ const ApplicationAPI = {
   },
 };
 const ScheduleAPI = {
-  getDataSchedule: (id?: string, fromDate?: string, toDate?: string) => {
-    return `/schedule?userId=${id}&fromDate=${fromDate}&toDate=${toDate}`;
-  },
+  getDataSchedule: "/schedules",
 };
 const StatisticsAPI = {
   getCount_admin: "/statistics/getCount_Admin",

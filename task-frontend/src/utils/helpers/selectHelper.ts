@@ -39,20 +39,20 @@ const convertTagsToOptions = (tags: TagModel[]) => {
 const convertHrsToOptions = (hrs: HumanResourceModel[]) => {
   return hrs?.map((procedure) => ({
     value: procedure.id,
-    label: `${procedure.firstName} ${procedure.lastName}`,
+    label: `${procedure.firstName} ${procedure.lastName} (${procedure.email})`,
   }));
 };
 
 const findOptionByHrId = (id: string, hrs: HumanResourceModel[]) => {
-  return convertHrsToOptions(hrs)?.find((option) => option.value === id) || null;
+  return (
+    convertHrsToOptions(hrs)?.find((option) => option.value === id) || null
+  );
 };
 const findOptionByTagId = (id: string, tags: TagModel[]) => {
   return (
     convertTagsToOptions(tags)?.find((option) => option.value === id) || null
   );
 };
-
-
 
 export const SelectHelper = {
   convertCategoriesToOptions,

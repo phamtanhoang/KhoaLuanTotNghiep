@@ -172,7 +172,7 @@ const DetailsJob = (props: any) => {
                   <input
                     className="w-full content-center p-2 mt-1 border rounded focus:outline-none focus:border-orangetext text-sm"
                     type="text"
-                    value={job?.humanResource?.name}
+                    value={`${job?.humanResource?.name}`}
                     disabled
                   />
                 </div>

@@ -1,27 +1,23 @@
 package com.pth.taskbackend.controller;
+
 import com.pth.taskbackend.dto.response.BaseResponse;
 import com.pth.taskbackend.dto.response.TopCategoriesResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Category;
-import com.pth.taskbackend.model.meta.Employer;
 import com.pth.taskbackend.model.meta.Job;
 import com.pth.taskbackend.model.meta.User;
-import com.pth.taskbackend.repository.CategoryRepository;
 import com.pth.taskbackend.repository.JobRepository;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.CategoryService;
 import com.pth.taskbackend.service.JobService;
 import com.pth.taskbackend.util.func.CheckPermission;
-import com.pth.taskbackend.util.func.ImageFunc;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -43,7 +39,7 @@ import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 @SecurityRequirement(name = "javainuseapi")
 @RequiredArgsConstructor
 @RestController
-    @RequestMapping(value = {BASE_URL + "/categories"})
+@RequestMapping(value = {BASE_URL + "/categories"})
 public class CategoryController {
 
     @Autowired
@@ -51,12 +47,14 @@ public class CategoryController {
 
     @Autowired
     private JobRepository jobRepository;
-    private final CheckPermission checkPermission ;
-@Autowired
+    private final CheckPermission checkPermission;
+    @Autowired
     UserRepository userRepository;
     @Autowired
     JwtService jwtService;
-    @Autowired JobService jobService;
+    @Autowired
+    JobService jobService;
+
     @Operation(summary = "Get by id", description = "", tags = {})
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getCategoryById(@PathVariable String id) {
@@ -92,7 +90,7 @@ public class CategoryController {
 
     @Operation(summary = "Get list by name", description = "", tags = {})
     @GetMapping
-    public ResponseEntity<BaseResponse> getCategories(@RequestHeader("Authorization")String token, @RequestParam(required = false) String name, Pageable pageable) {
+    public ResponseEntity<BaseResponse> getCategories(@RequestHeader("Authorization") String token, @RequestParam(required = false) String name, Pageable pageable) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
@@ -100,6 +98,7 @@ public class CategoryController {
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
+
             Optional<User> optionalUser = userRepository.findByEmail(email);
             if (optionalUser.isEmpty())
                 return ResponseEntity.ok(
@@ -129,9 +128,10 @@ public class CategoryController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
     @Operation(summary = "Get list top down", description = "", tags = {})
     @GetMapping("/getCategories_Dropdown")
-    public ResponseEntity<BaseResponse> getCategoriesDropDown(@RequestParam(required = false) String name ) throws IOException {
+    public ResponseEntity<BaseResponse> getCategoriesDropDown(@RequestParam(required = false) String name) throws IOException {
         try {
             List<Category> categories = categoryService.findAll(Pageable.unpaged()).toList();
 
@@ -153,8 +153,8 @@ public class CategoryController {
 
     @Operation(summary = "Create", description = "", tags = {})
     @PostMapping("/create")
-    public ResponseEntity<BaseResponse> createCategory(@RequestHeader("Authorization") String token,@RequestParam("name") String name,
-                                 @RequestParam("image") MultipartFile image) throws IOException {
+    public ResponseEntity<BaseResponse> createCategory(@RequestHeader("Authorization") String token, @RequestParam("name") String name,
+                                                       @RequestParam("image") MultipartFile image) throws IOException {
         try {
 
             String email = jwtService.extractUsername(token.substring(7));
@@ -163,6 +163,7 @@ public class CategoryController {
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
+
             Optional<User> optionalUser = userRepository.findByEmail(email);
             if (optionalUser.isEmpty())
                 return ResponseEntity.ok(
@@ -188,8 +189,8 @@ public class CategoryController {
 
     @Operation(summary = "update", description = "", tags = {})
     @PatchMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization")String token, @PathVariable("id") String id, @RequestPart String name,
-                                                   @RequestPart(required = false) MultipartFile image) {
+    public ResponseEntity<BaseResponse> updateCategory(@RequestHeader("Authorization") String token, @PathVariable("id") String id, @RequestPart String name,
+                                                       @RequestPart(required = false) MultipartFile image) {
         try {
 
             String email = jwtService.extractUsername(token.substring(7));
@@ -212,14 +213,14 @@ public class CategoryController {
                 );
             }
 
-            Category  category = categoryService.updateCategory(optionalCategory.get(), name, image);
+            Category category = categoryService.updateCategory(optionalCategory.get(), name, image);
             return ResponseEntity.ok(
                     new BaseResponse("Cập nhật danh mục thành công", HttpStatus.OK.value(), category)
             );
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        }catch (DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException e) {
             return ResponseEntity.ok(
                     new BaseResponse("Tên danh mục đã tồn tại!", HttpStatus.BAD_REQUEST.value(), null)
             );
@@ -231,7 +232,7 @@ public class CategoryController {
 
     @Operation(summary = "delete", description = "", tags = {})
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteCategory(@RequestHeader("Authorization")String token, @PathVariable("id") String id) {
+    public ResponseEntity<BaseResponse> deleteCategory(@RequestHeader("Authorization") String token, @PathVariable("id") String id) {
         try {
 
             String email = jwtService.extractUsername(token.substring(7));
@@ -240,6 +241,7 @@ public class CategoryController {
                 return ResponseEntity.ok(
                         new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
+
             Optional<User> optionalUser = userRepository.findByEmail(email);
             if (optionalUser.isEmpty())
                 return ResponseEntity.ok(
@@ -247,8 +249,8 @@ public class CategoryController {
                 );
             Optional<Category> existingCategory = categoryService.findById(id);
             if (existingCategory.isPresent()) {
-                List<Job> jobs = jobService.findByCategoryId(id,null).toList();
-                for(Job job :jobs){
+                List<Job> jobs = jobService.findByCategoryId(id, null).toList();
+                for (Job job : jobs) {
                     job.setCategory(null);
                     jobService.update(job);
                 }
@@ -261,7 +263,7 @@ public class CategoryController {
                         new BaseResponse("Không tìm thấy danh mục để xóa!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
-        }catch (ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
         } catch (EmptyResultDataAccessException e) {
@@ -276,19 +278,18 @@ public class CategoryController {
     @GetMapping("/topCategories")
     public ResponseEntity<BaseResponse> getTopCategories(Pageable pageable) {
         try {
-           Page<Object[]> categories = categoryService.findCategoriesByJobCount(pageable);
+            Page<Object[]> categories = categoryService.findCategoriesByJobCount(pageable);
             Page<TopCategoriesResponse> topCategoriesResponses = categories.map(result -> {
                 Category category = (Category) result[0];
                 Long count = (Long) result[1];
 
-                TopCategoriesResponse dto = new TopCategoriesResponse(category.getId(),category.getName(),category.getImage(),count);
+                TopCategoriesResponse dto = new TopCategoriesResponse(category.getId(), category.getName(), category.getImage(), count);
                 return dto;
             });
             if (categories.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Danh sách danh mục rỗng", HttpStatus.OK.value(), null)
                 );
-//
             return ResponseEntity.ok(
                     new BaseResponse("Danh sách danh mục", HttpStatus.OK.value(), topCategoriesResponses)
             );

@@ -17,7 +17,7 @@ import { ONCHANGE_EMPLOYER_LIST } from "@/store/reducers/listDataReducer";
 
 const EmployersPage: React.FC = () => {
   const dispatch = useDispatch();
-  const { totalPages, currentPage, itemPerPage, isEmpty } = useSelector(
+  const { totalPages, currentPage, isEmpty } = useSelector(
     (state: any) => state.paginationReducer
   );
   const { employers } = useSelector((state: any) => state.listDataReducer);
@@ -34,7 +34,7 @@ const EmployersPage: React.FC = () => {
   const fetchListData = () => {
     setIsLoading(false);
     employersService
-      .getListPublic(keyWord, currentPage - 1, itemPerPage)
+      .getListPublic(keyWord, currentPage - 1, 12)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           dispatch(ONCHANGE_EMPLOYER_LIST(res.data.Data?.content || []));

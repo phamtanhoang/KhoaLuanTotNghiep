@@ -4,4 +4,5 @@ interface Event {
   end?: Date;
   title?: string;
   color?: string;
+  application?: ApplicationModel;
 }

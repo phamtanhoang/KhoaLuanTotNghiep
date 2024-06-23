@@ -28,13 +28,11 @@ public class ResourceController {
     public ResponseEntity<BaseResponse> SendMail() {
         try {
             mailService.sendEmail("2051052048hoang@ou.edu.vn", "Hoàng",
-                    "Ban đã đăng kí tài khoản thành công!!","EMAIL_TEMPLATE");
+                    "Ban đã đăng kí tài khoản thành công!!", "EMAIL_TEMPLATE");
             return ResponseEntity.ok(new BaseResponse("Gửi mail thành công", 200, null));
-        }
-        catch(MessagingException e){
+        } catch (MessagingException e) {
             return ResponseEntity.ok(new BaseResponse("Tên mail không hợp lệ!", 500, null));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.ok(new BaseResponse("Có lỗi xảy ra trong quá trình gửi mail!", 500, null));
         }
@@ -54,11 +52,13 @@ public class ResourceController {
     public String getValue(@RequestParam String key) {
         return redisTemplate.opsForValue().get(key);
     }
+
     @DeleteMapping()
     public String deleteValue(@RequestParam String key) {
         redisTemplate.delete(key);
         return "Clear successfully";
     }
+
     @PutMapping("")
     public String putValue(@RequestParam String key, @RequestParam String value) {
         redisTemplate.opsForValue().set(key, value);

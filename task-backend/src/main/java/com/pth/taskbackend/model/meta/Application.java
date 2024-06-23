@@ -35,9 +35,6 @@ public class Application extends BaseEntity {
     @Column(nullable = false)
     private String cV;
 
-    @Column(nullable = false)
-    private int currentStep;
-
     @Enumerated(EnumType.STRING)
     private EApplyStatus status;
 
@@ -49,7 +46,7 @@ public class Application extends BaseEntity {
     @JoinColumn(name = "candidate_id")
     private Candidate candidate;
 
-    @JsonIgnore
+
     @ManyToOne
     @JoinColumn(name = "job_id")
     private Job job;
@@ -57,10 +54,5 @@ public class Application extends BaseEntity {
     @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Message> messages = new HashSet<>();
 
-    @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<StepResult> stepResults = new HashSet<>();
-
-    @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<StepSchedule> stepSchedule = new HashSet<>();
 }
 

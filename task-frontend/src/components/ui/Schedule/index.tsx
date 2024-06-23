@@ -18,24 +18,26 @@ const Schedule: React.FC<ScheduleProps> = ({ value, fetchScheduleData }) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const [eventId, setEventId] = useState<string>("");
-  const [applicationId, setApplicationId] = useState<string>("");
+  const [subId, setSubId] = useState<any>("");
+  const [id, setId] = useState<string>("");
   const _onSelectEvent = (event: Event) => {
-    setEventId(event?.event_id!);
-    setFuncs(ModalConstants.APPLICATION_KEYS.detailStepSchedule);
+    console.log("object, ", event);
+    setSubId(event?.event_id!);
+    setId(event?.application?.id!);
+    setFuncs(ModalConstants.APPLICATION_KEYS.detailSchedule);
     handleOpen();
   };
   return (
     <>
       <ModalBase
-        stepId={eventId}
         fetchData={fetchScheduleData}
         open={open}
         handleClose={handleClose}
         funcs={funcs}
         setFuncs={setFuncs}
-        setApplicationId={setApplicationId}
-        id={applicationId}
+        type={true}
+        id={id}
+        subId={subId}
       />
       <Calendar
         step={15}

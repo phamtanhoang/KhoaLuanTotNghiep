@@ -30,8 +30,8 @@ const APPLICATION_KEYS = {
   applyJob: "ApplyJob",
   applycationDetail: "ApplycationDetail",
   applycationStep: "ApplycationStep",
-  createStepSchedule: "CreateStepSchedule",
-  detailStepSchedule: "DetailStepSchedule",
+  createSchedule: "CreateSchedule",
+  detailSchedule: "DetailSchedule",
   handleApplication: "HandleApplication",
 };
 const HUMANRESOURCE_KEYS = {

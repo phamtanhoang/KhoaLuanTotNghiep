@@ -91,7 +91,7 @@ const FindCandidatePage = () => {
         open={open}
         handleClose={handleClose}
         funcs={funcs}
-        fetchData={fetchListData}
+        fetchData={()=>{}}
       />
       <div className="relative w-full flex flex-col gap-4 max-lg:px-3">
         {isPermission ? (

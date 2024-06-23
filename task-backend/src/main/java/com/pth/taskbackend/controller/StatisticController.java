@@ -1,28 +1,26 @@
 package com.pth.taskbackend.controller;
 
-import com.pth.taskbackend.dto.response.*;
+import com.pth.taskbackend.dto.response.BaseResponse;
+import com.pth.taskbackend.dto.response.StatisticResponse;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
-import com.pth.taskbackend.model.meta.*;
+import com.pth.taskbackend.model.meta.Employer;
+import com.pth.taskbackend.model.meta.HumanResource;
+import com.pth.taskbackend.model.meta.User;
+import com.pth.taskbackend.model.meta.VipEmployer;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.*;
 import com.pth.taskbackend.util.func.CheckPermission;
-import com.pth.taskbackend.util.func.DateFunc;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
@@ -57,20 +55,20 @@ public class StatisticController {
 
     @Autowired
     CategoryService categoryService;
+
     @GetMapping("/getCount_Admin")
     public ResponseEntity<BaseResponse> getCount_Admin(@RequestHeader("Authorization") String token) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
-
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
             Optional<User> optionalUser = userRepository.findByEmail(email);
             if (optionalUser.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
-                );
-
-            if (optionalUser.get().getRole()!=ERole.ADMIN)
-                return ResponseEntity.ok(
-                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
                 );
 
 
@@ -87,17 +85,18 @@ public class StatisticController {
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
     @GetMapping("/getCount")
     public ResponseEntity<BaseResponse> getCount(@RequestHeader("Authorization") String token) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER)
-                    ||checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+                    || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
 
             if (!permission)
                 return ResponseEntity.ok(
@@ -110,10 +109,10 @@ public class StatisticController {
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            if(optionalUser.get().getRole()==ERole.EMPLOYER) {
+            if (optionalUser.get().getRole() == ERole.EMPLOYER) {
 
                 Optional<Employer> optionalEmployer = employerService.findByUserEmail(email);
-                if(optionalEmployer.isEmpty()){
+                if (optionalEmployer.isEmpty()) {
                     return ResponseEntity.ok(
                             new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null)
                     );
@@ -128,9 +127,9 @@ public class StatisticController {
                 return ResponseEntity.ok(
                         new BaseResponse("Thành công", HttpStatus.OK.value(), statistics)
                 );
-            }else{
+            } else {
                 Optional<HumanResource> optionalHumanResource = humanResourceService.findByEmail(email);
-                if(optionalHumanResource.isEmpty()){
+                if (optionalHumanResource.isEmpty()) {
                     return ResponseEntity.ok(
                             new BaseResponse("Không tìm thấy nhân sự", HttpStatus.NOT_FOUND.value(), null)
                     );
@@ -151,27 +150,27 @@ public class StatisticController {
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 
     @GetMapping("/getStatistic_Admin")
-    public ResponseEntity<BaseResponse> getStatistic(@RequestHeader("Authorization") String token, @RequestParam int year){
+    public ResponseEntity<BaseResponse> getStatistic(@RequestHeader("Authorization") String token, @RequestParam int year) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
-
+            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.ADMIN);
+            if (!permission)
+                return ResponseEntity.ok(
+                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
+                );
             Optional<User> optionalUser = userRepository.findByEmail(email);
             if (optionalUser.isEmpty())
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy người dùng", HttpStatus.NOT_FOUND.value(), null)
                 );
 
-            if (optionalUser.get().getRole()!=ERole.ADMIN)
-                return ResponseEntity.ok(
-                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-                );
 
             // Initialize an array with 12 elements for 12 months
             Long[] prices = new Long[12];
@@ -204,7 +203,7 @@ public class StatisticController {
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }

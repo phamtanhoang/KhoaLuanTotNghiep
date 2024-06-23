@@ -26,7 +26,7 @@ public interface EmployerRepository extends JpaRepository<Employer, String> {
 
     Optional<Employer>findByIdAndUserStatus(String id, EStatus status);
     @Query("SELECT e FROM Employer e, User u " +
-            "WHERE (e.user = u) " + // Điều kiện để nối hai bảng
+            "WHERE (e.user = u) " +
             "AND (:keyword IS NULL OR e.name LIKE %:keyword% OR u.email LIKE %:keyword%) " +
             "AND (:status IS NULL OR u.status = :status) " +
             "AND u.status <> 'DELETED'")

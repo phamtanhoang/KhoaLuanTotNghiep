@@ -1,44 +1,39 @@
 import { LoadingContext } from "@/App";
 import applicationsService from "@/services/applicationsService";
 import { SwalHelper } from "@/utils/helpers";
+import { sub } from "date-fns";
 import { useContext, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaRegSave } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
-import { useSelector } from "react-redux";
 
-const CreateStepSchedule = (props: any) => {
+const CreateSchedule = (props: any) => {
   const handleClose = props.handleClose;
-  const applicationId = props.id;
-  const stepId = props.stepId;
+  const id = props.subId;
   const fetchData = props.fetchData;
   const context = useContext(LoadingContext);
 
-  const { steps } = useSelector((state: any) => state.listDataReducer);
-
-  const step = steps.find((step: any) => step.id === stepId);
-
   const [name, setName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const [color, setColor] = useState<string>("#3498DB");
   const [startDate, setStartDate] = useState<string>("");
   const [hour, setHour] = useState<number>(0);
 
   const _onClickSave = () => {
-    if (name === "" || color === "" || startDate === "" || hour === 0) {
+    if (
+      name === "" ||
+      color === "" ||
+      startDate === "" ||
+      hour === 0 ||
+      description === ""
+    ) {
       SwalHelper.MiniAlert("Vui lòng nhập đầy đủ thông tin!", "warning");
       return;
     }
     context.handleOpenLoading();
     applicationsService
-      .createStepSchedule(
-        applicationId,
-        name,
-        startDate,
-        hour,
-        color,
-        step?.number
-      )
+      .createSchedule(id, name, startDate, hour, color, description)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           handleClose();
@@ -72,12 +67,9 @@ const CreateStepSchedule = (props: any) => {
 
         <div className="h-max max-h-[75vh] my-2 mx-1 flex">
           <div className="ml-1  text-gray-700 flex flex-col gap-2 w-full">
-            <p className="text-sm font-semibold text-black bg-body2 pl-1 pr-1 pt-1.5 pb-1.5 rounded-sm shadow-sm w-full truncate">
-              Bước {step?.number + 1}: {step?.name}
-            </p>
             <div className="content-center w-full">
               <label className="font-medium tracking-wide text-sm">
-                Tiêu đề:
+                Tiêu đề <span className="text-red-500">*</span>
               </label>
               <input
                 className="w-full p-2 mt-1 border rounded focus:outline-none focus:border-orangetext text-sm"
@@ -88,7 +80,7 @@ const CreateStepSchedule = (props: any) => {
             </div>
             <div className="content-center w-full">
               <label className="font-medium tracking-wide text-sm">
-                Ngày hẹn:
+                Ngày hẹn <span className="text-red-500">*</span>
               </label>
               <input
                 className="w-full p-2 mt-1 border rounded focus:outline-none focus:border-orangetext text-sm"
@@ -99,14 +91,24 @@ const CreateStepSchedule = (props: any) => {
             </div>
             <div className="content-center w-full">
               <label className="font-medium tracking-wide text-sm">
-                Thời gian (giờ):
+                Thời gian (giờ) <span className="text-red-500">*</span>
               </label>
               <input
                 className="w-full p-2 mt-1 border rounded focus:outline-none focus:border-orangetext text-sm"
                 value={hour}
                 onChange={(e) => setHour(parseFloat(e.target.value))}
-                type="number" // type="number"
+                type="number"
                 min={0}
+              />
+            </div>
+            <div className="content-center w-full">
+              <label className="font-medium tracking-wide text-sm">
+                Nội dung:
+              </label>
+              <textarea
+                className="w-full p-2 mt-1 border rounded focus:outline-none focus:border-orangetext text-sm h-[70px]"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </div>
             <div className="content-center">
@@ -144,4 +146,4 @@ const CreateStepSchedule = (props: any) => {
     </>
   );
 };
-export default CreateStepSchedule;
+export default CreateSchedule;

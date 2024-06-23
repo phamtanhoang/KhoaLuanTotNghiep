@@ -1,17 +1,12 @@
 package com.pth.taskbackend.service.impl;
 
 import com.pth.taskbackend.enums.EApplyStatus;
-import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.Application;
 import com.pth.taskbackend.model.meta.Message;
-import com.pth.taskbackend.model.meta.StepResult;
-import com.pth.taskbackend.model.meta.StepSchedule;
 import com.pth.taskbackend.repository.ApplicationRepository;
 import com.pth.taskbackend.repository.MessageRepository;
-import com.pth.taskbackend.repository.StepResultRepository;
-import com.pth.taskbackend.repository.StepScheduleRepository;
+import com.pth.taskbackend.repository.ScheduleRepository;
 import com.pth.taskbackend.service.ApplicationService;
-import com.pth.taskbackend.service.StepScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,9 +22,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Autowired
     MessageRepository messageRepository;
     @Autowired
-    StepScheduleRepository stepScheduleRepository;
-    @Autowired
-    StepResultRepository stepResultRepository;
+    ScheduleRepository scheduleRepository;
+
     @Override
     public Application create(Application application) {
 
@@ -52,11 +46,12 @@ public class ApplicationServiceImpl implements ApplicationService {
         List<Message> messages = messageRepository.findByApplicationId(application.getId());
         messageRepository.deleteAll(messages);
 
-        List<StepSchedule> stepSchedules = stepScheduleRepository.findByApplicationId(application.getId());
-        stepScheduleRepository.deleteAll(stepSchedules);
-
-        List<StepResult> stepResults = stepResultRepository.findByApplicationId(application.getId());
-        stepResultRepository.deleteAll(stepResults);
+        //cansua
+//        List<Schedule> schedules = stepScheduleRepository.findByApplicationId(application.getId());
+//        stepScheduleRepository.deleteAll(schedules);
+        //cansua
+//        List<ApplicationSchedule> scheduleApplications = stepResultRepository.findByApplicationId(application.getId());
+//        stepResultRepository.deleteAll(scheduleApplications);
 
         applicationRepository.delete(application);
     }

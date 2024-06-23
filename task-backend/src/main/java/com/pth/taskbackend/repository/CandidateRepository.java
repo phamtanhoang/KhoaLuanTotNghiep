@@ -46,7 +46,17 @@ public interface CandidateRepository extends JpaRepository<Candidate, String> {
             "AND u.status = 'ACTIVE' " +
             "AND LOWER(c.job) LIKE LOWER(CONCAT('%', :job, '%')) " +
             "AND LOWER(c.address) LIKE LOWER(CONCAT('%', :address, '%')) " +
-            "AND LOWER(s.skill) LIKE LOWER(CONCAT('%', :skill, '%'))",
+            "AND LOWER(s.skill) LIKE LOWER(CONCAT('%', :skill, '%')) " +
+            "ORDER BY RAND()",
+            countQuery = "SELECT COUNT(DISTINCT c.id) " +
+                    "FROM candidate c " +
+                    "JOIN user u ON c.user_id = u.id " +
+                    "JOIN skill s ON c.id = s.candidate_id " +
+                    "WHERE c.is_find_job = true " +
+                    "AND u.status = 'ACTIVE' " +
+                    "AND LOWER(c.job) LIKE LOWER(CONCAT('%', :job, '%')) " +
+                    "AND LOWER(c.address) LIKE LOWER(CONCAT('%', :address, '%')) " +
+                    "AND LOWER(s.skill) LIKE LOWER(CONCAT('%', :skill, '%'))",
             nativeQuery = true)
     Page<Candidate> findCV(@Param("job") String job,
                            @Param("address") String address,

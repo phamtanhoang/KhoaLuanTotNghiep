@@ -101,65 +101,61 @@ const applicationsService = {
       }
     );
   },
-  async updateStatus(id: string, status: string, result: string) {
+  async updateStatus(id: string, status: string) {
     const body = {
       status: status,
-      result: result,
     };
     return await axiosConfig.patch(ApplicationAPI.updateStatus(id), body, {
       headers: { "Content-Type": "application/json" },
     });
   },
 
-  async createStepSchedule(
+  async createSchedule(
     id: string,
     name: string,
     startDate: string,
     hour: number,
     color: string,
-    stepNumber: number
+    description: string
   ) {
     const body = {
       name: name.trim(),
       startDate: startDate.trim(),
       hour: hour,
       color: color.trim(),
-      stepNumber: stepNumber,
+      description: description,
     };
-    console.log("body,  ", body);
 
-    return await axiosConfig.post(ApplicationAPI.createStepSchedule(id), body, {
+    return await axiosConfig.post(ApplicationAPI.createSchedule(id), body, {
       headers: { "Content-Type": "application/json" },
     });
   },
 
-  async updateStepSchedule(
+  async updateSchedule(
     id: string,
     name: string,
     startDate: string,
     hour: number,
-    color: string
+    color: string,
+    description: string
   ) {
     const body = {
       name: name,
       startDate: startDate,
       hour: hour,
       color: color,
+      description: description,
     };
 
-    return await axiosConfig.patch(
-      ApplicationAPI.updateStepSchedule(id),
-      body,
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return await axiosConfig.patch(ApplicationAPI.updateSchedule(id), body, {
+      headers: { "Content-Type": "application/json" },
+    });
   },
-  async detailStepSchedule(id: string) {
-    return await axiosConfig.get(ApplicationAPI.detailStepSchedule(id));
+  async detailSchedule(id: string) {
+    return await axiosConfig.get(ApplicationAPI.detailSchedule(id));
   },
-  async deleteStepSchedule(id: string) {
-    return await axiosConfig.delete(ApplicationAPI.deleteStepSchedule(id));
+  async deleteSchedule(id: string) {
+    return await axiosConfig.delete(ApplicationAPI.deleteSchedule(id));
   },
 
   async getPending_Employer(currentPage?: number, itemPerPage?: number) {

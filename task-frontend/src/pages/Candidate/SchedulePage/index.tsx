@@ -10,19 +10,16 @@ import { useDispatch, useSelector } from "react-redux";
 const SchedulePage = () => {
   const context = useContext(LoadingContext);
   const dispatch = useDispatch();
-  const { eventList, fromDate, toDate } = useSelector(
-    (state: any) => state.scheduleReducer
-  );
+  const { eventList } = useSelector((state: any) => state.scheduleReducer);
 
   const [open, setOpen] = useState(false);
   const [funcs, setFuncs] = useState<string>("");
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const [userId, setUserId] = useState<string>("");
   const fetchScheduleData = () => {
     context.handleOpenLoading();
     scheduleService
-      .getDataSchedule(userId, fromDate, toDate)
+      .getDataSchedule()
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           const convertedData = res?.data?.Data?.map((item: any) => ({

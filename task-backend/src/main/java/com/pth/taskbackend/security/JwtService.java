@@ -1,12 +1,10 @@
 package com.pth.taskbackend.security;
 
-import com.google.api.client.util.Value;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -19,22 +17,23 @@ import java.util.function.Function;
 public class JwtService {
 
     public static final String SECRET = "Lu4byRqrMCp6OmPf3zyRUphe1NP0MZrZaB+2Kzay5OBb1Mfs6atzgSfwFCNVxpXhtQP5ToIzK1x1PgCFCpFY0Q==";
-    public static  int REFRESH_TOKEN_EXPIRATION_SECONDS = 30*24*60*60;
+    public static int REFRESH_TOKEN_EXPIRATION_SECONDS = 30 * 24 * 60 * 60;
 
-    public static  int ACCESS_TOKEN_EXPIRATION_SECONDS = 5*60;
+    public static int ACCESS_TOKEN_EXPIRATION_SECONDS = 5 * 60;
     private List<String> validTokens = new ArrayList<>();
+
     public String generateToken(String username, EStatus status, ERole role) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username, status,role);
+        return createToken(claims, username, status, role);
     }
 
-    private String createToken(Map<String, Object> claims, String username,EStatus status,ERole role) {
+    private String createToken(Map<String, Object> claims, String username, EStatus status, ERole role) {
         Instant now = Instant.now();
         String token = Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
-                .claim("status",status)
-                .claim("role",role)
+                .claim("status", status)
+                .claim("role", role)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(Date.from(now.plus(ACCESS_TOKEN_EXPIRATION_SECONDS, ChronoUnit.SECONDS)))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
@@ -45,7 +44,7 @@ public class JwtService {
     }
 
     private Key getSignKey() {
-        byte[] keyBytes= Decoders.BASE64.decode(SECRET);
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -65,12 +64,14 @@ public class JwtService {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
+
     public Jws<Claims> extractClaim(String token) {
         return Jwts.parser()
                 .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token);
     }
+
     public Claims extractAllClaims(String token) {
         return Jwts
                 .parser()
@@ -91,14 +92,16 @@ public class JwtService {
     public void invalidateToken(String token) {
         validTokens.remove(token);
     }
+
     public Boolean validateToken(String token) {
-        return  !isTokenExpired(token);
+        return !isTokenExpired(token);
     }
 
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
         return createRefreshToken(claims, username);
     }
+
     private String createRefreshToken(Map<String, Object> claims, String username) {
         Instant now = Instant.now();
         String token = Jwts.builder()
@@ -113,7 +116,7 @@ public class JwtService {
 
     }
 
-    public String refreshToken(String refreshToken,EStatus status,ERole role) {
+    public String refreshToken(String refreshToken, EStatus status, ERole role) {
         try {
             Jws<Claims> claimsJws = extractRefreshClaim(refreshToken);
             String username = claimsJws.getBody().getSubject();

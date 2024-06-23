@@ -1,12 +1,16 @@
 import { TextEditor } from "@/components/form";
 import { useContext, useEffect, useRef, useState } from "react";
 import {
-  AiFillCheckCircle,
-  AiFillCloseCircle,
+  AiFillDelete,
+  AiFillEye,
   AiFillMessage,
   AiOutlineClose,
 } from "react-icons/ai";
-import { IoMdExit } from "react-icons/io";
+import {
+  IoIosAddCircle,
+  IoMdExit,
+  IoMdInformationCircleOutline,
+} from "react-icons/io";
 import ModalBase from "../..";
 import { DataConstants, ModalConstants } from "@/utils/constants";
 import { LoadingContext } from "@/App";
@@ -16,21 +20,16 @@ import applicationsService from "@/services/applicationsService";
 import { AuthHelper, DateHelper, SwalHelper } from "@/utils/helpers";
 import {
   ONCHANGE_MESSAGE_LIST,
-  ONCHANGE_STEP_LIST,
+  ONCHANGE_SCHEDULE_LIST,
 } from "@/store/reducers/listDataReducer";
-import { ChatUI } from "@/components/ui";
-import { MdSkipNext } from "react-icons/md";
+import { ChatUI, ListEmpty } from "@/components/ui";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { GrSchedulePlay } from "react-icons/gr";
-import { BiDetail } from "react-icons/bi";
 
 interface StepItemProps {
   index: number;
-  item: StepModel;
-  stepResult: any;
-  stepSchedule: any;
-  _onClickCreateStepSchedule: (id: string) => void;
-  _onClickDetailStepSchedule: (id: string) => void;
+  item: ScheduleModel;
+  _onClickScheduleDetail: (id: string) => void;
+  _onClickScheduleDelete: (id: string) => void;
 }
 import { over } from "stompjs";
 import SockJS from "sockjs-client";
@@ -40,10 +39,8 @@ let stompClient: any = null;
 const StepItem: React.FC<StepItemProps> = ({
   index,
   item,
-  stepResult,
-  stepSchedule,
-  _onClickCreateStepSchedule,
-  _onClickDetailStepSchedule,
+  _onClickScheduleDelete,
+  _onClickScheduleDetail,
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -80,75 +77,61 @@ const StepItem: React.FC<StepItemProps> = ({
       className="bg-white table-row flex-row flex-no-wrap mb-10 lg:mb-0"
     >
       <td className="w-auto p-3 text-gray-800 text-center border border-b table-cell static">
-        {item?.number! + 1}
+        {index + 1}
       </td>
 
       <td className="w-auto p-3 text-gray-800 text-center border border-b table-cell static">
         {item?.name!}
       </td>
       <td className="w-auto p-3 text-gray-800 text-center border border-b table-cell static">
-        {stepSchedule?.startDate &&
-          DateHelper.formatDateTime(stepSchedule?.startDate)}
+        {item?.startDate &&
+          DateHelper.formatDateTime(new Date(item?.startDate!))}
       </td>
 
       <td className="w-auto p-3 text-gray-800 text-center border border-b table-cell static">
-        {stepResult?.status == DataConstants.STATUS_DATA.PASS ? (
-          <span className="rounded bg-green-400 py-1 px-3 text-sm font-medium text-white ">
-            Pass
-          </span>
-        ) : stepResult?.status == DataConstants.STATUS_DATA.FAIL ? (
-          <span className="rounded bg-red-400 py-1 px-3 text-sm font-medium text-white ">
-            Fail
-          </span>
-        ) : (
-          ""
-        )}
-      </td>
-      <td className="w-auto p-3 text-gray-800 text-center border border-b table-cell static">
-        {stepResult?.result!}
+        {item?.endDate && DateHelper.formatDateTime(new Date(item?.endDate!))}
       </td>
       <td className="w-auto p-3 text-gray-800 text-center border border-b btable-cell static">
-        {AuthHelper.isCandidate() && !stepSchedule ? (
-          <></>
-        ) : (
-          <button
-            ref={trigger}
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className={`text-lg  ${
-              dropdownOpen ? "bg-gray-100" : "bg-white"
-            } hover:bg-gray-100 p-1.5 rounded relative`}
-          >
-            <BsThreeDotsVertical className="my-auto" />
+        <button
+          ref={trigger}
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          className={`text-lg  ${
+            dropdownOpen ? "bg-gray-100" : "bg-white"
+          } hover:bg-gray-100 p-1.5 rounded relative`}
+        >
+          <BsThreeDotsVertical className="my-auto" />
+          {dropdownOpen && (
             <div
               ref={dropdown}
               onFocus={() => setDropdownOpen(true)}
               onBlur={() => setDropdownOpen(false)}
-              className={` text-sm z-[1] absolute bottom-0 right-[100%] w-max rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-0.5 group ${
-                dropdownOpen ? "block" : "hidden"
-              }`}
+              className="origin-top-right absolute right-full bottom-0 mt-2 w-32 rounded bg-white ring-1 ring-black ring-opacity-5 border border-borderColor"
             >
-              {(AuthHelper.isEmployer() || AuthHelper.isHR()) &&
-                !stepSchedule && (
+              <div className="p-1.5">
+                <a
+                  className="flex gap-2 rounded-md px-3 py-1.5 text-base text-gray-700 hover:bg-blue-100 active:bg-blue-100/70 cursor-pointer text-center"
+                  onClick={() => {
+                    _onClickScheduleDetail(item.id!);
+                  }}
+                >
+                  <AiFillEye className="text-lg my-auto" />
+                  Chi tiết
+                </a>
+                {(AuthHelper.isHR() || AuthHelper.isEmployer()) && (
                   <a
-                    className="flex px-6 py-2 text-gray-700 hover:bg-gray-100 gap-1.5"
-                    onClick={() => _onClickCreateStepSchedule(item?.id!)}
+                    className="flex gap-2 rounded-md px-3 py-1.5 text-base text-gray-700 hover:bg-red-100 active:bg-red-100/70 cursor-pointer text-center"
+                    onClick={() => {
+                      _onClickScheduleDelete(item.id!);
+                    }}
                   >
-                    <GrSchedulePlay className="my-auto text-base" />
-                    Tạo lịch hẹn
+                    <AiFillDelete className="text-lg my-auto" />
+                    Xóa
                   </a>
                 )}
-              {stepSchedule && (
-                <a
-                  className="flex px-6 py-2 text-gray-700 hover:bg-gray-100 gap-1.5"
-                  onClick={() => _onClickDetailStepSchedule(stepSchedule?.id!)}
-                >
-                  <BiDetail className="my-auto text-base" />
-                  Chi tiết lịch hẹn
-                </a>
-              )}
+              </div>
             </div>
-          </button>
-        )}
+          )}
+        </button>
       </td>
     </tr>
   );
@@ -162,22 +145,38 @@ const ApplicationDetail = (props: any) => {
   const id = props.id;
   const fetchListData = props.fetchData;
   const handleClose = props.handleClose;
+  const { schedules } = useSelector((state: any) => state.listDataReducer);
 
   const context = useContext(LoadingContext);
   const dispatch = useDispatch();
   const { application } = useSelector((state: any) => state.singleDataReducer);
-  const { steps } = useSelector((state: any) => state.listDataReducer);
   const [content, setContent] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [stepId, setStepId] = useState<string>("");
-  const [status, setStatus] = useState<string>("");
 
   const [messages, setMessages] = useState<any>([]);
+  const [type, setType] = useState<boolean>(true);
+  const [subId, setSubId] = useState<string>("");
 
+  const [openMenu, setOpenMenu] = useState(false);
+  const menuRef = useRef<any>(null);
+  const handleClickOutsideMenu = (event: any) => {
+    if (menuRef.current && !menuRef.current.contains(event.target)) {
+      setOpenMenu(false);
+      return;
+    }
+    setOpenMenu(true);
+  };
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutsideMenu);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideMenu);
+    };
+  }, []);
   useEffect(() => {
     dispatch(ONCHANGE_APPLICATION_SINGLE(null));
-    dispatch(ONCHANGE_STEP_LIST([]));
+    dispatch(ONCHANGE_SCHEDULE_LIST([]));
     dispatch(ONCHANGE_MESSAGE_LIST([]));
   }, []);
 
@@ -189,7 +188,7 @@ const ApplicationDetail = (props: any) => {
         .then((res) => {
           if (res.status === 200 && res.data.Status === 200) {
             dispatch(ONCHANGE_APPLICATION_SINGLE(res.data.Data));
-            dispatch(ONCHANGE_STEP_LIST(res.data.Data?.job?.process?.steps));
+            dispatch(ONCHANGE_SCHEDULE_LIST(res.data.Data?.schedules));
           } else {
             SwalHelper.MiniAlert(res.data.Message, "error");
           }
@@ -207,7 +206,7 @@ const ApplicationDetail = (props: any) => {
         .then((res) => {
           if (res.status === 200 && res.data.Status === 200) {
             dispatch(ONCHANGE_APPLICATION_SINGLE(res.data.Data));
-            dispatch(ONCHANGE_STEP_LIST(res.data.Data?.job?.process?.steps));
+            dispatch(ONCHANGE_SCHEDULE_LIST(res.data.Data?.schedules));
           } else {
             SwalHelper.MiniAlert(res.data.Message, "error");
           }
@@ -270,48 +269,69 @@ const ApplicationDetail = (props: any) => {
       });
   };
 
-  const _onClickUpDateStep = (status: string, result: string) => {
-    context.handleOpenLoading();
-    applicationsService
-      .updateStatus(id, status, result)
-      .then((res) => {
-        if (res.status === 200 && res.data.Status === 200) {
-          if (status == DataConstants.STATUS_DATA.APPROVED) {
-            SwalHelper.MiniAlert("Duyệt thành công!", "success");
-          } else if (status == DataConstants.STATUS_DATA.REJECTED) {
-            SwalHelper.MiniAlert("Không duyệt thành công!", "success");
-          } else {
-            SwalHelper.MiniAlert("Chuyển bước thành công!", "success");
-          }
-          fetchData();
-          fetchListData();
-        } else {
-          SwalHelper.MiniAlert(res.data.Message, "error");
-        }
-      })
-      .catch(() => {
-        SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
-      })
-      .finally(() => {
-        context.handleCloseLoading();
-      });
-  };
-
   const _onClick = (status: string) => {
-    setStatus(status);
-    setFuncsSub(ModalConstants.APPLICATION_KEYS.handleApplication);
-    handleOpenSub();
+    SwalHelper.Confirm(
+      "Bạn có muốn chuyển sang trạng thái này không?",
+      "question",
+      () => {
+        context.handleOpenLoading();
+        applicationsService
+          .updateStatus(id, status)
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              SwalHelper.MiniAlert("Chuyển trạng thái thành công!", "success");
+              fetchData();
+              fetchListData();
+            } else {
+              SwalHelper.MiniAlert(res.data.Message, "error");
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
+      },
+      () => {}
+    );
   };
 
-  const _onClickCreateStepSchedule = (id: string) => {
-    setStepId(id);
-    setFuncsSub(ModalConstants.APPLICATION_KEYS.createStepSchedule);
+  const _onClickCreateSchedule = () => {
+    setSubId(id);
+    setFuncsSub(ModalConstants.APPLICATION_KEYS.createSchedule);
     handleOpenSub();
   };
-  const _onClickDetailStepSchedule = (id: string) => {
-    setStepId(id);
-    setFuncsSub(ModalConstants.APPLICATION_KEYS.detailStepSchedule);
+  const _onClickScheduleDetail = (id: string) => {
+    setSubId(id);
+    setFuncsSub(ModalConstants.APPLICATION_KEYS.detailSchedule);
     handleOpenSub();
+  };
+  const _onClickScheduleDelete = (id: string) => {
+    SwalHelper.Confirm(
+      "Xác nhận xóa lịch hẹn?",
+      "question",
+      () => {
+        context.handleOpenLoading();
+        applicationsService
+          .deleteSchedule(id)
+          .then((res) => {
+            if (res.status === 200 && res.data.Status === 200) {
+              fetchData();
+              SwalHelper.MiniAlert(res.data.Message, "success");
+            } else {
+              SwalHelper.MiniAlert(res.data.Message, "error");
+            }
+          })
+          .catch(() => {
+            SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
+          })
+          .finally(() => {
+            context.handleCloseLoading();
+          });
+      },
+      () => {}
+    );
   };
 
   const connect = () => {
@@ -332,26 +352,21 @@ const ApplicationDetail = (props: any) => {
     setMessages((prevMessages: any) => [...prevMessages, payloadData]);
   };
 
-  const [type, setType] = useState<boolean>(true);
-
-  const _onClickChat = () => {
-    setType(true);
+  const _onClickJob = () => {
+    setFuncsSub(ModalConstants.JOB_KEYS.detailJob);
+    handleOpenSub();
   };
-  const _onClickApplication = () => {
-    setType(false);
-  };
-
   return (
     <>
       <ModalBase
-        id={id}
-        stepId={stepId}
+        id={application?.job?.id}
+        subId={subId}
         fetchData={fetchData}
         open={openSub}
         handleClose={handleCloseSub}
         funcs={funcsSub}
-        _onClickUpDateStep={_onClickUpDateStep}
         status={status}
+        type={false}
       />
       <div className="w-screen bg-white relative rounded lg:w-[75%]">
         <div className="flex justify-between gap-4 px-4 py-3 text-white border-b bg-orangetext rounded-t">
@@ -374,9 +389,14 @@ const ApplicationDetail = (props: any) => {
           >
             <div className="content-center flex flex-col gap-2">
               <div className="content-center w-full">
-                <label className="font-medium tracking-wide text-base uppercase">
-                  Ứng tuyển vị trí&nbsp;
-                  {application?.job?.name}
+                <label className="font-medium tracking-wide text-base ">
+                  Ứng tuyển vị trí:&nbsp;
+                  <a
+                    className="hover:text-bgBlue cursor-pointer uppercase"
+                    onClick={_onClickJob}
+                  >
+                    {application?.job?.name}
+                  </a>
                 </label>
               </div>
             </div>
@@ -443,9 +463,23 @@ const ApplicationDetail = (props: any) => {
             </div>
 
             <div className="content-center">
-              <label className="font-medium tracking-wide text-base">
-                Quá trình ứng tuyển:&nbsp;
-              </label>
+              <div className="flex gap-3 justify-between">
+                <label className="font-medium tracking-wide text-base">
+                  Danh sách lịch hẹn:&nbsp;
+                </label>
+                {AuthHelper.isCandidate() ? (
+                  <div></div>
+                ) : (
+                  <button
+                    className="text-2xl text-orangetext hover:text-orangetext/85 cursor-pointer"
+                    onClick={_onClickCreateSchedule}
+                    data-tooltip-id="tooltip"
+                    data-tooltip-content="Thêm lịch hẹn"
+                  >
+                    <IoIosAddCircle className="text-2xl" />
+                  </button>
+                )}
+              </div>
 
               <table className="border-collapse w-full mt-1 text-sm">
                 <thead>
@@ -455,16 +489,13 @@ const ApplicationDetail = (props: any) => {
                     </th>
 
                     <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell">
-                      Tên bước
+                      Tiêu đề
                     </th>
                     <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell">
-                      Lịch hẹn
-                    </th>
-                    <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell w-[10%]">
-                      Kết quả
+                      Bắt đầu vào
                     </th>
                     <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell">
-                      Đánh giá
+                      Kết thúc lúc
                     </th>
 
                     <th className="px-1 py-1.5 font-semibold bg-gray-100 text-gray-600 border border-borderColor table-cell w-[10%]"></th>
@@ -472,24 +503,28 @@ const ApplicationDetail = (props: any) => {
                 </thead>
 
                 <tbody>
-                  {steps?.map((item: StepModel, index: number) => (
-                    <StepItem
-                      index={index}
-                      item={item}
-                      stepResult={
-                        application?.stepResults?.find(
-                          (item1: any) => item1?.stepNumber == item?.number
-                        ) || null
-                      }
-                      stepSchedule={
-                        application?.stepSchedules?.find(
-                          (item1: any) => item1?.stepNumber == item?.number
-                        ) || null
-                      }
-                      _onClickCreateStepSchedule={_onClickCreateStepSchedule}
-                      _onClickDetailStepSchedule={_onClickDetailStepSchedule}
-                    />
-                  ))}
+                  {schedules?.length < 1 ? (
+                    <tr className="bg-white border">
+                      <td className="py-3 whitespace-no-wrap" colSpan={5}>
+                        <div className="flex items-center justify-center w-full h-full">
+                          <div className="flex justify-center items-center text-sm text-gray-700">
+                            <div>Chưa có lịch hẹn nào!!!</div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    <>
+                      {schedules?.map((item: ScheduleModel, index: number) => (
+                        <StepItem
+                          index={index}
+                          item={item}
+                          _onClickScheduleDetail={_onClickScheduleDetail}
+                          _onClickScheduleDelete={_onClickScheduleDelete}
+                        />
+                      ))}
+                    </>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -517,7 +552,7 @@ const ApplicationDetail = (props: any) => {
           </div>
         </div>
 
-        <div className="flex justify-between gap-4 px-4 py-3 border-t  ">
+        <div className="flex justify-between gap-2 px-4 py-3 border-t  ">
           <div className="flex gap-4">
             {type ? (
               <button
@@ -536,48 +571,86 @@ const ApplicationDetail = (props: any) => {
                   setType(true);
                 }}
               >
-                <AiFillMessage className="text-lg" />
-                <p>Đơn ứng tuyển</p>
+                <IoMdInformationCircleOutline className="text-lg" />
+                <p>Thông tin</p>
               </button>
             )}
           </div>
           <div className="flex gap-4">
-            {(AuthHelper.isHR() || AuthHelper.isEmployer()) &&
-              application?.status != DataConstants.STATUS_DATA.APPROVED &&
-              application?.status != DataConstants.STATUS_DATA.REJECTED && (
-                <>
-                  <button
-                    className="flex items-center gap-2 w-max h-max px-4 py-2 bg-red-500 text-white rounded hover:bg-red-500/90 font-medium"
-                    onClick={() => _onClick(DataConstants.STATUS_DATA.REJECTED)}
+            <div className="relative" ref={menuRef}>
+              <button className="flex items-center gap-2 w-max h-max px-4 py-2  text-gray-700 bg-white border-2 border-borderColor rounded">
+                Trạng thái:{" "}
+                {application?.status == DataConstants.STATUS_DATA.PROCESSING ? (
+                  <p className="text-[#0000FF] font-medium">Đang phỏng vấn</p>
+                ) : application?.status ==
+                  DataConstants.STATUS_DATA.APPROVED ? (
+                  <p className="text-[#169C46] font-medium">Thành công</p>
+                ) : application?.status ==
+                  DataConstants.STATUS_DATA.REJECTED ? (
+                  <p className="text-[#FF0000] font-medium">Thất bại</p>
+                ) : application?.status == DataConstants.STATUS_DATA.PENDING ? (
+                  <p className="text-[#FFC300] font-medium">Chờ xét duyệt</p>
+                ) : (
+                  <></>
+                )}
+                {(AuthHelper.isHR() || AuthHelper.isEmployer()) && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5 ml-2 -mr-1"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
                   >
-                    <AiFillCloseCircle className="text-lg" />
-                    <p>Không duyệt</p>
-                  </button>
-                  {application?.currentStep == steps.length - 1 && (
-                    <button
-                      className="flex items-center gap-2 w-max h-max px-4 py-2 bg-green-500 text-white rounded hover:bg-green-500/90 font-medium"
-                      onClick={() =>
-                        _onClick(DataConstants.STATUS_DATA.APPROVED)
-                      }
-                    >
-                      <AiFillCheckCircle className="text-lg" />
-                      <p>Duyệt</p>
-                    </button>
-                  )}
-                  {application?.currentStep != steps.length - 1 && (
-                    <button
-                      className="flex items-center gap-2 w-max h-max px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-500/90 font-medium "
-                      onClick={() =>
-                        _onClick(DataConstants.STATUS_DATA.PROCESSING)
-                      }
-                    >
-                      <MdSkipNext className="text-xl" />
-                      <p>Chuyển bước</p>
-                    </button>
-                  )}
+                    <path
+                      fill-rule="evenodd"
+                      d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                )}
+              </button>
+              {(AuthHelper.isHR() || AuthHelper.isEmployer()) && openMenu && (
+                <>
+                  <div className="origin-top-right absolute right-0 bottom-[105%] mt-2 w-48 rounded bg-white ring-1 ring-black ring-opacity-5 border border-borderColor">
+                    <div className="py-2 p-2 ">
+                      {application?.status !=
+                        DataConstants.STATUS_DATA.PROCESSING && (
+                        <a
+                          className="flex rounded-md px-4 py-2 text-base text-gray-700 hover:bg-blue-100 active:bg-blue-100/70 cursor-pointer text-center"
+                          onClick={() => {
+                            _onClick(DataConstants.STATUS_DATA.PROCESSING);
+                          }}
+                        >
+                          Đang phỏng vấn
+                        </a>
+                      )}
+                      {application?.status !=
+                        DataConstants.STATUS_DATA.APPROVED && (
+                        <a
+                          className="flex rounded-md px-4 py-2 text-base text-gray-700 hover:bg-green-100 active:bg-green-100/70 cursor-pointer text-center"
+                          onClick={() => {
+                            _onClick(DataConstants.STATUS_DATA.APPROVED);
+                          }}
+                        >
+                          Thành công
+                        </a>
+                      )}
+                      {application?.status !=
+                        DataConstants.STATUS_DATA.REJECTED && (
+                        <a
+                          className="flex rounded-md px-4 py-2 text-base text-gray-700 hover:bg-red-100 active:bg-red-100/70 cursor-pointer text-center"
+                          onClick={() => {
+                            _onClick(DataConstants.STATUS_DATA.REJECTED);
+                          }}
+                        >
+                          Thất bại
+                        </a>
+                      )}
+                    </div>
+                  </div>
                 </>
               )}
-
+            </div>
             <button
               className="flex items-center gap-2 w-max h-max px-4 py-2 bg-slate-300 text-white rounded hover:bg-slate-300/90 font-medium max-lg:hidden"
               onClick={handleClose}

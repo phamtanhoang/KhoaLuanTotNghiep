@@ -1,14 +1,11 @@
 package com.pth.taskbackend.controller;
 
 
-import com.pth.taskbackend.dto.request.MessageRequest;
 import com.pth.taskbackend.dto.response.BaseResponse;
-
-import com.pth.taskbackend.dto.response.JobResponse;
 import com.pth.taskbackend.dto.response.MessageResponse;
 import com.pth.taskbackend.enums.EApplyStatus;
-
 import com.pth.taskbackend.enums.ERole;
+import com.pth.taskbackend.enums.EStatus;
 import com.pth.taskbackend.model.meta.*;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
@@ -24,23 +21,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
@@ -75,42 +67,48 @@ public class ChatController {
     private SimpMessagingTemplate messagingTemplate;
 
     @GetMapping("/{applicationId}")
-    public ResponseEntity<BaseResponse> getChatMessages(@RequestHeader("Authorization")String token, @PathVariable String applicationId, Pageable pageable) throws IOException {
+    public ResponseEntity<BaseResponse> getChatMessages(@RequestHeader("Authorization") String token, @PathVariable String applicationId, Pageable pageable) throws IOException {
         try {
             String username = jwtService.extractUsername(token.substring(7));
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) ||
+                    checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR) ||
+                    checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            }
             Optional<User> userOptional = userRepository.findByEmail(username);
-            if (userOptional.isEmpty())  {
+            if (userOptional.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
             User user = userOptional.get();
 
-            Optional<Application> applicationOptional  =applicationService.findById(applicationId);
-            if (applicationOptional.isEmpty())  {
+            Optional<Application> applicationOptional = applicationService.findById(applicationId);
+            if (applicationOptional.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy đơn tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
             Application application = applicationOptional.get();
-            if(Objects.equals(user.getId(), application.getCandidate().getUser().getId())
+            if (Objects.equals(user.getId(), application.getCandidate().getUser().getId())
                     || Objects.equals(user.getId(), application.getJob().getHumanResource().getUser().getId())
-                    || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())){
-                if(application.getStatus()!= EApplyStatus.DELETED) {
+                    || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())) {
+                if (application.getStatus() != EApplyStatus.DELETED) {
 
                     Page<Message> messages = chatService.findByApplication(applicationId, pageable);
                     List<MessageResponse> messagesResponses = messages.getContent().stream().map(message -> {
 
-                        String userName ="";
-                        String avatar ="";
+                        String userName = "";
+                        String avatar = "";
 
-                        if(message.getUser().getRole()== ERole.CANDIDATE) {
+                        if (message.getUser().getRole() == ERole.CANDIDATE) {
 
                             try {
                                 Optional<Candidate> candidateOptional = candidateService.findByUserEmail(message.getUser().getEmail());
-                                if(candidateOptional.isPresent()){
-                                    userName=candidateOptional.get().getFirstName()+" "+candidateOptional.get().getLastName();
-                                    avatar=candidateOptional.get().getAvatar();
+                                if (candidateOptional.isPresent()) {
+                                    userName = candidateOptional.get().getFirstName() + " " + candidateOptional.get().getLastName();
+                                    avatar = candidateOptional.get().getAvatar();
                                 }
 
                             } catch (IOException e) {
@@ -118,21 +116,21 @@ public class ChatController {
                             }
 
 
-                        }else if(message.getUser().getRole() == ERole.EMPLOYER) {
+                        } else if (message.getUser().getRole() == ERole.EMPLOYER) {
 
-                                Optional<Employer> employerOptional = employerService.findByUserEmail(message.getUser().getEmail());
-                                if(employerOptional.isPresent()){
-                                    userName=employerOptional.get().getName();
-                                    avatar=employerOptional.get().getImage();
-                                }
+                            Optional<Employer> employerOptional = employerService.findByUserEmail(message.getUser().getEmail());
+                            if (employerOptional.isPresent()) {
+                                userName = employerOptional.get().getName();
+                                avatar = employerOptional.get().getImage();
+                            }
 
 
-                        }else{
+                        } else {
 
                             Optional<HumanResource> humanResourceOptional = humanResourceService.findByEmail(message.getUser().getEmail());
-                            if(humanResourceOptional.isPresent()){
-                                userName=humanResourceOptional.get().getFirstName()+" "+humanResourceOptional.get().getLastName();
-                                avatar=humanResourceOptional.get().getAvatar();
+                            if (humanResourceOptional.isPresent()) {
+                                userName = humanResourceOptional.get().getFirstName() + " " + humanResourceOptional.get().getLastName();
+                                avatar = humanResourceOptional.get().getAvatar();
                             }
 
                         }
@@ -151,7 +149,7 @@ public class ChatController {
                     return ResponseEntity.ok(
                             new BaseResponse("Danh sách tin nhắn", HttpStatus.OK.value(), messagesResponses)
                     );
-                }else{
+                } else {
                     return ResponseEntity.ok(
                             new BaseResponse("Đơn ứng tuyển chưa được duyệt!", HttpStatus.BAD_REQUEST.value(), null)
                     );
@@ -168,32 +166,39 @@ public class ChatController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
     @PostMapping("/{applicationId}/sendMessage")
-    public ResponseEntity<BaseResponse> sendMessage(@RequestHeader("Authorization")String token,
+    public ResponseEntity<BaseResponse> sendMessage(@RequestHeader("Authorization") String token,
                                                     @PathVariable String applicationId,
                                                     @RequestParam(required = false) MultipartFile file,
                                                     @RequestParam(required = false) String content) throws IOException {
         try {
             String username = jwtService.extractUsername(token.substring(7));
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) ||
+                    checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR) ||
+                    checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            }
             Optional<User> userOptional = userRepository.findByEmail(username);
-            if (userOptional.isEmpty())  {
+            if (userOptional.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
             User user = userOptional.get();
 
-            Optional<Application> applicationOptional  =applicationService.findById(applicationId);
-            if (applicationOptional.isEmpty())  {
+            Optional<Application> applicationOptional = applicationService.findById(applicationId);
+            if (applicationOptional.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy đơn tuyển dụng!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
             Application application = applicationOptional.get();
-            if(Objects.equals(user.getId(), application.getCandidate().getUser().getId())
+            if (Objects.equals(user.getId(), application.getCandidate().getUser().getId())
                     || Objects.equals(user.getId(), application.getJob().getHumanResource().getUser().getId())
-                    || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())){
-                if(application.getStatus()!= EApplyStatus.DELETED) {
+                    || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())) {
+                if (application.getStatus() != EApplyStatus.DELETED) {
 
                     if ((content == null || content.isBlank()) && (file == null || file.isEmpty())) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -206,18 +211,18 @@ public class ChatController {
                         path = fileUploadFunc.getFullImagePath(fileUploadFunc.uploadImage(file));
                     }
 
-                    Message message = chatService.sendMessage(content,path,application, user);
+                    Message message = chatService.sendMessage(content, path, application, user);
 
-                    String userName ="";
-                    String avatar ="";
+                    String userName = "";
+                    String avatar = "";
 
-                    if(message.getUser().getRole()== ERole.CANDIDATE) {
+                    if (message.getUser().getRole() == ERole.CANDIDATE) {
 
                         try {
                             Optional<Candidate> candidateOptional = candidateService.findByUserEmail(message.getUser().getEmail());
-                            if(candidateOptional.isPresent()){
-                                userName=candidateOptional.get().getFirstName()+" "+candidateOptional.get().getLastName();
-                                avatar=candidateOptional.get().getAvatar();
+                            if (candidateOptional.isPresent()) {
+                                userName = candidateOptional.get().getFirstName() + " " + candidateOptional.get().getLastName();
+                                avatar = candidateOptional.get().getAvatar();
                             }
 
                         } catch (IOException e) {
@@ -225,21 +230,21 @@ public class ChatController {
                         }
 
 
-                    }else if(message.getUser().getRole() == ERole.EMPLOYER) {
+                    } else if (message.getUser().getRole() == ERole.EMPLOYER) {
 
                         Optional<Employer> employerOptional = employerService.findByUserEmail(message.getUser().getEmail());
-                        if(employerOptional.isPresent()){
-                            userName=employerOptional.get().getName();
-                            avatar=employerOptional.get().getImage();
+                        if (employerOptional.isPresent()) {
+                            userName = employerOptional.get().getName();
+                            avatar = employerOptional.get().getImage();
                         }
 
 
-                    }else{
+                    } else {
 
                         Optional<HumanResource> humanResourceOptional = humanResourceService.findByEmail(message.getUser().getEmail());
-                        if(humanResourceOptional.isPresent()){
-                            userName=humanResourceOptional.get().getFirstName()+" "+humanResourceOptional.get().getLastName();
-                            avatar=humanResourceOptional.get().getAvatar();
+                        if (humanResourceOptional.isPresent()) {
+                            userName = humanResourceOptional.get().getFirstName() + " " + humanResourceOptional.get().getLastName();
+                            avatar = humanResourceOptional.get().getAvatar();
                         }
 
                     }
@@ -258,7 +263,7 @@ public class ChatController {
                     return ResponseEntity.ok(
                             new BaseResponse("Gửi tin nhắn thành công", HttpStatus.OK.value(), messageResponse)
                     );
-                }else{
+                } else {
                     return ResponseEntity.ok(
                             new BaseResponse("Đơn ứng tuyển chưa được duyệt!", HttpStatus.BAD_REQUEST.value(), null)
                     );

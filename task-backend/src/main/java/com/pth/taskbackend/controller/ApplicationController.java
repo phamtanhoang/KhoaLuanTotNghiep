@@ -1,17 +1,14 @@
 package com.pth.taskbackend.controller;
-import com.fasterxml.jackson.core.type.TypeReference;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pth.taskbackend.dto.request.ApplicationRequest;
-import com.pth.taskbackend.dto.request.StepResultRequest;
-import com.pth.taskbackend.dto.request.StepScheduleRequest;
+import com.pth.taskbackend.dto.request.ScheduleRequest;
+import com.pth.taskbackend.dto.request.UpdateStatusApplicationRequest;
 import com.pth.taskbackend.dto.response.*;
 import com.pth.taskbackend.enums.EApplyStatus;
 import com.pth.taskbackend.enums.ERole;
 import com.pth.taskbackend.enums.EStatus;
-import com.pth.taskbackend.enums.EStepStatus;
 import com.pth.taskbackend.model.meta.*;
 import com.pth.taskbackend.repository.ApplicationRepository;
-import com.pth.taskbackend.repository.StepScheduleRepository;
 import com.pth.taskbackend.repository.UserRepository;
 import com.pth.taskbackend.security.JwtService;
 import com.pth.taskbackend.service.*;
@@ -24,14 +21,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,13 +33,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static com.pth.taskbackend.util.constant.PathConstant.BASE_URL;
 
@@ -81,9 +73,7 @@ public class ApplicationController {
     @Autowired
     VipEmployerService vipEmployerService;
     @Autowired
-    StepScheduleService stepScheduleService;
-    @Autowired
-    StepResultService stepResultService;
+    ScheduleService scheduleService;
 
     @Autowired
     private MailService mailService;
@@ -135,10 +125,14 @@ public class ApplicationController {
                 return ResponseEntity.ok(
                         new BaseResponse("Đã ứng tuyển vào công việc này!!!", HttpStatus.BAD_REQUEST.value(), null)
                 );
-
-            mailService.sendEmail(optionalCandidate.get().getUser().getEmail(), optionalCandidate.get().getUser().getEmail(),
-                    "Ban đã nộp ứng tuyển thành công vị trí "+job.getName()+" của "+job.getHumanResource().getEmployer().getName(),"EMAIL_TEMPLATE");
-
+            CompletableFuture.runAsync(() -> {
+                try {
+                    mailService.sendEmail(optionalCandidate.get().getUser().getEmail(), optionalCandidate.get().getUser().getEmail(),
+                            "Ban đã nộp ứng tuyển thành công vị trí " + job.getName() + " của " + job.getHumanResource().getEmployer().getName(), "EMAIL_TEMPLATE");
+                } catch (MessagingException e) {
+                    System.out.println("Failed to send email to: " + optionalCandidate.get().getUser().getEmail());
+                }
+            });
 
             Application application = new Application();
 
@@ -153,17 +147,13 @@ public class ApplicationController {
             application.setStatus(EApplyStatus.PENDING);
             application.setJob(job);
             application.setFullName(fullName);
-            application.setCurrentStep(0);
             applicationService.create(application);
-
 
 
             return ResponseEntity.ok(
                     new BaseResponse("Ứng tuyển công việc thành công", HttpStatus.OK.value(), null)
             );
 
-        } catch(MessagingException e){
-            return ResponseEntity.ok(new BaseResponse("Tên mail không hợp lệ!", 500, null));
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
@@ -173,6 +163,7 @@ public class ApplicationController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
+
     @PostMapping("/applyWithLink/{id}")
     public ResponseEntity<BaseResponse> applyJobWithOldCV(
             @RequestHeader("Authorization") String token,
@@ -211,10 +202,14 @@ public class ApplicationController {
                 return ResponseEntity.ok(
                         new BaseResponse("Đã ứng tuyển vào công việc này!", HttpStatus.BAD_REQUEST.value(), null)
                 );
-
-            mailService.sendEmail(optionalCandidate.get().getUser().getEmail(), optionalCandidate.get().getUser().getEmail(),
-                    "Ban đã nộp ứng tuyển thành công vị trí "+job.getName()+" của "+job.getHumanResource().getEmployer().getName(),"EMAIL_TEMPLATE");
-
+            CompletableFuture.runAsync(() -> {
+                try {
+                    mailService.sendEmail(optionalCandidate.get().getUser().getEmail(), optionalCandidate.get().getUser().getEmail(),
+                            "Ban đã nộp ứng tuyển thành công vị trí " + job.getName() + " của " + job.getHumanResource().getEmployer().getName(), "EMAIL_TEMPLATE");
+                } catch (MessagingException e) {
+                    System.out.println("Failed to send email to: " + optionalCandidate.get().getUser().getEmail());
+                }
+            });
 
             Application application = new Application();
 
@@ -226,7 +221,6 @@ public class ApplicationController {
             application.setStatus(EApplyStatus.PENDING);
             application.setJob(job);
             application.setFullName(fullName);
-            application.setCurrentStep(0);
             applicationService.create(application);
 
 
@@ -234,8 +228,6 @@ public class ApplicationController {
                     new BaseResponse("Ứng tuyển công việc thành công", HttpStatus.OK.value(), null)
             );
 
-        } catch(MessagingException e){
-            return ResponseEntity.ok(new BaseResponse("Tên mail không hợp lệ!", 500, null));
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
@@ -330,13 +322,12 @@ public class ApplicationController {
                         application.getId(),
                         application.getCreated(),
                         application.getCV(),
-                        application.getCurrentStep(),
                         application.getEmail(),
                         application.getFullName(),
                         application.getLetter(),
                         application.getPhoneNumber(),
                         application.getStatus(),
-                        candidateResponse,jobResponse
+                        candidateResponse, jobResponse
                 );
             });
 
@@ -365,7 +356,6 @@ public class ApplicationController {
             if (!hasPermission) {
                 return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
             }
-
 
             Optional<User> optionalUser = userRepository.findByEmail(email);
             if (optionalUser.isEmpty()) {
@@ -413,7 +403,7 @@ public class ApplicationController {
                         application.getCandidate().getUser().getStatus(),
                         application.getCandidate().getUser().getEmail(),
                         application.getCandidate().getUser().getId()
-                        );
+                );
                 JobResponse jobResponse = new JobResponse(
                         application.getJob().getId(),
                         application.getJob().getCreated(),
@@ -440,13 +430,12 @@ public class ApplicationController {
                         application.getId(),
                         application.getCreated(),
                         application.getCV(),
-                        application.getCurrentStep(),
                         application.getEmail(),
                         application.getFullName(),
                         application.getLetter(),
                         application.getPhoneNumber(),
                         application.getStatus(),
-                        candidateResponse,jobResponse
+                        candidateResponse, jobResponse
                 );
                 return response;
             });
@@ -481,27 +470,27 @@ public class ApplicationController {
             if (optionalCandidate.isEmpty()) {
                 return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null));
             }
-            Page<Application> applications = applicationService.findByCandidateIdAndNameContainingAndLocationContainingAndStatus(optionalCandidate.get().getId(), status,title,location, pageable);
+            Page<Application> applications = applicationService.findByCandidateIdAndNameContainingAndLocationContainingAndStatus(optionalCandidate.get().getId(), status, title, location, pageable);
             if (applications.isEmpty())
                 return ResponseEntity.ok(new BaseResponse("Bạn chưa ứng tuyển công việc nào", HttpStatus.OK.value(), null));
 
             Page<ApplicationResponse> responseList = applications.map(application -> {
-                JobEmployerResponse employerResponse= new JobEmployerResponse(
+                JobEmployerResponse employerResponse = new JobEmployerResponse(
                         application.getJob().getHumanResource().getEmployer().getName(),
                         application.getJob().getHumanResource().getEmployer().getId(),
                         application.getJob().getHumanResource().getEmployer().getUser().getEmail(),
                         application.getJob().getHumanResource().getEmployer().getImage(),
                         application.getJob().getHumanResource().getEmployer().getPhoneNumber()
-                        );
+                );
 
 
                 JobCategoryResponse categoryResponse;
-                if(application.getJob().getCategory()==null){
-                    categoryResponse=null;
-                }else{
-                    categoryResponse=new JobCategoryResponse(
-                        application.getJob().getCategory().getId(),
-                        application.getJob().getCategory().getName()
+                if (application.getJob().getCategory() == null) {
+                    categoryResponse = null;
+                } else {
+                    categoryResponse = new JobCategoryResponse(
+                            application.getJob().getCategory().getId(),
+                            application.getJob().getCategory().getName()
                     );
                 }
                 JobResponse jobResponse = new JobResponse(
@@ -530,13 +519,12 @@ public class ApplicationController {
                         application.getId(),
                         application.getCreated(),
                         application.getCV(),
-                        application.getCurrentStep(),
                         application.getEmail(),
                         application.getFullName(),
                         application.getLetter(),
                         application.getPhoneNumber(),
                         application.getStatus(),
-                        null,jobResponse
+                        null, jobResponse
                 );
                 return response;
             });
@@ -576,49 +564,6 @@ public class ApplicationController {
                         new BaseResponse("Không tìm thấy đơn xin việc", HttpStatus.NOT_FOUND.value(), null)
                 );
             Application application = optionalApplication.get();
-            CandidateResponse candidateResponse = new CandidateResponse(
-                    application.getCandidate().getId(),
-                    application.getCandidate().getCreated(),
-                    application.getCandidate().getUpdated(),
-                    application.getCandidate().getFirstName(),
-                    application.getCandidate().getLastName(),
-                    application.getCandidate().getPhoneNumber(),
-                    application.getCandidate().getSex(),
-                    application.getCandidate().getAvatar(),
-                    application.getCandidate().getDateOfBirth(),
-                    application.getCandidate().getIntroduction(),
-                    application.getCandidate().getJob(),
-                    application.getCandidate().getLink(),
-                    application.getCandidate().getIsFindJob(),
-                    application.getCandidate().getUser().getStatus(),
-                    application.getCandidate().getUser().getEmail(),
-                    application.getCandidate().getUser().getId()
-            );
-
-            List<StepResponse> stepResponses;
-            if (application.getJob().getProcess() != null) {
-                Page<Step> steps = stepService.findByProcessId(application.getJob().getProcess().getId(), Pageable.unpaged());
-
-                List<Step> stepList = steps.getContent();
-
-                stepResponses = stepList.stream()
-                        .map(step -> new StepResponse(
-                                step.getId(),
-                                step.getName(),
-                                step.getNumber(),
-                                step.getDescription(),
-                                step.getProcess() != null ? step.getProcess().getId() : null
-                        ))
-                        .collect(Collectors.toList());
-                stepResponses.sort(Comparator.comparingInt(StepResponse::number));
-            } else {
-                stepResponses = Collections.emptyList();
-            }
-            JobProcessResponse processResponse =new JobProcessResponse(
-                    application.getJob().getProcess().getId(),
-                    application.getJob().getProcess().getDescription(),
-                    stepResponses
-            );
 
             JobResponse jobResponse = new JobResponse(
                     application.getJob().getId(),
@@ -632,31 +577,30 @@ public class ApplicationController {
                     application.getJob().getToSalary(),
                     application.getJob().getLocation(),
                     application.getJob().getStatus(),
-                    vipEmployerService.isVip(application.getJob().getHumanResource().getEmployer().getId()),
-                    optionalCandidate.filter(value -> jobService.findByCandidateIdAndJobId(value.getId(), application.getJob().getId()).isPresent()).isPresent(),
+                    false,
+                    false,
                     DateFunc.isExpired(application.getJob().getToDate()),
-                    true,
+                    false,
                     null,
                     null,
                     null,
-                    processResponse,
+                    null,
                     null
             );
+
 
             ApplicationDetailResponse response = new ApplicationDetailResponse(
                     application.getId(),
                     application.getCreated(),
                     application.getCV(),
-                    application.getCurrentStep(),
                     application.getEmail(),
                     application.getFullName(),
                     application.getLetter(),
                     application.getPhoneNumber(),
                     application.getStatus(),
-                    candidateResponse,
+                    null,
                     jobResponse,
-                    stepResultService.findByApplicationId(application.getId()),
-                    stepScheduleService.findByApplicationId(application.getId())
+                    scheduleService.findByApplicationId(application.getId())
             );
             return ResponseEntity.ok(
                     new BaseResponse("Chi tiết đơn ứng tuyển", HttpStatus.OK.value(), response)
@@ -678,18 +622,15 @@ public class ApplicationController {
     ) {
         try {
             String email = jwtService.extractUsername(token.substring(7));
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
-            if (!permission) {
-                return ResponseEntity.ok(
-                        new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null)
-                );
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) ||
+                    checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
             }
 
             Optional<User> optionalUser = userRepository.findByEmail(email);
             if (optionalUser.isEmpty()) {
-                return ResponseEntity.ok(
-                        new BaseResponse("Không tìm người dùng", HttpStatus.NOT_FOUND.value(), null)
-                );
+                return ResponseEntity.ok(new BaseResponse("Không tìm thấy nhà tuyển dụng", HttpStatus.NOT_FOUND.value(), null));
             }
 
             Application application;
@@ -753,30 +694,6 @@ public class ApplicationController {
                     application.getCandidate().getUser().getId()
             );
 
-            List<StepResponse> stepResponses;
-            if (application.getJob().getProcess() != null) {
-                Page<Step> steps = stepService.findByProcessId(application.getJob().getProcess().getId(), Pageable.unpaged());
-
-                List<Step> stepList = steps.getContent();
-                stepResponses = stepList.stream()
-                        .map(step -> new StepResponse(
-                                step.getId(),
-                                step.getName(),
-                                step.getNumber(),
-                                step.getDescription(),
-                                step.getProcess() != null ? step.getProcess().getId() : null
-                        ))
-                        .collect(Collectors.toList());
-                stepResponses.sort(Comparator.comparingInt(StepResponse::number));
-            } else {
-                stepResponses = Collections.emptyList();
-            }
-            JobProcessResponse processResponse =new JobProcessResponse(
-                    application.getJob().getProcess().getId(),
-                    application.getJob().getProcess().getDescription(),
-                    stepResponses
-            );
-
             JobResponse jobResponse = new JobResponse(
                     application.getJob().getId(),
                     application.getJob().getCreated(),
@@ -796,7 +713,7 @@ public class ApplicationController {
                     null,
                     null,
                     null,
-                    processResponse,
+                    null,
                     null
             );
 
@@ -805,7 +722,6 @@ public class ApplicationController {
                     application.getId(),
                     application.getCreated(),
                     application.getCV(),
-                    application.getCurrentStep(),
                     application.getEmail(),
                     application.getFullName(),
                     application.getLetter(),
@@ -813,8 +729,7 @@ public class ApplicationController {
                     application.getStatus(),
                     candidateResponse,
                     jobResponse,
-                    stepResultService.findByApplicationId(application.getId()),
-                    stepScheduleService.findByApplicationId(application.getId())
+                    scheduleService.findByApplicationId(application.getId())
             );
             return ResponseEntity.ok(
                     new BaseResponse("Chi tiết đơn ứng tuyển", HttpStatus.OK.value(), response)
@@ -1010,14 +925,12 @@ public class ApplicationController {
                     application.getId(),
                     application.getCreated(),
                     application.getCV(),
-                    application.getCurrentStep(),
-
                     application.getEmail(),
                     application.getFullName(),
                     application.getLetter(),
                     application.getPhoneNumber(),
                     application.getStatus(),
-                    null,null
+                    null, null
             ));
             return ResponseEntity.ok(new BaseResponse("Danh sách đơn xin việc của ứng viên", HttpStatus.OK.value(), candidateApplications));
 
@@ -1124,18 +1037,21 @@ public class ApplicationController {
     @PatchMapping("/updateStatus/{id}")
     public ResponseEntity<BaseResponse> updateApplicationStatus(@RequestHeader("Authorization") String token,
                                                                 @PathVariable("id") String id,
-                                                                @RequestBody StepResultRequest stepResultRequest) {
+                                                                @RequestBody UpdateStatusApplicationRequest updateStatusApplicationRequest) {
         try {
-            EApplyStatus statusEnum=stepResultRequest.status();
-            String result=stepResultRequest.result();
+            EApplyStatus statusEnum = updateStatusApplicationRequest.status();
 
             String email = jwtService.extractUsername(token.substring(7));
-
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) ||
+                    checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            }
 
             Optional<User> userOptional = userRepository.findByEmail(email);
             if (userOptional.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
             User user = userOptional.get();
@@ -1160,114 +1076,36 @@ public class ApplicationController {
                             new BaseResponse("Đơn ứng tuyển đã bị xóa!", HttpStatus.FORBIDDEN.value(), null)
                     );
                 }
-                if (application.getStatus() == EApplyStatus.APPROVED) {
-                    return ResponseEntity.ok(
-                            new BaseResponse("Đơn ứng tuyển đã được duyệt!", HttpStatus.FORBIDDEN.value(), null)
-                    );
-                }
-                if (application.getStatus() == EApplyStatus.REJECTED) {
-                    return ResponseEntity.ok(
-                            new BaseResponse("Đơn ứng tuyển đã bị từ chối!", HttpStatus.FORBIDDEN.value(), null)
-                    );
-                }
-
-                int totalStep = Math.toIntExact(stepService.countAllByProcessId(application.getJob().getProcess().getId()));
-                int currentStep = application.getCurrentStep();
-                if(statusEnum==EApplyStatus.PROCESSING)
-                    mailService.sendEmail(application.getCandidate().getUser().getEmail(), application.getCandidate().getUser().getEmail(),
-                            "Đơn ứng tuyển vị trí "+application.getJob().getName()+" của bạn đã được chuyển bước!","EMAIL_TEMPLATE");
-                if(statusEnum==EApplyStatus.APPROVED)
-                    mailService.sendEmail(application.getCandidate().getUser().getEmail(), application.getCandidate().getUser().getEmail(),
-                            "Đơn ứng tuyển vị trí "+application.getJob().getName()+" của bạn đã được duyệt!","EMAIL_TEMPLATE");
-                if(statusEnum==EApplyStatus.REJECTED)
-                    mailService.sendEmail(application.getCandidate().getUser().getEmail(), application.getCandidate().getUser().getEmail(),
-                            "Đơn ứng tuyển vị trí "+application.getJob().getName()+" của bạn đã không được duyệt!","EMAIL_TEMPLATE");
-
-                if (currentStep == 0) {
-
-                    if (currentStep == totalStep - 1) {
-                        if (statusEnum != EApplyStatus.REJECTED && statusEnum != EApplyStatus.APPROVED) {
-                            return ResponseEntity.ok(
-                                    new BaseResponse("Trạng thái không hợp lệ!", HttpStatus.FORBIDDEN.value(), application)
-                            );
-                        }
-                        System.out.println("so 1");
-                        application.setStatus(statusEnum);
-                        applicationRepository.save(application);
-
-                        stepResultService.create(
-                                result,
-                                statusEnum == EApplyStatus.REJECTED ? EStepStatus.FAIL : EStepStatus.PASS,
-                                currentStep,
-                                application);
-                        return ResponseEntity.ok(
-                                new BaseResponse("Cập nhật thành công!", HttpStatus.OK.value(), application)
-                        );
-                    }
-                    if (statusEnum != EApplyStatus.REJECTED && statusEnum != EApplyStatus.PROCESSING) {
-                        return ResponseEntity.ok(
-                                new BaseResponse("Trạng thái không hợp lệ!", HttpStatus.FORBIDDEN.value(), application)
-                        );
-                    }
-                    System.out.println("so 2");
-                    application.setStatus(statusEnum);
-                    application.setCurrentStep(statusEnum != EApplyStatus.REJECTED ? application.getCurrentStep() + 1 : application.getCurrentStep());
-                    applicationRepository.save(application);
-                    stepResultService.create(
-                            result,
-                            statusEnum == EApplyStatus.REJECTED ? EStepStatus.FAIL : EStepStatus.PASS,
-                            currentStep,
-                            application);
-                    return ResponseEntity.ok(
-                            new BaseResponse("Cập nhật thành công!", HttpStatus.OK.value(), application)
-                    );
-
-                }
-
-                if (currentStep == totalStep - 1) {
-                    if (statusEnum != EApplyStatus.REJECTED && statusEnum != EApplyStatus.APPROVED) {
-                        return ResponseEntity.ok(
-                                new BaseResponse("Trạng thái không hợp lệ!", HttpStatus.FORBIDDEN.value(), application)
-                        );
-                    }
-
-                    System.out.println("so 3");
-                    application.setStatus(statusEnum);
-                    applicationRepository.save(application);
-                    stepResultService.create(
-                            result,
-                            statusEnum == EApplyStatus.REJECTED ? EStepStatus.FAIL : EStepStatus.PASS,
-                            currentStep,
-                            application);
-                    return ResponseEntity.ok(
-                            new BaseResponse("Cập nhật thành công!", HttpStatus.OK.value(), application)
-                    );
-                }
-
-                if (statusEnum != EApplyStatus.REJECTED && statusEnum != EApplyStatus.PROCESSING) {
-                    return ResponseEntity.ok(
-                            new BaseResponse("Trạng thái không hợp lệ!", HttpStatus.FORBIDDEN.value(), application)
-                    );
-                }
-                System.out.println("so 4");
+                //123
                 application.setStatus(statusEnum);
-                application.setCurrentStep(statusEnum != EApplyStatus.REJECTED ? application.getCurrentStep() + 1 : application.getCurrentStep());
                 applicationRepository.save(application);
-                stepResultService.create(
-                        result,
-                        statusEnum == EApplyStatus.REJECTED ? EStepStatus.FAIL : EStepStatus.PASS,
-                        currentStep,
-                        application);
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        String text = "";
+                        if (statusEnum == EApplyStatus.PROCESSING) {
+                            text = "đang phỏng vấn";
+                        } else if (statusEnum == EApplyStatus.APPROVED) {
+                            text = "thành công";
+                        } else if (statusEnum == EApplyStatus.REJECTED) {
+                            text = "thất bại";
+                        }
+                        if (text != "") {
+                            mailService.sendEmail(application.getCandidate().getUser().getEmail(), application.getCandidate().getUser().getEmail(),
+                                    "Đơn ứng tuyển vị trí " + application.getJob().getName() + " của bạn đã được chuyển trang thái thành " + text + "!", "EMAIL_TEMPLATE");
+                        }
+
+                    } catch (MessagingException e) {
+                        System.out.println("Failed to send email to: " + application.getCandidate().getUser().getEmail());
+                    }
+                });
                 return ResponseEntity.ok(
-                        new BaseResponse("Cập nhật thành công!", HttpStatus.OK.value(), application)
+                        new BaseResponse("Cập nhật thành công!", HttpStatus.OK.value(), null)
                 );
             }
 
             return ResponseEntity.ok(
                     new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
             );
-        } catch(MessagingException e){
-            return ResponseEntity.ok(new BaseResponse("Tên mail không hợp lệ!", 500, null));
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
@@ -1277,26 +1115,26 @@ public class ApplicationController {
         }
     }
 
-    @Operation(summary = "create step status", description = "", tags = {})
-    @PostMapping("/createStepSchedule/{id}")
+    @Operation(summary = "create Schedule", description = "", tags = {})
+    @PostMapping("/createSchedule/{id}")
     public ResponseEntity<BaseResponse> createSchedule(@RequestHeader("Authorization") String token,
                                                        @PathVariable("id") String id,
-                                                       @RequestBody StepScheduleRequest stepScheduleRequest
-                                                       ) {
+                                                       @RequestBody ScheduleRequest scheduleRequest
+    ) {
         try {
-            boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
-            if (!permission)
-                return ResponseEntity.ok(
-                        new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
-                );
 
             String email = jwtService.extractUsername(token.substring(7));
 
+            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER) ||
+                    checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR);
+            if (!hasPermission) {
+                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
+            }
 
             Optional<User> userOptional = userRepository.findByEmail(email);
             if (userOptional.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm  người dùng!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
             User user = userOptional.get();
@@ -1308,47 +1146,37 @@ public class ApplicationController {
                 );
             }
             Application application = applicationOptional.get();
-            int totalStep = Math.toIntExact(stepService.countAllByProcessId(application.getJob().getProcess().getId()));
             if (Objects.equals(user.getId(), application.getJob().getHumanResource().getUser().getId())
                     || Objects.equals(user.getId(), application.getJob().getHumanResource().getEmployer().getUser().getId())) {
 
-
-
-                Optional<StepSchedule> stepSchedule = stepScheduleService.findByApplicationIdAndStepNumber(id, stepScheduleRequest.stepNumber());
-                if(stepSchedule.isPresent()){
-                    return ResponseEntity.ok(
-                            new BaseResponse("Lịch hẹn của bước này đã được tạo!", HttpStatus.BAD_REQUEST.value(), null)
-                    );
-                }
-                if(stepScheduleRequest.stepNumber()>=totalStep){
-                    return ResponseEntity.ok(
-                            new BaseResponse("Số bước không hợp lệ!", HttpStatus.OK.value(), application)
-                    );
-                }
-                LocalDateTime endDate = stepScheduleRequest.startDate().plusHours(stepScheduleRequest.hour());
-                StepSchedule stepSchedule1 = stepScheduleService.create(
-                        stepScheduleRequest.name(),
-                        stepScheduleRequest.startDate(),
-                        endDate,stepScheduleRequest.color(),
-                        stepScheduleRequest.stepNumber(),
+                LocalDateTime endDate = scheduleRequest.startDate().plusHours(scheduleRequest.hour());
+                Schedule schedule1 = scheduleService.create(
+                        scheduleRequest.name(),
+                        scheduleRequest.description(),
+                        scheduleRequest.startDate(),
+                        endDate, scheduleRequest.color(),
                         application);
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
-                String formattedStartDate = stepScheduleRequest.startDate().format(formatter);
+                String formattedStartDate = scheduleRequest.startDate().format(formatter);
                 String formattedEndDate = endDate.format(formatter);
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        mailService.sendEmail(application.getCandidate().getUser().getEmail(), application.getCandidate().getUser().getEmail(),
+                                "Đơn ứng tuyển vị trí " + application.getJob().getName() + " của bạn đã được tạo 1 lịch hẹn mới vào " + formattedStartDate + " và kết thúc vào " + formattedEndDate + "!", "EMAIL_TEMPLATE");
+                    } catch (MessagingException e) {
+                        System.out.println("Failed to send email to: " + application.getCandidate().getUser().getEmail());
+                    }
+                });
 
-                mailService.sendEmail(application.getCandidate().getUser().getEmail(), application.getCandidate().getUser().getEmail(),
-                        "Đơn ứng tuyển vị trí "+application.getJob().getName()+" của bạn đã được tạo 1 lịch hẹn mới vào "+formattedStartDate+" và kết thúc vào "+formattedEndDate+"!","EMAIL_TEMPLATE");
                 return ResponseEntity.ok(
-                        new BaseResponse("Tạo lịch hẹn thành công!", HttpStatus.OK.value(), stepSchedule1)
+                        new BaseResponse("Tạo lịch hẹn thành công!", HttpStatus.OK.value(), schedule1)
                 );
             }
 
             return ResponseEntity.ok(
                     new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
             );
-        } catch(MessagingException e){
-            return ResponseEntity.ok(new BaseResponse("Tên mail không hợp lệ!", 500, null));
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
@@ -1358,11 +1186,13 @@ public class ApplicationController {
         }
     }
 
-    @Operation(summary = "detail step status", description = "", tags = {})
-    @GetMapping("/detailStepSchedule/{id}")
-    public ResponseEntity<BaseResponse> getDetailStepSchedule(@RequestHeader("Authorization") String token,
-                                                       @PathVariable("id") String id) {
+    @Operation(summary = "detail Schedule", description = "", tags = {})
+    @GetMapping("/detailSchedule/{id}")
+    public ResponseEntity<BaseResponse> getDetailSchedule(@RequestHeader("Authorization") String token,
+                                                          @PathVariable("id") String id) {
         try {
+            String email = jwtService.extractUsername(token.substring(7));
+
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR)
                     || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER)
                     || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
@@ -1370,88 +1200,30 @@ public class ApplicationController {
                 return ResponseEntity.ok(
                         new BaseResponse("Bạn không có quyền!", HttpStatus.FORBIDDEN.value(), null)
                 );
-            String email = jwtService.extractUsername(token.substring(7));
 
             Optional<User> userOptional = userRepository.findByEmail(email);
             if (userOptional.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm người dùng!", HttpStatus.NOT_FOUND.value(), null)
+                        new BaseResponse("Không tìm thấy người dùng!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
             User user = userOptional.get();
 
-            Optional<StepSchedule> stepScheduleOptional = stepScheduleService.findById(id);
-            if(stepScheduleOptional.isEmpty()){
+
+            Optional<Schedule> scheduleOptional = scheduleService.findById(id);
+            if (scheduleOptional.isEmpty()) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Không tìm thấy lịch hẹn!", HttpStatus.BAD_REQUEST.value(), null)
+                        new BaseResponse("Không tìm thấy lịch hẹn!", HttpStatus.NOT_FOUND.value(), null)
                 );
             }
 
-            StepSchedule stepSchedule = stepScheduleOptional.get();
+            Schedule schedule = scheduleOptional.get();
 
-            if (Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getUser().getId())
-                    || Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getEmployer().getUser().getId())
-                    || Objects.equals(user.getId(), stepSchedule.getApplication().getCandidate().getUser().getId())) {
-
-                List<StepResponse> stepResponses;
-                if (stepSchedule.getApplication().getJob().getProcess() != null) {
-                    Page<Step> steps = stepService.findByProcessId(stepSchedule.getApplication().getJob().getProcess().getId(), Pageable.unpaged());
-
-                    List<Step> stepList = steps.getContent();
-                    stepResponses = stepList.stream()
-                            .map(step -> new StepResponse(
-                                    step.getId(),
-                                    step.getName(),
-                                    step.getNumber(),
-                                    step.getDescription(),
-                                    step.getProcess() != null ? step.getProcess().getId() : null
-                            ))
-                            .collect(Collectors.toList());
-                    stepResponses.sort(Comparator.comparingInt(StepResponse::number));
-                } else {
-                    stepResponses = Collections.emptyList();
-                }
-                JobProcessResponse processResponse =new JobProcessResponse(
-                        stepSchedule.getApplication().getJob().getProcess().getId(),
-                        stepSchedule.getApplication().getJob().getProcess().getDescription(),
-                        stepResponses
-                );
-
-                JobResponse jobResponse = new JobResponse(
-                        stepSchedule.getApplication().getJob().getId(),
-                        stepSchedule.getApplication().getJob().getCreated(),
-                        stepSchedule.getApplication().getJob().getUpdated(),
-                        stepSchedule.getApplication().getJob().getToDate(),
-                        stepSchedule.getApplication().getJob().getName(),
-                        stepSchedule.getApplication().getJob().getDescription(),
-                        stepSchedule.getApplication().getJob().getExperience(),
-                        stepSchedule.getApplication().getJob().getFromSalary(),
-                        stepSchedule.getApplication().getJob().getToSalary(),
-                        stepSchedule.getApplication().getJob().getLocation(),
-                        stepSchedule.getApplication().getJob().getStatus(),
-                        false,
-                        false,
-                        DateFunc.isExpired(stepSchedule.getApplication().getJob().getToDate()),
-                        false,
-                        null,
-                        null,
-                        null,
-                        processResponse,
-                        null
-                );
-
-                StepScheduleResponse  stepScheduleResponse = new StepScheduleResponse(
-                        stepSchedule.getId(),
-                        stepSchedule.getName(),
-                        stepSchedule.getStepNumber(),
-                        stepSchedule.getColor(),
-                        stepSchedule.getStartDate(),
-                        stepSchedule.getEndDate(),
-                        stepSchedule.getApplication(),
-                        jobResponse
-                );
+            if (Objects.equals(user.getId(), schedule.getApplication().getJob().getHumanResource().getUser().getId())
+                    || Objects.equals(user.getId(), schedule.getApplication().getJob().getHumanResource().getEmployer().getUser().getId())
+                    || Objects.equals(user.getId(), schedule.getApplication().getCandidate().getUser().getId())) {
                 return ResponseEntity.ok(
-                        new BaseResponse("Chi tiết lịch hẹn!", HttpStatus.OK.value(), stepScheduleResponse)
+                        new BaseResponse("Chi tiết lịch hẹn!", HttpStatus.OK.value(), schedule)
                 );
             }
 
@@ -1466,12 +1238,13 @@ public class ApplicationController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-    @Operation(summary = "update step status", description = "", tags = {})
-    @PatchMapping("/updateStepSchedule/{id}")
+
+    @Operation(summary = "update schedule", description = "", tags = {})
+    @PatchMapping("/updateSchedule/{id}")
     public ResponseEntity<BaseResponse> updateSchedule(@RequestHeader("Authorization") String token,
-                                                                @PathVariable("id") String id,
-                                                                @RequestBody StepScheduleRequest stepScheduleRequest
-                                                                ) {
+                                                       @PathVariable("id") String id,
+                                                       @RequestBody ScheduleRequest scheduleRequest
+    ) {
         try {
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
             if (!permission)
@@ -1490,21 +1263,34 @@ public class ApplicationController {
             }
             User user = userOptional.get();
 
-            Optional<StepSchedule> stepScheduleOptional = stepScheduleService.findById(id);
-            if(stepScheduleOptional.isEmpty()){
+            Optional<Schedule> stepScheduleOptional = scheduleService.findById(id);
+            if (stepScheduleOptional.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy lịch hẹn!", HttpStatus.BAD_REQUEST.value(), null)
                 );
             }
-            StepSchedule stepSchedule = stepScheduleOptional.get();
-            if (Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getUser().getId())
-                    || Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getEmployer().getUser().getId())) {
+            Schedule schedule = stepScheduleOptional.get();
+            if (Objects.equals(user.getId(), schedule.getApplication().getJob().getHumanResource().getUser().getId())
+                    || Objects.equals(user.getId(), schedule.getApplication().getJob().getHumanResource().getEmployer().getUser().getId())) {
 
-                LocalDateTime endDate = stepScheduleRequest.startDate().plusHours(stepScheduleRequest.hour());
-                StepSchedule stepSchedule1 = stepScheduleService.update(stepScheduleOptional.get(),stepScheduleRequest.name(), stepScheduleRequest.startDate(),endDate,stepScheduleRequest.color());
-
+                LocalDateTime endDate = scheduleRequest.startDate().plusHours(scheduleRequest.hour());
+                Schedule schedule1 = scheduleService.update(stepScheduleOptional.get(),
+                        scheduleRequest.name(),
+                        scheduleRequest.startDate(),
+                        endDate, scheduleRequest.color(),
+                        scheduleRequest.description());
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
+                String formattedStartDate = schedule1.getStartDate().format(formatter);
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        mailService.sendEmail(schedule.getApplication().getCandidate().getUser().getEmail(), schedule.getApplication().getCandidate().getUser().getEmail(),
+                                "Đơn ứng tuyển vị trí " + schedule.getApplication().getJob().getName() + " của bạn có 1 lịch hẹn vào lúc " + formattedStartDate + " đã được cập nhật!", "EMAIL_TEMPLATE");
+                    } catch (MessagingException e) {
+                        System.out.println("Failed to send email to: " + schedule.getApplication().getCandidate().getUser().getEmail());
+                    }
+                });
                 return ResponseEntity.ok(
-                        new BaseResponse("Cập nhật lịch hẹn thành công thành công!", HttpStatus.OK.value(), stepSchedule1)
+                        new BaseResponse("Cập nhật lịch hẹn thành công thành công!", HttpStatus.OK.value(), schedule1)
                 );
             }
 
@@ -1519,8 +1305,9 @@ public class ApplicationController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-    @Operation(summary = "delete step status", description = "", tags = {})
-    @DeleteMapping("/deleteStepSchedule/{id}")
+
+    @Operation(summary = "delete Schedule", description = "", tags = {})
+    @DeleteMapping("/deleteSchedule/{id}")
     public ResponseEntity<BaseResponse> deleteSchedule(@RequestHeader("Authorization") String token, @PathVariable("id") String id) {
         try {
             boolean permission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.HR) || checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.EMPLOYER);
@@ -1540,17 +1327,26 @@ public class ApplicationController {
             }
             User user = userOptional.get();
 
-            Optional<StepSchedule> stepScheduleOptional = stepScheduleService.findById(id);
-            if(stepScheduleOptional.isEmpty()){
+            Optional<Schedule> stepScheduleOptional = scheduleService.findById(id);
+            if (stepScheduleOptional.isEmpty()) {
                 return ResponseEntity.ok(
                         new BaseResponse("Không tìm thấy lịch hẹn!", HttpStatus.BAD_REQUEST.value(), null)
                 );
             }
-            StepSchedule stepSchedule = stepScheduleOptional.get();
-            if (Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getUser().getId())
-                    || Objects.equals(user.getId(), stepSchedule.getApplication().getJob().getHumanResource().getEmployer().getUser().getId())) {
-                stepScheduleService.delete(stepSchedule);
-
+            Schedule schedule = stepScheduleOptional.get();
+            if (Objects.equals(user.getId(), schedule.getApplication().getJob().getHumanResource().getUser().getId())
+                    || Objects.equals(user.getId(), schedule.getApplication().getJob().getHumanResource().getEmployer().getUser().getId())) {
+                scheduleService.delete(schedule);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
+                String formattedStartDate = schedule.getStartDate().format(formatter);
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        mailService.sendEmail(schedule.getApplication().getCandidate().getUser().getEmail(), schedule.getApplication().getCandidate().getUser().getEmail(),
+                                "Đơn ứng tuyển vị trí " + schedule.getApplication().getJob().getName() + " của bạn có 1 lịch hẹn vào lúc " + formattedStartDate + " đã được xóa!", "EMAIL_TEMPLATE");
+                    } catch (MessagingException e) {
+                        System.out.println("Failed to send email to: " + schedule.getApplication().getCandidate().getUser().getEmail());
+                    }
+                });
                 return ResponseEntity.ok(
                         new BaseResponse("Xóa lịch hẹn thành công thành công!", HttpStatus.OK.value(), null)
                 );
@@ -1567,48 +1363,7 @@ public class ApplicationController {
                     .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
-    @GetMapping("/isApplied/{id}")
-    public ResponseEntity<?> isApplied(
-            @RequestHeader("Authorization") String token,
-            @PathVariable("id") String jobId
-    ) {
-        try {
-            String username = jwtService.extractUsername(token.substring(7));
-            boolean hasPermission = checkPermission.hasPermission(token, EStatus.ACTIVE, ERole.CANDIDATE);
-            if (!hasPermission) {
-                return ResponseEntity.ok(new BaseResponse("Người dùng không được phép", HttpStatus.FORBIDDEN.value(), null));
-            }
 
-            Optional<Candidate> optionalCandidate = candidateService.findByUserEmail(username);
-            if (optionalCandidate.isEmpty()) {
-                return ResponseEntity.ok(new BaseResponse("Không tìm thấy ứng viên", HttpStatus.NOT_FOUND.value(), null));
-            }
-
-            Optional<Job> optionalJob = jobService.findById(jobId);
-            if (optionalJob.isEmpty()) {
-                return ResponseEntity.ok(new BaseResponse("Không tìm thấy công việc ", HttpStatus.NOT_FOUND.value(), null));
-            }
-
-
-            if (applicationService.findByJobIdAndCandidateId(jobId, optionalCandidate.get().getId()).isPresent())
-                return ResponseEntity.ok(
-                        new BaseResponse("Đã ứng tuyển ", HttpStatus.BAD_REQUEST.value(), true)
-                );
-            else
-                return ResponseEntity.ok(
-                        new BaseResponse("Chưa ứng tuyển ", HttpStatus.BAD_REQUEST.value(), false)
-                );
-        } catch (ExpiredJwtException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse("Có lỗi xảy ra!", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
-    }
 }
-
-//    }
 
 

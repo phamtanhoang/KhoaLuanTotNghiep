@@ -11,6 +11,7 @@ interface ListDataReducerState {
   procedures: ProcedureModel[];
   skills: SkillModel[];
   steps: StepModel[];
+  schedules: ScheduleModel[];
   tags: TagModel[];
   applications: ApplicationModel[];
   messages: MessageModel[];
@@ -29,6 +30,7 @@ const initialState: ListDataReducerState = {
   procedures: [],
   skills: [],
   steps: [],
+  schedules: [],
   tags: [],
   applications: [],
   messages: [],
@@ -89,6 +91,9 @@ export const listDataReducer = createSlice({
     ONCHANGE_STEP_LIST: (state, action: PayloadAction<StepModel[]>) => {
       state.steps = action.payload;
     },
+    ONCHANGE_SCHEDULE_LIST: (state, action: PayloadAction<ScheduleModel[]>) => {
+      state.schedules = action.payload;
+    },
     ONCHANGE_TAG_LIST: (state, action: PayloadAction<TagModel[]>) => {
       state.tags = action.payload;
     },
@@ -141,6 +146,7 @@ export const {
   ONCHANGE_APPLICATION_LIST,
   ONCHANGE_MESSAGE_LIST,
   ONCHANGE_VIP_LIST,
+  ONCHANGE_SCHEDULE_LIST,
 } = listDataReducer.actions;
 
 export default listDataReducer.reducer;

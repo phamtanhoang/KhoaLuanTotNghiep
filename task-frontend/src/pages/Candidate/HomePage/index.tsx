@@ -144,12 +144,11 @@ const HomePage: React.FC = () => {
           )}
         </div>
       </section>
-      
 
       <RecentJobs />
       <PopularJobs />
       <JobSuitable />
-      <section className="pb-12 lg:pb-16">
+      <section className="py-12 lg:py-16">
         <div className="px-5 lg:px-28">
           <div className="text-center">
             <h2 className="text-3xl font-bold">
