@@ -110,7 +110,7 @@ const DetailSchedule = (props: any) => {
   };
 
   const _onClickDetail = () => {
-    // setId(application?.id);
+
     setFuncs(ModalConstants.APPLICATION_KEYS.applycationDetail);
   };
   return (

@@ -220,7 +220,7 @@ const JobsPage: React.FC = () => {
                       location={job?.location}
                       tags={job?.tags}
                       description={job?.description}
-                      totalStep={job?.steps?.length || 1}
+                      totalStep={job?.process?.steps?.length || 1}
                       _onClickApplyJob={_onClickApplyJob}
                       _onClickLogin={_onClickLogin}
                       _onClickSaveJob={_onClickSaveJob}

@@ -12,10 +12,6 @@ const SchedulePage = () => {
   const dispatch = useDispatch();
   const { eventList } = useSelector((state: any) => state.scheduleReducer);
 
-  const [open, setOpen] = useState(false);
-  const [funcs, setFuncs] = useState<string>("");
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
   const fetchScheduleData = () => {
     context.handleOpenLoading();
     scheduleService
@@ -28,6 +24,7 @@ const SchedulePage = () => {
             end: new Date(item.endDate),
             title: item.name,
             color: item.color,
+            application: item?.application,
           }));
           dispatch(ONLOAD_EVENTLIST(convertedData));
         } else {
@@ -47,13 +44,6 @@ const SchedulePage = () => {
 
   return (
     <>
-      <ModalBase
-        open={open}
-        handleClose={handleClose}
-        funcs={funcs}
-        setFuncs={setFuncs}
-        fetchData={fetchScheduleData}
-      />
       <div className="relative w-full py-2 bg-body">
         <div className="bg-white  h-[100vh]">
           <Schedule value={eventList} fetchScheduleData={fetchScheduleData} />

@@ -83,10 +83,12 @@ const ApplyJob = (props: any) => {
             fetchData(id);
             SwalHelper.MiniAlert(res.data.Message, "success");
           } else {
+            console.log("321");
             SwalHelper.MiniAlert(res.data.Message, "error");
           }
         })
         .catch(() => {
+          console.log("123");
           SwalHelper.MiniAlert("Có lỗi xảy ra!", "error");
         })
         .finally(() => {
@@ -316,16 +318,16 @@ const ApplyJob = (props: any) => {
                     type="checkbox"
                     className="cursor-pointer relative h-4 w-4 rounded-md border my-auto accent-bgBlue"
                     checked={checked == "generate" ? true : false}
-                    disabled={candidate?.cV ? false : true}
+                    // disabled={candidate?.cV ? false : true}
                     onClick={() => {
-                      candidate?.cV && setChecked("generate");
+                      setChecked("generate");
                     }}
                   />
                   <label
                     htmlFor="isExChange"
                     className="cursor-pointer text-slate-500 flex justify-center items-center font-bold pl-2 pr-2 bg-slate-200 uppercase text-xs py-0.5"
                     onClick={() => {
-                      candidate?.cV && setChecked("generate");
+                      setChecked("generate");
                     }}
                   >
                     Tạo CV từ thông tin cá nhân

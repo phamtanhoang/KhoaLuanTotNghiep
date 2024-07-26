@@ -152,10 +152,9 @@ public class ProcessController {
                 step.setDescription(stepRequest.description());
                 stepService.create(step);
             }
-
             processService.update(createdProcess);
 
-            return ResponseEntity.ok(new BaseResponse("Cập nhật quy trình thành công", HttpStatus.OK.value(), createdProcess));
+            return ResponseEntity.ok(new BaseResponse("Cập nhật quy trình thành công", HttpStatus.OK.value(), null));
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new BaseResponse("Token đã hết hạn", HttpStatus.UNAUTHORIZED.value(), null));

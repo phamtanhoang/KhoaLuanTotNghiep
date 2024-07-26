@@ -36,7 +36,7 @@ const JobDetailPage = () => {
       .saveJob(id!)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          fetchData();
+          fetchData(id);
           SwalHelper.MiniAlert(res.data.Message, "success");
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
@@ -55,7 +55,7 @@ const JobDetailPage = () => {
       .unSaveJob(id!)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
-          fetchData();
+          fetchData(id);
           SwalHelper.MiniAlert(res.data.Message, "success");
         } else {
           SwalHelper.MiniAlert(res.data.Message, "error");
@@ -68,10 +68,10 @@ const JobDetailPage = () => {
         context.handleCloseLoading();
       });
   };
-  const fetchData = async () => {
+  const fetchData = async (id: any) => {
     context.handleOpenLoading();
     jobsService
-      .getDetail_Public(id!)
+      .getDetail_Public(id)
       .then((res) => {
         if (res.status === 200 && res.data.Status === 200) {
           setJob(res.data.Data);
@@ -89,11 +89,17 @@ const JobDetailPage = () => {
       });
   };
   useEffect(() => {
-    fetchData();
+    fetchData(id);
   }, [id]);
   return (
     <>
-      <ModalBase id={id} open={open} handleClose={handleClose} funcs={funcs} />
+      <ModalBase
+        id={id}
+        open={open}
+        handleClose={handleClose}
+        funcs={funcs}
+        fetchData={fetchData}
+      />
       <Hero
         title="Chi tiết tuyển dụng"
         linkSearch={PathConstants.CANDIDATE_PATHS.jobs}

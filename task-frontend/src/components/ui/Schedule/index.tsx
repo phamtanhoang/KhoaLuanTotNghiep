@@ -21,7 +21,7 @@ const Schedule: React.FC<ScheduleProps> = ({ value, fetchScheduleData }) => {
   const [subId, setSubId] = useState<any>("");
   const [id, setId] = useState<string>("");
   const _onSelectEvent = (event: Event) => {
-    console.log("object, ", event);
+    console.log("event,", event);
     setSubId(event?.event_id!);
     setId(event?.application?.id!);
     setFuncs(ModalConstants.APPLICATION_KEYS.detailSchedule);
